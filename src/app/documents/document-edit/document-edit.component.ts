@@ -5,7 +5,8 @@ import { MessageService } from 'primeng/components/common/messageservice';
 import { FileUploadModule } from 'primeng/fileupload';
 import { FileUploader } from 'ng2-file-upload';
 import { NormDocument } from '../document.model';
-import { NgForm } from '@angular/forms';
+import { NgForm, NgModel } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 const URL = 'http://localhost:4000/api/upload';
 
@@ -16,22 +17,6 @@ const URL = 'http://localhost:4000/api/upload';
 })
 export class DocumentEditComponent implements OnInit {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
-  /* @ViewChild('divisionInput', { static: false }) divisionInput: ElementRef;
-  @ViewChild('normNumberInput', { static: false }) normNumberInput: ElementRef;
-  @ViewChild('nameInput', { static: false }) nameInput: ElementRef;
-  @ViewChild('revisionInput', { static: false }) revisionInput: ElementRef;
-  @ViewChild('outputDateInput', { static: false }) outputDateInput: ElementRef;
-  @ViewChild('inputDateInput', { static: false }) inputDateInput: ElementRef;
-  @ViewChild('normFilePath', { static: false }) normFilePath: ElementRef;
-  @ViewChild('ownerInput', { static: false }) ownerInput: ElementRef;
-  @ViewChild('activationInterval', { static: false })
-  activationIntervalInput: ElementRef;
-  @ViewChild('sourceInput', { static: false }) sourceInput: ElementRef;
-  @ViewChild('sourceLoginInput', { static: false })
-  sourceLoginInput: ElementRef;
-  @ViewChild('sourcePasswordInput', { static: false })
-  sourcePasswordInput: ElementRef;
-  @ViewChild('activeInput', { static: false }) activeInput: ElementRef; */
 
   public uploader: FileUploader = new FileUploader({
     url: URL,
@@ -41,7 +26,9 @@ export class DocumentEditComponent implements OnInit {
   writeItem: NormDocument;
   divisions: any = [];
   owners: any = [];
-  private componentID = 200;
+
+  formTitle: string;
+
   activationIntervals = [
     'Kein update nötig',
     'Aktive Versorgung durch Kunden',
@@ -51,6 +38,7 @@ export class DocumentEditComponent implements OnInit {
     '- Quartalsweise',
     '- Jährlich'
   ];
+  id: string;
   type: string;
   division: string;
   normNumber: string;
@@ -59,6 +47,7 @@ export class DocumentEditComponent implements OnInit {
   outputDate: string;
   inputDate: string;
   normFilePath: string;
+  normFilePathTemp: string;
   owner: string;
   activationInterval: string;
   source: string;
@@ -77,19 +66,36 @@ export class DocumentEditComponent implements OnInit {
     this.onFetchDivisions();
     this.onFetchUsers();
 
+    this.uploader.onCompleteItem = (
+      item: any,
+      response: any,
+      status: any,
+      headers: any
+    ) => {
+      console.log('ImageUpload:uploaded:', item);
+      console.log('response:', response);
+      console.log('headers:', headers);
+
+      console.log(JSON.parse(response).fileName);
+      this.normFilePath = item.url + '/' + JSON.parse(response).fileName;
+    };
+
     this.route.params.subscribe(results => {
       if (results['id']) {
         console.log('Edit mode');
+        this.formTitle = 'Norm bearbeiten';
         this.couchDBService.fetchEntry('/' + results['id']).subscribe(entry => {
           console.log('Entry:');
           console.log(entry);
+          this.id = results['_id'];
           this.type = 'norm';
           this.division = entry['division'];
-          this.normNumber = entry['normNumber'];
+          this.normNumber = entry['number'];
           this.name = entry['name'];
           this.revision = entry['revision'];
           this.outputDate = entry['outputDate'];
           this.inputDate = entry['inputDate'];
+          this.normFilePathTemp = entry['normFilePathTemp'];
           this.normFilePath = entry['normFilePath'];
           this.owner = entry['owner'];
           this.activationInterval = entry['activationInterval'];
@@ -100,6 +106,7 @@ export class DocumentEditComponent implements OnInit {
         });
       } else {
         console.log('New mode');
+        this.formTitle = 'Neue Norm anlegen';
       }
     });
   }
@@ -124,6 +131,12 @@ export class DocumentEditComponent implements OnInit {
       });
   }
 
+  private onUpdateUsers(): void {
+    this.couchDBService.updateEntry(this.writeItem).subscribe(result => {
+      console.log(result);
+    });
+  }
+
   onCreate(form: NgForm) {
     console.log('onCreate: DocumentAddComponent');
 
@@ -144,13 +157,13 @@ export class DocumentEditComponent implements OnInit {
       active: Boolean(this.normForm.value.active)
     };
 
-    console.log(this.writeItem);
-
     this.couchDBService.writeEntry(this.writeItem).subscribe(result => {
       console.log(result);
     });
+  }
+}
 
-    /*
+/*
     {
       "type": "norm",
       "group": "",
@@ -190,7 +203,7 @@ export class DocumentEditComponent implements OnInit {
     }
     */
 
-    /* try {
+/* try {
       console.log('onCreate');
       this.couchDBService
         .writeEntry(this.writeItem)
@@ -201,5 +214,3 @@ export class DocumentEditComponent implements OnInit {
     } catch (error) {
       console.error(error);
     } */
-  }
-}

@@ -5,6 +5,7 @@ const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const app = express();
+let fileName = '';
 
 const DIR = './uploads';
 
@@ -14,10 +15,9 @@ let storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     console.log('File: ' + file.originalname);
-    cb(
-      null,
-      file.originalname + '-' + Date.now() + path.extname(file.originalname)
-    );
+    fileName =
+      file.originalname + '-' + Date.now() + path.extname(file.originalname);
+    cb(null, fileName);
   }
 });
 let upload = multer({ storage: storage });
@@ -49,7 +49,8 @@ app.post('/api/upload', upload.single('myfile'), function(req, res) {
   } else {
     console.log('file received');
     return res.send({
-      success: true
+      success: true,
+      fileName: fileName
     });
   }
 });

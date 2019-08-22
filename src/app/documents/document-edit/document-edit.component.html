@@ -1,11 +1,22 @@
-<h3>Norm anlegen / bearbeiten</h3>
+<div class="row">
+  <div class="col">
+    <h4>{{ formTitle }}</h4>
+    <h5 *ngIf="normNumber">{{ normNumber }} - {{ name }}</h5>
+    <hr />
+  </div>
+</div>
+
 <div class="row">
   <div class="col">
     <form class="form" (ngSubmit)="onCreate()" #normForm="ngForm">
       <div class="form-group">
         <select class="form-control" ngModel name="division">
           <option value="">Bereich wählen</option>
-          <option *ngFor="let item of divisions" [value]="item._id">
+          <option
+            *ngFor="let item of divisions"
+            [value]="item._id"
+            [selected]="item.id == id"
+          >
             {{ item.name }}
           </option>
         </select>
@@ -15,7 +26,7 @@
           type="text"
           class="form-control"
           placeholder="Nummer"
-          ngModel
+          [(ngModel)]="normNumber"
           name="normNumber"
           required
         />
@@ -26,7 +37,7 @@
           class="form-control"
           placeholder="Name"
           required
-          ngModel
+          [(ngModel)]="name"
           name="name"
         />
       </div>
@@ -35,7 +46,7 @@
           type="text"
           class="form-control"
           placeholder="Ausgabe / Revision"
-          ngModel
+          [(ngModel)]="revision"
           name="revision"
         />
       </div>
@@ -44,7 +55,7 @@
           type="date"
           class="form-control"
           placeholder="Ausgabedatum"
-          ngModel
+          [(ngModel)]="outputDate"
           name="outputDate"
         />
       </div>
@@ -53,18 +64,19 @@
           type="date"
           class="form-control"
           placeholder="Eingangsdatum ACP"
-          ngModel
+          [(ngModel)]="inputDate"
           name="inputDate"
         />
       </div>
       <div class="form-group">
+        <input type="hidden" [(ngModel)]="normFilePath" name="normFilePath" />
         <input
           type="file"
-          name="normFilePath"
+          name="normFilePathTemp"
           ng2FileSelect
           [uploader]="uploader"
-          ngModel
-          name="normFilePath"
+          [(ngModel)]="normFilePathTemp"
+          name="normFilePathTemp"
         />
         <button
           type="button"
@@ -76,21 +88,30 @@
         </button>
       </div>
       <div class="form-group">
-        <select class="form-control" ngModel name="owner">
+        <select class="form-control" [(ngModel)]="owner" name="owner">
           <option value="">Owner wählen</option>
-          <option *ngFor="let owner of owners" [value]="owner._id">
+          <option
+            *ngFor="let owner of owners"
+            [value]="owner._id"
+            [selected]="owner._id == owner"
+          >
             {{ owner.lastName }}, {{ owner.firstName }}
           </option>
         </select>
       </div>
       <div class="form-group">
-        <select class="form-control" ngModel name="activationInterval">
+        <select
+          class="form-control"
+          [(ngModel)]="activationInterval"
+          name="activationInterval"
+        >
           <option value="">Aktivierungs Intervall wählen</option>
           <option
-            *ngFor="let activationInterval of activationIntervals"
-            [value]="activationInterval"
+            *ngFor="let activationIntervalItem of activationIntervals"
+            [value]="activationIntervalItem"
+            [selected]="activationIntervalItem == activationInterval"
           >
-            {{ activationInterval }}
+            {{ activationIntervalItem }}
           </option>
         </select>
       </div>
@@ -99,7 +120,7 @@
           type="text"
           class="form-control"
           placeholder="Bezugsquelle"
-          ngModel
+          [(ngModel)]="source"
           name="source"
         />
       </div>
@@ -108,7 +129,7 @@
           type="text"
           class="form-control"
           placeholder="Bezugsquelle Login"
-          ngModel
+          [(ngModel)]="sourceLogin"
           name="sourceLogin"
         />
       </div>
@@ -117,13 +138,18 @@
           type="text"
           class="form-control"
           placeholder="Bezugsquelle Passwort"
-          ngModel
+          [(ngModel)]="sourcePassword"
           name="sourcePassword"
         />
       </div>
       <div class="form-group">
         <label>Aktiv ?</label>
-        <input type="checkbox" class="form-control" ngModel name="active" />
+        <input
+          type="checkbox"
+          class="form-control"
+          [(ngModel)]="active"
+          name="active"
+        />
       </div>
 
       <div class="form-group">
