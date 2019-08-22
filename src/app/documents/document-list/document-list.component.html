@@ -1,0 +1,11 @@
+<h2>Revisions Liste</h2>
+
+<div class="row">
+  <div class="col">
+    <ul *ngIf="documents?.length">
+      <li *ngFor="let document of documents">
+        <a [routerLink]="[document._id]">{{ document.name }}</a>
+      </li>
+    </ul>
+  </div>
+</div>
