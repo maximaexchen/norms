@@ -1,1 +1,136 @@
-<p>document-edit works!</p>
+<h3>Norm anlegen / bearbeiten</h3>
+<div class="row">
+  <div class="col">
+    <form class="form" (ngSubmit)="onCreate()" #normForm="ngForm">
+      <div class="form-group">
+        <select class="form-control" ngModel name="division">
+          <option value="">Bereich wählen</option>
+          <option *ngFor="let item of divisions" [value]="item._id">
+            {{ item.name }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Nummer"
+          ngModel
+          name="normNumber"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Name"
+          required
+          ngModel
+          name="name"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Ausgabe / Revision"
+          ngModel
+          name="revision"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="date"
+          class="form-control"
+          placeholder="Ausgabedatum"
+          ngModel
+          name="outputDate"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="date"
+          class="form-control"
+          placeholder="Eingangsdatum ACP"
+          ngModel
+          name="inputDate"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="file"
+          name="normFilePath"
+          ng2FileSelect
+          [uploader]="uploader"
+          ngModel
+          name="normFilePath"
+        />
+        <button
+          type="button"
+          class="btn btn-success btn-s"
+          (click)="uploader.uploadAll()"
+          [disabled]="!uploader.getNotUploadedItems().length"
+        >
+          Upload an Image
+        </button>
+      </div>
+      <div class="form-group">
+        <select class="form-control" ngModel name="owner">
+          <option value="">Owner wählen</option>
+          <option *ngFor="let owner of owners" [value]="owner._id">
+            {{ owner.lastName }}, {{ owner.firstName }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <select class="form-control" ngModel name="activationInterval">
+          <option value="">Aktivierungs Intervall wählen</option>
+          <option
+            *ngFor="let activationInterval of activationIntervals"
+            [value]="activationInterval"
+          >
+            {{ activationInterval }}
+          </option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Bezugsquelle"
+          ngModel
+          name="source"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Bezugsquelle Login"
+          ngModel
+          name="sourceLogin"
+        />
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Bezugsquelle Passwort"
+          ngModel
+          name="sourcePassword"
+        />
+      </div>
+      <div class="form-group">
+        <label>Aktiv ?</label>
+        <input type="checkbox" class="form-control" ngModel name="active" />
+      </div>
+
+      <div class="form-group">
+        <button class="btn btn-success" type="submit">
+          Anlegen
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

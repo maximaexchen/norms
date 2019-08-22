@@ -6,6 +6,7 @@ import { DocumentDetailComponent } from './documents/document-detail/document-de
 import { DocumentEditComponent } from './documents/document-edit/document-edit.component';
 import { DocumentsStartComponent } from './documents/documents-start/documents-start.component';
 import { DocumentResolve } from './documents/document-resolve.resolver';
+import { DocumentAddComponent } from './documents/document-add/document-add.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/documents', pathMatch: 'full' },

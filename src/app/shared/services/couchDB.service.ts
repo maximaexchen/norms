@@ -32,7 +32,6 @@ export class CouchDBService {
   }
 
   private fetchEntries(param: string): Observable<any> {
-    console.log(CouchDBService.DB_REQUEST + param);
     return this.http.get(CouchDBService.DB_REQUEST + param).pipe(
       map(responseData => {
         const entriesArray = [];
@@ -42,14 +41,12 @@ export class CouchDBService {
             entriesArray.push({ ...responseData['rows'][key]['doc'] });
           }
         }
-        console.log(entriesArray);
         return entriesArray;
       })
     );
   }
 
   fetchEntry(param: string): Observable<any> {
-    console.log(this.http.get(CouchDBService.DB_REQUEST + param));
     return this.http.get(CouchDBService.DB_REQUEST + param);
   }
 }

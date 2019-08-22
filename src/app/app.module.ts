@@ -7,16 +7,15 @@ import { FormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DocumentsComponent } from './documents/documents.component';
+import { DocumentsStartComponent } from './documents/documents-start/documents-start.component';
 import { DocumentListComponent } from './documents/document-list/document-list.component';
 import { DocumentDetailComponent } from './documents/document-detail/document-detail.component';
-import { DocumentAddComponent } from './documents/document-add/document-add.component';
+import { DocumentEditComponent } from './documents/document-edit/document-edit.component';
 
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { MessageService } from 'primeng/api';
 import { FileSelectDirective } from 'ng2-file-upload';
 import { HeaderComponent } from './header/header.component';
-import { DocumentEditComponent } from './documents/document-edit/document-edit.component';
-import { DocumentsStartComponent } from './documents/documents-start/documents-start.component';
 
 @NgModule({
   declarations: [
@@ -24,11 +23,9 @@ import { DocumentsStartComponent } from './documents/documents-start/documents-s
     DocumentsComponent,
     DocumentListComponent,
     DocumentDetailComponent,
-    DocumentAddComponent,
     FileSelectDirective,
     HeaderComponent,
     DocumentEditComponent,
-    DocumentsStartComponent,
     DocumentsStartComponent
   ],
   imports: [HttpClientModule, BrowserModule, AppRoutingModule, FormsModule],
