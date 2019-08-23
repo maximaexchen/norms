@@ -1,12 +1,9 @@
 import { ActivatedRoute } from '@angular/router';
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { MessageService } from 'primeng/components/common/messageservice';
-import { FileUploadModule } from 'primeng/fileupload';
 import { FileUploader } from 'ng2-file-upload';
 import { NormDocument } from '../document.model';
-import { NgForm, NgModel } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
+import { NgForm } from '@angular/forms';
 
 const URL = 'http://localhost:4000/api/upload';
 
@@ -23,12 +20,6 @@ export class DocumentEditComponent implements OnInit {
     itemAlias: 'myfile'
   });
 
-  writeItem: NormDocument;
-  divisions: any = [];
-  owners: any = [];
-
-  formTitle: string;
-
   activationIntervals = [
     'Kein update nötig',
     'Aktive Versorgung durch Kunden',
@@ -38,7 +29,15 @@ export class DocumentEditComponent implements OnInit {
     '- Quartalsweise',
     '- Jährlich'
   ];
+
+  writeItem: NormDocument;
+  divisions: any = [];
+  owners: any = [];
+
+  formTitle: string;
+  formState = false; // 0 = new - 1 = update
   id: string;
+  rev: string;
   type: string;
   division: string;
   normNumber: string;
@@ -55,6 +54,7 @@ export class DocumentEditComponent implements OnInit {
   sourcePassword: string;
   active: boolean;
 
+
   constructor(
     private couchDBService: CouchDBService,
     private route: ActivatedRoute
@@ -65,29 +65,20 @@ export class DocumentEditComponent implements OnInit {
 
     this.onFetchDivisions();
     this.onFetchUsers();
-
-    this.uploader.onCompleteItem = (
-      item: any,
-      response: any,
-      status: any,
-      headers: any
-    ) => {
-      console.log('ImageUpload:uploaded:', item);
-      console.log('response:', response);
-      console.log('headers:', headers);
-
-      console.log(JSON.parse(response).fileName);
-      this.normFilePath = item.url + '/' + JSON.parse(response).fileName;
-    };
+    this.initUploader();
 
     this.route.params.subscribe(results => {
+      // check if we are updating
       if (results['id']) {
         console.log('Edit mode');
+        this.formState = true;
         this.formTitle = 'Norm bearbeiten';
+
         this.couchDBService.fetchEntry('/' + results['id']).subscribe(entry => {
           console.log('Entry:');
           console.log(entry);
-          this.id = results['_id'];
+          this.id = entry['_id'];
+          this.rev = entry['_rev'];
           this.type = 'norm';
           this.division = entry['division'];
           this.normNumber = entry['number'];
@@ -104,11 +95,31 @@ export class DocumentEditComponent implements OnInit {
           this.sourcePassword = entry['sourcePassword'];
           this.active = entry['active'];
         });
+
       } else {
         console.log('New mode');
         this.formTitle = 'Neue Norm anlegen';
+        this.activationInterval = '';
+        this.division = '';
+        this.owner = '';
       }
     });
+  }
+
+  private initUploader() {
+    this.uploader.onCompleteItem = (
+      item: any,
+      response: any,
+      status: any,
+      headers: any
+    ) => {
+      /* console.log('ImageUpload:uploaded:', item);
+      console.log('response:', response);
+      console.log('headers:', headers);
+      console.log(JSON.parse(response).fileName); */
+      const realtivePathString = item.url.substring(item.url.lastIndexOf('/api') + 1);
+      this.normFilePath = realtivePathString + '/' + JSON.parse(response).fileName;
+    };
   }
 
   private onFetchDivisions(): void {
@@ -131,37 +142,69 @@ export class DocumentEditComponent implements OnInit {
       });
   }
 
-  private onUpdateUsers(): void {
-    this.couchDBService.updateEntry(this.writeItem).subscribe(result => {
+  onSubmit(): void  {
+    if (this.normForm.value.formState) {
+      console.log('Update a norm');
+      this.onUpdateDocument();
+    } else {
+      console.log('Create a norm');
+      this.onCreate();
+    }
+  }
+
+  private onUpdateDocument(): void {
+    // console.log(this.normForm);
+
+    this.createWriteItem();
+
+    this.couchDBService.updateEntry(this.writeItem, this.normForm.value._id ).subscribe(result => {
       console.log(result);
     });
   }
 
-  onCreate(form: NgForm) {
+  private onCreate(): void {
     console.log('onCreate: DocumentAddComponent');
 
-    this.writeItem = {
-      type: 'norm',
-      division: '' + this.normForm.value.division + '',
-      number: '' + this.normForm.value.normNumber + '',
-      name: '' + this.normForm.value.name,
-      revision: '' + this.normForm.value.revision + '',
-      outputDate: '' + this.normForm.value.outputDate + '',
-      inputDate: '' + this.normForm.value.inputDate + '',
-      normFilePath: '' + this.normForm.value.normFilePath + '',
-      owner: '' + this.normForm.value.owner + '',
-      activationInterval: '' + this.normForm.value.activationInterval + '',
-      source: '' + this.normForm.value.source + '',
-      sourceLogin: '' + this.normForm.value.sourceLogin + '',
-      sourcePassword: '' + this.normForm.value.sourcePassword + '',
-      active: Boolean(this.normForm.value.active)
-    };
+    this.createWriteItem();
 
     this.couchDBService.writeEntry(this.writeItem).subscribe(result => {
       console.log(result);
     });
   }
+
+  createWriteItem() {
+
+    this.writeItem = {};
+
+    this.writeItem['type'] = 'norm';
+    this.writeItem['division'] = this.normForm.value.division || '';
+    this.writeItem['number'] = this.normForm.value.normNumber || '';
+    this.writeItem['name'] = this.normForm.value.name || '';
+    this.writeItem['revision'] = this.normForm.value.revision || '';
+    this.writeItem['outputDate'] = this.normForm.value.outputDate || '';
+    this.writeItem['inputDate'] = this.normForm.value.inputDate || '';
+    this.writeItem['normFilePath'] = this.normForm.value.normFilePath || '';
+    this.writeItem['owner'] = this.normForm.value.owner || '';
+    this.writeItem['activationInterval'] = this.normForm.value.activationInterval || '';
+    this.writeItem['source'] = this.normForm.value.source || '';
+    this.writeItem['sourceLogin'] = this.normForm.value.sourceLogin || '';
+    this.writeItem['sourcePassword'] = this.normForm.value.sourcePassword || '';
+    this.writeItem['active'] = this.normForm.value.active || false;
+
+    if (this.normForm.value._id) {
+      this.writeItem['_id'] = this.normForm.value._id;
+    }
+
+    if (this.normForm.value._id) {
+      this.writeItem['_rev'] = this.normForm.value._rev;
+    }
+
+    console.log(this.writeItem);
+
+    return this.writeItem;
+  }
 }
+
 
 /*
     {

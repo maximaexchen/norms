@@ -6,6 +6,9 @@ import * as toId from '../../../../node_modules/to-id/to-id.js';
 import * as DocURI from '../../../../node_modules/docuri/index.js';
 import { Observable } from 'rxjs';
 
+// CouchDB Ubuntu Server
+/* $kP2ZernC */
+
 @Injectable()
 export class CouchDBService {
   private static readonly BASE_URL = 'http://127.0.0.1:5984/';
@@ -21,8 +24,12 @@ export class CouchDBService {
     return this.http.post(CouchDBService.DB_REQUEST, document);
   }
 
-  updateEntry(document: NormDocument) {
+  /* updateEntry(document: NormDocument) {
     return this.http.put(CouchDBService.DB_REQUEST, document);
+  } */
+  updateEntry(document: NormDocument, id: string) {
+    console.log(id);
+    return this.http.put(CouchDBService.DB_REQUEST + '/' + id , document);
   }
 
   readEntry(param: string): Observable<any> {

@@ -8,14 +8,17 @@
 
 <div class="row">
   <div class="col">
-    <form class="form" (ngSubmit)="onCreate()" #normForm="ngForm">
+    <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
+    <input type="hidden" [(ngModel)]="formState" name="formState" >
+    <input type="hidden" [(ngModel)]="id" name="_id" >
+    <input type="hidden" [(ngModel)]="rev" name="_rev" >
       <div class="form-group">
-        <select class="form-control" ngModel name="division">
+        <select class="form-control" [(ngModel)]="division" name="division">
           <option value="">Bereich wählen</option>
           <option
             *ngFor="let item of divisions"
             [value]="item._id"
-            [selected]="item.id == id"
+            [selected]="item._id == id"
           >
             {{ item.name }}
           </option>
@@ -82,7 +85,7 @@
           type="button"
           class="btn btn-success btn-s"
           (click)="uploader.uploadAll()"
-          [disabled]="!uploader.getNotUploadedItems().length"
+          [disabled]="!uploader.getNotUploadedItems().length || !normNumber || !name"
         >
           Upload an Image
         </button>
@@ -104,8 +107,9 @@
           class="form-control"
           [(ngModel)]="activationInterval"
           name="activationInterval"
+          ng-init="activationInterval = options[0]"
         >
-          <option value="">Aktivierungs Intervall wählen</option>
+          <option value="" selected="selected">Aktivierungs Intervall wählen</option>
           <option
             *ngFor="let activationIntervalItem of activationIntervals"
             [value]="activationIntervalItem"

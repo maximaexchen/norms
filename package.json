@@ -24,7 +24,7 @@
     "bootstrap-sass": "^3.4.1",
     "couchdb-client": "^1.0.14",
     "docuri": "^4.2.2",
-    "dotenv": "^8.0.0",
+    "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "jquery": "^2.2.4",
     "multer": "^1.4.2",
