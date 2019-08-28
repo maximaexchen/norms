@@ -17,8 +17,8 @@ export class GroupListComponent implements OnInit {
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'group') {
-          console.log('Message1:');
-          console.log(message.text);
+          /*  console.log('Message1:');
+          console.log(message.text); */
           this.onFetchGroup();
         }
       });
@@ -31,9 +31,8 @@ export class GroupListComponent implements OnInit {
   private onFetchGroup(): void {
     this.groups = [];
     this.couchDBService
-      .readEntry('/_design/norms/_view/all-groups?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-groups?include_docs=true')
       .subscribe(results => {
-        console.log(results);
         results.forEach(item => {
           this.groups.push(item);
         });

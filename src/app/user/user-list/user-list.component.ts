@@ -30,7 +30,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   private onFetchUser(): void {
     this.users = [];
     this.couchDBService
-      .readEntry('/_design/norms/_view/all-users?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .subscribe(results => {
         results.forEach(item => {
           this.users.push(item);

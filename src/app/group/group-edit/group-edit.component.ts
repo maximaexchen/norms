@@ -107,7 +107,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
   private getUsers(): void {
     this.couchDBService
-      .readEntry('/_design/norms/_view/all-users?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .subscribe(results => {
         results.forEach(item => {
           const userObject = {} as User;

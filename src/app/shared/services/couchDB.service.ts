@@ -20,29 +20,22 @@ export class CouchDBService {
 
   constructor(private http: HttpClient) {}
 
-  writeEntry(document: NormDocument) {
+  public writeEntry(document: NormDocument) {
     return this.http.post(CouchDBService.DB_REQUEST, document);
   }
 
-  /* updateEntry(document: NormDocument) {
-    return this.http.put(CouchDBService.DB_REQUEST, document);
-  } */
-  updateEntry(document: NormDocument, id: string) {
+  public updateEntry(document: NormDocument, id: string) {
     console.log(id);
     return this.http.put(CouchDBService.DB_REQUEST + '/' + id, document);
   }
 
-  readEntry(param: string): Observable<any> {
-    return this.fetchEntries(param);
-  }
-
-  deleteEntry(id: string, rev: string): Observable<any> {
+  public deleteEntry(id: string, rev: string): Observable<any> {
     return this.http.delete(
       CouchDBService.DB_REQUEST + '/' + id + '?rev=' + rev
     );
   }
 
-  private fetchEntries(param: string): Observable<any> {
+  public fetchEntries(param: string): Observable<any> {
     return this.http.get(CouchDBService.DB_REQUEST + param).pipe(
       map(responseData => {
         const entriesArray = [];
@@ -57,15 +50,19 @@ export class CouchDBService {
     );
   }
 
-  fetchEntry(param: string): Observable<any> {
+  public fetchEntry(param: string): Observable<any> {
     return this.http.get(CouchDBService.DB_REQUEST + param);
   }
 
-  sendStateUpdate(message: string) {
+  public search(object: any): Observable<any> {
+    return this.http.post(CouchDBService.DB_REQUEST + '/_find', object);
+  }
+
+  public sendStateUpdate(message: string) {
     this.updateSubject.next({ text: message });
   }
 
-  setStateUpdate(): Observable<any> {
+  public setStateUpdate(): Observable<any> {
     return this.updateSubject.asObservable();
   }
 }

@@ -18,16 +18,17 @@ import { DocumentResolver } from 'src/app/shared/resolver/document.resolver';
 export class DocumentSearchComponent implements OnInit, OnDestroy {
   @ViewChild('searchForm', { static: false }) searchForm: NgForm;
 
-  routeSubsscription = new Subscription();
-  divisionSubscription = new Subscription();
-  userSubscription = new Subscription();
-  groupSubscription = new Subscription();
+  searchSubsscription = new Subscription();
+  foundDocuments: Document[];
 
   divisions: any = [];
+  divisionID: string;
   owners: User = [];
+  ownerID: string;
   users: User = [];
+  userID: string;
   groups: Group = [];
-  selectedtUsers: User = [];
+  groupID: string;
 
   constructor(
     private httpClient: HttpClient,
@@ -40,7 +41,7 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
   ngOnInit() {
     console.log('DocumentSearchComponent');
 
-    this.routeSubsscription = this.route.params.subscribe(results => {
+    this.searchSubsscription = this.route.params.subscribe(results => {
       this.divisions = this.documentService.getDivisions();
       this.owners = this.documentService.getUsers();
       this.groups = this.documentService.getGroups();
@@ -49,12 +50,57 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
   }
 
   private onSubmit(): void {
-    console.log(this.searchForm);
+    /*  console.log(this.searchForm); */
+
+    if (this.searchForm.value.division !== undefined) {
+      this.divisionID = this.searchForm.value.division;
+    }
+
+    if (this.searchForm.value.owner !== undefined) {
+      this.ownerID = this.searchForm.value.owner;
+    }
+
+    if (this.searchForm.value.group !== undefined) {
+      this.groupID = this.searchForm.value.group;
+    }
+
+    if (this.searchForm.value.user !== undefined) {
+      this.userID = this.searchForm.value.user;
+    }
+
+    const searchObject = {
+      use_index: ['searchkeys'],
+      selector: {
+        $or: [
+          {
+            division: this.divisionID
+          },
+          {
+            users: {
+              $elemMatch: {
+                $eq: this.userID
+              }
+            }
+          },
+          {
+            owner: this.ownerID
+          }
+        ]
+      }
+    };
+
+    // http://127.0.0.1:5984/norm_documents/_design/norms/_view/norm-users?startkey=
+    // ["2a350192903b8d08259b69d22700c2d4",1]&endkey=["2a350192903b8d08259b69d22700c2d4",10]&include_docs=true
+
+    this.searchSubsscription = this.couchDBService
+      .search(searchObject)
+      .subscribe(results => {
+        this.foundDocuments = results.docs;
+        console.log(results);
+      });
   }
 
   ngOnDestroy(): void {
-    this.routeSubsscription.unsubscribe();
-    this.divisionSubscription.unsubscribe();
-    this.userSubscription.unsubscribe();
+    this.searchSubsscription.unsubscribe();
   }
 }

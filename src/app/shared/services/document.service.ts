@@ -49,7 +49,7 @@ export class DocumentService {
 
   public async getDivisions(): Promise<Division[]> {
     return this.couchDBService
-      .readEntry('/_design/norms/_view/all-divisions?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-divisions?include_docs=true')
       .toPromise()
       .then(responseData => {
         return responseData;
@@ -58,7 +58,7 @@ export class DocumentService {
 
   public async getUsers(): Promise<User[]> {
     return this.couchDBService
-      .readEntry('/_design/norms/_view/all-users?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .toPromise()
       .then(responseData => {
         return responseData;
@@ -67,20 +67,18 @@ export class DocumentService {
 
   public async getOwners(): Promise<User[]> {
     return this.couchDBService
-      .readEntry('/_design/norms/_view/all-users?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .toPromise()
       .then(responseData => {
-        console.log(responseData);
         return responseData;
       });
   }
 
   public async getGroups(): Promise<Group[]> {
     return this.couchDBService
-      .readEntry('/_design/norms/_view/all-groups?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-groups?include_docs=true')
       .toPromise()
       .then(responseData => {
-        console.log(responseData);
         return responseData;
       });
   }

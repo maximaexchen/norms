@@ -34,7 +34,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   private onFetchDocument(): void {
     this.documents = [];
     this.couchDBService
-      .readEntry('/_design/norms/_view/all-norms?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
       .subscribe(results => {
         results.forEach(item => {
           this.documents.push(item);

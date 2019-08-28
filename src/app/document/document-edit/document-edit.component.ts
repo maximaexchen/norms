@@ -185,7 +185,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private getDivisions(): void {
     this.divisionSubscription = this.couchDBService
-      .readEntry('/_design/norms/_view/all-divisions?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-divisions?include_docs=true')
       .subscribe(results => {
         results.forEach(item => {
           this.divisions.push(item);
@@ -195,7 +195,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private getOwners(): void {
     this.userSubscription = this.couchDBService
-      .readEntry('/_design/norms/_view/all-users?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .subscribe(results => {
         results.forEach(item => {
           this.owners.push(item);
@@ -205,7 +205,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private getUsers(): void {
     this.couchDBService
-      .readEntry('/_design/norms/_view/all-users?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .subscribe(results => {
         results.forEach(item => {
           const userObject = {} as User;

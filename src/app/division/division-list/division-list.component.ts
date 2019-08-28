@@ -30,7 +30,7 @@ export class DivisionListComponent implements OnInit, OnDestroy {
   private onFetchDivision(): void {
     this.divisions = [];
     this.couchDBService
-      .readEntry('/_design/norms/_view/all-divisions?include_docs=true')
+      .fetchEntries('/_design/norms/_view/all-divisions?include_docs=true')
       .subscribe(results => {
         results.forEach(item => {
           this.divisions.push(item);
