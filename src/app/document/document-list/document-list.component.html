@@ -1,0 +1,11 @@
+<div class="col">
+  <a class="btn btn-success" [routerLink]="['/document/new']">Neues Document</a>
+</div>
+<hr>
+<div class="col">
+  <ul *ngIf="documents?.length" class="list-group">
+    <li *ngFor="let document of documents" class="list-group-item">
+      <a [routerLink]="[document._id] + '/edit'">{{ document.number }} / {{ document.name }} <small>({{ document.revision }})</small></a>
+    </li>
+  </ul>
+</div>

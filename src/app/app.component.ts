@@ -19,7 +19,8 @@ export class AppComponent implements OnInit {
   constructor(private couchDBService: CouchDBService) {}
 
   /*
-  "C:\Program Files (x86)\Wakanda\Enterprise\Server\wakanda-enterprise-server.exe" C:\Users\itspoon\Documents\Wakanda\solutions\Documents\app.waSolution /admin-port:8090
+  "C:\Program Files (x86)\Wakanda\Enterprise\Server\wakanda-enterprise-server.exe"
+  C:\Users\itspoon\Documents\Wakanda\solutions\Documents\app.waSolution /admin-port:8090
 */
   ngOnInit() {
     const params = {

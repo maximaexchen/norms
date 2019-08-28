@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { NormDocument } from 'src/app/documents/document.model';
-import * as toId from '../../../../node_modules/to-id/to-id.js';
-import * as DocURI from '../../../../node_modules/docuri/index.js';
-import { Observable } from 'rxjs';
+import { NormDocument } from 'src/app/document/document.model';
+import { Observable, Subject } from 'rxjs';
 
 // CouchDB Ubuntu Server
 /* $kP2ZernC */
@@ -12,13 +10,15 @@ import { Observable } from 'rxjs';
 @Injectable()
 export class CouchDBService {
   private static readonly BASE_URL = 'http://127.0.0.1:5984/';
+  // private static readonly BASE_URL = 'http://192.168.178.24:8888/';
+  // private static readonly BASE_URL = 'http://116.203.220.19:5984/';
   private static readonly NORM_DB = 'norm_documents';
   private static readonly DB_REQUEST =
     CouchDBService.BASE_URL + CouchDBService.NORM_DB;
 
-  constructor(private http: HttpClient) {
-    console.log(toId('Inside a 34 smartphone'));
-  }
+  private updateSubject = new Subject<any>();
+
+  constructor(private http: HttpClient) {}
 
   writeEntry(document: NormDocument) {
     return this.http.post(CouchDBService.DB_REQUEST, document);
@@ -29,14 +29,14 @@ export class CouchDBService {
   } */
   updateEntry(document: NormDocument, id: string) {
     console.log(id);
-    return this.http.put(CouchDBService.DB_REQUEST + '/' + id , document);
+    return this.http.put(CouchDBService.DB_REQUEST + '/' + id, document);
   }
 
   readEntry(param: string): Observable<any> {
     return this.fetchEntries(param);
   }
 
-  deleteEntry(id: string, rev: string) {
+  deleteEntry(id: string, rev: string): Observable<any> {
     return this.http.delete(
       CouchDBService.DB_REQUEST + '/' + id + '?rev=' + rev
     );
@@ -59,5 +59,13 @@ export class CouchDBService {
 
   fetchEntry(param: string): Observable<any> {
     return this.http.get(CouchDBService.DB_REQUEST + param);
+  }
+
+  sendStateUpdate(message: string) {
+    this.updateSubject.next({ text: message });
+  }
+
+  setStateUpdate(): Observable<any> {
+    return this.updateSubject.asObservable();
   }
 }

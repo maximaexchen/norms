@@ -1,0 +1,75 @@
+<div class="col">
+  <h4>{{ formTitle }}</h4>
+  <h5 *ngIf="groupName">{{ groupName }}</h5>
+</div>
+<hr />
+<div class="col">
+  <form class="form" (ngSubmit)="onSubmit()" #groupForm="ngForm">
+    <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+    <input type="hidden" [(ngModel)]="id" name="_id" />
+    <input type="hidden" [(ngModel)]="rev" name="_rev" />
+    <div class="form-group">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Name"
+        required
+        [(ngModel)]="name"
+        name="name"
+      />
+    </div>
+
+    <button class="btn btn-success" type="button" (click)="updateSelect()">
+      Update Select
+    </button>
+
+    <div class="form-group">
+      <angular2-multiselect
+        name="users"
+        [data]="users"
+        [(ngModel)]="selectedtUsers"
+        [settings]="dropdownSettings"
+        (onSelect)="onItemSelect($event)"
+        (onDeSelect)="onItemDeSelect($event)"
+        (onSelectAll)="onSelectAll($event)"
+        (onDeSelectAll)="onDeSelectAll($event)"
+      >
+        <c-item>
+          <ng-template let-item="item">
+            <label> {{ item.name }}</label>
+          </ng-template>
+        </c-item>
+      </angular2-multiselect>
+
+      <!-- <select class="form-control" [(ngModel)]="users" name="users">
+        <option [ngValue]="undefined" disabled selected>User wählen</option>
+        <option
+          *ngFor="let user of users"
+          [value]="user._id"
+          [selected]="user._id == user"
+        >
+          {{ user.lastName }}, {{ user.firstName }}
+        </option>
+      </select> -->
+    </div>
+
+    <div class="checkbox">
+      <label
+        ><input
+          type="checkbox"
+          class="form-control"
+          [(ngModel)]="active"
+          name="active"
+        />Aktiv ?</label
+      >
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+      <button class="btn btn-success" type="submit">
+        {{ formMode ? 'Speichern' : 'Erstellen' }}
+      </button>
+    </div>
+  </form>
+</div>

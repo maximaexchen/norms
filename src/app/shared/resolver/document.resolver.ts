@@ -1,11 +1,11 @@
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+import { DocumentService } from 'src/app/shared/services/document.service';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Resolve } from '@angular/router';
 
 @Injectable()
-export class APIResolver implements Resolve<Observable<string>> {
-  constructor(private apiService: CouchDBService) {}
+export class DocumentResolver implements Resolve<Observable<string>> {
+  constructor(private documentService: DocumentService) {}
 
   resolve() {
     return null; // this.apiService.readEntry();

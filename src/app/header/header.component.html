@@ -17,21 +17,16 @@
     >
       <ul class="nav navbar-nav">
         <li routerLinkActive="active">
-          <a [routerLink]="['/documents']">Documente</a>
+          <a [routerLink]="['/document']">Documente</a>
         </li>
         <li routerLinkActive="active">
-          <a [routerLink]="['/documents/new']">Neues Document</a>
+          <a [routerLink]="['/group']">Gruppen</a>
         </li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown" appDropDown>
-          <a class="dropdown-toggle" role="button"
-            >Manage <span class="caret"></span
-          ></a>
-          <ul class="dropdown-menu">
-            <li><a style="cursor: pointer;">Save data</a></li>
-            <li><a style="cursor: pointer;">Fetch data</a></li>
-          </ul>
+        <li routerLinkActive="active">
+          <a [routerLink]="['/user']">Benutzer</a>
+        </li>
+        <li routerLinkActive="active">
+          <a [routerLink]="['/division']">Bereich</a>
         </li>
       </ul>
     </div>

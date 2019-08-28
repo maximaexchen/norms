@@ -1,35 +1,70 @@
-import { DocumentResolve } from './documents/document-resolve.resolver';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { DocumentsComponent } from './documents/documents.component';
-import { DocumentsStartComponent } from './documents/documents-start/documents-start.component';
-import { DocumentListComponent } from './documents/document-list/document-list.component';
-import { DocumentDetailComponent } from './documents/document-detail/document-detail.component';
-import { DocumentEditComponent } from './documents/document-edit/document-edit.component';
+import { DocumentComponent } from './document/document.component';
+import { DocumentStartComponent } from './document/document-start/document-start.component';
+import { DocumentListComponent } from './document/document-list/document-list.component';
+import { DocumentDetailComponent } from './document/document-detail/document-detail.component';
+import { DocumentEditComponent } from './document/document-edit/document-edit.component';
 
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { MessageService } from 'primeng/api';
 import { FileSelectDirective } from 'ng2-file-upload';
 import { HeaderComponent } from './header/header.component';
+import { GroupComponent } from './group/group.component';
+import { GroupEditComponent } from './group/group-edit/group-edit.component';
+import { UserComponent } from './user/user.component';
+import { UserEditComponent } from './user/user-edit/user-edit.component';
+import { GroupListComponent } from './group/group-list/group-list.component';
+import { UserListComponent } from './user/user-list/user-list.component';
+import { DivisionComponent } from './division/division.component';
+import { DivisionEditComponent } from './division/division-edit/division-edit.component';
+import { DivisionListComponent } from './division/division-list/division-list.component';
+import { DocumentSearchComponent } from './document/document-search/document-search.component';
+import { APIResolver } from './shared/resolver/api.resolver';
+import { DocumentResolver } from './shared/resolver/document.resolver';
+import { DocumentService } from './shared/services/document.service';
 
 @NgModule({
   declarations: [
     AppComponent,
-    DocumentsComponent,
+    DocumentComponent,
     DocumentListComponent,
     DocumentDetailComponent,
     FileSelectDirective,
     HeaderComponent,
     DocumentEditComponent,
-    DocumentsStartComponent
+    DocumentStartComponent,
+    GroupComponent,
+    GroupEditComponent,
+    UserComponent,
+    UserEditComponent,
+    GroupListComponent,
+    UserListComponent,
+    DivisionComponent,
+    DivisionEditComponent,
+    DivisionListComponent,
+    DocumentSearchComponent
   ],
-  imports: [HttpClientModule, BrowserModule, AppRoutingModule, FormsModule],
-  providers: [MessageService, CouchDBService, DocumentResolve],
+  imports: [
+    HttpClientModule,
+    BrowserModule,
+    AppRoutingModule,
+    AngularMultiSelectModule,
+    FormsModule
+  ],
+  providers: [
+    MessageService,
+    CouchDBService,
+    DocumentService,
+    APIResolver,
+    DocumentResolver
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

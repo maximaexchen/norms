@@ -1,0 +1,72 @@
+<div class="col">
+  <h4>Suche</h4>
+  <hr />
+</div>
+
+<div class="col">
+  <form class="form" (ngSubmit)="onSubmit()" #searchForm="ngForm">
+    <div class="form-group">
+      <label class="form-label">Bereich</label>
+      <select class="form-control" [(ngModel)]="division" name="division">
+        <option [value]="undefined" selected="selected">Bereich wählen</option>
+        <option
+          *ngFor="let item of divisions | async"
+          [value]="item._id"
+          [selected]="item._id == id"
+        >
+          {{ item.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">User</label>
+      <select class="form-control" [(ngModel)]="user" name="user">
+        <option [value]="undefined" selected="selected">Benutzer wählen </option
+        ><option
+          *ngFor="let item of users | async"
+          [value]="item._id"
+          [selected]="item._id == id"
+        >
+          {{ item.lastName }}, {{ item.firstName }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Gruppe</label>
+      <select class="form-control" [(ngModel)]="group" name="group">
+        <option [value]="undefined" selected="selected">Gruppe wählen</option>
+        <option
+          *ngFor="let item of groups | async"
+          [value]="item._id"
+          [selected]="item._id == id"
+        >
+          {{ item.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <select class="form-control" [(ngModel)]="owner" name="owner">
+        <<option [value]="undefined" selected="selected">Owner wählen</option>
+        <option
+          *ngFor="let owner of owners | async"
+          [value]="owner._id"
+          [selected]="owner._id == owner"
+        >
+          {{ owner.lastName }}, {{ owner.firstName }}
+        </option>
+      </select>
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+      <button class="btn btn-success" type="submit">
+        Suche
+      </button>
+    </div>
+  </form>
+</div>

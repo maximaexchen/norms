@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col">
+    <a class="btn btn-success" [routerLink]="['/group/new']">Neue Gruppe</a>
+  </div>
+</div>
+<hr />
+<div class="row">
+  <div class="col">
+    <ul *ngIf="groups?.length" class="list-group">
+      <li *ngFor="let group of groups" class="list-group-item">
+        <a [routerLink]="[group._id] + '/edit'">{{ group.name }}</a>
+      </li>
+    </ul>
+  </div>
+</div>

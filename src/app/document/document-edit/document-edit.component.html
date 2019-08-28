@@ -1,0 +1,211 @@
+<div class="col">
+  <h4>{{ formTitle }}</h4>
+  <h5 *ngIf="normNumber">{{ normNumber }} - {{ name }}</h5>
+  <hr />
+</div>
+
+<div class="col">
+  <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
+    <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+    <input type="hidden" [(ngModel)]="id" name="_id" />
+    <input type="hidden" [(ngModel)]="rev" name="_rev" />
+    <div class="form-group">
+      <label class="form-label">Bereich</label>
+      <select class="form-control" [(ngModel)]="division" name="division">
+        <option value="">Bereich wählen</option>
+        <option
+          *ngFor="let item of divisions"
+          [value]="item._id"
+          [selected]="item._id == id"
+        >
+          {{ item.name }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nummer</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Nummer"
+        [(ngModel)]="normNumber"
+        name="normNumber"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Name"
+        required
+        [(ngModel)]="name"
+        name="name"
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ausgabe / Revision</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Ausgabe / Revision"
+        [(ngModel)]="revision"
+        name="revision"
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Ausgabedatum</label>
+      <input
+        type="date"
+        class="form-control"
+        placeholder="Ausgabedatum"
+        [(ngModel)]="outputDate"
+        name="outputDate"
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Eingangsdatum</label>
+      <input
+        type="date"
+        class="form-control"
+        placeholder="Eingangsdatum ACP"
+        [(ngModel)]="inputDate"
+        name="inputDate"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Benutzer</label>
+      <angular2-multiselect
+        name="users"
+        [data]="users"
+        [(ngModel)]="selectedtUsers"
+        [settings]="dropdownSettings"
+        (onSelect)="onItemSelect($event)"
+        (onDeSelect)="onItemDeSelect($event)"
+        (onSelectAll)="onSelectAll($event)"
+        (onDeSelectAll)="onDeSelectAll($event)"
+      >
+        <c-item>
+          <ng-template let-item="item">
+            <label> {{ item.name }}</label>
+          </ng-template>
+        </c-item>
+      </angular2-multiselect>
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+      <label class="form-label" style="display: block; width: 100%;"
+        >Normdatei</label
+      >
+      <input type="hidden" [(ngModel)]="normFilePath" name="normFilePath" />
+      <input
+        style="float: left;"
+        type="file"
+        name="normFilePathTemp"
+        ng2FileSelect
+        [uploader]="uploader"
+        [(ngModel)]="normFilePathTemp"
+        name="normFilePathTemp"
+      />
+      <button
+        type="button"
+        class="btn btn-success btn-s"
+        (click)="uploader.uploadAll()"
+        [disabled]="
+          !uploader.getNotUploadedItems().length || !normNumber || !name
+        "
+      >
+        Fileupload
+      </button>
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+      <label class="form-label">Owner</label>
+      <select class="form-control" [(ngModel)]="owner" name="owner">
+        <option value="" selected="selected">Owner wählen</option>
+        <option
+          *ngFor="let owner of owners"
+          [value]="owner._id"
+          [selected]="owner._id == owner"
+        >
+          {{ owner.lastName }}, {{ owner.firstName }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Aktivierungs Intervall</label>
+      <select
+        class="form-control"
+        [(ngModel)]="activationInterval"
+        name="activationInterval"
+        ng-init="activationInterval = options[0]"
+      >
+        <option value="" selected="selected"
+          >Aktivierungs Intervall wählen</option
+        >
+        <option
+          *ngFor="let activationIntervalItem of activationIntervals"
+          [value]="activationIntervalItem"
+          [selected]="activationIntervalItem == activationInterval"
+        >
+          {{ activationIntervalItem }}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bezugsquelle</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Bezugsquelle"
+        [(ngModel)]="source"
+        name="source"
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bezugsquelle Login</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Bezugsquelle Login"
+        [(ngModel)]="sourceLogin"
+        name="sourceLogin"
+      />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bezugsquelle Passwort</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Bezugsquelle Passwort"
+        [(ngModel)]="sourcePassword"
+        name="sourcePassword"
+      />
+    </div>
+
+    <div class="checkbox">
+      <label
+        ><input
+          type="checkbox"
+          class="form-control"
+          [(ngModel)]="active"
+          name="active"
+        />Aktiv ?</label
+      >
+    </div>
+
+    <hr />
+
+    <div class="form-group">
+      <button class="btn btn-success" type="submit">
+        {{ formMode ? 'Speichern' : 'Erstellen' }}
+      </button>
+    </div>
+  </form>
+</div>
