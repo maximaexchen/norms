@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Subscription } from 'rxjs';
+import { DocumentService } from 'src/app/shared/services/document.service';
+import { NormDocument } from '../document.model';
 
 @Component({
   selector: 'app-document-list',
@@ -8,39 +10,29 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./document-list.component.scss']
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
-  documents: any = [];
+  documents: NormDocument = [];
 
   messages: any[] = [];
   changeSubscription: Subscription;
 
-  constructor(private couchDBService: CouchDBService) {
+  constructor(
+    private couchDBService: CouchDBService,
+    private documentService: DocumentService
+  ) {
     // subscribe to home component messages
     this.changeSubscription = this.couchDBService
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'document') {
-          this.onFetchDocument();
+          // this.onFetchDocument();
+          this.documents = this.documentService.getDocuments();
         }
       });
   }
 
   ngOnInit() {
     console.log('ngOnInit: DocumentListComponent');
-
-    this.onFetchDocument();
-  }
-
-  private onFetchDocument(): void {
-    this.documents = [];
-    this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
-      .subscribe(results => {
-        results.forEach(item => {
-          this.documents.push(item);
-        });
-
-        console.log(this.documents);
-      });
+    this.documents = this.documentService.getDocuments();
   }
 
   ngOnDestroy() {

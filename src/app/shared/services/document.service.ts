@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { User } from 'src/app/user/user.model';
 import { Group } from 'src/app/group/group.model';
 import { HttpClient } from '@angular/common/http';
+import { NormDocument } from 'src/app/document/document.model';
 
 @Injectable()
 export class DocumentService {
@@ -16,22 +17,34 @@ export class DocumentService {
   userSubscription = new Subscription();
   updateSubscription = new Subscription();
 
-  divisions: any = [];
-  owners: User[] = [];
-  users: User[] = [];
+  divisions: Division = [];
+  owners: User = [];
+  users: User = [];
   selectedtUsers: User[] = [];
-  groups: Group[] = [];
+  groups: Group = [];
 
   constructor(
     private http: HttpClient,
     private couchDBService: CouchDBService
   ) {}
 
-  public getSelectedUsers(users: any[]): User[] {
-    users.forEach(user => {
-      this.getUserByID(user).subscribe(result => {
+  public async getDocuments(): Promise<NormDocument[]> {
+    return this.couchDBService
+      .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
+      .toPromise()
+      .then(responseData => {
+        return responseData;
+      })
+      .catch(response => {
+        return response.message;
+      });
+  }
+
+  public getSelectedUsers(usersIds: string[]): User[] {
+    usersIds.forEach(userId => {
+      this.getUserByID(userId).subscribe(result => {
         // build the Object for the selectbox in right format
-        const selectedUserObject = {};
+        const selectedUserObject = {} as User;
         selectedUserObject['id'] = result._id;
         selectedUserObject['name'] = result.lastName + ', ' + result.firstName;
         this.selectedtUsers.push(selectedUserObject);
@@ -53,6 +66,9 @@ export class DocumentService {
       .toPromise()
       .then(responseData => {
         return responseData;
+      })
+      .catch(response => {
+        return response.message;
       });
   }
 
@@ -62,6 +78,9 @@ export class DocumentService {
       .toPromise()
       .then(responseData => {
         return responseData;
+      })
+      .catch(response => {
+        return response.message;
       });
   }
 
@@ -71,6 +90,9 @@ export class DocumentService {
       .toPromise()
       .then(responseData => {
         return responseData;
+      })
+      .catch(response => {
+        return response.message;
       });
   }
 
@@ -80,6 +102,9 @@ export class DocumentService {
       .toPromise()
       .then(responseData => {
         return responseData;
+      })
+      .catch(response => {
+        return response.message;
       });
   }
 }

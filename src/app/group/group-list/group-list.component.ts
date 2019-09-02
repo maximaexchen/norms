@@ -1,41 +1,37 @@
 import { Group } from './../group.model';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Subscription } from 'rxjs';
+import { DocumentService } from 'src/app/shared/services/document.service';
 
 @Component({
   selector: 'app-group-list',
   templateUrl: './group-list.component.html',
   styleUrls: ['./group-list.component.scss']
 })
-export class GroupListComponent implements OnInit {
-  groups: Group[] = [];
+export class GroupListComponent implements OnInit, OnDestroy {
+  groups: Group = [];
   changeSubscription: Subscription;
 
-  constructor(private couchDBService: CouchDBService) {
+  constructor(
+    private couchDBService: CouchDBService,
+    private documentService: DocumentService
+  ) {}
+
+  ngOnInit() {
     this.changeSubscription = this.couchDBService
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'group') {
-          /*  console.log('Message1:');
-          console.log(message.text); */
-          this.onFetchGroup();
+          this.groups = this.documentService.getGroups();
         }
       });
+
+    this.groups = this.documentService.getGroups();
   }
 
-  ngOnInit() {
-    this.onFetchGroup();
-  }
-
-  private onFetchGroup(): void {
-    this.groups = [];
-    this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-groups?include_docs=true')
-      .subscribe(results => {
-        results.forEach(item => {
-          this.groups.push(item);
-        });
-      });
+  ngOnDestroy() {
+    // unsubscribe to ensure no memory leaks
+    this.changeSubscription.unsubscribe();
   }
 }

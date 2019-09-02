@@ -8,8 +8,8 @@
 <hr />
 <div class="row">
   <div class="col">
-    <ul *ngIf="divisions?.length" class="list-group">
-      <li *ngFor="let division of divisions" class="list-group-item">
+    <ul class="list-group">
+      <li *ngFor="let division of divisions | async" class="list-group-item">
         <a [routerLink]="[division._id] + '/edit'">{{ division.name }}</a>
       </li>
     </ul>

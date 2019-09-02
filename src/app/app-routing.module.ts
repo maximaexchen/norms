@@ -82,9 +82,7 @@ const routes: Routes = [
       { path: 'new', component: DivisionEditComponent },
       {
         path: ':id',
-        component: DocumentDetailComponent,
-        runGuardsAndResolvers: 'paramsOrQueryParamsChange',
-        resolve: { division: APIResolver }
+        component: DocumentDetailComponent
       },
       { path: ':id/edit', component: DivisionEditComponent }
     ]

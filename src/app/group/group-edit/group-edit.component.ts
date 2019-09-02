@@ -12,6 +12,7 @@ import { FileUploader } from 'ng2-file-upload';
 import { Group } from '../group.model';
 import { NgForm } from '@angular/forms';
 import { User } from 'src/app/user/user.model';
+import { DocumentService } from 'src/app/shared/services/document.service';
 
 @Component({
   selector: 'app-group-edit',
@@ -41,6 +42,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
   constructor(
     private couchDBService: CouchDBService,
+    private documentService: DocumentService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -106,16 +108,14 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   private getUsers(): void {
-    this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
-      .subscribe(results => {
-        results.forEach(item => {
-          const userObject = {} as User;
-          userObject['id'] = item._id;
-          userObject['name'] = item.lastName + ', ' + item.firstName;
-          this.users.push(userObject);
-        });
+    this.documentService.getUsers().then(results => {
+      results.forEach(item => {
+        const userObject = {} as User;
+        userObject['id'] = item['_id'];
+        userObject['name'] = item['lastName'] + ', ' + item['firstName'];
+        this.users.push(userObject);
       });
+    });
   }
 
   private getUserByID(id: string): any {
@@ -148,7 +148,6 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   private updateGroup(): void {
-    // console.log(this.groupForm);
     console.log('onUpdateGroup: GroupEditComponent');
     this.createWriteItem();
 
@@ -187,10 +186,6 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     ];
 
     this.writeItem['users'] = selUsersId || [];
-
-    /* const listOfUserGroups = [...new Set(users.map(it => it.group))];
-
-// listOfUserGroups is ['editor', 'admin']; */
 
     if (this.groupForm.value._id) {
       this.writeItem['_id'] = this.groupForm.value._id;

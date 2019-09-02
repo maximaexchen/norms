@@ -1,6 +1,9 @@
+import { Division } from './../division.model';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+import { DocumentService } from 'src/app/shared/services/document.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-division-list',
@@ -8,34 +11,26 @@ import { CouchDBService } from 'src/app/shared/services/couchDB.service';
   styleUrls: ['./division-list.component.scss']
 })
 export class DivisionListComponent implements OnInit, OnDestroy {
-  divisions: any = [];
+  divisions: Division = [];
   changeSubscription: Subscription;
 
-  constructor(private couchDBService: CouchDBService) {
+  constructor(
+    private couchDBService: CouchDBService,
+    private documentService: DocumentService
+  ) {}
+
+  ngOnInit() {
+    console.log('DivisionListComponent ngOnInit');
+
+    // Listen for new division created
     this.changeSubscription = this.couchDBService
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'division') {
-          console.log('Message1:');
-          console.log(message.text);
-          this.onFetchDivision();
+          this.divisions = this.documentService.getDivisions();
         }
       });
-  }
-
-  ngOnInit() {
-    this.onFetchDivision();
-  }
-
-  private onFetchDivision(): void {
-    this.divisions = [];
-    this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-divisions?include_docs=true')
-      .subscribe(results => {
-        results.forEach(item => {
-          this.divisions.push(item);
-        });
-      });
+    this.divisions = this.documentService.getDivisions();
   }
 
   ngOnDestroy() {

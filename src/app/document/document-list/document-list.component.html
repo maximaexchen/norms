@@ -3,7 +3,7 @@
 </div>
 <hr />
 <div class="col">
-  <table *ngIf="documents?.length" class="table table-bordered">
+  <table class="table table-bordered">
     <thead>
       <tr>
         <th>Bereich</th>
@@ -18,7 +18,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let document of documents">
+      <tr *ngFor="let document of documents | async">
         <td>
           {{ document.division }}
         </td>

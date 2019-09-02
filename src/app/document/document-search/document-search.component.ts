@@ -33,8 +33,6 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
   groupID = '';
 
   constructor(
-    private httpClient: HttpClient,
-    private router: Router,
     private route: ActivatedRoute,
     private couchDBService: CouchDBService,
     private documentService: DocumentService
