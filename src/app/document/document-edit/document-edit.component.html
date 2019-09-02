@@ -14,7 +14,7 @@
       <select class="form-control" [(ngModel)]="division" name="division">
         <option value="">Bereich wählen</option>
         <option
-          *ngFor="let item of divisions"
+          *ngFor="let item of divisions | async"
           [value]="item._id"
           [selected]="item._id == id"
         >
@@ -142,7 +142,7 @@
       <select class="form-control" [(ngModel)]="owner" name="owner">
         <option value="" selected="selected">Owner wählen</option>
         <option
-          *ngFor="let owner of owners"
+          *ngFor="let owner of owners | async"
           [value]="owner._id"
           [selected]="owner._id == owner"
         >

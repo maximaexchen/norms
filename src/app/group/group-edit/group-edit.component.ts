@@ -8,7 +8,6 @@ import {
   OnDestroy
 } from '@angular/core';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { FileUploader } from 'ng2-file-upload';
 import { Group } from '../group.model';
 import { NgForm } from '@angular/forms';
 import { User } from 'src/app/user/user.model';

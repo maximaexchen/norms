@@ -1,3 +1,4 @@
+import { Division } from './../../division/division.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
@@ -6,6 +7,7 @@ import { NormDocument } from '../document.model';
 import { NgForm } from '@angular/forms';
 import { User } from 'src/app/user/user.model';
 import { Subscription } from 'rxjs';
+import { DocumentService } from 'src/app/shared/services/document.service';
 
 const URL = 'http://localhost:4000/api/upload';
 
@@ -40,8 +42,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   ];
 
   writeItem: NormDocument;
-  divisions: any = [];
-  owners: User[] = [];
+  divisions: Division = [];
+  owners: User = [];
   users: User[] = [];
   selectedtUsers: User[] = [];
 
@@ -68,17 +70,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   constructor(
     private couchDBService: CouchDBService,
+    private documentService: DocumentService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     console.log('DocumentEditComponent');
-
-    this.getDivisions();
-    this.getOwners();
-    this.initUploader();
-    this.getSelectedUser();
 
     // Prepare the user multi select box
     this.dropdownSettings = {
@@ -94,12 +92,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       noDataLabel: 'Keinen Benutzer gefunden'
     };
 
-    // get all users for the select-box
-    this.getUsers();
-
     this.routeSubsscription = this.route.params.subscribe(results => {
       // empty the select-box
       this.selectedtUsers = [];
+
+      // get all data for the select-boxes
+      this.divisions = this.documentService.getDivisions();
+      this.owners = this.documentService.getUsers();
+      this.getUsers();
 
       // check if we are updating
       if (results['id']) {
@@ -183,7 +183,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private getSelectedUser() {}
 
-  private getDivisions(): void {
+  /*  private getDivisions(): void {
     this.divisionSubscription = this.couchDBService
       .fetchEntries('/_design/norms/_view/all-divisions?include_docs=true')
       .subscribe(results => {
@@ -202,6 +202,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         });
       });
   }
+
+   */
 
   private getUsers(): void {
     this.couchDBService
