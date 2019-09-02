@@ -1,3 +1,5 @@
+import { DocumentListComponent } from './document/document-list/document-list.component';
+import { DocumentSearchComponent } from './document/document-search/document-search.component';
 import { DivisionComponent } from './division/division.component';
 
 import { NgModule } from '@angular/core';
@@ -16,14 +18,23 @@ import { DivisionEditComponent } from './division/division-edit/division-edit.co
 import { DocumentResolver } from './shared/resolver/document.resolver';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/document', pathMatch: 'full' },
+  {
+    path: '',
+    component: DocumentSearchComponent,
+    pathMatch: 'full'
+  },
   {
     path: 'document',
     component: DocumentComponent,
-    resolve: { document: DocumentResolver },
+    /* resolve: { document: DocumentResolver }, */
     children: [
-      { path: '', component: DocumentStartComponent },
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'list'
+      },
       { path: 'new', component: DocumentEditComponent },
+      { path: 'list', component: DocumentListComponent },
       {
         path: ':id',
         component: DocumentDetailComponent,

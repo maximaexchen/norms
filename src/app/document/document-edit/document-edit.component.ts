@@ -54,8 +54,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   normNumber: string;
   name: string;
   revision: string;
-  outputDate: string;
-  inputDate: string;
+  outputDate: Date;
+  inputDate: Date;
   normFilePath: string;
   normFilePathTemp: string;
   owner: string;
@@ -119,8 +119,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.normNumber = entry['number'];
             this.name = entry['name'];
             this.revision = entry['revision'];
-            this.outputDate = entry['outputDate'];
-            this.inputDate = entry['inputDate'];
+            this.outputDate = new Date(entry['outputDate']);
+            this.inputDate = new Date(entry['inputDate']);
             this.normFilePathTemp = entry['normFilePathTemp'];
             this.normFilePath = entry['normFilePath'];
             this.owner = entry['owner'];

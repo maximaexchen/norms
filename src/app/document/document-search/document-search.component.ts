@@ -1,14 +1,14 @@
+import { OrderByPipe } from '../../shared/pipes/orderBy.pipe';
 import { Group } from 'src/app/group/group.model';
 import { DocumentService } from './../../shared/services/document.service';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { NormDocument } from '../document.model';
 import { User } from 'src/app/user/user.model';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { DocumentResolver } from 'src/app/shared/resolver/document.resolver';
+import * as _ from 'underscore';
 
 @Component({
   selector: 'app-document-search',
@@ -20,15 +20,17 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
 
   searchSubsscription = new Subscription();
   foundDocuments: Document[];
+  newUserArray: any[];
+  display = false;
 
   divisions: any = [];
-  divisionID: string;
+  divisionID = '';
   owners: User = [];
-  ownerID: string;
+  ownerID = '';
   users: User = [];
-  userID: string;
+  userID = '';
   groups: Group = [];
-  groupID: string;
+  groupID = '';
 
   constructor(
     private httpClient: HttpClient,
@@ -68,36 +70,77 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
       this.userID = this.searchForm.value.user;
     }
 
+    // Build the searchObjectStatement for couchDB _find method
+    // only for norm documents >> type: { $eq: 'norm' },
     const searchObject = {
-      use_index: ['searchkeys'],
+      use_index: ['_design/search_norm'],
       selector: {
+        _id: { $gt: null },
+        type: { $eq: 'norm' },
         $or: [
-          {
-            division: this.divisionID
-          },
+          { division: this.divisionID },
+          { owner: this.ownerID },
           {
             users: {
               $elemMatch: {
                 $eq: this.userID
               }
             }
-          },
-          {
-            owner: this.ownerID
           }
         ]
       }
     };
 
-    // http://127.0.0.1:5984/norm_documents/_design/norms/_view/norm-users?startkey=
-    // ["2a350192903b8d08259b69d22700c2d4",1]&endkey=["2a350192903b8d08259b69d22700c2d4",10]&include_docs=true
+    // console.log(JSON.stringify(searchObject));
 
     this.searchSubsscription = this.couchDBService
       .search(searchObject)
       .subscribe(results => {
         this.foundDocuments = results.docs;
-        console.log(results);
+        results.docs.forEach(norm => {
+          if (norm.division) {
+            const divisionItem = this.couchDBService
+              .fetchEntry('/' + norm.division)
+              .subscribe(divisionC => {
+                norm.division = divisionC.name;
+              });
+          }
+
+          if (norm.owner) {
+            const ownerItem = this.couchDBService
+              .fetchEntry('/' + norm.owner)
+              .subscribe(ownerC => {
+                norm.owner = ownerC.firstName + ' ' + ownerC.lastName;
+              });
+          }
+
+          if (norm.users) {
+            this.couchDBService
+              .getUsersForNorm(norm._id)
+              .subscribe(userResult => {
+                let fetchedUserArr = [];
+                const wantedUser = _.tail(userResult['rows']);
+
+                if (wantedUser) {
+                  wantedUser.forEach(user => {
+                    const newUser = {
+                      firstName: user['doc'].firstName,
+                      lastName: user['doc'].lastName
+                    };
+                    fetchedUserArr.push(newUser);
+                  });
+
+                  fetchedUserArr = _.sortBy(fetchedUserArr, 'lastName');
+                }
+                norm.fetchedUser = fetchedUserArr;
+              });
+          }
+        });
       });
+  }
+
+  showDialog() {
+    this.display = true;
   }
 
   ngOnDestroy(): void {

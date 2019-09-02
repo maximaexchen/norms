@@ -9,7 +9,6 @@ import { Subscription } from 'rxjs';
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
   documents: any = [];
-  console = console;
 
   messages: any[] = [];
   changeSubscription: Subscription;
@@ -39,20 +38,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         results.forEach(item => {
           this.documents.push(item);
         });
-      });
 
-    // console.log(this.documents);
-    /* try {
-      console.log('getEntry');
-      this.couchDBService
-        .readEntry('/_design/norms/_view/all-norms?include_docs=true')
-        .then(r => {
-          this.documents = r['rows'];
-        })
-        .catch(e => console.error(e));
-    } catch (error) {
-      console.error(error);
-    } */
+        console.log(this.documents);
+      });
   }
 
   ngOnDestroy() {

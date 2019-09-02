@@ -55,6 +55,7 @@ export class CouchDBService {
   }
 
   public search(object: any): Observable<any> {
+    console.log(CouchDBService.DB_REQUEST + '/_find', object);
     return this.http.post(CouchDBService.DB_REQUEST + '/_find', object);
   }
 
@@ -64,5 +65,20 @@ export class CouchDBService {
 
   public setStateUpdate(): Observable<any> {
     return this.updateSubject.asObservable();
+  }
+
+  public getUsersForNorm(id: string) {
+    // http://127.0.0.1:5984/norm_documents/_design/norms/_view/norm-users?
+    // startkey=["2a350192903b8d08259b69d22700c2d4"]&endkey=["2a350192903b8d08259b69d22700c2d4",{},{}]&include_docs=true
+
+    return this.http.get(
+      CouchDBService.DB_REQUEST +
+        '/_design/norms/_view/norm-users?' +
+        'startkey=["' +
+        id +
+        '"]&endkey=["' +
+        id +
+        '",{},{}]&include_docs=true'
+    );
   }
 }
