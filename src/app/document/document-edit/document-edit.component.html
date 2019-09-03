@@ -113,29 +113,6 @@
       <label class="form-label" style="display: block; width: 100%;"
         >Normdatei (pdf)</label
       >
-      <input type="hidden" [(ngModel)]="normFilePath" name="normFilePath" />
-      <input
-        style="float: left;"
-        type="file"
-        name="normFilePathTemp"
-        ng2FileSelect
-        [uploader]="uploader"
-        [(ngModel)]="normFilePathTemp"
-        name="normFilePathTemp"
-      />
-      <button
-        type="button"
-        class="btn btn-success btn-s"
-        (click)="uploader.uploadAll()"
-        [disabled]="
-          !uploader.getNotUploadedItems().length || !normNumber || !name
-        "
-      >
-        Fileupload
-      </button>
-
-      <hr />
-
       <!-- File input for upload without using the plugin. -->
       <input
         type="file"

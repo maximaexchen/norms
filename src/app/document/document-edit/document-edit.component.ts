@@ -2,14 +2,15 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { delay, take } from 'rxjs/operators';
+import { Subscription, forkJoin, of, interval } from 'rxjs';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { FileUploader, FileItem } from 'ng2-file-upload';
 import { NormDocument } from '../document.model';
 import { Division } from './../../division/division.model';
 import { User } from 'src/app/user/user.model';
 import { DocumentService } from 'src/app/shared/services/document.service';
-import { UploadService } from 'src/app/shared/services/upload.service';
+import { ServerService } from 'src/app/shared/services/server.service';
 
 @Component({
   selector: 'app-document-edit',
@@ -78,7 +79,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private uploadService: UploadService
+    private serverService: ServerService
   ) {
     this.uploader.onBeforeUploadItem = (fileItem: FileItem): any => {
       // logic of connecting url with the file
@@ -141,7 +142,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.revision = entry['revision'];
             this.outputDate = new Date(entry['outputDate']);
             this.inputDate = new Date(entry['inputDate']);
-            this.normFilePathTemp = entry['normFilePathTemp'];
             this.normFilePath = entry['normFilePath'];
             this.owner = entry['owner'];
             this.activationInterval = entry['activationInterval'];
@@ -225,13 +225,48 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private updateDocument(): void {
     // console.log(this.normForm);
     console.log('onUpdateDocument: DocumentEditComponent');
-    this.createWriteItem();
+
+    const example = forkJoin(
+      // emit 'Hello' immediately
+      of('Hello'),
+      // emit 'World' after 1 second
+      of('World').pipe(delay(1000)),
+      // emit 0 after 1 second
+      interval(1000).pipe(take(1)),
+      // emit 0...1 in 1 second interval
+      interval(1000).pipe(take(2))
+      // promise that resolves to 'Promise Resolved' after 5 seconds
+      // myPromise('RESULT')
+    );
+    //  output: ["Hello", "World", 0, 1, "Promise Resolved: RESULT"]
+    const subscribe = example.subscribe(val => console.log(val));
+
+    if (this.fileUpload) {
+      console.log('THERE IS A FILE');
+      this.serverService
+        .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
+        .subscribe(updloadResult => {
+          if (updloadResult['body']) {
+            this.normFilePath = updloadResult['body'].file;
+          }
+          console.log('updateDocument createWriteItem');
+          console.log(this.normFilePath);
+          this.createWriteItem();
+        });
+      /* this.serverService.findDirectory(this.id).subscribe(readResult => {
+        console.log('readResult');
+        console.log(readResult);
+      }); */
+    } else {
+      this.createWriteItem();
+    }
 
     this.updateSubscription = this.couchDBService
       .updateEntry(this.writeItem, this.normForm.value._id)
       .subscribe(result => {
-        console.log('update result');
-        console.log(result);
+        /*console.log('update result');
+        console.log(result); */
+
         // Inform about Database change.
         this.selectedtUsers = [];
         this.sendStateUpdate();
@@ -249,12 +284,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .writeEntry(this.writeItem)
       .subscribe(result => {
         this.createId = result['id'];
-        // this.upload(this.uploadUrl + '/' + result['id']);
-        this.uploadService
+        if (!this.fileUpload) {
+          console.log('THERE IS NO FILE');
+        }
+        this.serverService
           .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
           .subscribe(updloadResult => {
             console.log(updloadResult);
           });
+        console.log('createWriteItem');
+        console.log(this.normFilePath);
         this.sendStateUpdate();
       });
   }
@@ -268,6 +307,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private createWriteItem() {
     this.writeItem = {};
 
+    console.log('createWriteItem');
+    console.log(this.normFilePath);
+
     this.writeItem['type'] = 'norm';
     this.writeItem['division'] = this.normForm.value.division || '';
     this.writeItem['number'] = this.normForm.value.normNumber || '';
@@ -275,7 +317,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem['revision'] = this.normForm.value.revision || '';
     this.writeItem['outputDate'] = this.normForm.value.outputDate || '';
     this.writeItem['inputDate'] = this.normForm.value.inputDate || '';
-    this.writeItem['normFilePath'] = this.normForm.value.normFilePath || '';
+    this.writeItem['normFilePath'] = this.normFilePath || '';
     this.writeItem['owner'] = this.normForm.value.owner || '';
     this.writeItem['activationInterval'] =
       this.normForm.value.activationInterval || '';

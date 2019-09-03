@@ -1,6 +1,7 @@
 // server.js
 // https://appdividend.com/2019/06/07/angular-8-file-upload-tutorial-with-example-angular-image-upload/
 const fs = require('fs-extra');
+const klaw = require('klaw');
 const path = require('path');
 const express = require('express');
 const multer = require('multer');
@@ -29,10 +30,42 @@ var allowCrossDomain = function(req, res, next) {
 };
 app.use(allowCrossDomain);
 
-app.get('/api', function(req, res) {
-  res.end('file catcher example');
+app.post('/api/test', function(req, res) {
+  //return res.end('api test');
 });
 
+//middleware
+function searchMiddleware(req, res, next) {
+  next();
+}
+
+app.get('/api/findDirectory/:id', searchMiddleware, function(req, res) {
+  var items = [];
+
+  let dirExists = false;
+
+  // Read all folders in upload directory
+  klaw('./uploads/')
+    .on('data', item => {
+      items.push(item.path);
+    })
+    .on('end', function() {
+      items.forEach(item => {
+        if (item.includes(req.params.id)) {
+          dirExists = true;
+          return;
+        }
+      });
+
+      res.json('dirExists : ' + dirExists);
+    })
+    .on('error', function(err, item) {
+      //console.log(err.message);
+      //console.log(item.path); // the file the error occurred on
+    });
+});
+
+// Store file in temp directory
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
     callback(null, './uploads/tempDir/');
@@ -49,23 +82,20 @@ var upload = multer({ storage: storage }).any();
 app.post('/api/upload', function(req, res) {
   upload(req, res, function(err) {
     if (err) {
-      console.log(err);
       return res.end('Error uploading file.');
     } else {
       let tempPath = './' + req.files[0].path;
       let copyPath =
         './uploads/' + req.body.createID + '/' + req.files[0].filename;
 
+      // Move file in synamic generated Directory
       fs.move(tempPath, copyPath, function(err) {
         if (err) return console.error(err);
-        console.log('success!');
       });
-
-      /* req.files.forEach(function(f) {
-        console.log(f);
-        fs.mkdirsSync(path);
-      }); */
-      res.end('File has been uploaded');
+      res.json({
+        file: copyPath,
+        success: 'File has been uploaded'
+      });
     }
   });
 });

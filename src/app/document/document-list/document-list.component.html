@@ -19,16 +19,16 @@
     </thead>
     <tbody>
       <tr *ngFor="let document of documents | async">
-        <td>
+        <!-- <td>
           {{ document.division }}
-        </td>
+        </td> -->
         <td>{{ document.number }}</td>
         <td>{{ document.name }}</td>
         <td>{{ document.revision }}</td>
         <td>{{ document.outputDate | date }}</td>
         <td>{{ document.inputDate | date }}</td>
         <td>{{ document.owner }}</td>
-        <td>{{ document.users }}</td>
+        <!-- <td>{{ document.users }}</td> -->
         <td>
           <a
             [routerLink]="'../' + [document._id] + '/edit'"

@@ -34,7 +34,7 @@ import { OrderByPipe } from './shared/pipes/orderBy.pipe';
 import { DialogModule, Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
-import { UploadService } from './shared/services/upload.service';
+import { ServerService } from './shared/services/server.service';
 
 @NgModule({
   declarations: [
@@ -74,7 +74,7 @@ import { UploadService } from './shared/services/upload.service';
     MessageService,
     CouchDBService,
     DocumentService,
-    UploadService,
+    ServerService,
     APIResolver,
     DocumentResolver
   ],

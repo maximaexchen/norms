@@ -8,11 +8,16 @@ import {
 import { Subscription, Observable } from 'rxjs';
 
 @Injectable()
-export class UploadService {
+export class ServerService {
   constructor(private http: HttpClient) {}
 
-  // file from event.target.files[0]
-  uploadFile(
+  public findDirectory(id: string): Observable<HttpEvent<any>> {
+    const url = 'http://localhost:4000/api/findDirectory/' + id;
+    const req = new HttpRequest('GET', url);
+    return this.http.request(req);
+  }
+
+  public uploadFile(
     url: string,
     file: File,
     createID: string
