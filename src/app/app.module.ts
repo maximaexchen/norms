@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DocumentComponent } from './document/document.component';
@@ -28,11 +29,12 @@ import { DocumentSearchComponent } from './document/document-search/document-sea
 import { APIResolver } from './shared/resolver/api.resolver';
 import { DocumentResolver } from './shared/resolver/document.resolver';
 import { DocumentService } from './shared/services/document.service';
+import { FileInputValueAccessor } from './shared/services/file-input-value.accessor';
 import { OrderByPipe } from './shared/pipes/orderBy.pipe';
 import { DialogModule, Dialog } from 'primeng/dialog';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
+import { UploadService } from './shared/services/upload.service';
 
 @NgModule({
   declarations: [
@@ -54,7 +56,8 @@ import { CalendarModule } from 'primeng/calendar';
     DivisionEditComponent,
     DivisionListComponent,
     DocumentSearchComponent,
-    OrderByPipe
+    OrderByPipe,
+    FileInputValueAccessor
   ],
   imports: [
     HttpClientModule,
@@ -71,6 +74,7 @@ import { CalendarModule } from 'primeng/calendar';
     MessageService,
     CouchDBService,
     DocumentService,
+    UploadService,
     APIResolver,
     DocumentResolver
   ],

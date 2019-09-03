@@ -1,15 +1,15 @@
-import { Division } from './../../division/division.model';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { FileUploader } from 'ng2-file-upload';
-import { NormDocument } from '../document.model';
+import { HttpClient } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
-import { User } from 'src/app/user/user.model';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+import { FileUploader, FileItem } from 'ng2-file-upload';
+import { NormDocument } from '../document.model';
+import { Division } from './../../division/division.model';
+import { User } from 'src/app/user/user.model';
 import { DocumentService } from 'src/app/shared/services/document.service';
-
-const URL = 'http://localhost:4000/api/upload';
+import { UploadService } from 'src/app/shared/services/upload.service';
 
 @Component({
   selector: 'app-document-edit',
@@ -19,10 +19,12 @@ const URL = 'http://localhost:4000/api/upload';
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
 
-  public uploader: FileUploader = new FileUploader({
+  uploadUrl = 'http://localhost:4000/api/upload';
+  uploader = new FileUploader({ url: this.uploadUrl, itemAlias: 'myfile' });
+  /* public uploader: FileUploader = new FileUploader({
     url: URL,
     itemAlias: 'myfile'
-  });
+  }); */
 
   routeSubsscription = new Subscription();
   writeSubscription = new Subscription();
@@ -50,6 +52,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
   id: string;
+  createId: string;
   rev: string;
   type: string;
   division: string;
@@ -67,13 +70,30 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   sourcePassword: string;
   active: boolean;
   dropdownSettings = {};
+  fileUpload: File | null;
 
   constructor(
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
     private router: Router,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private uploadService: UploadService
+  ) {
+    this.uploader.onBeforeUploadItem = (fileItem: FileItem): any => {
+      // logic of connecting url with the file
+      fileItem.url = 'http://localhost:4000/api/upload';
+
+      this.uploader.options.additionalParameter = {
+        name: fileItem.file.name,
+        normId: this.normNumber
+      };
+
+      console.log('fileItem');
+      console.log(fileItem);
+      return { fileItem };
+    };
+  }
 
   ngOnInit() {
     console.log('DocumentEditComponent');
@@ -143,8 +163,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getSelectedUsers(users: any[]) {
-    console.log('users');
-    console.log(users);
     users.forEach(user => {
       this.getUserByID(user).subscribe(result => {
         // build the Object for the selectbox in right format
@@ -162,48 +180,24 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     return this.couchDBService.fetchEntry('/' + id);
   }
 
-  private initUploader() {
+  /* private initUploader() {
     this.uploader.onCompleteItem = (
       item: any,
       response: any,
       status: any,
       headers: any
     ) => {
-      /* console.log('ImageUpload:uploaded:', item);
-      console.log('response:', response);
-      console.log('headers:', headers);
-      console.log(JSON.parse(response).fileName); */
+      // console.log('ImageUpload:uploaded:', item);
+      // console.log('response:', response);
+      // console.log('headers:', headers);
+      // console.log(JSON.parse(response).fileName);
       const realtivePathString = item.url.substring(
         item.url.lastIndexOf('/api') + 1
       );
       this.normFilePath =
         realtivePathString + '/' + JSON.parse(response).fileName;
     };
-  }
-
-  private getSelectedUser() {}
-
-  /*  private getDivisions(): void {
-    this.divisionSubscription = this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-divisions?include_docs=true')
-      .subscribe(results => {
-        results.forEach(item => {
-          this.divisions.push(item);
-        });
-      });
-  }
-
-  private getOwners(): void {
-    this.userSubscription = this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
-      .subscribe(results => {
-        results.forEach(item => {
-          this.owners.push(item);
-        });
-      });
-  }
-
-   */
+  } */
 
   private getUsers(): void {
     this.couchDBService
@@ -254,11 +248,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeSubscription = this.couchDBService
       .writeEntry(this.writeItem)
       .subscribe(result => {
-        console.log('Create document result');
-        console.log(result);
+        this.createId = result['id'];
+        // this.upload(this.uploadUrl + '/' + result['id']);
+        this.uploadService
+          .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
+          .subscribe(updloadResult => {
+            console.log(updloadResult);
+          });
         this.sendStateUpdate();
       });
   }
+
+  /* private onFileChange(event) {
+    this.files = event.target.files;
+    console.log(this.files);
+    console.log(event);
+  } */
 
   private createWriteItem() {
     this.writeItem = {};
@@ -293,8 +298,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.writeItem['users'] = selUsersId || [];
 
-    // console.log(this.writeItem);
-
     return this.writeItem;
   }
 
@@ -326,56 +329,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.userSubscription.unsubscribe();
     this.updateSubscription.unsubscribe();
   }
+
+  /*  private getDivisions(): void {
+  this.divisionSubscription = this.couchDBService
+    .fetchEntries('/_design/norms/_view/all-divisions?include_docs=true')
+    .subscribe(results => {
+      results.forEach(item => {
+        this.divisions.push(item);
+      });
+    });
 }
 
-/*
-    {
-      "type": "norm",
-      "group": "",
-      "number": "AA-005",
-      "name": "Obsolete & Obsolesnce Management",
-      "revision": "1",
-      "outputDate": "2017-01-19",
-      "inputDate": "2017-01-25",
-      "normFilePath": "",
-      "owner": "",
-      "activationInterval": "",
-      "source": "",
-      "sourceLogin": "",
-      "sourcePassword": "",
-      "active": true
-    }
+private getOwners(): void {
+  this.userSubscription = this.couchDBService
+    .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
+    .subscribe(results => {
+      results.forEach(item => {
+        this.owners.push(item);
+      });
+    });
+}
 
-    {
-      "type": "division",
-      "name": "ACP Group - Arbeitsanweisungen",
-      "active": true
-    }
-
-    {
-      "type": "user",
-      "firstname": "Max",
-      "lastname": "Müller",
-      "email": "max.mueller@mueller.com",
-      "active": true
-    }
-
-    {
-      "type": "usergroup",
-      "name": "BAZ",
-      "users": [""],
-      "active": true
-    }
-    */
-
-/* try {
-      console.log('onCreate');
-      this.couchDBService
-        .writeEntry(this.writeItem)
-        .then(r => {
-            console.log(r);
-        })
-        .catch(e => console.error(e));
-    } catch (error) {
-      console.error(error);
-    } */
+ */
+}

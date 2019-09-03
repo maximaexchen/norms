@@ -133,6 +133,16 @@
       >
         Fileupload
       </button>
+
+      <hr />
+
+      <!-- File input for upload without using the plugin. -->
+      <input
+        type="file"
+        name="fileUpload"
+        [(ngModel)]="fileUpload"
+        observeFiles
+      />
     </div>
 
     <hr />
