@@ -84,6 +84,8 @@ app.post('/api/upload', function(req, res) {
     if (err) {
       return res.end('Error uploading file.');
     } else {
+      console.log('req.body');
+      console.log(req.body);
       let tempPath = './' + req.files[0].path;
       let copyPath =
         './uploads/' + req.body.createID + '/' + req.files[0].filename;

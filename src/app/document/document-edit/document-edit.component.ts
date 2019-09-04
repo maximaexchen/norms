@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { delay, take } from 'rxjs/operators';
-import { Subscription, forkJoin, of, interval } from 'rxjs';
+import { switchMap, map, merge } from 'rxjs/operators';
+import { Subscription, Observable } from 'rxjs';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { FileUploader, FileItem } from 'ng2-file-upload';
 import { NormDocument } from '../document.model';
@@ -33,6 +33,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   documentSubscription = new Subscription();
   userSubscription = new Subscription();
   updateSubscription = new Subscription();
+  fileUploadSubscription = new Subscription();
 
   activationIntervals = [
     'Kein update nötig',
@@ -226,46 +227,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // console.log(this.normForm);
     console.log('onUpdateDocument: DocumentEditComponent');
 
-    const example = forkJoin(
-      // emit 'Hello' immediately
-      of('Hello'),
-      // emit 'World' after 1 second
-      of('World').pipe(delay(1000)),
-      // emit 0 after 1 second
-      interval(1000).pipe(take(1)),
-      // emit 0...1 in 1 second interval
-      interval(1000).pipe(take(2))
-      // promise that resolves to 'Promise Resolved' after 5 seconds
-      // myPromise('RESULT')
-    );
-    //  output: ["Hello", "World", 0, 1, "Promise Resolved: RESULT"]
-    const subscribe = example.subscribe(val => console.log(val));
+    const fileUploadSubscription = this.serverService
+      .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
+      .subscribe(updloadResult => {
+        if (updloadResult['body']) {
+          this.normFilePath = updloadResult['body'].file;
+        }
+        console.log('updateDocument createWriteItem');
+        console.log(this.normFilePath);
+        this.createWriteItem();
+      });
 
-    if (this.fileUpload) {
-      console.log('THERE IS A FILE');
-      this.serverService
-        .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
-        .subscribe(updloadResult => {
-          if (updloadResult['body']) {
-            this.normFilePath = updloadResult['body'].file;
-          }
-          console.log('updateDocument createWriteItem');
-          console.log(this.normFilePath);
-          this.createWriteItem();
-        });
-      /* this.serverService.findDirectory(this.id).subscribe(readResult => {
-        console.log('readResult');
-        console.log(readResult);
-      }); */
-    } else {
-      this.createWriteItem();
-    }
-
-    this.updateSubscription = this.couchDBService
+    const updateSubscription = this.couchDBService
       .updateEntry(this.writeItem, this.normForm.value._id)
-      .subscribe(result => {
-        /*console.log('update result');
-        console.log(result); */
+      .subscribe(results => {
+        console.log('update result');
+        console.log(results);
 
         // Inform about Database change.
         this.selectedtUsers = [];
@@ -273,6 +250,31 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
         this.router.navigate(['../document']);
       });
+
+    /* updateSubscription2
+      .pipe(
+        map(updloadResult => {
+          if (updloadResult['body']) {
+            this.normFilePath = updloadResult['body'].file;
+          }
+          console.log('updateDocument createWriteItem');
+          console.log(this.normFilePath);
+        }).mergeAll()
+      )
+      .subscribe(val => console.log(val));
+
+    const result$s = merge(series1$, series2$);
+
+    result$s.subscribe(console.log); */
+    /* if (this.fileUpload) {
+      console.log('THERE IS A FILE');
+      this.serverService.findDirectory(this.id).subscribe(readResult => {
+        console.log('readResult');
+        console.log(readResult);
+      });
+    } else {
+      this.createWriteItem();
+    } */
   }
 
   private createDocument(): void {
@@ -308,7 +310,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem = {};
 
     console.log('createWriteItem');
-    console.log(this.normFilePath);
 
     this.writeItem['type'] = 'norm';
     this.writeItem['division'] = this.normForm.value.division || '';
