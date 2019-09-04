@@ -2,10 +2,8 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap, map, merge } from 'rxjs/operators';
 import { Subscription, Observable } from 'rxjs';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { FileUploader, FileItem } from 'ng2-file-upload';
 import { NormDocument } from '../document.model';
 import { Division } from './../../division/division.model';
 import { User } from 'src/app/user/user.model';
@@ -21,11 +19,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
 
   uploadUrl = 'http://localhost:4000/api/upload';
-  uploader = new FileUploader({ url: this.uploadUrl, itemAlias: 'myfile' });
-  /* public uploader: FileUploader = new FileUploader({
-    url: URL,
-    itemAlias: 'myfile'
-  }); */
 
   routeSubsscription = new Subscription();
   writeSubscription = new Subscription();
@@ -81,21 +74,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private http: HttpClient,
     private serverService: ServerService
-  ) {
-    this.uploader.onBeforeUploadItem = (fileItem: FileItem): any => {
-      // logic of connecting url with the file
-      fileItem.url = 'http://localhost:4000/api/upload';
-
-      this.uploader.options.additionalParameter = {
-        name: fileItem.file.name,
-        normId: this.normNumber
-      };
-
-      console.log('fileItem');
-      console.log(fileItem);
-      return { fileItem };
-    };
-  }
+  ) {}
 
   ngOnInit() {
     console.log('DocumentEditComponent');
@@ -170,6 +149,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         const selectedUserObject = {};
         selectedUserObject['id'] = result._id;
         selectedUserObject['name'] = result.lastName + ', ' + result.firstName;
+        selectedUserObject['email'] = result.email;
         this.selectedtUsers.push(selectedUserObject);
       });
     });
@@ -180,25 +160,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // ["2a350192903b8d08259b69d22700c2d4",1]&endkey=["2a350192903b8d08259b69d22700c2d4",10]&include_docs=true
     return this.couchDBService.fetchEntry('/' + id);
   }
-
-  /* private initUploader() {
-    this.uploader.onCompleteItem = (
-      item: any,
-      response: any,
-      status: any,
-      headers: any
-    ) => {
-      // console.log('ImageUpload:uploaded:', item);
-      // console.log('response:', response);
-      // console.log('headers:', headers);
-      // console.log(JSON.parse(response).fileName);
-      const realtivePathString = item.url.substring(
-        item.url.lastIndexOf('/api') + 1
-      );
-      this.normFilePath =
-        realtivePathString + '/' + JSON.parse(response).fileName;
-    };
-  } */
 
   private getUsers(): void {
     this.couchDBService
@@ -224,57 +185,33 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private updateDocument(): void {
-    // console.log(this.normForm);
     console.log('onUpdateDocument: DocumentEditComponent');
 
-    const fileUploadSubscription = this.serverService
-      .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
-      .subscribe(updloadResult => {
-        if (updloadResult['body']) {
-          this.normFilePath = updloadResult['body'].file;
-        }
-        console.log('updateDocument createWriteItem');
-        console.log(this.normFilePath);
-        this.createWriteItem();
-      });
+    this.createWriteItem();
 
+    if (this.fileUpload) {
+      const fileUploadSubscription = this.serverService
+        .uploadFile(this.uploadUrl + '/', this.fileUpload, this.id)
+        .toPromise()
+        .then(res => {
+          this.writeItem['normFilePath'] = res['body'].file;
+          this.writeUpdate();
+        });
+    } else {
+      this.writeUpdate();
+    }
+  }
+
+  private writeUpdate() {
     const updateSubscription = this.couchDBService
       .updateEntry(this.writeItem, this.normForm.value._id)
       .subscribe(results => {
-        console.log('update result');
-        console.log(results);
-
-        // Inform about Database change.
         this.selectedtUsers = [];
+        // Inform about Database change.
         this.sendStateUpdate();
 
         this.router.navigate(['../document']);
       });
-
-    /* updateSubscription2
-      .pipe(
-        map(updloadResult => {
-          if (updloadResult['body']) {
-            this.normFilePath = updloadResult['body'].file;
-          }
-          console.log('updateDocument createWriteItem');
-          console.log(this.normFilePath);
-        }).mergeAll()
-      )
-      .subscribe(val => console.log(val));
-
-    const result$s = merge(series1$, series2$);
-
-    result$s.subscribe(console.log); */
-    /* if (this.fileUpload) {
-      console.log('THERE IS A FILE');
-      this.serverService.findDirectory(this.id).subscribe(readResult => {
-        console.log('readResult');
-        console.log(readResult);
-      });
-    } else {
-      this.createWriteItem();
-    } */
   }
 
   private createDocument(): void {
@@ -294,17 +231,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .subscribe(updloadResult => {
             console.log(updloadResult);
           });
-        console.log('createWriteItem');
-        console.log(this.normFilePath);
         this.sendStateUpdate();
       });
   }
-
-  /* private onFileChange(event) {
-    this.files = event.target.files;
-    console.log(this.files);
-    console.log(event);
-  } */
 
   private createWriteItem() {
     this.writeItem = {};
@@ -335,8 +264,27 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
 
-    const selUsersId = [
+    console.log(this.selectedtUsers);
+
+    /* const selUsersId = [
       ...new Set(this.selectedtUsers.map(userId => userId['id']))
+    ]; */
+
+    const selUsersId = [
+      ...new Set(
+        this.selectedtUsers.map(user => {
+          console.log(user);
+
+          const nameArr = user['name'].split(', ');
+
+          const newUser = {};
+          newUser['id'] = user['id'];
+          newUser['firstName'] = nameArr[1];
+          newUser['lastName'] = nameArr[0];
+
+          return newUser;
+        })
+      )
     ];
 
     this.writeItem['users'] = selUsersId || [];
@@ -371,27 +319,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.documentSubscription.unsubscribe();
     this.userSubscription.unsubscribe();
     this.updateSubscription.unsubscribe();
+    this.fileUploadSubscription.unsubscribe();
   }
-
-  /*  private getDivisions(): void {
-  this.divisionSubscription = this.couchDBService
-    .fetchEntries('/_design/norms/_view/all-divisions?include_docs=true')
-    .subscribe(results => {
-      results.forEach(item => {
-        this.divisions.push(item);
-      });
-    });
-}
-
-private getOwners(): void {
-  this.userSubscription = this.couchDBService
-    .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
-    .subscribe(results => {
-      results.forEach(item => {
-        this.owners.push(item);
-      });
-    });
-}
-
- */
 }

@@ -108,7 +108,6 @@ export class FileInputValueAccessor implements ControlValueAccessor {
         console.warn(
           'Ignoring attempt to assign non-FileList to input[type=file].'
         );
-        console.log('Value:', value);
       }
     }
   }

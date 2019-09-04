@@ -68,7 +68,7 @@ app.get('/api/findDirectory/:id', searchMiddleware, function(req, res) {
 // Store file in temp directory
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, './uploads/tempDir/');
+    callback(null, './uploadsTemp/');
   },
   filename: (req, file, callback) => {
     fileName =
@@ -88,7 +88,10 @@ app.post('/api/upload', function(req, res) {
       console.log(req.body);
       let tempPath = './' + req.files[0].path;
       let copyPath =
-        './uploads/' + req.body.createID + '/' + req.files[0].filename;
+        './src/assets/uploads/' +
+        req.body.createID +
+        '/' +
+        req.files[0].filename;
 
       // Move file in synamic generated Directory
       fs.move(tempPath, copyPath, function(err) {

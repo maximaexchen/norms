@@ -22,7 +22,15 @@
         <!-- <td>
           {{ document.division }}
         </td> -->
-        <td>{{ document.number }}</td>
+        <td>
+          <a
+            *ngIf="document.normFilePath"
+            href="{{ document.normFilePath.replace('./src', '') }}"
+            target="_blank"
+            >{{ document.number }}</a
+          >
+          <span *ngIf="!document.normFilePath">{{ document.number }}</span>
+        </td>
         <td>{{ document.name }}</td>
         <td>{{ document.revision }}</td>
         <td>{{ document.outputDate | date }}</td>

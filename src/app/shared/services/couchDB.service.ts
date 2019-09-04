@@ -25,7 +25,9 @@ export class CouchDBService {
   }
 
   public updateEntry(document: NormDocument, id: string): Observable<any> {
+    console.log('updateEntry');
     console.log(id);
+    console.log(document);
     return this.http.put(CouchDBService.DB_REQUEST + '/' + id, document);
   }
 
