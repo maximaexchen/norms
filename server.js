@@ -87,11 +87,17 @@ app.post('/api/upload', function(req, res) {
       console.log('req.body');
       console.log(req.body);
       let tempPath = './' + req.files[0].path;
+
       let copyPath =
         './src/assets/uploads/' +
         req.body.createID +
         '/' +
         req.files[0].filename;
+      /* let copyPath =
+        './dist/wakandaAngular/assets/uploads/' +
+        req.body.createID +
+        '/' +
+        req.files[0].filename; */
 
       // Move file in synamic generated Directory
       fs.move(tempPath, copyPath, function(err) {

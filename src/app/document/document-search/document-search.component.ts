@@ -22,6 +22,8 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
   foundDocuments: Document[];
   newUserArray: any[];
   display = false;
+  modalTitle = '';
+  modalContent = '';
 
   divisions: any = [];
   divisionID = '';
@@ -42,15 +44,22 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
     console.log('DocumentSearchComponent');
 
     this.searchSubsscription = this.route.params.subscribe(results => {
-      this.divisions = this.documentService.getDivisions();
-      this.owners = this.documentService.getUsers();
+      // this.divisions = this.documentService.getDivisions();
+      // this.owners = this.documentService.getUsers();
       this.groups = this.documentService.getGroups();
       this.users = this.documentService.getUsers();
+
+      this.documentService.getDivisions().then(res => {
+        this.divisions = res;
+      });
+      this.documentService.getUsers().then(res => {
+        this.owners = res;
+      });
     });
   }
 
   private onSubmit(): void {
-    /*  console.log(this.searchForm); */
+    console.log(this.searchForm);
 
     if (this.searchForm.value.division !== undefined) {
       this.divisionID = this.searchForm.value.division;
@@ -76,12 +85,22 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
         _id: { $gt: null },
         type: { $eq: 'norm' },
         $or: [
-          { division: this.divisionID },
-          { owner: this.ownerID },
+          {
+            division: {
+              _id: { $eq: this.divisionID }
+            }
+          },
+          {
+            owner: {
+              _id: { $eq: this.ownerID }
+            }
+          },
           {
             users: {
               $elemMatch: {
-                $eq: this.userID
+                id: {
+                  $eq: this.userID
+                }
               }
             }
           }
@@ -89,7 +108,7 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
       }
     };
 
-    // console.log(JSON.stringify(searchObject));
+    console.log(JSON.stringify(searchObject));
 
     this.searchSubsscription = this.couchDBService
       .search(searchObject)
@@ -98,7 +117,7 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
         results.docs.forEach(norm => {
           if (norm.division) {
             const divisionItem = this.couchDBService
-              .fetchEntry('/' + norm.division)
+              .fetchEntry('/' + norm.division._id)
               .subscribe(divisionC => {
                 norm.division = divisionC.name;
               });
@@ -106,7 +125,7 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
 
           if (norm.owner) {
             const ownerItem = this.couchDBService
-              .fetchEntry('/' + norm.owner)
+              .fetchEntry('/' + norm.owner._id)
               .subscribe(ownerC => {
                 norm.owner = ownerC.firstName + ' ' + ownerC.lastName;
               });
@@ -121,9 +140,11 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
 
                 if (wantedUser) {
                   wantedUser.forEach(user => {
+                    console.log(user);
                     const newUser = {
-                      firstName: user['doc'].firstName,
-                      lastName: user['doc'].lastName
+                      firstName: user['value']._id.firstName,
+                      lastName: user['value']._id.lastName,
+                      email: user['value']._id.email
                     };
                     fetchedUserArr.push(newUser);
                   });
@@ -137,8 +158,33 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
       });
   }
 
-  showDialog() {
+  showDialog(users: User[]) {
     this.display = true;
+    this.modalTitle = 'Benutzer';
+    this.modalContent = '';
+    this.modalContent += `
+    <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Nachname</th>
+        <th>Vorname</th>
+        <th>E-Mail</th>
+      </tr>
+    </thead>
+    <tbody>`;
+    users.forEach(user => {
+      this.modalContent += '<tr>';
+      this.modalContent += '<td>' + user['lastName'] + '</td>';
+      this.modalContent += '<td>' + user['firstName'] + '</td>';
+      this.modalContent +=
+        '<td><a href="mailto:' +
+        user['email'] +
+        '">' +
+        user['email'] +
+        '</a></td>';
+      this.modalContent += '</tr>';
+    });
+    this.modalContent += '</tbody></table>';
   }
 
   ngOnDestroy(): void {

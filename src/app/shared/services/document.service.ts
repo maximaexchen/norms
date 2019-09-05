@@ -110,4 +110,23 @@ export class DocumentService {
         return response.message;
       });
   }
+
+  public renameKeys(keysMap, obj) {
+    // debugger;
+
+    return Object.keys(obj).reduce((acc, key) => {
+      // debugger;
+
+      const renamedObject = {
+        [keysMap[key] || key]: obj[key]
+      };
+
+      // debugger;
+
+      return {
+        ...acc,
+        ...renamedObject
+      };
+    }, {});
+  }
 }

@@ -13,7 +13,6 @@ import { DocumentDetailComponent } from './document/document-detail/document-det
 import { DocumentEditComponent } from './document/document-edit/document-edit.component';
 
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { MessageService } from 'primeng/api';
 import { FileSelectDirective } from 'ng2-file-upload';
 import { HeaderComponent } from './header/header.component';
 import { GroupComponent } from './group/group.component';
@@ -35,6 +34,10 @@ import { DialogModule, Dialog } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { ServerService } from './shared/services/server.service';
+import { NotificationsComponent } from './shared/notifications.component';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { NotificationsService } from './shared/services/notifications.service';
 
 @NgModule({
   declarations: [
@@ -57,7 +60,8 @@ import { ServerService } from './shared/services/server.service';
     DivisionListComponent,
     DocumentSearchComponent,
     OrderByPipe,
-    FileInputValueAccessor
+    FileInputValueAccessor,
+    NotificationsComponent
   ],
   imports: [
     HttpClientModule,
@@ -68,7 +72,8 @@ import { ServerService } from './shared/services/server.service';
     DialogModule,
     BrowserAnimationsModule,
     ButtonModule,
-    CalendarModule
+    CalendarModule,
+    ToastModule
   ],
   providers: [
     MessageService,
@@ -76,7 +81,9 @@ import { ServerService } from './shared/services/server.service';
     DocumentService,
     ServerService,
     APIResolver,
-    DocumentResolver
+    DocumentResolver,
+    NotificationsService,
+    MessageService
   ],
   bootstrap: [AppComponent]
 })

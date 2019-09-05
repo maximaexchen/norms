@@ -3,5 +3,6 @@
   "editor.formatOnPaste": true,
   "javascript.preferences.quoteStyle": "single",
   "prettier.singleQuote": true,
-  "editor.minimap.enabled": false
+  "editor.minimap.enabled": false,
+  "javascript.implicitProjectConfig.experimentalDecorators": true
 }

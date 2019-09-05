@@ -18,10 +18,10 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let document of documents | async">
-        <!-- <td>
-          {{ document.division }}
-        </td> -->
+      <tr *ngFor="let document of documents">
+        <td>
+          {{ document.division.name }}
+        </td>
         <td>
           <a
             *ngIf="document.normFilePath"
@@ -29,14 +29,30 @@
             target="_blank"
             >{{ document.number }}</a
           >
+          <!--  <a
+            *ngIf="document.normFilePath"
+            href="{{
+              document.normFilePath.replace('./dist/wakandaAngular', '')
+            }}"
+            target="_blank"
+            >{{ document.number }}</a
+          > -->
           <span *ngIf="!document.normFilePath">{{ document.number }}</span>
         </td>
         <td>{{ document.name }}</td>
         <td>{{ document.revision }}</td>
         <td>{{ document.outputDate | date }}</td>
         <td>{{ document.inputDate | date }}</td>
-        <td>{{ document.owner }}</td>
-        <!-- <td>{{ document.users }}</td> -->
+        <td>
+          <span *ngIf="document.owner.lastName"
+            >{{ document.owner.lastName }}, {{ document.owner.firstName }}</span
+          >
+        </td>
+        <td>
+          <p *ngFor="let user of document.users">
+            {{ user.lastName }}, {{ user.firstName }}
+          </p>
+        </td>
         <td>
           <a
             [routerLink]="'../' + [document._id] + '/edit'"

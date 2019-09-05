@@ -2,13 +2,15 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription, Observable } from 'rxjs';
+
+import { Subscription, Observable, forkJoin } from 'rxjs';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { NormDocument } from '../document.model';
 import { Division } from './../../division/division.model';
 import { User } from 'src/app/user/user.model';
 import { DocumentService } from 'src/app/shared/services/document.service';
 import { ServerService } from 'src/app/shared/services/server.service';
+import { NotificationsService } from 'src/app/shared/services/notifications.service';
 
 @Component({
   selector: 'app-document-edit',
@@ -39,8 +41,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   ];
 
   writeItem: NormDocument;
-  divisions: Division = [];
-  owners: User = [];
+  divisions: Division[] = [];
+  owners: User[] = [];
   users: User[] = [];
   selectedtUsers: User[] = [];
 
@@ -50,7 +52,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   createId: string;
   rev: string;
   type: string;
-  division: string;
+  division: Division;
+  divisionId: string;
   normNumber: string;
   name: string;
   revision: string;
@@ -58,7 +61,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   inputDate: Date;
   normFilePath: string;
   normFilePathTemp: string;
-  owner: string;
+  owner: User;
+  ownerId: string;
   activationInterval: string;
   source: string;
   sourceLogin: string;
@@ -73,7 +77,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private serverService: ServerService
+    private serverService: ServerService,
+    private notificationsService: NotificationsService
   ) {}
 
   ngOnInit() {
@@ -96,10 +101,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.routeSubsscription = this.route.params.subscribe(results => {
       // empty the select-box
       this.selectedtUsers = [];
-
-      // get all data for the select-boxes
-      this.divisions = this.documentService.getDivisions();
-      this.owners = this.documentService.getUsers();
+      this.documentService.getDivisions().then(res => {
+        this.divisions = res;
+      });
+      this.documentService.getUsers().then(res => {
+        this.owners = res;
+      });
       this.getUsers();
 
       // check if we are updating
@@ -111,12 +118,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.documentSubscription = this.couchDBService
           .fetchEntry('/' + results['id'])
           .subscribe(entry => {
-            /* console.log('Entry:');
-          console.log(entry); */
+            console.log(entry);
             this.id = entry['_id'];
             this.rev = entry['_rev'];
             this.type = 'norm';
             this.division = entry['division'];
+            this.divisionId = entry['division']._id;
             this.normNumber = entry['number'];
             this.name = entry['name'];
             this.revision = entry['revision'];
@@ -124,12 +131,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.inputDate = new Date(entry['inputDate']);
             this.normFilePath = entry['normFilePath'];
             this.owner = entry['owner'];
+            this.ownerId = entry['owner']._id;
             this.activationInterval = entry['activationInterval'];
             this.source = entry['source'];
             this.sourceLogin = entry['sourceLogin'];
             this.sourcePassword = entry['sourcePassword'];
             this.active = entry['active'];
-            this.getSelectedUsers(entry['users']);
+            this.setSelectedUsers(entry['users']);
           });
       } else {
         console.log('New mode');
@@ -142,17 +150,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getSelectedUsers(users: any[]) {
-    users.forEach(user => {
-      this.getUserByID(user).subscribe(result => {
-        // build the Object for the selectbox in right format
-        const selectedUserObject = {};
-        selectedUserObject['id'] = result._id;
-        selectedUserObject['name'] = result.lastName + ', ' + result.firstName;
-        selectedUserObject['email'] = result.email;
-        this.selectedtUsers.push(selectedUserObject);
-      });
+  private setSelectedUsers(users: any[]) {
+    const userMap: User[] = users.map(user => {
+      const selectedUserObject = {};
+      selectedUserObject['id'] = user.id;
+      selectedUserObject['name'] = user.lastName + ', ' + user.firstName;
+      selectedUserObject['email'] = user.email;
+      return selectedUserObject;
     });
+    this.selectedtUsers = userMap;
   }
 
   private getUserByID(id: string): any {
@@ -169,6 +175,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           const userObject = {} as User;
           userObject['id'] = item._id;
           userObject['name'] = item.lastName + ', ' + item.firstName;
+          userObject['email'] = item.email;
           this.users.push(userObject);
         });
       });
@@ -211,7 +218,17 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.sendStateUpdate();
 
         this.router.navigate(['../document']);
+        this.showConfirm();
       });
+  }
+
+  showConfirm() {
+    console.log('showConfirm');
+    this.notificationsService.addSingle(
+      'success',
+      'Datensatz wurde Gespeichert',
+      'ok'
+    );
   }
 
   private createDocument(): void {
@@ -223,14 +240,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .writeEntry(this.writeItem)
       .subscribe(result => {
         this.createId = result['id'];
-        if (!this.fileUpload) {
-          console.log('THERE IS NO FILE');
+
+        if (this.fileUpload) {
+          this.serverService
+            .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
+            .subscribe(updloadResult => {
+              console.log(updloadResult);
+            });
         }
-        this.serverService
-          .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
-          .subscribe(updloadResult => {
-            console.log(updloadResult);
-          });
+
         this.sendStateUpdate();
       });
   }
@@ -241,14 +259,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('createWriteItem');
 
     this.writeItem['type'] = 'norm';
-    this.writeItem['division'] = this.normForm.value.division || '';
     this.writeItem['number'] = this.normForm.value.normNumber || '';
     this.writeItem['name'] = this.normForm.value.name || '';
     this.writeItem['revision'] = this.normForm.value.revision || '';
     this.writeItem['outputDate'] = this.normForm.value.outputDate || '';
     this.writeItem['inputDate'] = this.normForm.value.inputDate || '';
     this.writeItem['normFilePath'] = this.normFilePath || '';
-    this.writeItem['owner'] = this.normForm.value.owner || '';
     this.writeItem['activationInterval'] =
       this.normForm.value.activationInterval || '';
     this.writeItem['source'] = this.normForm.value.source || '';
@@ -264,30 +280,32 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
 
-    console.log(this.selectedtUsers);
-
-    /* const selUsersId = [
-      ...new Set(this.selectedtUsers.map(userId => userId['id']))
-    ]; */
-
-    const selUsersId = [
+    const selectedUserObjects = [
       ...new Set(
         this.selectedtUsers.map(user => {
-          console.log(user);
-
           const nameArr = user['name'].split(', ');
-
           const newUser = {};
           newUser['id'] = user['id'];
           newUser['firstName'] = nameArr[1];
           newUser['lastName'] = nameArr[0];
+          newUser['email'] = user['email'];
 
           return newUser;
         })
       )
     ];
+    this.writeItem['users'] = selectedUserObjects || [];
 
-    this.writeItem['users'] = selUsersId || [];
+    const selDivision = this.divisions.find(
+      divi => divi['_id'] === this.normForm.value.divisionId
+    );
+    this.writeItem['division'] = selDivision || '';
+
+    const selOwner = this.owners.find(
+      own => own['_id'] === this.normForm.value.ownerId
+    );
+    // delete Object.assign(selOwner, { ['id']: selOwner['_id'] })['_id'];
+    this.writeItem['owner'] = selOwner || '';
 
     return this.writeItem;
   }
