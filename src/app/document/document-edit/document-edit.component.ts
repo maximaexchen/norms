@@ -6,11 +6,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, Observable, forkJoin } from 'rxjs';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { NormDocument } from '../document.model';
+import { RevisionDocument } from './../revision-document.model';
 import { Division } from './../../division/division.model';
 import { User } from 'src/app/user/user.model';
 import { DocumentService } from 'src/app/shared/services/document.service';
 import { ServerService } from 'src/app/shared/services/server.service';
 import { NotificationsService } from 'src/app/shared/services/notifications.service';
+
+import * as _ from 'underscore';
 
 @Component({
   selector: 'app-document-edit',
@@ -45,6 +48,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   owners: User[] = [];
   users: User[] = [];
   selectedtUsers: User[] = [];
+  revisionDocuments: RevisionDocument[] = [];
 
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
@@ -55,12 +59,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   division: Division;
   divisionId: string;
   normNumber: string;
+
   name: string;
   revision: string;
   outputDate: Date;
   inputDate: Date;
   normFilePath: string;
   normFilePathTemp: string;
+  revisionDocument: RevisionDocument;
   owner: User;
   ownerId: string;
   activationInterval: string;
@@ -101,6 +107,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.routeSubsscription = this.route.params.subscribe(results => {
       // empty the select-box
       this.selectedtUsers = [];
+      // fetch data for select-boxes
       this.documentService.getDivisions().then(res => {
         this.divisions = res;
       });
@@ -115,6 +122,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.formMode = true;
         this.formTitle = 'Norm bearbeiten';
 
+        // fetch document which should be upated
         this.documentSubscription = this.couchDBService
           .fetchEntry('/' + results['id'])
           .subscribe(entry => {
@@ -125,6 +133,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.division = entry['division'];
             this.divisionId = entry['division']._id;
             this.normNumber = entry['number'];
+            this.revisionDocuments = _.sortBy(
+              entry['revisionDocuments'],
+              'revisionID'
+            ).reverse();
+
             this.name = entry['name'];
             this.revision = entry['revision'];
             this.outputDate = new Date(entry['outputDate']);
@@ -161,11 +174,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedtUsers = userMap;
   }
 
-  private getUserByID(id: string): any {
+  /* private getUserByID(id: string): any {
     // http://127.0.0.1:5984/norm_documents/_design/norms/_view/norm-users?startkey=
     // ["2a350192903b8d08259b69d22700c2d4",1]&endkey=["2a350192903b8d08259b69d22700c2d4",10]&include_docs=true
     return this.couchDBService.fetchEntry('/' + id);
-  }
+  } */
 
   private getUsers(): void {
     this.couchDBService
@@ -202,6 +215,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         .toPromise()
         .then(res => {
           this.writeItem['normFilePath'] = res['body'].file;
+          const oldRevNumber = Number(this.revision);
+          this.revisionDocument = {};
+          this.revisionDocument['path'] = res['body'].file;
+          this.revisionDocument['revisionID'] = oldRevNumber + 1;
+          this.revisionDocument['date'] = new Date();
+
+          this.revisionDocuments.push(this.revisionDocument);
+          this.writeItem['revisionDocuments'] = this.revisionDocuments || [];
+
+          console.log('############');
+          console.log(this.revision);
+          console.log(oldRevNumber + 1);
+          console.log(this.revisionDocument['revisionID']);
+          console.log('############');
           this.writeUpdate();
         });
     } else {
@@ -272,6 +299,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem['sourcePassword'] = this.normForm.value.sourcePassword || '';
     this.writeItem['active'] = this.normForm.value.active || false;
 
+    console.log('%%%%%%%%%%%%%%%%%%%%%');
+    console.log(this.revisionDocuments);
+    console.log(this.revisionDocument);
+    console.log('%%%%%%%%%%%%%%%%%%%%%');
+
     if (this.normForm.value._id) {
       this.writeItem['_id'] = this.normForm.value._id;
     }
@@ -280,6 +312,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
 
+    // reformat key and values for the User Object from
+    // values from selectBox
     const selectedUserObjects = [
       ...new Set(
         this.selectedtUsers.map(user => {
@@ -289,7 +323,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           newUser['firstName'] = nameArr[1];
           newUser['lastName'] = nameArr[0];
           newUser['email'] = user['email'];
-
           return newUser;
         })
       )

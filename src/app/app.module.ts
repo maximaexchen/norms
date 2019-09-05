@@ -30,14 +30,15 @@ import { DocumentResolver } from './shared/resolver/document.resolver';
 import { DocumentService } from './shared/services/document.service';
 import { FileInputValueAccessor } from './shared/services/file-input-value.accessor';
 import { OrderByPipe } from './shared/pipes/orderBy.pipe';
-import { DialogModule, Dialog } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
-import { CalendarModule } from 'primeng/calendar';
 import { ServerService } from './shared/services/server.service';
 import { NotificationsComponent } from './shared/notifications.component';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 import { NotificationsService } from './shared/services/notifications.service';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { DialogModule, Dialog } from 'primeng/dialog';
+import { CalendarModule } from 'primeng/calendar';
+import { ButtonModule } from 'primeng/button';
+import { FieldsetModule } from 'primeng/fieldset';
 
 @NgModule({
   declarations: [
@@ -73,7 +74,8 @@ import { NotificationsService } from './shared/services/notifications.service';
     BrowserAnimationsModule,
     ButtonModule,
     CalendarModule,
-    ToastModule
+    ToastModule,
+    FieldsetModule
   ],
   providers: [
     MessageService,

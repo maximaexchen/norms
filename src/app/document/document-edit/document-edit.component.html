@@ -122,6 +122,31 @@
         observeFiles
       />
     </div>
+    <hr />
+    <a
+      *ngIf="normFilePath"
+      href="{{ normFilePath.replace('./src', '') }}"
+      target="_blank"
+      >{{ normFilePath.split('/').pop() }}</a
+    >
+    <hr />
+
+    <p-fieldset
+      legend="Revision History"
+      [toggleable]="true"
+      [transitionOptions]="'100ms'"
+      [collapsed]="true"
+    >
+      <div *ngFor="let revDoc of revisionDocuments">
+        <a
+          *ngIf="revDoc.path"
+          href="{{ revDoc.path.replace('./src', '') }}"
+          target="_blank"
+          >{{ revDoc.path.split('/').pop() }}</a
+        >
+        ({{ revDoc.revisionID }})
+      </div>
+    </p-fieldset>
 
     <hr />
 

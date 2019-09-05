@@ -12,7 +12,6 @@ export class User {
     for (const key in kwArgs) {
       if (kwArgs[key]) {
         this[key] = kwArgs[key];
-        console.log(this[key]);
       }
     }
   }

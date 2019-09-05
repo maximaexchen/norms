@@ -173,3 +173,11 @@ $selected-background: #e9f4ff;
   border: 1px solid $btn-border;
   color: #fff;
 }
+
+body .ui-fieldset .ui-fieldset-legend {
+  font-size: 15px !important;
+
+  a {
+    padding: 0.371em 0.8em !important;
+  }
+}

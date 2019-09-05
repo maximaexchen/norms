@@ -44,8 +44,6 @@ export class DocumentService {
     usersIds.forEach(userId => {
       this.getUserByID(userId).subscribe(result => {
         // build the Object for the selectbox in right format
-
-        console.log(result);
         const selectedUserObject = {} as User;
         selectedUserObject['id'] = result._id;
         selectedUserObject['name'] = result.lastName + ', ' + result.firstName;

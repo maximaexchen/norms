@@ -59,7 +59,7 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
   }
 
   private onSubmit(): void {
-    console.log(this.searchForm);
+    // console.log(this.searchForm);
 
     if (this.searchForm.value.division !== undefined) {
       this.divisionID = this.searchForm.value.division;
@@ -140,7 +140,6 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
 
                 if (wantedUser) {
                   wantedUser.forEach(user => {
-                    console.log(user);
                     const newUser = {
                       firstName: user['value']._id.firstName,
                       lastName: user['value']._id.lastName,
