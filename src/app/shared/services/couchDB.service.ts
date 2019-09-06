@@ -9,10 +9,14 @@ import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class CouchDBService {
-  private static readonly BASE_URL = 'http://127.0.0.1:5984/';
+  // private static readonly BASE_URL = 'http://127.0.0.1:5984/';
+  // private static readonly NORM_DB = 'norm_documents';
+
   // private static readonly BASE_URL = 'http://192.168.178.24:8888/';
-  // private static readonly BASE_URL = 'http://116.203.220.19:5984/';
-  private static readonly NORM_DB = 'norm_documents';
+  // private static readonly NORM_DB = 'norm_rep';
+
+  private static readonly BASE_URL = 'http://116.203.220.19:5984/';
+  private static readonly NORM_DB = 'norm_rep2';
   private static readonly DB_REQUEST =
     CouchDBService.BASE_URL + CouchDBService.NORM_DB;
 
@@ -57,8 +61,8 @@ export class CouchDBService {
   }
 
   public search(object: any): Observable<any> {
-    console.log('search');
-    /* console.log(object);
+    /* console.log('search');
+    console.log(object);
     console.log(CouchDBService.DB_REQUEST + '/_find', object); */
     return this.http.post(CouchDBService.DB_REQUEST + '/_find', object);
   }
