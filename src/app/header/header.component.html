@@ -5,7 +5,7 @@
       <button
         type="button"
         class="navbar-toggle"
-        (click)="collapsed = !collapsed"
+        (click)="isCollapsed = !isCollapsed"
       >
         <span class="icon-bar" *ngFor="let iconBar of [1, 2, 3]"></span>
       </button>
@@ -13,8 +13,8 @@
     </div>
     <div
       class="navbar-collapse"
-      [class.collapse]="collapsed"
-      (window:resize)="collapsed = true"
+      [class.collapse]="isCollapsed"
+      (window:resize)="isCollapsed = true"
     >
       <ul class="nav navbar-nav">
         <li routerLinkActive="active">

@@ -9,11 +9,9 @@ import { AppComponent } from './app.component';
 import { DocumentComponent } from './document/document.component';
 import { DocumentStartComponent } from './document/document-start/document-start.component';
 import { DocumentListComponent } from './document/document-list/document-list.component';
-import { DocumentDetailComponent } from './document/document-detail/document-detail.component';
 import { DocumentEditComponent } from './document/document-edit/document-edit.component';
 
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { FileSelectDirective } from 'ng2-file-upload';
 import { HeaderComponent } from './header/header.component';
 import { GroupComponent } from './group/group.component';
 import { GroupEditComponent } from './group/group-edit/group-edit.component';
@@ -45,8 +43,6 @@ import { FieldsetModule } from 'primeng/fieldset';
     AppComponent,
     DocumentComponent,
     DocumentListComponent,
-    DocumentDetailComponent,
-    FileSelectDirective,
     HeaderComponent,
     DocumentEditComponent,
     DocumentStartComponent,

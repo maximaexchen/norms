@@ -5,15 +5,11 @@
     <form class="form" (ngSubmit)="onSubmit()" #searchForm="ngForm">
       <div class="form-group">
         <label class="form-label">Bereich</label>
-        <select class="form-control" [(ngModel)]="division" name="division">
+        <select class="form-control" [(ngModel)]="divisionId" name="divisionId">
           <option [value]="undefined" selected="selected"
             >Bereich wählen</option
           >
-          <option
-            *ngFor="let item of divisions"
-            [value]="item._id"
-            [selected]="item._id == id"
-          >
+          <option *ngFor="let item of divisions" [value]="item._id">
             {{ item.name }}
           </option>
         </select>
@@ -21,14 +17,10 @@
 
       <div class="form-group">
         <label class="form-label">User</label>
-        <select class="form-control" [(ngModel)]="user" name="user">
+        <select class="form-control" [(ngModel)]="userId" name="userId">
           <option [value]="undefined" selected="selected"
             >Benutzer wählen </option
-          ><option
-            *ngFor="let item of users | async"
-            [value]="item._id"
-            [selected]="item._id == id"
-          >
+          ><option *ngFor="let item of users" [value]="item._id">
             {{ item.lastName }}, {{ item.firstName }}
           </option>
         </select>
@@ -36,13 +28,9 @@
 
       <div class="form-group">
         <label class="form-label">Gruppe</label>
-        <select class="form-control" [(ngModel)]="group" name="group">
+        <select class="form-control" [(ngModel)]="groupId" name="groupId">
           <option [value]="undefined" selected="selected">Gruppe wählen</option>
-          <option
-            *ngFor="let item of groups | async"
-            [value]="item._id"
-            [selected]="item._id == id"
-          >
+          <option *ngFor="let item of groups" [value]="item._id">
             {{ item.name }}
           </option>
         </select>
@@ -50,7 +38,7 @@
 
       <div class="form-group">
         <label class="form-label">Owner</label>
-        <select class="form-control" [(ngModel)]="owner" name="owner">
+        <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
           <<option [value]="undefined" selected="selected">Owner wählen</option>
           <option
             *ngFor="let owner of owners"

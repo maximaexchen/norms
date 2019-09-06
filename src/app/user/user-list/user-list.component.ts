@@ -10,7 +10,7 @@ import { DocumentService } from 'src/app/shared/services/document.service';
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit, OnDestroy {
-  users: User = [];
+  users: User[] = [];
   changeSubscription: Subscription;
 
   constructor(
@@ -23,10 +23,14 @@ export class UserListComponent implements OnInit, OnDestroy {
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'user') {
-          this.users = this.documentService.getUsers();
+          this.documentService.getUsers().then(res => {
+            this.users = res;
+          });
         }
       });
-    this.users = this.documentService.getUsers();
+    this.documentService.getUsers().then(res => {
+      this.users = res;
+    });
   }
 
   ngOnDestroy() {

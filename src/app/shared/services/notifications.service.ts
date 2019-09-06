@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
-import { Message, MessageService } from 'primeng/primeng';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 type Severities = 'success' | 'info' | 'warn' | 'error';
 
