@@ -39,7 +39,7 @@
       <div class="form-group">
         <label class="form-label">Owner</label>
         <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
-          <<option [value]="undefined" selected="selected">Owner wählen</option>
+          <option [value]="undefined" selected="selected">Owner wählen</option>
           <option
             *ngFor="let owner of owners"
             [value]="owner._id"

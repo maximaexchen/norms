@@ -14,6 +14,7 @@ import { ServerService } from 'src/app/shared/services/server.service';
 import { NotificationsService } from 'src/app/shared/services/notifications.service';
 
 import * as _ from 'underscore';
+import { EnvService } from 'src/app/shared/services/env.service';
 
 @Component({
   selector: 'app-document-edit',
@@ -23,7 +24,7 @@ import * as _ from 'underscore';
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
 
-  uploadUrl = 'http://localhost:4000/api/upload';
+  uploadUrl = this.env.uploadUrl;
 
   routeSubsscription = new Subscription();
   writeSubscription = new Subscription();
@@ -78,6 +79,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   fileUpload: File | null;
 
   constructor(
+    private env: EnvService,
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
     private router: Router,
@@ -211,7 +213,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     if (this.fileUpload) {
       const fileUploadSubscription = this.serverService
-        .uploadFile(this.uploadUrl + '/', this.fileUpload, this.id)
+        .uploadFile(
+          this.uploadUrl + '/',
+          this.fileUpload,
+          this.id,
+          this.env.uploadDir
+        )
         .toPromise()
         .then(res => {
           this.writeItem['normFilePath'] = res['body'].file;
@@ -270,7 +277,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
         if (this.fileUpload) {
           this.serverService
-            .uploadFile(this.uploadUrl + '/', this.fileUpload, this.createId)
+            .uploadFile(
+              this.uploadUrl + '/',
+              this.fileUpload,
+              this.createId,
+              this.env.uploadDir
+            )
             .subscribe(updloadResult => {
               console.log(updloadResult);
             });

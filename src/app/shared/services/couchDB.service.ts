@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { NormDocument } from 'src/app/document/document.model';
 import { Observable, Subject } from 'rxjs';
+import { EnvService } from './env.service';
 
 // CouchDB Ubuntu Server
 /* $kP2ZernC */
@@ -15,34 +16,36 @@ export class CouchDBService {
   // private static readonly BASE_URL = 'http://192.168.178.24:8888/';
   // private static readonly NORM_DB = 'norm_rep';
 
-  private static readonly BASE_URL = 'http://116.203.220.19:5984/';
-  private static readonly NORM_DB = 'norm_rep2';
-  private static readonly DB_REQUEST =
-    CouchDBService.BASE_URL + CouchDBService.NORM_DB;
+  private baseUrl = this.env.dbBaseUrl;
+  private dbName = this.env.dbName;
+  private dbRequest = this.baseUrl + this.dbName;
 
   private updateSubject = new Subject<any>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private env: EnvService, private http: HttpClient) {}
 
   public writeEntry(document: NormDocument) {
-    return this.http.post(CouchDBService.DB_REQUEST, document);
+    return this.http.post(this.dbRequest, document);
   }
 
   public updateEntry(document: NormDocument, id: string): Observable<any> {
     console.log('updateEntry');
     // console.log(id);
-    console.log(document);
-    return this.http.put(CouchDBService.DB_REQUEST + '/' + id, document);
+    // console.log(document);
+    return this.http.put(this.dbRequest + '/' + id, document);
   }
 
   public deleteEntry(id: string, rev: string): Observable<any> {
-    return this.http.delete(
-      CouchDBService.DB_REQUEST + '/' + id + '?rev=' + rev
-    );
+    return this.http.delete(this.dbRequest + '/' + id + '?rev=' + rev);
   }
 
   public fetchEntries(param: string): Observable<any> {
-    return this.http.get(CouchDBService.DB_REQUEST + param).pipe(
+    console.log('+++++++++++++++++++++++');
+    console.log(this.dbRequest + param);
+    console.log(this.dbRequest);
+    console.log(param);
+    console.log('+++++++++++++++++++++++');
+    return this.http.get(this.dbRequest + param).pipe(
       map(responseData => {
         const entriesArray = [];
 
@@ -57,14 +60,14 @@ export class CouchDBService {
   }
 
   public fetchEntry(param: string): Observable<any> {
-    return this.http.get(CouchDBService.DB_REQUEST + param);
+    return this.http.get(this.dbRequest + param);
   }
 
   public search(object: any): Observable<any> {
     /* console.log('search');
     console.log(object);
     console.log(CouchDBService.DB_REQUEST + '/_find', object); */
-    return this.http.post(CouchDBService.DB_REQUEST + '/_find', object);
+    return this.http.post(this.dbRequest + '/_find', object);
   }
 
   public sendStateUpdate(message: string) {
@@ -80,7 +83,7 @@ export class CouchDBService {
     // startkey=["2a350192903b8d08259b69d22700c2d4"]&endkey=["2a350192903b8d08259b69d22700c2d4",{},{}]&include_docs=true
 
     return this.http.get(
-      CouchDBService.DB_REQUEST +
+      this.dbRequest +
         '/_design/norms/_view/norm-users?' +
         'startkey=["' +
         id +

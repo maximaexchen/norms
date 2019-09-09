@@ -20,11 +20,13 @@ export class ServerService {
   public uploadFile(
     url: string,
     file: File,
-    createID: string
+    createID: string,
+    uploadDir: string
   ): Observable<HttpEvent<any>> {
     const formData = new FormData();
     formData.append('uploadFile', file, file.name);
     formData.append('createID', createID);
+    formData.append('uploadDir', uploadDir);
 
     const params = new HttpParams();
 

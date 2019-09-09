@@ -37,6 +37,7 @@ import { DialogModule, Dialog } from 'primeng/dialog';
 import { CalendarModule } from 'primeng/calendar';
 import { ButtonModule } from 'primeng/button';
 import { FieldsetModule } from 'primeng/fieldset';
+import { EnvServiceProvider } from './shared/services/env.service.provider';
 
 @NgModule({
   declarations: [
@@ -81,7 +82,8 @@ import { FieldsetModule } from 'primeng/fieldset';
     APIResolver,
     DocumentResolver,
     NotificationsService,
-    MessageService
+    MessageService,
+    EnvServiceProvider
   ],
   bootstrap: [AppComponent]
 })

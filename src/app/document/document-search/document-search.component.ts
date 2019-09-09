@@ -8,6 +8,7 @@ import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as _ from 'underscore';
 import { Division } from 'src/app/division/division.model';
+import { EnvService } from 'src/app/shared/services/env.service';
 
 @Component({
   selector: 'app-document-search',
@@ -34,6 +35,7 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
   groupId: string;
 
   constructor(
+    private env: EnvService,
     private route: ActivatedRoute,
     private couchDBService: CouchDBService,
     private documentService: DocumentService
