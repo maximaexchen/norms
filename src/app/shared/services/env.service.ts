@@ -16,6 +16,7 @@ export class EnvService {
 
   public uploadUrl = 'http://localhost:4000/api/upload';
   public uploadDir = './dist/wakandaAngular/assets/uploads/';
+  public uploadRoot = './dist/wakandaAngular/';
 
   constructor() {}
 }

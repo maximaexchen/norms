@@ -144,7 +144,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.revision = entry['revision'];
             this.outputDate = new Date(entry['outputDate']);
             this.inputDate = new Date(entry['inputDate']);
-            this.normFilePath = entry['normFilePath'];
+            this.normFilePath = entry['normFilePath'].replace(
+              this.env.uploadRoot,
+              ''
+            );
             this.owner = entry['owner'];
             this.ownerId = entry['owner']._id;
             this.activationInterval = entry['activationInterval'];
@@ -224,7 +227,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.writeItem['normFilePath'] = res['body'].file;
           const oldRevNumber = Number(this.revision);
           this.revisionDocument = {};
-          this.revisionDocument['path'] = res['body'].file;
+          this.revisionDocument['path'] = res['body'].file.replace(
+            this.env.uploadRoot,
+            ''
+          );
           this.revisionDocument['revisionID'] = oldRevNumber + 1;
           this.revisionDocument['date'] = new Date();
 
@@ -310,11 +316,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem['sourceLogin'] = this.normForm.value.sourceLogin || '';
     this.writeItem['sourcePassword'] = this.normForm.value.sourcePassword || '';
     this.writeItem['active'] = this.normForm.value.active || false;
-
-    console.log('%%%%%%%%%%%%%%%%%%%%%');
-    console.log(this.revisionDocuments);
-    console.log(this.revisionDocument);
-    console.log('%%%%%%%%%%%%%%%%%%%%%');
 
     if (this.normForm.value._id) {
       this.writeItem['_id'] = this.normForm.value._id;

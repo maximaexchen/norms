@@ -123,12 +123,9 @@
       />
     </div>
     <hr />
-    <a
-      *ngIf="normFilePath"
-      href="{{ normFilePath.replace('./src', '') }}"
-      target="_blank"
-      >{{ normFilePath.split('/').pop() }}</a
-    >
+    <a *ngIf="normFilePath" href="{{ normFilePath }}" target="_blank">{{
+      normFilePath.split('/').pop()
+    }}</a>
     <hr />
 
     <p-fieldset

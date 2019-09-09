@@ -19,5 +19,7 @@
   window.__env.uploadUrl = 'http://localhost:4000/api/upload';
 
   // window.__env.uploadDir = './dist/wakandaAngular/assets/uploads/';
+  // window.__env.uploadRoot = './dist/wakandaAngular/';
   window.__env.uploadDir = './src/assets/uploads/';
+  window.__env.uploadRoot = './src/';
 })(this);
