@@ -156,6 +156,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.sourcePassword = entry['sourcePassword'];
             this.active = entry['active'];
             this.setSelectedUsers(entry['users']);
+
+            console.log('-----------');
+            console.log(this.normFilePath);
+            console.log('-----------');
+            console.log('######');
+            console.log(this.revisionDocuments);
+            console.log('######');
           });
       } else {
         console.log('New mode');

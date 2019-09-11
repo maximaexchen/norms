@@ -125,7 +125,7 @@
     <hr />
     <a
       *ngIf="normFilePath"
-      href="{{ normFilePath }}"
+      href="../{{ normFilePath }}"
       target="_blank"
       download
       >{{ normFilePath.split('/').pop() }}</a
@@ -141,7 +141,7 @@
       <div *ngFor="let revDoc of revisionDocuments">
         <a
           *ngIf="revDoc.path"
-          href="{{ revDoc.path.replace('./src', '') }}"
+          href="../{{ revDoc.path.replace('./src', '') }}"
           target="_blank"
           download
           >{{ revDoc.path.split('/').pop() }}</a
