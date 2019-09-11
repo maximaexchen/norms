@@ -123,9 +123,13 @@
       />
     </div>
     <hr />
-    <a *ngIf="normFilePath" href="{{ normFilePath }}" target="_blank">{{
-      normFilePath.split('/').pop()
-    }}</a>
+    <a
+      *ngIf="normFilePath"
+      href="{{ normFilePath }}"
+      target="_blank"
+      download
+      >{{ normFilePath.split('/').pop() }}</a
+    >
     <hr />
 
     <p-fieldset
@@ -139,6 +143,7 @@
           *ngIf="revDoc.path"
           href="{{ revDoc.path.replace('./src', '') }}"
           target="_blank"
+          download
           >{{ revDoc.path.split('/').pop() }}</a
         >
         ({{ revDoc.revisionID }})
