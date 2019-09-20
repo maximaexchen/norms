@@ -31,7 +31,6 @@ export class GroupListComponent implements OnInit, OnDestroy {
 
     this.documentService.getGroups().then(res => {
       this.groups = res;
-      console.log(this.groups.push());
     });
   }
 

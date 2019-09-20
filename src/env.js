@@ -22,6 +22,8 @@
   // window.__env.uploadRoot = './dist/wakandaAngular/';
   window.__env.uploadDir = './src/assets/uploads/';
   window.__env.uploadRoot = './src/';
+
+  // ng build --prod --base-href ./
 })(this);
 
 // sudo lsof -i :4000

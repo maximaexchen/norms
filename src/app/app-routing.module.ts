@@ -10,11 +10,9 @@ import { DocumentEditComponent } from './document/document-edit/document-edit.co
 import { DocumentStartComponent } from './document/document-start/document-start.component';
 import { GroupComponent } from './group/group.component';
 import { GroupEditComponent } from './group/group-edit/group-edit.component';
-import { APIResolver } from './shared/resolver/api.resolver';
 import { UserEditComponent } from './user/user-edit/user-edit.component';
 import { UserComponent } from './user/user.component';
 import { DivisionEditComponent } from './division/division-edit/division-edit.component';
-import { DocumentResolver } from './shared/resolver/document.resolver';
 
 const routes: Routes = [
   {

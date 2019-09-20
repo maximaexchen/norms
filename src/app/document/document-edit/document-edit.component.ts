@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Subscription, Observable, forkJoin } from 'rxjs';
+import { Subscription, Observable, of, Subscriber } from 'rxjs';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { NormDocument } from '../document.model';
 import { RevisionDocument } from './../revision-document.model';
@@ -23,6 +24,8 @@ import { EnvService } from 'src/app/shared/services/env.service';
 })
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
+
+  isLoading = false;
 
   uploadUrl = this.env.uploadUrl;
 
@@ -50,6 +53,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   users: User[] = [];
   selectedtUsers: User[] = [];
   revisionDocuments: RevisionDocument[] = [];
+  attachment: any;
 
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
@@ -77,6 +81,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   active: boolean;
   dropdownSettings = {};
   fileUpload: File | null;
+  rawPDF: string;
 
   constructor(
     private env: EnvService,
@@ -84,7 +89,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private documentService: DocumentService,
     private router: Router,
     private route: ActivatedRoute,
-    private http: HttpClient,
     private serverService: ServerService,
     private notificationsService: NotificationsService
   ) {}
@@ -156,13 +160,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.sourcePassword = entry['sourcePassword'];
             this.active = entry['active'];
             this.setSelectedUsers(entry['users']);
-
-            console.log('-----------');
-            console.log(this.normFilePath);
-            console.log('-----------');
-            console.log('######');
-            console.log(this.revisionDocuments);
-            console.log('######');
+            this.attachment = entry['_attachments'];
           });
       } else {
         console.log('New mode');
@@ -173,6 +171,102 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.owner = '';
       }
     });
+  }
+
+  private createDocument(): void {
+    console.log('onCreate: DocumentEditComponent');
+
+    this.createWriteItem();
+
+    this.writeSubscription = this.couchDBService
+      .writeEntry(this.writeItem)
+      .subscribe(result => {
+        this.createId = result['id'];
+
+        if (this.fileUpload) {
+          this.serverService
+            .uploadFile(
+              this.uploadUrl + '/',
+              this.fileUpload,
+              this.createId,
+              this.env.uploadDir
+            )
+            .subscribe(updloadResult => {
+              console.log(updloadResult);
+            });
+        }
+        this.isLoading = false;
+        this.sendStateUpdate();
+      });
+  }
+
+  private updateDocument(): void {
+    console.log('onUpdateDocument: DocumentEditComponent');
+
+    this.createWriteItem();
+
+    // TODO: updates with no new Document should not loose the attachment in database
+    if (this.fileUpload) {
+      // upload file to server
+      const fileUploadSubscription = this.serverService
+        .uploadFile(
+          this.uploadUrl + '/',
+          this.fileUpload,
+          this.id,
+          this.env.uploadDir
+        )
+        .toPromise()
+        .then(res => {
+          // after upload, save the file to couchDB
+          this.convertToBase64(this.fileUpload).subscribe(encodedPDF => {
+            // remove the base64 link from converted pdf Data
+            encodedPDF = encodedPDF.replace('data:application/pdf;base64,', '');
+
+            const pathToUpload = res['body'].file.replace(
+              this.env.uploadRoot,
+              ''
+            );
+            this.writeItem['normFilePath'] = pathToUpload;
+
+            // TODO: revision number klären
+            // FIXME: revision number klären
+            this.revision = (Number(this.revision) + 1).toString();
+
+            this.revisionDocument = {};
+            this.revisionDocument['path'] = pathToUpload;
+            this.revisionDocument['revisionID'] = this.revision;
+            this.revisionDocument['date'] = new Date();
+
+            this.revisionDocuments.push(this.revisionDocument);
+            this.writeItem['revisionDocuments'] = this.revisionDocuments || [];
+
+            // add _attacment to write object
+            this.writeItem['_attachments'] = {
+              [res['body'].fileName]: {
+                data: encodedPDF,
+                content_type: 'application/pdf'
+              }
+            };
+
+            this.writeUpdate();
+          });
+        });
+    } else {
+      this.writeUpdate();
+    }
+  }
+
+  private writeUpdate() {
+    const updateSubscription = this.couchDBService
+      .updateEntry(this.writeItem, this.normForm.value._id)
+      .subscribe(results => {
+        this.selectedtUsers = [];
+        // Inform about database change.
+        this.sendStateUpdate();
+        this.isLoading = false;
+        this.router.navigate(['../document']);
+        this.showConfirm();
+      });
   }
 
   private setSelectedUsers(users: any[]) {
@@ -207,6 +301,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit(): void {
+    this.isLoading = true;
     if (this.normForm.value.formMode) {
       console.log('Update a norm');
       this.updateDocument();
@@ -216,95 +311,28 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateDocument(): void {
-    console.log('onUpdateDocument: DocumentEditComponent');
-
-    this.createWriteItem();
-
-    console.log(this.uploadUrl);
-
-    if (this.fileUpload) {
-      const fileUploadSubscription = this.serverService
-        .uploadFile(
-          this.uploadUrl + '/',
-          this.fileUpload,
-          this.id,
-          this.env.uploadDir
-        )
-        .toPromise()
-        .then(res => {
-          this.writeItem['normFilePath'] = res['body'].file;
-          const oldRevNumber = Number(this.revision);
-          this.revisionDocument = {};
-          this.revisionDocument['path'] = res['body'].file.replace(
-            this.env.uploadRoot,
-            ''
-          );
-          this.revisionDocument['revisionID'] = oldRevNumber + 1;
-          this.revisionDocument['date'] = new Date();
-
-          this.revisionDocuments.push(this.revisionDocument);
-          this.writeItem['revisionDocuments'] = this.revisionDocuments || [];
-
-          console.log('############');
-          console.log(this.revision);
-          console.log(oldRevNumber + 1);
-          console.log(this.revisionDocument['revisionID']);
-          console.log('############');
-          this.writeUpdate();
-        });
-    } else {
-      this.writeUpdate();
-    }
+  private convertToBase64(file: File): Observable<string> {
+    return Observable.create((sub: Subscriber<string>): void => {
+      const r = new FileReader();
+      // if success
+      r.onload = (ev: ProgressEvent): void => {
+        sub.next((ev.target as any).result);
+      };
+      // if failed
+      r.onerror = (ev: ProgressEvent): void => {
+        sub.error(ev);
+      };
+      r.readAsDataURL(file);
+    });
   }
 
-  private writeUpdate() {
-    const updateSubscription = this.couchDBService
-      .updateEntry(this.writeItem, this.normForm.value._id)
-      .subscribe(results => {
-        this.selectedtUsers = [];
-        // Inform about Database change.
-        this.sendStateUpdate();
-
-        this.router.navigate(['../document']);
-        this.showConfirm();
-      });
-  }
-
-  showConfirm() {
+  private showConfirm() {
     console.log('showConfirm');
     this.notificationsService.addSingle(
       'success',
       'Datensatz wurde Gespeichert',
       'ok'
     );
-  }
-
-  private createDocument(): void {
-    console.log('onCreate: DocumentEditComponent');
-
-    this.createWriteItem();
-
-    this.writeSubscription = this.couchDBService
-      .writeEntry(this.writeItem)
-      .subscribe(result => {
-        this.createId = result['id'];
-
-        if (this.fileUpload) {
-          this.serverService
-            .uploadFile(
-              this.uploadUrl + '/',
-              this.fileUpload,
-              this.createId,
-              this.env.uploadDir
-            )
-            .subscribe(updloadResult => {
-              console.log(updloadResult);
-            });
-        }
-
-        this.sendStateUpdate();
-      });
   }
 
   private createWriteItem() {
@@ -362,6 +390,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // delete Object.assign(selOwner, { ['id']: selOwner['_id'] })['_id'];
     this.writeItem['owner'] = selOwner || '';
 
+    if (this.attachment) {
+      this.writeItem['_attachments'] = this.attachment;
+    }
     return this.writeItem;
   }
 

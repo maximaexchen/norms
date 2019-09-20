@@ -10,15 +10,9 @@ import { EnvService } from './env.service';
 
 @Injectable()
 export class CouchDBService {
-  // private static readonly BASE_URL = 'http://127.0.0.1:5984/';
-  // private static readonly NORM_DB = 'norm_documents';
-
-  // private static readonly BASE_URL = 'http://192.168.178.24:8888/';
-  // private static readonly NORM_DB = 'norm_rep';
-
   private baseUrl = this.env.dbBaseUrl;
   private dbName = this.env.dbName;
-  private dbRequest = this.baseUrl + this.dbName;
+  public dbRequest = this.baseUrl + this.dbName;
 
   private updateSubject = new Subject<any>();
 
@@ -30,8 +24,6 @@ export class CouchDBService {
 
   public updateEntry(document: NormDocument, id: string): Observable<any> {
     console.log('updateEntry');
-    // console.log(id);
-    // console.log(document);
     return this.http.put(this.dbRequest + '/' + id, document);
   }
 
@@ -63,14 +55,20 @@ export class CouchDBService {
     return this.http.get(this.dbRequest + param);
   }
 
+  public bulkUpdate(bulkObject: any): Observable<any> {
+    return this.http.post(this.dbRequest + '/_bulk_docs', bulkObject);
+  }
+
   public search(object: any): Observable<any> {
-    /* console.log('search');
+    console.log('search');
     console.log(object);
-    console.log(CouchDBService.DB_REQUEST + '/_find', object); */
+    console.log(this.dbRequest + '/_find', object);
     return this.http.post(this.dbRequest + '/_find', object);
   }
 
   public sendStateUpdate(message: string) {
+    console.log('UPDATE EVENT');
+    console.log(message);
     this.updateSubject.next({ text: message });
   }
 

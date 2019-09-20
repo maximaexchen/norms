@@ -1,3 +1,4 @@
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
@@ -72,7 +73,8 @@ import { EnvServiceProvider } from './shared/services/env.service.provider';
     ButtonModule,
     CalendarModule,
     ToastModule,
-    FieldsetModule
+    FieldsetModule,
+    ProgressSpinnerModule
   ],
   providers: [
     MessageService,
