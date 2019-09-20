@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Division } from './../../division/division.model';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { Subscription, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { User } from 'src/app/user/user.model';
 import { Group } from 'src/app/group/group.model';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NormDocument } from 'src/app/document/document.model';
 
 @Injectable()
@@ -108,6 +107,19 @@ export class DocumentService {
         return response.message;
       });
   }
+
+  public getDownload(id: string, documentName: string) {
+    const url = '/' + id + '/' + documentName;
+
+    return this.http.get(this.couchDBService.dbRequest + url, {
+      responseType: 'blob',
+      headers: new HttpHeaders().append('Content-Type', 'application/pdf')
+    });
+  }
+
+  /**
+   * Helperfunctions
+   */
 
   public renameKeys(keysMap, obj) {
     // debugger;

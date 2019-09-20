@@ -120,6 +120,7 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
       .subscribe(results => {
         this.foundDocuments = results.docs;
         results.docs.forEach(norm => {
+          console.log(norm);
           if (norm.division) {
             const divisionItem = this.couchDBService
               .fetchEntry('/' + norm.division._id)

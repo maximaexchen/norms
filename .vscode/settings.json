@@ -1,8 +1,4 @@
 {
-  "editor.formatOnSave": true,
-  "editor.formatOnPaste": true,
-  "javascript.preferences.quoteStyle": "single",
-  "prettier.singleQuote": true,
-  "editor.minimap.enabled": false,
-  "javascript.implicitProjectConfig.experimentalDecorators": true
+    "editor.formatOnSave": true,
+    "prettier.singleQuote": true
 }

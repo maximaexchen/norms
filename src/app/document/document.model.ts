@@ -17,6 +17,7 @@ export interface NormDocumentProperties {
   active?: boolean;
 }
 
+// export class NormDocument implements Iterable<string> {
 export class NormDocument {
   constructor(kwArgs: NormDocumentProperties = {}) {
     for (const key in kwArgs) {
@@ -25,4 +26,10 @@ export class NormDocument {
       }
     }
   }
+
+  /* *[Symbol.iterator](): Iterator<string> {
+    for (const key of Object.keys(this)) {
+      yield key;
+    }
+  } */
 }

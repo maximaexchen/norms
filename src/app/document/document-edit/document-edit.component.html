@@ -1,3 +1,10 @@
+<div class="loading-indicator" *ngIf="isLoading">
+  <p-progressSpinner
+    [style]="{ width: '80px', height: '80px' }"
+    strokeWidth="5"
+    animationDuration=".8s"
+  ></p-progressSpinner>
+</div>
 <div class="col">
   <h4>{{ formTitle }}</h4>
   <h5 *ngIf="normNumber">{{ normNumber }} - {{ name }}</h5>
@@ -125,7 +132,7 @@
     <hr />
     <a
       *ngIf="normFilePath"
-      href="./{{ normFilePath }}"
+      href="/{{ normFilePath }}"
       target="_blank"
       download
       >{{ normFilePath.split('/').pop() }}</a
@@ -141,7 +148,7 @@
       <div *ngFor="let revDoc of revisionDocuments">
         <a
           *ngIf="revDoc.path"
-          href="./{{ revDoc.path.replace('./src', '') }}"
+          href="/{{ revDoc.path.replace('./src', '') }}"
           target="_blank"
           download
           >{{ revDoc.path.split('/').pop() }}</a

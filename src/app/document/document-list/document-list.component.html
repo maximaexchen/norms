@@ -20,23 +20,19 @@
     <tbody>
       <tr *ngFor="let document of documents">
         <td>
-          {{ document.division.name }}
+          <span *ngIf="document.division">
+            {{ document.division.name }}
+          </span>
         </td>
+
         <td>
           <a
             *ngIf="document.normFilePath"
-            href="{{ document.normFilePath.replace('./src', '') }}"
+            (click)="getDownload(document._id, document._attachments)"
             target="_blank"
+            download
             >{{ document.number }}</a
           >
-          <!--  <a
-            *ngIf="document.normFilePath"
-            href="{{
-              document.normFilePath.replace('./dist/wakandaAngular', '')
-            }}"
-            target="_blank"
-            >{{ document.number }}</a
-          > -->
           <span *ngIf="!document.normFilePath">{{ document.number }}</span>
         </td>
         <td>{{ document.name }}</td>
@@ -44,7 +40,7 @@
         <td>{{ document.outputDate | date }}</td>
         <td>{{ document.inputDate | date }}</td>
         <td>
-          <span *ngIf="document.owner.lastName"
+          <span *ngIf="document.owner"
             >{{ document.owner.lastName }}, {{ document.owner.firstName }}</span
           >
         </td>
