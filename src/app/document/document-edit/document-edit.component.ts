@@ -221,6 +221,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.createWriteItem();
 
+    console.log(this.uploadUrl);
+
     if (this.fileUpload) {
       const fileUploadSubscription = this.serverService
         .uploadFile(
