@@ -4,7 +4,7 @@ import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { ActivatedRoute } from '@angular/router';
 import { Division } from '../division.model';
 import { Subscription } from 'rxjs';
-import { NormDocument } from 'src/app/document/document.model';
+import { NormDocument } from 'src/app/modules/document-module/document.model';
 
 @Component({
   selector: 'app-division-edit',

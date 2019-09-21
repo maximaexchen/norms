@@ -1,13 +1,13 @@
-import { Group } from 'src/app/group/group.model';
-import { DocumentService } from './../../shared/services/document.service';
+import { Group } from 'src/app/modules/group/group.model';
+import { DocumentService } from '../../../shared/services/document.service';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { User } from 'src/app/user/user.model';
+import { User } from 'src/app/modules/user/user.model';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as _ from 'underscore';
-import { Division } from 'src/app/division/division.model';
+import { Division } from 'src/app/modules/division-module/division.model';
 import { EnvService } from 'src/app/shared/services/env.service';
 
 @Component({

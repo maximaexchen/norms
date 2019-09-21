@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Division } from './../../division/division.model';
+import { Division } from '../../modules/division-module/division.model';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Subscription } from 'rxjs';
-import { User } from 'src/app/user/user.model';
-import { Group } from 'src/app/group/group.model';
+import { User } from 'src/app/modules/user/user.model';
+import { Group } from 'src/app/modules/group/group.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NormDocument } from 'src/app/document/document.model';
+import { NormDocument } from 'src/app/modules/document-module/document.model';
 
 @Injectable()
 export class DocumentService {

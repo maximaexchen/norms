@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { NormDocument } from 'src/app/document/document.model';
+import { NormDocument } from 'src/app/modules/document-module/document.model';
 import { Observable, Subject } from 'rxjs';
 import { EnvService } from './env.service';
 

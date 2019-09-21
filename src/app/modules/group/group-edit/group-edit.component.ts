@@ -10,7 +10,7 @@ import {
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Group } from '../group.model';
 import { NgForm } from '@angular/forms';
-import { User } from 'src/app/user/user.model';
+import { User } from 'src/app/modules/user/user.model';
 import { DocumentService } from 'src/app/shared/services/document.service';
 
 @Component({

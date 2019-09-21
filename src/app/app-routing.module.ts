@@ -1,18 +1,18 @@
-import { DocumentListComponent } from './document/document-list/document-list.component';
-import { DocumentSearchComponent } from './document/document-search/document-search.component';
-import { DivisionComponent } from './division/division.component';
+import { DocumentListComponent } from './modules/document-module/document-list/document-list.component';
+import { DocumentSearchComponent } from './modules/document-module/document-search/document-search.component';
+import { DivisionComponent } from './modules/division-module/division.component';
 
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { DocumentComponent } from './document/document.component';
-import { DocumentEditComponent } from './document/document-edit/document-edit.component';
-import { DocumentStartComponent } from './document/document-start/document-start.component';
-import { GroupComponent } from './group/group.component';
-import { GroupEditComponent } from './group/group-edit/group-edit.component';
-import { UserEditComponent } from './user/user-edit/user-edit.component';
-import { UserComponent } from './user/user.component';
-import { DivisionEditComponent } from './division/division-edit/division-edit.component';
+import { DocumentComponent } from './modules/document-module/document.component';
+import { DocumentEditComponent } from './modules/document-module/document-edit/document-edit.component';
+import { DocumentStartComponent } from './modules/document-module/document-start/document-start.component';
+import { GroupComponent } from './modules/group/group.component';
+import { GroupEditComponent } from './modules/group/group-edit/group-edit.component';
+import { UserEditComponent } from './modules/user/user-edit/user-edit.component';
+import { UserComponent } from './modules/user/user.component';
+import { DivisionEditComponent } from './modules/division-module/division-edit/division-edit.component';
 
 const routes: Routes = [
   {
