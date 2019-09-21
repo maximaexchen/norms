@@ -86,13 +86,11 @@ app.post('/api/upload', function(req, res) {
     } else {
       console.log('req.body');
       console.log(req.body);
+      console.log(req.files[0].filename);
       let tempPath = './' + req.files[0].path;
 
       let copyPath =
-        './src/assets/uploads/' +
-        req.body.createID +
-        '/' +
-        req.files[0].filename;
+        req.body.uploadDir + req.body.createID + '/' + req.files[0].filename;
       /* let copyPath =
         './dist/wakandaAngular/assets/uploads/' +
         req.body.createID +
@@ -105,6 +103,7 @@ app.post('/api/upload', function(req, res) {
       });
       res.json({
         file: copyPath,
+        fileName: req.files[0].filename,
         success: 'File has been uploaded'
       });
     }

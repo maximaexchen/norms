@@ -10,7 +10,7 @@ import { DocumentService } from 'src/app/shared/services/document.service';
   styleUrls: ['./group-list.component.scss']
 })
 export class GroupListComponent implements OnInit, OnDestroy {
-  groups: Group = [];
+  groups: Group[] = [];
   changeSubscription: Subscription;
 
   constructor(
@@ -23,11 +23,15 @@ export class GroupListComponent implements OnInit, OnDestroy {
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'group') {
-          this.groups = this.documentService.getGroups();
+          this.documentService.getGroups().then(res => {
+            this.groups = res;
+          });
         }
       });
 
-    this.groups = this.documentService.getGroups();
+    this.documentService.getGroups().then(res => {
+      this.groups = res;
+    });
   }
 
   ngOnDestroy() {

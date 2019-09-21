@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Message, MessageService } from 'primeng/primeng';
+import { Message } from 'primeng/components/common/message';
 import { NotificationsService } from 'src/app/shared/services/notifications.service';
 import { Subscription } from 'rxjs/Subscription';
 

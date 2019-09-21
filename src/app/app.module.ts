@@ -1,3 +1,4 @@
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
@@ -9,11 +10,9 @@ import { AppComponent } from './app.component';
 import { DocumentComponent } from './document/document.component';
 import { DocumentStartComponent } from './document/document-start/document-start.component';
 import { DocumentListComponent } from './document/document-list/document-list.component';
-import { DocumentDetailComponent } from './document/document-detail/document-detail.component';
 import { DocumentEditComponent } from './document/document-edit/document-edit.component';
 
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { FileSelectDirective } from 'ng2-file-upload';
 import { HeaderComponent } from './header/header.component';
 import { GroupComponent } from './group/group.component';
 import { GroupEditComponent } from './group/group-edit/group-edit.component';
@@ -39,14 +38,13 @@ import { DialogModule, Dialog } from 'primeng/dialog';
 import { CalendarModule } from 'primeng/calendar';
 import { ButtonModule } from 'primeng/button';
 import { FieldsetModule } from 'primeng/fieldset';
+import { EnvServiceProvider } from './shared/services/env.service.provider';
 
 @NgModule({
   declarations: [
     AppComponent,
     DocumentComponent,
     DocumentListComponent,
-    DocumentDetailComponent,
-    FileSelectDirective,
     HeaderComponent,
     DocumentEditComponent,
     DocumentStartComponent,
@@ -75,7 +73,8 @@ import { FieldsetModule } from 'primeng/fieldset';
     ButtonModule,
     CalendarModule,
     ToastModule,
-    FieldsetModule
+    FieldsetModule,
+    ProgressSpinnerModule
   ],
   providers: [
     MessageService,
@@ -85,7 +84,8 @@ import { FieldsetModule } from 'primeng/fieldset';
     APIResolver,
     DocumentResolver,
     NotificationsService,
-    MessageService
+    MessageService,
+    EnvServiceProvider
   ],
   bootstrap: [AppComponent]
 })

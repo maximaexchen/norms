@@ -121,7 +121,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     return this.couchDBService.fetchEntry('/' + id);
   }
 
-  private onSubmit(): void {
+  public onSubmit(): void {
     if (this.groupForm.value.formMode) {
       console.log('Update a group');
       this.updateGroup();
@@ -131,18 +131,18 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  private onItemSelect(item: any) {
+  public onItemSelect(item: any) {
     console.log(item['itemName']);
     console.log(this.selectedtUsers);
   }
-  private onItemDeSelect(item: any) {
+  public onItemDeSelect(item: any) {
     console.log(item);
     console.log(this.selectedtUsers);
   }
-  private onSelectAll(items: any) {
+  public onSelectAll(items: any) {
     console.log(items);
   }
-  private onDeSelectAll(items: any) {
+  public onDeSelectAll(items: any) {
     console.log(items);
   }
 

@@ -38,7 +38,7 @@ export class FileInputValueAccessor implements ControlValueAccessor {
   // tslint:disable-next-line:ban-types
   private onChangeCallback: Function;
   // tslint:disable-next-line:ban-types
-  private onTouchedCallback: Function;
+  public onTouchedCallback: Function;
 
   // I initialize the file-input value accessor service.
   constructor(elementRef: ElementRef) {

@@ -3,6 +3,8 @@ import { NgForm } from '@angular/forms';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { ActivatedRoute } from '@angular/router';
 import { Division } from '../division.model';
+import { Subscription } from 'rxjs';
+import { NormDocument } from 'src/app/document/document.model';
 
 @Component({
   selector: 'app-division-edit',
@@ -11,6 +13,8 @@ import { Division } from '../division.model';
 })
 export class DivisionEditComponent implements OnInit {
   @ViewChild('divisionForm', { static: false }) normForm: NgForm;
+
+  updateRelatedSubsscription = new Subscription();
 
   writeItem: Division;
   divisions: Division[] = [];
@@ -32,17 +36,13 @@ export class DivisionEditComponent implements OnInit {
     console.log('DivisionEditComponent');
 
     this.route.params.subscribe(results => {
-      console.log(results['id']);
       // check if we are updating
       if (results['id']) {
         console.log('Edit mode');
         this.formMode = true;
         this.formTitle = 'Bereich bearbeiten';
-        console.log(results['id']);
 
         this.couchDBService.fetchEntry('/' + results['id']).subscribe(entry => {
-          console.log('Entry:');
-          console.log(entry);
           this.id = entry['_id'];
           this.rev = entry['_rev'];
           this.name = entry['name'];
@@ -67,14 +67,31 @@ export class DivisionEditComponent implements OnInit {
   }
 
   private onUpdateDivision(): void {
-    // console.log(this.normForm);
     console.log('onUpdateDivision: DivisionEditComponent');
     this.createWriteItem();
 
     this.couchDBService
       .updateEntry(this.writeItem, this.normForm.value._id)
       .subscribe(result => {
-        console.log(result);
+        // Query for NormDocuments having the changed division
+        const updateQuery = {
+          use_index: ['_design/search_norm'],
+          selector: {
+            _id: { $gt: null },
+            type: { $eq: 'norm' },
+            division: {
+              _id: { $eq: result.id }
+            }
+          }
+        };
+
+        // Update all NormDocuments with the changed division
+        this.updateRelatedSubsscription = this.couchDBService
+          .search(updateQuery)
+          .subscribe(results => {
+            this.updateRelated(results);
+          });
+
         // Inform about Database change.
         this.sendStateUpdate();
       });
@@ -86,12 +103,11 @@ export class DivisionEditComponent implements OnInit {
     this.createWriteItem();
 
     this.couchDBService.writeEntry(this.writeItem).subscribe(result => {
-      console.log(result);
       this.sendStateUpdate();
     });
   }
 
-  createWriteItem() {
+  private createWriteItem() {
     this.writeItem = {};
 
     this.writeItem['type'] = 'division';
@@ -106,9 +122,20 @@ export class DivisionEditComponent implements OnInit {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
 
-    // console.log(this.writeItem);
-
     return this.writeItem;
+  }
+
+  private updateRelated(related: any) {
+    const bulkUpdateObject = {};
+    bulkUpdateObject['docs'] = [];
+    related.docs.forEach(norm => {
+      norm['division'] = this.createWriteItem();
+      bulkUpdateObject['docs'].push(norm);
+    });
+
+    this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(res => {
+      console.log(res);
+    });
   }
 
   sendStateUpdate(): void {

@@ -11,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./division-list.component.scss']
 })
 export class DivisionListComponent implements OnInit, OnDestroy {
-  divisions: Division = [];
+  divisions: Division[] = [];
   changeSubscription: Subscription;
 
   constructor(
@@ -27,10 +27,14 @@ export class DivisionListComponent implements OnInit, OnDestroy {
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'division') {
-          this.divisions = this.documentService.getDivisions();
+          this.documentService.getDivisions().then(res => {
+            this.divisions = res;
+          });
         }
       });
-    this.divisions = this.documentService.getDivisions();
+    this.documentService.getDivisions().then(res => {
+      this.divisions = res;
+    });
   }
 
   ngOnDestroy() {
