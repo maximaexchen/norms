@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 
+import { GeneralModule } from 'src/app/shared/modules/general.module';
 import { DivisionRoutingModule } from './division-routing.module';
+import { DivisionComponent } from './division.component';
 import { DivisionEditComponent } from './division-edit/division-edit.component';
 import { DivisionListComponent } from './division-list/division-list.component';
-import { DivisionComponent } from './division.component';
-import { GeneralModule } from 'src/app/shared/modules/general.module';
 
 @NgModule({
   declarations: [
@@ -12,7 +12,6 @@ import { GeneralModule } from 'src/app/shared/modules/general.module';
     DivisionEditComponent,
     DivisionListComponent
   ],
-  imports: [GeneralModule, DivisionRoutingModule, DivisionRoutingModule],
-  exports: []
+  imports: [GeneralModule, DivisionRoutingModule]
 })
 export class DivisionModule {}

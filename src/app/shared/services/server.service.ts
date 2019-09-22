@@ -7,7 +7,7 @@ import {
 } from '@angular/common/http';
 import { Subscription, Observable } from 'rxjs';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ServerService {
   constructor(private http: HttpClient) {}
 

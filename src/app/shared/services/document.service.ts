@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Division } from '../../modules/division-module/division.model';
+import { Division } from '../../modules/division/division.model';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/modules/user/user.model';
 import { Group } from 'src/app/modules/group/group.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NormDocument } from 'src/app/modules/document-module/document.model';
+import { NormDocument } from 'src/app/modules/document/document.model';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class DocumentService {
   routeSubsscription = new Subscription();
   writeSubscription = new Subscription();

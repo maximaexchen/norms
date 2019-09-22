@@ -4,7 +4,7 @@ import { MessageService } from 'primeng/components/common/messageservice';
 
 type Severities = 'success' | 'info' | 'warn' | 'error';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class NotificationsService {
   constructor(private messageService: MessageService) {}
 

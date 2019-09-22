@@ -7,7 +7,7 @@ import { Subscription, Observable, of, Subscriber } from 'rxjs';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { NormDocument } from '../document.model';
 import { RevisionDocument } from './../revision-document.model';
-import { Division } from '../../division-module/division.model';
+import { Division } from '../../division/division.model';
 import { User } from 'src/app/modules/user/user.model';
 import { DocumentService } from 'src/app/shared/services/document.service';
 import { ServerService } from 'src/app/shared/services/server.service';

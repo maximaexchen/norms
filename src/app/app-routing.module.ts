@@ -1,20 +1,41 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-
-import { DocumentSearchComponent } from './modules/document-module/document-search/document-search.component';
+import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 
 const routes: Routes = [
   {
     path: '',
-    component: DocumentSearchComponent,
+    redirectTo: 'search',
     pathMatch: 'full'
+  },
+  {
+    path: 'search',
+    loadChildren: './modules/search/search.module#SearchModule'
+  },
+  {
+    path: 'division',
+    loadChildren: './modules/division/division.module#DivisionModule'
+  },
+  {
+    path: 'document',
+    loadChildren: './modules/document/document.module#DocumentModule'
+  },
+  {
+    path: 'group',
+    loadChildren: './modules/group/group.module#GroupModule'
+  },
+  {
+    path: 'user',
+    loadChildren: './modules/user/user.module#UserModule'
   }
 ];
 
 @NgModule({
   imports: [
     RouterModule.forRoot(
-      routes
+      routes,
+      {
+        preloadingStrategy: PreloadAllModules
+      }
       /*, { enableTracing: true }, { onSameUrlNavigation: 'reload' }  */
     )
   ],

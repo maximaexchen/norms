@@ -6,7 +6,6 @@ import { DocumentComponent } from './document.component';
 import { DocumentListComponent } from './document-list/document-list.component';
 import { DocumentEditComponent } from './document-edit/document-edit.component';
 import { DocumentStartComponent } from './document-start/document-start.component';
-import { DocumentSearchComponent } from './document-search/document-search.component';
 import { GroupModule } from '../group/group.module';
 
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -23,12 +22,10 @@ import { GeneralModule } from 'src/app/shared/modules/general.module';
     DocumentComponent,
     DocumentListComponent,
     DocumentEditComponent,
-    DocumentStartComponent,
-    DocumentSearchComponent
+    DocumentStartComponent
   ],
   imports: [
     GeneralModule,
-    DocumentRoutingModule,
     DocumentRoutingModule,
     ProgressSpinnerModule,
     CalendarModule,

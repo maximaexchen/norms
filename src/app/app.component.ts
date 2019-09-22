@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { from } from 'rxjs';
 import { CouchDBService } from './shared/services/couchDB.service';
-import { MessageService } from 'primeng/components/common/messageservice';
 
 @Component({
   selector: 'app-root',
@@ -18,10 +16,6 @@ export class AppComponent implements OnInit {
 
   constructor(private couchDBService: CouchDBService) {}
 
-  /*
-  "C:\Program Files (x86)\Wakanda\Enterprise\Server\wakanda-enterprise-server.exe"
-  C:\Users\itspoon\Documents\Wakanda\solutions\Documents\app.waSolution /admin-port:8090
-*/
   ngOnInit() {
     const params = {
       username: this.userName,

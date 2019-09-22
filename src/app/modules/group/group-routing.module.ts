@@ -6,7 +6,7 @@ import { GroupEditComponent } from './group-edit/group-edit.component';
 
 const routes: Routes = [
   {
-    path: 'group',
+    path: '',
     component: GroupComponent,
     children: [
       { path: '', component: GroupComponent },

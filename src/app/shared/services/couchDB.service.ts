@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
 import { map } from 'rxjs/operators';
-import { NormDocument } from 'src/app/modules/document-module/document.model';
 import { Observable, Subject } from 'rxjs';
+
 import { EnvService } from './env.service';
+import { NormDocument } from 'src/app/modules/document/document.model';
 
 // CouchDB Ubuntu Server
 /* $kP2ZernC */
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class CouchDBService {
   private baseUrl = this.env.dbBaseUrl;
   private dbName = this.env.dbName;

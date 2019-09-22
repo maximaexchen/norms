@@ -7,17 +7,17 @@ import * as _ from 'underscore';
 
 import { EnvService } from 'src/app/shared/services/env.service';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { DocumentService } from '../../../shared/services/document.service';
+import { DocumentService } from '../../shared/services/document.service';
 import { Group } from 'src/app/modules/group/group.model';
 import { User } from 'src/app/modules/user/user.model';
-import { Division } from 'src/app/modules/division-module/division.model';
+import { Division } from 'src/app/modules/division/division.model';
 
 @Component({
   selector: 'app-document-search',
-  templateUrl: './document-search.component.html',
-  styleUrls: ['./document-search.component.scss']
+  templateUrl: './search.component.html',
+  styleUrls: ['./search.component.scss']
 })
-export class DocumentSearchComponent implements OnInit, OnDestroy {
+export class SearchComponent implements OnInit, OnDestroy {
   @ViewChild('searchForm', { static: false }) searchForm: NgForm;
 
   searchSubsscription = new Subscription();
@@ -47,8 +47,6 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
     console.log('DocumentSearchComponent');
 
     this.searchSubsscription = this.route.params.subscribe(results => {
-      // this.divisions = this.documentService.getDivisions();
-      // this.owners = this.documentService.getUsers();
       this.documentService.getGroups().then(res => {
         this.groups = res;
       });
@@ -115,14 +113,20 @@ export class DocumentSearchComponent implements OnInit, OnDestroy {
       }
     };
 
-    console.log(JSON.stringify(searchObject));
+    if (
+      this.searchForm.value.divisionId === undefined &&
+      this.searchForm.value.ownerId === undefined &&
+      this.searchForm.value.groupId === undefined &&
+      this.searchForm.value.userId === undefined
+    ) {
+      console.log('No search parameters');
+    }
 
     this.searchSubsscription = this.couchDBService
       .search(searchObject)
       .subscribe(results => {
         this.foundDocuments = results.docs;
         results.docs.forEach(norm => {
-          console.log(norm);
           if (norm.division) {
             const divisionItem = this.couchDBService
               .fetchEntry('/' + norm.division._id)
