@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+
 import { Subscription } from 'rxjs';
+
+import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { DocumentService } from 'src/app/shared/services/document.service';
 import { NormDocument } from '../document.model';
 import { NotificationsService } from 'src/app/shared//services/notifications.service';

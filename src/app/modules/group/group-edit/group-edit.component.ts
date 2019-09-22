@@ -1,5 +1,3 @@
-import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
 import {
   Component,
   OnInit,
@@ -7,11 +5,15 @@ import {
   ViewEncapsulation,
   OnDestroy
 } from '@angular/core';
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { Group } from '../group.model';
 import { NgForm } from '@angular/forms';
-import { User } from 'src/app/modules/user/user.model';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { Subscription } from 'rxjs';
+
+import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { DocumentService } from 'src/app/shared/services/document.service';
+import { Group } from '../group.model';
+import { User } from 'src/app/modules/user/user.model';
 
 @Component({
   selector: 'app-group-edit',

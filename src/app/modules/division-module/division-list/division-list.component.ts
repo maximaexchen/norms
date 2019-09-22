@@ -1,9 +1,9 @@
-import { Division } from './../division.model';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
+
+import { Division } from './../division.model';
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { DocumentService } from 'src/app/shared/services/document.service';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-division-list',

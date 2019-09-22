@@ -1,8 +1,10 @@
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
+
 import { Subscription } from 'rxjs';
-import { User } from '../user.model';
+
+import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { DocumentService } from 'src/app/shared/services/document.service';
+import { User } from '../user.model';
 
 @Component({
   selector: 'app-user-list',

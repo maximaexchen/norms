@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { ActivatedRoute } from '@angular/router';
-import { Division } from '../division.model';
-import { Subscription } from 'rxjs';
-import { NormDocument } from 'src/app/modules/document-module/document.model';
+import { NgForm } from '@angular/forms';
 
+import { Subscription } from 'rxjs';
+
+import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+import { Division } from '../division.model';
 @Component({
   selector: 'app-division-edit',
   templateUrl: './division-edit.component.html',

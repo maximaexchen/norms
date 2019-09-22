@@ -24,6 +24,13 @@ export class ServerService {
     uploadDir: string
   ): Observable<HttpEvent<any>> {
     const formData = new FormData();
+
+    console.log('ppppppppp');
+    console.log(file);
+    console.log(file.name);
+    console.log(createID);
+    console.log(uploadDir);
+    console.log('ppppppppp');
     formData.append('uploadFile', file, file.name);
     formData.append('createID', createID);
     formData.append('uploadDir', uploadDir);

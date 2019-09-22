@@ -1,8 +1,10 @@
-import { Group } from './../group.model';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+
 import { Subscription } from 'rxjs';
+
+import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { DocumentService } from 'src/app/shared/services/document.service';
+import { Group } from './../group.model';
 
 @Component({
   selector: 'app-group-list',

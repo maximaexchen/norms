@@ -1,10 +1,9 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Subscription, Observable, of, Subscriber } from 'rxjs';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { NormDocument } from '../document.model';
 import { RevisionDocument } from './../revision-document.model';
@@ -182,6 +181,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .writeEntry(this.writeItem)
       .subscribe(result => {
         this.createId = result['id'];
+
+        console.log('dddddddd');
+        console.log(this.uploadUrl + '/');
+        console.log(this.fileUpload);
+        console.log(this.createId);
+        console.log('dddddddd');
 
         if (this.fileUpload) {
           this.serverService

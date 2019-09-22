@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { ActivatedRoute } from '@angular/router';
+import { NgForm } from '@angular/forms';
+
+import { CouchDBService } from 'src/app/shared/services/couchDB.service';
 import { User } from '../user.model';
 
 @Component({
