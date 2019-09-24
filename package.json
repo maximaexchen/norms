@@ -28,6 +28,7 @@
     "couchdb-client": "^1.0.14",
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
+    "font-awesome": "^4.7.0",
     "fs-extra": "^8.1.0",
     "klaw": "^3.0.0",
     "method-override": "^3.0.0",
