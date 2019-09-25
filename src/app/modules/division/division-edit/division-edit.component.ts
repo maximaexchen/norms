@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
@@ -11,7 +11,7 @@ import { Division } from '../division.model';
   templateUrl: './division-edit.component.html',
   styleUrls: ['./division-edit.component.scss']
 })
-export class DivisionEditComponent implements OnInit {
+export class DivisionEditComponent implements OnInit, OnDestroy {
   @ViewChild('divisionForm', { static: false }) normForm: NgForm;
 
   updateRelatedSubsscription = new Subscription();
@@ -141,5 +141,9 @@ export class DivisionEditComponent implements OnInit {
   sendStateUpdate(): void {
     // send message to subscribers via observable subject
     this.couchDBService.sendStateUpdate('division');
+  }
+
+  ngOnDestroy(): void {
+    this.updateRelatedSubsscription.unsubscribe();
   }
 }
