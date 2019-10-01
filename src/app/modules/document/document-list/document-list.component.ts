@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { DocumentService } from 'src/app/shared/services/document.service';
+import { CouchDBService } from 'src/app//services/couchDB.service';
+import { DocumentService } from 'src/app//services/document.service';
 import { NormDocument } from '../document.model';
-import { NotificationsService } from 'src/app/shared//services/notifications.service';
-import { EnvService } from 'src/app/shared/services/env.service';
+import { NotificationsService } from 'src/app/services/notifications.service';
+import { EnvService } from 'src/app//services/env.service';
 
 @Component({
   selector: 'app-document-list',

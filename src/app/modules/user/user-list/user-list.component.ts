@@ -2,9 +2,10 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { DocumentService } from 'src/app/shared/services/document.service';
+import { CouchDBService } from 'src/app//services/couchDB.service';
+import { DocumentService } from 'src/app//services/document.service';
 import { User } from '../user.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-list',
@@ -13,30 +14,49 @@ import { User } from '../user.model';
 })
 export class UserListComponent implements OnInit, OnDestroy {
   users: User[] = [];
-  changeSubscription: Subscription;
+  userChangeSubscription: Subscription;
 
   constructor(
     private couchDBService: CouchDBService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    this.changeSubscription = this.couchDBService
+    this.userChangeSubscription = this.couchDBService
       .setStateUpdate()
-      .subscribe(message => {
-        if (message.text === 'user') {
-          this.documentService.getUsers().then(res => {
-            this.users = res;
-          });
-        }
-      });
-    this.documentService.getUsers().then(res => {
-      this.users = res;
-    });
+      .subscribe(
+        message => {
+          if (message.text === 'user') {
+            this.documentService.getUsers().then(res => {
+              this.users = res;
+            });
+          }
+        },
+        err => console.log('HTTP Error', err),
+        () => console.log('HTTP request completed.')
+      );
+
+    this.documentService.getUsers().then(
+      res => {
+        this.users = res;
+      },
+      err => {
+        console.log('Error on loading users');
+      }
+    );
+  }
+
+  public showDetail(id: string) {
+    this.router.navigate(['../user/' + id + '/edit']);
+  }
+
+  public userCount() {
+    return this.users.length;
   }
 
   ngOnDestroy() {
     // unsubscribe to ensure no memory leaks
-    this.changeSubscription.unsubscribe();
+    this.userChangeSubscription.unsubscribe();
   }
 }

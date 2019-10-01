@@ -15,7 +15,7 @@ import { FieldsetModule } from 'primeng/fieldset';
 import { DialogModule } from 'primeng/dialog';
 
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
-import { GeneralModule } from 'src/app/shared/modules/general.module';
+import { GeneralModule } from 'src/app/modules/general.module';
 
 @NgModule({
   declarations: [

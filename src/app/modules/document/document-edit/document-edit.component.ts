@@ -4,17 +4,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { Subscription, Observable, of, Subscriber } from 'rxjs';
 
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+import { CouchDBService } from 'src/app//services/couchDB.service';
 import { NormDocument } from '../document.model';
 import { RevisionDocument } from './../revision-document.model';
-import { Division } from '../../division/division.model';
+import { Publisher } from '../../publisher/publisher.model';
 import { User } from 'src/app/modules/user/user.model';
-import { DocumentService } from 'src/app/shared/services/document.service';
-import { ServerService } from 'src/app/shared/services/server.service';
-import { NotificationsService } from 'src/app/shared/services/notifications.service';
+import { DocumentService } from 'src/app//services/document.service';
+import { ServerService } from 'src/app//services/server.service';
+import { NotificationsService } from 'src/app//services/notifications.service';
 
 import * as _ from 'underscore';
-import { EnvService } from 'src/app/shared/services/env.service';
+import { EnvService } from 'src/app//services/env.service';
 
 @Component({
   selector: 'app-document-edit',
@@ -30,7 +30,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   routeSubsscription = new Subscription();
   writeSubscription = new Subscription();
-  divisionSubscription = new Subscription();
+  publisherSubscription = new Subscription();
   documentSubscription = new Subscription();
   userSubscription = new Subscription();
   updateSubscription = new Subscription();
@@ -47,7 +47,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   ];
 
   writeItem: NormDocument;
-  divisions: Division[] = [];
+  publishers: Publisher[] = [];
   owners: User[] = [];
   users: User[] = [];
   selectedtUsers: User[] = [];
@@ -60,8 +60,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   createId: string;
   rev: string;
   type: string;
-  division: Division;
-  divisionId: string;
+  publisher: Publisher;
+  publisherId: string;
   normNumber: string;
 
   name: string;
@@ -113,8 +113,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       // empty the select-box
       this.selectedtUsers = [];
       // fetch data for select-boxes
-      this.documentService.getDivisions().then(res => {
-        this.divisions = res;
+      this.documentService.getPublishers().then(res => {
+        this.publishers = res;
       });
       this.documentService.getUsers().then(res => {
         this.owners = res;
@@ -135,8 +135,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.id = entry['_id'];
             this.rev = entry['_rev'];
             this.type = 'norm';
-            this.division = entry['division'];
-            this.divisionId = entry['division']._id;
+            this.publisher = entry['publisher'];
+            this.publisherId = entry['publisher']._id;
             this.normNumber = entry['number'];
             this.revisionDocuments = _.sortBy(
               entry['revisionDocuments'],
@@ -166,7 +166,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.formMode = false;
         this.formTitle = 'Neue Norm anlegen';
         this.activationInterval = '';
-        this.division = '';
+        this.publisher = '';
         this.owner = '';
       }
     });
@@ -384,10 +384,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     ];
     this.writeItem['users'] = selectedUserObjects || [];
 
-    const selDivision = this.divisions.find(
-      divi => divi['_id'] === this.normForm.value.divisionId
+    const selPublisher = this.publishers.find(
+      divi => divi['_id'] === this.normForm.value.publisherId
     );
-    this.writeItem['division'] = selDivision || '';
+    this.writeItem['publisher'] = selPublisher || '';
 
     const selOwner = this.owners.find(
       own => own['_id'] === this.normForm.value.ownerId
@@ -424,7 +424,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.routeSubsscription.unsubscribe();
     this.writeSubscription.unsubscribe();
-    this.divisionSubscription.unsubscribe();
+    this.publisherSubscription.unsubscribe();
     this.documentSubscription.unsubscribe();
     this.userSubscription.unsubscribe();
     this.updateSubscription.unsubscribe();

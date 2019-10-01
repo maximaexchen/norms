@@ -12,12 +12,16 @@ const routes: Routes = [
     loadChildren: './modules/search/search.module#SearchModule'
   },
   {
-    path: 'division',
-    loadChildren: './modules/division/division.module#DivisionModule'
+    path: 'publisher',
+    loadChildren: './modules/publisher/publisher.module#PublisherModule'
   },
   {
     path: 'document',
     loadChildren: './modules/document/document.module#DocumentModule'
+  },
+  {
+    path: 'tag',
+    loadChildren: './modules/tag/tag.module#TagModule'
   },
   {
     path: 'group',
@@ -26,6 +30,10 @@ const routes: Routes = [
   {
     path: 'user',
     loadChildren: './modules/user/user.module#UserModule'
+  },
+  {
+    path: 'role',
+    loadChildren: './modules/role/role.module#RoleModule'
   }
 ];
 

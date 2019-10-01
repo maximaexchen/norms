@@ -1,0 +1,325 @@
+/**
+ * Allgmeine Formatierungen
+ * basiert auf UI-Framework PrimeNg 6.1.6
+ */
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+body .ui-widget,
+body .ui-widget input,
+body .ui-widget select,
+body .ui-widget textarea,
+body .ui-widget button,
+body .ui-inputtext {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 13px;
+}
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button,
+.ui-widget .ui-button-text,
+.ui-widget .ui-menu .ui-menuitem-link .ui-menuitem-text,
+.ui-widget.ui-inputtext,
+.ui-widget.ui-menuitem-text,
+.ui-widget.ui-splitbutton > .ui-button > .ui-button-text,
+.ui-widget.ui-autocomplete-list {
+  font-size: 95%;
+}
+
+h1 {
+  font-size: 120%;
+  font-weight: bold;
+  line-height: 140%;
+  margin: 7px 10px 5px 5px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+h1.search-title {
+  padding: 6px 10px 0 5px !important;
+}
+
+h2 {
+  font-size: 110%;
+}
+
+h3 {
+  font-size: 100%;
+}
+
+h4 {
+  font-size: 90%;
+  font-weight: bold;
+}
+
+table {
+  margin: 0 0 15px 0;
+}
+
+.ui-table table {
+  margin-bottom: 0;
+}
+
+.hyperlink {
+  cursor: pointer;
+}
+
+/**
+  * Header und Menü
+  */
+
+.header {
+  margin: 0 0 20px 0;
+  padding: 12px 0 3px 0;
+}
+
+.header,
+.main-menubar,
+.userinfo-menubar,
+.ui-menubar .ui-menubar-root-list {
+  background-color: rgb(35, 87, 128);
+}
+
+.main-menubar {
+  /* float: left; */
+  width: 100%;
+}
+
+.userinfo-menubar {
+  float: right;
+  width: auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
+body .ui-menubar {
+  background-color: inherit;
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+body .main-menubar,
+body .userinfo-menubar {
+  color: #eee;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+body .ui-menubar .ui-menuitem-link,
+body .ui-menu .ui-menuitem-link {
+  padding: 5px 10px;
+}
+
+body .ui-menubar .ui-menuitem-link .ui-menuitem-text {
+  color: #eee;
+}
+
+body .ui-menubar .ui-menuitem-link .ui-menuitem-icon {
+  color: #eee;
+  margin-right: 0.3em;
+}
+
+body
+  .ui-menubar
+  .ui-menubar-root-list
+  > .ui-menuitem
+  > .ui-menuitem-link:hover {
+  color: #222;
+}
+
+body .ui-menubar .ui-menubar-root-list > .ui-menuitem > .ui-menuitem-link {
+  color: #fff;
+  padding: 4px 10px 4px 10px;
+  border-radius: 2px;
+}
+
+.main-menubar .ui-menuitem .ui-menuitem-link.ui-state-active {
+  color: #eee;
+  background-color: rgb(140, 170, 196);
+  border-color: rgb(140, 170, 196);
+}
+
+body .ui-menubar .ui-menuitem-link {
+  color: #222;
+}
+
+body .ui-menubar .ui-submenu-list {
+  color: #222;
+  text-align: left;
+}
+
+body .main-menubar .ui-menuitem > .ui-submenu .ui-menuitem .ui-menuitem-text,
+body .main-menubar .ui-menuitem > .ui-submenu .ui-menuitem .ui-menuitem-icon,
+body
+  .userinfo-menubar
+  .ui-menuitem
+  > .ui-submenu
+  .ui-menuitem
+  .ui-menuitem-text,
+body
+  .userinfo-menubar
+  .ui-menuitem
+  > .ui-submenu
+  .ui-menuitem
+  .ui-menuitem-icon {
+  color: #222;
+}
+
+.header-company-icon > img {
+  float: left;
+  height: 57px;
+  margin: 5px 0 0 0;
+}
+
+.header-application-icon {
+  text-align: right;
+}
+
+.application-icon {
+  background-repeat: no-repeat;
+  background-size: 60px 60px;
+  height: 60px;
+  margin: 3px 0 0 0;
+}
+
+.application-name {
+  float: left;
+  margin: 17px 10px 5px 30px;
+  padding: 0;
+  font-size: 130%;
+  color: #eee;
+}
+
+.user-name {
+  float: right;
+  margin: 20px 10px 5px 30px;
+  font-size: 130%;
+  color: #eee;
+}
+
+.application-testmodeinfo {
+  float: right;
+  width: 76px;
+  margin: 5px;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 95%;
+  color: #eee;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+body .ui-tabview .ui-tabview-panels {
+  padding: 1.5em 1em;
+}
+
+.ui-tabview .ui-tabview-title {
+  font-size: 95%;
+}
+
+/**
+  * Formulare
+  */
+
+.form-body {
+  margin-top: 10px;
+}
+
+.form-group {
+  margin-bottom: 8px;
+}
+
+.form-control {
+  height: 26px;
+  margin: 2px 0;
+  padding: 4px 10px;
+}
+
+.form-horizontal .control-label {
+  font-size: 85%;
+  margin-top: 6px;
+  padding: 0;
+}
+
+input.ng-invalid,
+textarea.ng-invalid,
+select.ng-invalid,
+p-selectButton.ng-invalid,
+p-inputswitch.ng-invalid {
+  border-left: 4px solid $red;
+}
+
+p-calendar.ng-invalid > .ui-calendar > .ui-inputtext {
+  border-left: 4px solid $red;
+}
+
+p-autocomplete
+  > .ui-autocomplete
+  > .ui-autocomplete-input:not(.autocomplete-state-filled) {
+  border-left: 4px solid $red;
+}
+
+body .ui-autocomplete-dropdown.ui-button.ui-button-icon-only .ui-button-text {
+  padding: 0.41em;
+}
+
+body .ui-button.ui-button-text-icon-left .ui-button-text {
+  padding: 0.35em 1em 0.35em 2em;
+}
+
+body .ui-button.ui-button-icon-only .ui-button-text {
+  padding: 0.35em;
+}
+
+body .ui-widget.ui-splitbutton > .ui-button {
+  padding: 0;
+}
+
+body .ui-widget.ui-splitbutton {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn-primary,
+.btn-primary:focus {
+  background-color: #2399e5;
+  border-color: #2399e5;
+}
+
+.btn-primary:hover {
+  background-color: #1f89ce;
+  border-color: #1f89ce;
+}
+
+.btn {
+  padding: 6px 14px;
+  font-size: 90%;
+}
+
+.btn.btn-sm {
+  padding: 4px 10px;
+  font-size: 90%;
+}
+
+.btn.btn-xs {
+  padding: 2px 10px;
+  font-size: 90%;
+}
+
+.ui-progressbar {
+  height: 20px;
+  font-size: 90%;
+}
+
+.ui-progressbar.ui-progressbar-determinate .ui-progressbar-value {
+  background: #caf1bb;
+}

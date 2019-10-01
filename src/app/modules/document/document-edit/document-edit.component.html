@@ -19,12 +19,12 @@
     <div class="form-group">
       <label class="form-label">Bereich</label>
 
-      <select class="form-control" [(ngModel)]="divisionId" name="divisionId">
+      <select class="form-control" [(ngModel)]="publisherId" name="publisherId">
         <option value="">Bereich wählen</option>
         <option
-          *ngFor="let item of divisions"
+          *ngFor="let item of publishers"
           [value]="item._id"
-          [selected]="item._id == divisionId"
+          [selected]="item._id == publisherId"
         >
           {{ item.name }}
         </option>

@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 
 import { DialogModule } from 'primeng/dialog';
 
-import { GeneralModule } from 'src/app/shared/modules/general.module';
+import { GeneralModule } from 'src/app/modules/general.module';
 import { SearchRoutingModule } from './search-routing.module';
 import { SearchComponent } from './search.component';
 

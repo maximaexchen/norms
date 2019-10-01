@@ -28,6 +28,24 @@
             "scripts": []
           },
           "configurations": {
+            "de": {
+              "aot": true,
+              "outputPath": "dist/",
+              "i18nFile": "src/locale/messages.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "de",
+              "i18nMissingTranslation": "error",
+              "baseHref": "/"
+            },
+            "en": {
+              "aot": true,
+              "outputPath": "dist/en/",
+              "i18nFile": "src/locale/messages.en.xlf",
+              "i18nFormat": "xlf",
+              "i18nLocale": "en",
+              "i18nMissingTranslation": "error",
+              "baseHref": "/en/"
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -81,6 +99,16 @@
             "browserTarget": "wakandaAngular:build"
           },
           "configurations": {
+            "de": {
+              "aot": true,
+              "browserTarget": "wakandaAngular:build:de",
+              "baseHref": "/"
+            },
+            "en": {
+              "aot": true,
+              "browserTarget": "wakandaAngular:build:en",
+              "baseHref": "/en/"
+            },
             "production": {
               "browserTarget": "wakandaAngular:build:production"
             }

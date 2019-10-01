@@ -1,0 +1,358 @@
+/**
+ * Formatierungen für die Watzmann Anwendung
+ * basiert auf UI-Framework PrimeNg 6.1.6
+ */
+
+.navbar-primary {
+  overflow: hidden;
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+  background-color: $navbar-primary-bg-color;
+  width: 670px;
+  margin: 0 0 0 15px;
+  padding: 0;
+  float: left;
+  border-radius: 4px;
+}
+
+.navbar-primary.collapsed {
+  width: 60px;
+}
+
+.navbar-primary.collapsed .nav-label {
+  display: none;
+}
+
+.search-bar {
+  min-height: 20px;
+  padding: 9px;
+  margin-bottom: 10px;
+  background-color: $search-bar-bg-color;
+  border: 1px solid $search-bar-border-color;
+  border-radius: 4px;
+}
+
+.btn-expand-collapse {
+  font-size: 130%;
+  display: block;
+  color: grey;
+  text-align: center;
+  padding: 12px 10px 8px 10px;
+  text-decoration: none;
+}
+.btn-expand-collapse .nav-button {
+  display: block;
+  float: right;
+  width: 60px;
+  height: 34px;
+  padding: 3px 10px 3px 40px;
+  margin: 0 0 0 15px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.collapsed .sidebar-content,
+.collapsed .ui-table {
+  display: none;
+}
+
+.main-content {
+  margin-left: 700px;
+}
+
+.main-content.collapsed {
+  margin-left: 80px;
+}
+
+/* styles selectable rows */
+
+.selectable {
+  cursor: pointer;
+}
+
+.selectable.active {
+  background-color: $selectable-active-bg-color;
+}
+
+.selectable:hover {
+  color: #fff;
+  background-color: $selectable-hover-bg-color;
+}
+
+div.panel-table {
+  max-height: 200px;
+  overflow-y: scroll;
+}
+table.panel-table th {
+  font-size: 95%;
+}
+
+.tab-pane {
+  margin: 30px 0 20px 0;
+}
+
+.panel-heading {
+  padding: 5px 15px;
+  font-weight: bold;
+}
+
+.ui-cell-data {
+  white-space: nowrap;
+}
+
+.data-table-cell {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.ui-table .ui-table-tbody > tr.data-table-odd-row-disabled {
+  /*background-color: gray;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);*/
+  /*background-color: #eee;
+    background-image: repeating-linear-gradient(135deg, transparent, transparent 30px, rgba(255,255,255,.5) 30px, rgba(255,255,255,.5) 60px);*/
+  /*background-color: #edc;*/
+  color: #ccc;
+}
+
+.ui-table .ui-table-tbody > tr.data-table-even-row-disabled {
+  color: #ccc;
+}
+
+.col-icon {
+  width: 32px;
+}
+
+body .ui-table .ui-table-thead > tr > th {
+  font-size: 90%;
+  padding: 6px 6px;
+}
+
+body .ui-table .ui-table-tbody > tr {
+  font-size: 90%;
+}
+
+.ui-table .ui-table-tbody > tr > td.state-default,
+.ui-table .ui-table-tbody > tr > td.state-success,
+.ui-table .ui-table-tbody > tr > td.state-warning,
+.ui-table .ui-table-tbody > tr > td.state-error {
+  font-size: 1px;
+}
+.ui-table
+  .ui-table-tbody
+  > tr:not([class*='ui-state-highlight'])
+  > td.state-success {
+  background-color: rgb(92, 184, 92);
+  color: rgb(92, 184, 92);
+  font-size: 1px;
+}
+.ui-table
+  .ui-table-tbody
+  > tr:not([class*='ui-state-highlight'])
+  > td.state-warning {
+  background-color: rgb(240, 173, 78);
+  color: rgb(240, 173, 78);
+  font-size: 1px;
+}
+.ui-table
+  .ui-table-tbody
+  > tr:not([class*='ui-state-highlight'])
+  > td.state-error {
+  background-color: rgb(217, 83, 79);
+  color: rgb(217, 83, 79);
+  font-size: 1px;
+  margin: 4px;
+}
+
+body .ui-treetable-table .ui-treetable-tbody > tr > td.state-error {
+  background-color: rgb(217, 83, 79);
+  color: #eee;
+}
+
+.ui-state-highlight {
+  font-weight: normal;
+}
+
+.tab-pane {
+  margin: 30px 0 20px 0;
+}
+
+.panelItemSpace {
+  clear: left;
+  margin: 0;
+  padding-top: 5px;
+}
+
+.panelDropSpace {
+  clear: left;
+  margin: 0;
+  padding-top: 5px;
+}
+
+.tabBackground {
+  background-color: #eee;
+}
+
+.ui-tabview .ui-tabview-panels {
+  min-height: 700px;
+}
+
+.ui-grid-pad {
+  padding: 10px;
+}
+
+p-tabpanel .panel-body {
+  padding: 7px;
+}
+
+.panel-table-cell-left {
+  text-align: left;
+  padding-left: 22px;
+}
+
+.panel-table-cell-right {
+  text-align: right;
+  padding-right: 7px;
+}
+
+.ui-splitbutton > .ui-button {
+  padding: 3px 0 4px 0;
+}
+
+.ui-button-secondary {
+  vertical-align: middle;
+}
+
+.ui-inputtext {
+  padding: 4px 5px 5px 5px;
+}
+
+body .ui-panel > .ui-panel-titlebar {
+  padding: 0.7em 1em 0.45em 1em;
+}
+
+body .panel-small.ui-panel > .ui-panel-titlebar {
+  font-size: 90%;
+  padding: 0.5em 1em 0.35em 0.8em;
+}
+
+.ui-panel .ui-panel-titlebar .ui-panel-titlebar-icon {
+  background-color: inherit;
+  border: 0;
+}
+
+body .ui-panel .ui-panel-content {
+  padding-top: 1.2em;
+  border-radius: 0 0 3px 3px;
+}
+
+.tabPanelColumn {
+  float: left;
+  position: relative;
+  min-height: 1px;
+  padding-right: 8px;
+  padding-left: 8px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tabPanelCheckbox {
+  float: left;
+  position: relative;
+  width: 10px;
+  min-height: 1px;
+  padding: 0;
+}
+
+.productionorder-state > .ui-button.ui-button-text-only .ui-button-text {
+  font-size: 85%;
+  padding: 5px 8px;
+}
+
+.panelheader-order-state {
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 90%;
+  color: #fff;
+  text-align: right;
+}
+.panelheader-order-state.default {
+  background-color: rgb(119, 119, 119);
+}
+.panelheader-order-state.success {
+  background-color: rgb(92, 184, 92);
+}
+.panelheader-order-state.warning {
+  background-color: rgb(240, 173, 78);
+}
+.panelheader-order-state.error {
+  background-color: rgb(217, 83, 79);
+}
+
+/* Formularanzeige valid/invalid */
+input.ng-valid[required],
+textarea.ng-valid[required],
+select.ng-valid[required] {
+  /*  border-left: 4px solid #42A948; /* green */
+}
+
+.form-inline .ui-widget.ui-autocomplete {
+  padding-top: 2px;
+}
+
+.form-inline .btn {
+  margin-top: 2px;
+}
+
+/* PrimeNg OrderList */
+
+body .ui-orderlist .ui-orderlist-list {
+  height: 100%;
+  border-radius: 3px;
+}
+
+body .ui-orderlist .ui-orderlist-list-container {
+  width: 94%;
+}
+body .ui-orderlist.disabled .ui-orderlist-list-container {
+  width: 100%;
+}
+
+body .ui-orderlist .ui-orderlist-controls {
+  width: 6%;
+}
+body .ui-orderlist.disabled .ui-orderlist-controls {
+  display: none;
+}
+
+body .ui-orderlist .ui-orderlist-list .ui-orderlist-item {
+  padding: 3px;
+  border-radius: 3px;
+}
+
+.container-state {
+  cursor: default;
+  margin: 0 10px 0 20px;
+}
+.container-state > h4 {
+  margin: 0 1px;
+}
+.container-state > div {
+  margin: 5px 0;
+}
+
+div.label-state > span.label {
+  cursor: pointer;
+  font-size: 85%;
+  margin: 0.9em 0.6em 0.3em 0;
+}
+
+body .ui-datepicker table {
+  font-size: 90%;
+}
+
+.ui-slidemenu {
+  width: 20em;
+}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+  <file source-language="de" datatype="plaintext" original="ng2.template">
+    <body>
+      <trans-unit id="btn-new" datatype="html">
+        <source>Neu</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/group/group-edit/group-edit.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/user/user-edit/user-edit.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/user/user-edit/user-edit.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="btn-edit" datatype="html">
+        <source>Bearbeiten</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/group/group-edit/group-edit.component.html</context>
+          <context context-type="linenumber">22</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/user/user-edit/user-edit.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="btn-delete" datatype="html">
+        <source>Löschen</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/group/group-edit/group-edit.component.html</context>
+          <context context-type="linenumber">30</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/user/user-edit/user-edit.component.html</context>
+          <context context-type="linenumber">45</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="list-status-data-count" datatype="html">
+        <source>
+    Es wurden <x id="ICU" equiv-text="{userCount(), plural, =0 {...} =1 {...} other {...}}"/>
+  </source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/user/user-list/user-list.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8bbfd3e0e0e146377b417893087cb4694debb3d3" datatype="html">
+        <source>{VAR_PLURAL, plural, =0 {0 Benutzer gefunden} =1 {1 Benutzer
+    gefunden} other {<x id="INTERPOLATION" equiv-text="{{userCount()}}"/> Benutzer gefunden } }</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/modules/user/user-list/user-list.component.html</context>
+          <context context-type="linenumber">26</context>
+        </context-group>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

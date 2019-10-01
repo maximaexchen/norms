@@ -1,11 +1,17 @@
 /* You can add global styles to this file, and also import other style files */
 /* @import '~bootstrap-sass/assets/stylesheets/bootstrap';
 @import '~bootstrap/scss/bootstrap';*/
-@import '~bootstrap/dist/css/bootstrap.min.css';
+
+@import 'assets/styles/bootstrap/bootstrap_config.scss';
 @import '~primeicons/primeicons.css';
+@import 'assets/styles/primeng/primeng_config.scss';
 @import '~primeng/resources/themes/nova-light/theme.css';
 @import '~primeng/resources/primeng.min.css';
 @import '~font-awesome/css/font-awesome.min.css';
+
+@import 'assets/styles/styles_base.scss';
+@import 'assets/styles/styles_app.scss';
+@import 'assets/styles/acp/app.scss';
 
 .checkbox {
   input {
@@ -40,9 +46,6 @@ $selected-background: #e9f4ff;
   background: $btn-background;
   border: 1px solid $btn-border;
   color: $btn-text-color;
-  span {
-    font-size: 1.3rem;
-  }
 }
 .selected-list {
   .c-list {

@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+import { CouchDBService } from 'src/app//services/couchDB.service';
 import { User } from '../user.model';
 
 @Component({
@@ -24,7 +24,7 @@ export class UserEditComponent implements OnInit {
   firstName: string;
   lastName: string;
   email: string;
-  active: boolean;
+  active = 0;
 
   constructor(
     private couchDBService: CouchDBService,
@@ -32,20 +32,16 @@ export class UserEditComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log('GroupEditComponent');
+    console.log('UserEditComponent');
 
     this.route.params.subscribe(results => {
-      console.log(results['id']);
       // check if we are updating
       if (results['id']) {
         console.log('Edit mode');
         this.formMode = true;
         this.formTitle = 'User bearbeiten';
-        console.log(results['id']);
 
         this.couchDBService.fetchEntry('/' + results['id']).subscribe(entry => {
-          console.log('Entry:');
-          console.log(entry);
           this.id = entry['_id'];
           this.rev = entry['_rev'];
           this.type = 'user';
@@ -73,14 +69,12 @@ export class UserEditComponent implements OnInit {
   }
 
   private onUpdateUser(): void {
-    // console.log(this.normForm);
-    console.log('onUpdateUser: DocumentEditComponent');
+    console.log('onUpdateUser: UserEditComponent');
     this.createWriteItem();
 
     this.couchDBService
       .updateEntry(this.writeItem, this.normForm.value._id)
       .subscribe(result => {
-        console.log(result);
         // Inform about Database change.
         this.sendStateUpdate();
       });
@@ -97,7 +91,7 @@ export class UserEditComponent implements OnInit {
     });
   }
 
-  createWriteItem() {
+  private createWriteItem() {
     this.writeItem = {};
 
     this.writeItem['type'] = 'user';

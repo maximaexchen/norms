@@ -1,0 +1,16 @@
+@import '~primeng/resources/themes/nova-light/theme.css';
+@import 'assets/styles/primeng/variables.scss';
+@import 'assets/styles/primeng/buttons.scss';
+@import 'assets/styles/primeng/tabs.scss';
+
+body {
+  .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+    background-color: $primary;
+  }
+
+  .ui-table-tbody {
+    a {
+      cursor: pointer;
+    }
+  }
+}

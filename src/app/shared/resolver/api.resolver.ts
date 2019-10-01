@@ -1,4 +1,4 @@
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
+import { CouchDBService } from 'src/app/services/couchDB.service';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Resolve } from '@angular/router';

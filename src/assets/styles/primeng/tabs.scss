@@ -1,0 +1,65 @@
+.ui-tabview-title {
+  font-weight: 400;
+}
+
+.tab-active-state {
+  background-color: theme-color('primary');
+  border: 1px solid theme-color('primary');
+}
+
+.tab-hover-state {
+  background-color: lighten(theme-color('primary'), 15%);
+  border: 1px solid lighten(theme-color('primary'), 15%);
+}
+
+body {
+  .ui-tabview {
+    &.ui-tabview-top {
+      .ui-tabview-nav {
+        li.ui-state-active {
+          @extend .tab-active-state;
+
+          &:hover {
+            @extend .tab-hover-state;
+          }
+        }
+      }
+    }
+
+    &.ui-tabview-bottom {
+      .ui-tabview-nav {
+        li.ui-state-active {
+          @extend .tab-active-state;
+
+          &:hover {
+            @extend .tab-hover-state;
+          }
+        }
+      }
+    }
+
+    &.ui-tabview-left {
+      .ui-tabview-nav {
+        li.ui-state-active {
+          @extend .tab-active-state;
+
+          &:hover {
+            @extend .tab-hover-state;
+          }
+        }
+      }
+    }
+
+    &.ui-tabview-right {
+      .ui-tabview-nav {
+        li.ui-state-active {
+          @extend .tab-active-state;
+
+          &:hover {
+            @extend .tab-hover-state;
+          }
+        }
+      }
+    }
+  }
+}

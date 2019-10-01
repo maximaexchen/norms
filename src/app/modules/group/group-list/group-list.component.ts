@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { DocumentService } from 'src/app/shared/services/document.service';
+import { CouchDBService } from 'src/app//services/couchDB.service';
+import { DocumentService } from 'src/app//services/document.service';
 import { Group } from './../group.model';
 
 @Component({
@@ -17,7 +18,8 @@ export class GroupListComponent implements OnInit, OnDestroy {
 
   constructor(
     private couchDBService: CouchDBService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -34,6 +36,14 @@ export class GroupListComponent implements OnInit, OnDestroy {
     this.documentService.getGroups().then(res => {
       this.groups = res;
     });
+  }
+
+  public showDetail(id: string) {
+    this.router.navigate(['../group/' + id + '/edit']);
+  }
+
+  public groupCount() {
+    return this.groups.length;
   }
 
   ngOnDestroy() {

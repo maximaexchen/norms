@@ -2,7 +2,7 @@ export interface NormDocumentProperties {
   _id?: string;
   _rev?: string;
   type?: string;
-  division?: any;
+  publisher?: any;
   normNumber?: string;
   name?: string;
   revision?: string;

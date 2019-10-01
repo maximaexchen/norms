@@ -1,15 +1,16 @@
-<div class="row">
-  <div class="col">
-    <a class="btn btn-success" [routerLink]="['/group/new']">Neue Gruppe</a>
-  </div>
-</div>
-<hr />
-<div class="row">
-  <div class="col">
-    <ul class="list-group">
-      <li *ngFor="let group of groups" class="list-group-item">
-        <a [routerLink]="[group._id] + '/edit'">{{ group.name }}</a>
-      </li>
-    </ul>
-  </div>
-</div>
+<p-table [value]="groups" [paginator]="true" [rows]="13" class="table">
+  <ng-template pTemplate="header">
+    <tr>
+      <th width="30"></th>
+      <th>Name</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-group>
+    <tr>
+      <td>
+        <a class="fa fa-folder" (click)="showDetail(group._id)"></a>
+      </td>
+      <td>{{ group.name }}</td>
+    </tr>
+  </ng-template>
+</p-table>

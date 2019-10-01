@@ -1,0 +1,44 @@
+.detail-edit-header {
+  button {
+    margin-left: 5px;
+  }
+}
+
+.info-panel {
+  padding: 20px;
+  text-align: center;
+  background-color: #f4f4f4;
+
+  &.position-top {
+    border-top: 1px solid $gray-400;
+    border-right: 1px solid $gray-400;
+    border-left: 1px solid $gray-400;
+  }
+  &.position-bottom {
+    border-bottom: 1px solid $gray-400;
+    border-right: 1px solid $gray-400;
+    border-left: 1px solid $gray-400;
+  }
+
+  h1 {
+    color: $gray-600;
+    font-size: 150%;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  p {
+    margin-bottom: 0;
+    font-weight: 700;
+  }
+}
+
+/*
+  FORMS
+*/
+
+.col-form-label {
+  font-weight: 700;
+  text-align: right;
+  padding-right: 0;
+}

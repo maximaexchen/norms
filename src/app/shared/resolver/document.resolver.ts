@@ -1,4 +1,4 @@
-import { DocumentService } from 'src/app/shared/services/document.service';
+import { DocumentService } from 'src/app/services/document.service';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Resolve } from '@angular/router';

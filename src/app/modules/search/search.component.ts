@@ -5,12 +5,12 @@ import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import * as _ from 'underscore';
 
-import { EnvService } from 'src/app/shared/services/env.service';
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { DocumentService } from '../../shared/services/document.service';
+import { EnvService } from 'src/app//services/env.service';
+import { CouchDBService } from 'src/app//services/couchDB.service';
+import { DocumentService } from '../..//services/document.service';
 import { Group } from 'src/app/modules/group/group.model';
 import { User } from 'src/app/modules/user/user.model';
-import { Division } from 'src/app/modules/division/division.model';
+import { Publisher } from 'src/app/modules/publisher/publisher.model';
 
 @Component({
   selector: 'app-document-search',
@@ -27,8 +27,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   modalTitle = '';
   modalContent = '';
 
-  divisions: Division[];
-  divisionId: string;
+  publishers: Publisher[];
+  publisherId: string;
   owners: User[];
   ownerId: string;
   users: User[];
@@ -54,8 +54,8 @@ export class SearchComponent implements OnInit, OnDestroy {
         this.users = res;
       });
 
-      this.documentService.getDivisions().then(res => {
-        this.divisions = res;
+      this.documentService.getPublishers().then(res => {
+        this.publishers = res;
       });
       this.documentService.getUsers().then(res => {
         this.owners = res;
@@ -66,8 +66,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   public onSubmit(): void {
     // console.log(this.searchForm);
 
-    if (this.searchForm.value.divisionId !== undefined) {
-      this.divisionId = this.searchForm.value.divisionId;
+    if (this.searchForm.value.publisherId !== undefined) {
+      this.publisherId = this.searchForm.value.publisherId;
     }
 
     if (this.searchForm.value.ownerId !== undefined) {
@@ -91,8 +91,8 @@ export class SearchComponent implements OnInit, OnDestroy {
         type: { $eq: 'norm' },
         $or: [
           {
-            division: {
-              _id: { $eq: this.divisionId }
+            publisher: {
+              _id: { $eq: this.publisherId }
             }
           },
           {
@@ -114,7 +114,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     };
 
     if (
-      this.searchForm.value.divisionId === undefined &&
+      this.searchForm.value.publisherId === undefined &&
       this.searchForm.value.ownerId === undefined &&
       this.searchForm.value.groupId === undefined &&
       this.searchForm.value.userId === undefined
@@ -127,11 +127,11 @@ export class SearchComponent implements OnInit, OnDestroy {
       .subscribe(results => {
         this.foundDocuments = results.docs;
         results.docs.forEach(norm => {
-          if (norm.division) {
-            const divisionItem = this.couchDBService
-              .fetchEntry('/' + norm.division._id)
-              .subscribe(divisionC => {
-                norm.division = divisionC.name;
+          if (norm.publisher) {
+            const publisherItem = this.couchDBService
+              .fetchEntry('/' + norm.publisher._id)
+              .subscribe(publisherC => {
+                norm.publisher = publisherC.name;
               });
           }
 

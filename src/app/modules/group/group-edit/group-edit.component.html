@@ -1,75 +1,167 @@
-<div class="col">
-  <h4>{{ formTitle }}</h4>
-  <h5 *ngIf="name">{{ name }}</h5>
+<div class="row detail-edit-header">
+  <div class="col-sm-4">
+    <h1>{{ name }}</h1>
+  </div>
+  <div class="col-sm-8 text-right">
+    <div class="form-group">
+      <button
+        pButton
+        type="submit"
+        icon="fa fa-check"
+        iconPos="left"
+        label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
+        i18n-label="@@btn-new"
+        class="ui-button-secondary"
+        (click)="onSubmit()"
+        [disabled]="!groupForm.valid"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        icon="fa fa-file-o"
+        iconPos="left"
+        label="Neu"
+        i18n-label="@@btn-new"
+        class="ui-button-secondary"
+        [routerLink]="['/group/new']"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="fa fa-pencil"
+        iconPos="left"
+        i18n-label="@@btn-edit"
+        class="ui-button-secondary-outline"
+        label="Bearbeiten"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="fa fa-pencil"
+        iconPos="left"
+        i18n-label="@@btn-delete"
+        class="ui-button-secondary-outline"
+        label="Löschen"
+      ></button>
+    </div>
+  </div>
 </div>
-<hr />
-<div class="col">
-  <form class="form" (ngSubmit)="onSubmit()" #groupForm="ngForm">
-    <input type="hidden" [(ngModel)]="formMode" name="formMode" />
-    <input type="hidden" [(ngModel)]="id" name="_id" />
-    <input type="hidden" [(ngModel)]="rev" name="_rev" />
-    <div class="form-group">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Name"
-        required
-        [(ngModel)]="name"
-        name="name"
-      />
-    </div>
+<p-tabView>
+  <p-tabPanel header="Stammdaten">
+    <form
+      class="form form-horizontal"
+      (ngSubmit)="onSubmit()"
+      #groupForm="ngForm"
+    >
+      <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+      <input type="hidden" [(ngModel)]="id" name="_id" />
+      <input type="hidden" [(ngModel)]="rev" name="_rev" />
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-Name"
+              >Name</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Vorname"
+                required
+                [(ngModel)]="name"
+                name="name"
+                #nameCheck="ngModel"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-name-required"
+                *ngIf="!nameCheck.valid && nameCheck.touched"
+                >Bitte geben Sie einen Namen ein.</small
+              >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-benutzer"
+              >Benutzer</label
+            >
+            <div class="col-sm-10">
+              <p-multiSelect
+                [options]="users"
+                [(ngModel)]="selectedtUsers"
+                [panelStyle]="{ minWidth: '12em' }"
+              ></p-multiSelect>
 
-    <button class="btn btn-success" type="button" (click)="updateSelect()">
-      Update Select
-    </button>
+              <!-- <p-multiSelect
+                [options]="users"
+                [(ngModel)]="selectedtUsers"
+                name="selectedtUsers"
+                [panelStyle]="{ minWidth: '12em' }"
+              >
+                 <ng-template let-selectedtUsers pTemplate="selectedItems">
+                  <span *ngFor="let selectedUser of selectedtUsers">{{
+                    selectedUser['name']
+                  }}</span>
+                </ng-template>
+                <ng-template let-user pTemplate="item">
+                  <div style="font-size:14px;float:right;margin-top:4px">
+                    {{ user.name }}
+                  </div>
+                </ng-template>
+              </p-multiSelect> -->
 
-    <div class="form-group">
-      <angular2-multiselect
-        name="users"
-        [data]="users"
-        [(ngModel)]="selectedtUsers"
-        [settings]="dropdownSettings"
-        (onSelect)="onItemSelect($event)"
-        (onDeSelect)="onItemDeSelect($event)"
-        (onSelectAll)="onSelectAll($event)"
-        (onDeSelectAll)="onDeSelectAll($event)"
-      >
-        <c-item>
-          <ng-template let-item="item">
-            <label> {{ item.name }}</label>
-          </ng-template>
-        </c-item>
-      </angular2-multiselect>
-
-      <!-- <select class="form-control" [(ngModel)]="users" name="users">
-        <option [ngValue]="undefined" disabled selected>User wählen</option>
-        <option
-          *ngFor="let user of users"
-          [value]="user._id"
-          [selected]="user._id == user"
-        >
-          {{ user.lastName }}, {{ user.firstName }}
-        </option>
-      </select> -->
-    </div>
-
-    <div class="checkbox">
-      <label
-        ><input
-          type="checkbox"
-          class="form-control"
-          [(ngModel)]="active"
-          name="active"
-        />Aktiv ?</label
-      >
-    </div>
-
-    <hr />
-
-    <div class="form-group">
-      <button class="btn btn-success" type="submit">
-        {{ formMode ? 'Speichern' : 'Erstellen' }}
-      </button>
-    </div>
-  </form>
-</div>
+              <!-- <angular2-multiselect
+                name="users"
+                [data]="users"
+                [(ngModel)]="selectedtUsers"
+                [settings]="dropdownSettings"
+                (onSelect)="onItemSelect($event)"
+                (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAll($event)"
+              >
+                <c-item>
+                  <ng-template let-item="item">
+                    <label> {{ item.name }}</label>
+                  </ng-template>
+                </c-item>
+              </angular2-multiselect> -->
+            </div>
+            <!-- <select class="form-control" [(ngModel)]="users" name="users">
+                  <option [ngValue]="undefined" disabled selected>User wählen</option>
+                  <option
+                    *ngFor="let user of users"
+                    [value]="user._id"
+                    [selected]="user._id == user"
+                  >
+                    {{ user.lastName }}, {{ user.firstName }}
+                  </option>
+                </select> -->
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Staus</label>
+            <div class="col-sm-10">
+              <p-selectButton
+                [options]="[
+                  {
+                    label: 'aktiv',
+                    value: true
+                  },
+                  {
+                    label: 'gesperrt',
+                    value: false
+                  }
+                ]"
+                name="active"
+                [(ngModel)]="active"
+              ></p-selectButton>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </p-tabPanel>
+</p-tabView>

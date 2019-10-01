@@ -10,10 +10,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
-import { CouchDBService } from 'src/app/shared/services/couchDB.service';
-import { DocumentService } from 'src/app/shared/services/document.service';
+import { CouchDBService } from 'src/app//services/couchDB.service';
+import { DocumentService } from 'src/app//services/document.service';
 import { Group } from '../group.model';
 import { User } from 'src/app/modules/user/user.model';
+import { NotificationsService } from 'src/app/services/notifications.service';
 
 @Component({
   selector: 'app-group-edit',
@@ -45,7 +46,8 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private notificationsService: NotificationsService
   ) {}
 
   ngOnInit() {
@@ -98,25 +100,40 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
   private getSelectedUsers(users: any[]) {
     users.forEach(user => {
-      this.getUserByID(user).subscribe(result => {
-        // build the Object for the selectbox in right format
-        const selectedUserObject = {};
-        selectedUserObject['id'] = result._id;
-        selectedUserObject['name'] = result.lastName + ', ' + result.firstName;
-        this.selectedtUsers.push(selectedUserObject);
-      });
+      this.getUserByID(user).subscribe(
+        result => {
+          // build the Object for the selectbox in right format
+          const selectedUserObject = {};
+          selectedUserObject['id'] = result._id;
+          selectedUserObject['name'] =
+            result.lastName + ', ' + result.firstName;
+          this.selectedtUsers.push(selectedUserObject);
+        },
+        err => {
+          this.showConfirm('error', 'Fehler beim Laden der Benutzer');
+        }
+      );
     });
   }
 
   private getUsers(): void {
-    this.documentService.getUsers().then(results => {
-      results.forEach(item => {
-        const userObject = {} as User;
-        userObject['id'] = item['_id'];
-        userObject['name'] = item['lastName'] + ', ' + item['firstName'];
-        this.users.push(userObject);
-      });
-    });
+    this.documentService.getUsers().then(
+      results => {
+        results.forEach(item => {
+          const userObject = {} as User;
+          userObject['id'] = item['_id'];
+          userObject['name'] = item['lastName'] + ', ' + item['firstName'];
+          this.users.push({
+            label: userObject['name'],
+            value: userObject['id']
+          });
+          //this.users.push(userObject);
+        });
+      },
+      err => {
+        console.log('Error on loading users');
+      }
+    );
   }
 
   private getUserByID(id: string): any {
@@ -160,7 +177,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
         this.selectedtUsers = [];
         this.sendStateUpdate();
 
-        this.router.navigate(['../group']);
+        // this.router.navigate(['../group']);
       });
   }
 
@@ -170,7 +187,6 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     this.createWriteItem();
 
     this.couchDBService.writeEntry(this.writeItem).subscribe(result => {
-      console.log(result);
       this.sendStateUpdate();
     });
   }
@@ -195,9 +211,14 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     if (this.groupForm.value._id) {
       this.writeItem['_rev'] = this.groupForm.value._rev;
     }
-    console.log(this.writeItem);
+  }
 
-    // return this.writeItem;
+  private showConfirm(type: string, result: string) {
+    this.notificationsService.addSingle(
+      type,
+      result,
+      type === 'success' ? 'ok' : 'error'
+    );
   }
 
   private sendStateUpdate(): void {

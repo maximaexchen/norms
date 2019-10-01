@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 
-import { GeneralModule } from 'src/app/shared/modules/general.module';
+import { GeneralModule } from 'src/app/modules/general.module';
 import { GroupComponent } from './group.component';
 import { GroupEditComponent } from './group-edit/group-edit.component';
 import { GroupListComponent } from './group-list/group-list.component';

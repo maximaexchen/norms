@@ -1,63 +1,159 @@
-<div class="col">
-  <h4>{{ formTitle }}</h4>
-  <h5 *ngIf="firstName && lastName">{{ firstName }} {{ lastName }}</h5>
+<div class="row detail-edit-header">
+  <div class="col-sm-4">
+    <h1>{{ firstName }} {{ lastName }}</h1>
+  </div>
+  <div class="col-sm-8 text-right">
+    <div class="form-group">
+      <button
+        pButton
+        type="submit"
+        icon="fa fa-check"
+        iconPos="left"
+        label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
+        i18n-label="@@btn-new"
+        class="ui-button-secondary"
+        (click)="onSubmit()"
+        [disabled]="!userForm.valid"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        icon="fa fa-file-o"
+        iconPos="left"
+        label="Neu"
+        i18n-label="@@btn-new"
+        class="ui-button-secondary"
+        [routerLink]="['/user/new']"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="fa fa-pencil"
+        iconPos="left"
+        i18n-label="@@btn-edit"
+        class="ui-button-secondary-outline"
+        label="Bearbeiten"
+      ></button>
+      <button
+        pButton
+        type="button"
+        icon="fa fa-pencil"
+        iconPos="left"
+        i18n-label="@@btn-delete"
+        class="ui-button-secondary-outline"
+        label="Löschen"
+      ></button>
+    </div>
+  </div>
 </div>
-<hr />
-<div class="col">
-  <form class="form" (ngSubmit)="onSubmit()" #userForm="ngForm">
-    <input type="hidden" [(ngModel)]="formMode" name="formMode" />
-    <input type="hidden" [(ngModel)]="id" name="_id" />
-    <input type="hidden" [(ngModel)]="rev" name="_rev" />
-    <div class="form-group">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Vorname"
-        required
-        [(ngModel)]="firstName"
-        name="firstName"
-      />
-    </div>
+<p-tabView>
+  <p-tabPanel header="Stammdaten">
+    <form
+      class="form form-horizontal"
+      (ngSubmit)="onSubmit()"
+      #userForm="ngForm"
+    >
+      <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+      <input type="hidden" [(ngModel)]="id" name="_id" />
+      <input type="hidden" [(ngModel)]="rev" name="_rev" />
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-firstName"
+              >firstName</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Vorname"
+                required
+                [(ngModel)]="firstName"
+                name="firstName"
+                #firstNameCheck="ngModel"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-lastName-required"
+                *ngIf="!firstNameCheck.valid && firstNameCheck.touched"
+                >Bitte geben Sie einen Vornamen ein.</small
+              >
+            </div>
+          </div>
 
-    <div class="form-group">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Nachname"
-        required
-        [(ngModel)]="lastName"
-        name="lastName"
-      />
-    </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-lastName"
+              >Nachname</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Nachname"
+                required
+                [(ngModel)]="lastName"
+                name="lastName"
+                #lastNameCheck="ngModel"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-lastName-required"
+                *ngIf="!lastNameCheck.valid && lastNameCheck.touched"
+                >Bitte geben Sie einen Nachnamen ein.</small
+              >
+            </div>
+          </div>
 
-    <div class="form-group">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="E-Mail"
-        required
-        [(ngModel)]="email"
-        name="email"
-      />
-    </div>
-
-    <div class="checkbox">
-      <label
-        ><input
-          type="checkbox"
-          class="form-control"
-          [(ngModel)]="active"
-          name="active"
-        />Aktiv ?</label
-      >
-    </div>
-
-    <hr />
-
-    <div class="form-group">
-      <button class="btn btn-success" type="submit">
-        {{ formMode ? 'Aktualisieren' : 'Erstellen' }}
-      </button>
-    </div>
-  </form>
-</div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-email"
+              >E-Mail</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                i18n-placeholder
+                placeholder="E-Mail"
+                required
+                email
+                [(ngModel)]="email"
+                name="email"
+                #emailCheck="ngModel"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-email-required"
+                *ngIf="!emailCheck.valid && emailCheck.touched"
+                >Bitte geben Sie eine gültige E-Mail Adresse ein.</small
+              >
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Staus</label>
+            <div class="col-sm-10">
+              <p-selectButton
+                [options]="[
+                  {
+                    label: 'aktiv',
+                    value: true
+                  },
+                  {
+                    label: 'gesperrt',
+                    value: false
+                  }
+                ]"
+                name="active"
+                [(ngModel)]="active"
+              ></p-selectButton>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </p-tabPanel>
+</p-tabView>

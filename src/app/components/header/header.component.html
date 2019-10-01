@@ -1,0 +1,47 @@
+<!-- Kopfbereich der Anwendung -->
+<div class="header">
+  <!-- Ausgabe von Meldungen -->
+  <p-toast [style]="{ marginTop: '80px' }"></p-toast>
+  <app-notifications></app-notifications>
+
+  <div class="ui-g">
+    <div class="ui-g-12">
+      <div class="ui-g-10">
+        <div class="header-company-icon ">
+          <!-- Logo der Firma -->
+          <img src="../assets/images/src_assets_images_acp_logo_group.png" />
+          <!-- Name der Anwendung -->
+          <p class="application-name">{{ this.title }}</p>
+        </div>
+      </div>
+
+      <div class="ui-g-2 header-application-icon">
+        <img
+          class=" application-icon"
+          src="../assets/images/src_assets_images_icons_apps_hg_ohne_text_watzmann_weiss.png"
+        />
+        <!-- <div *ngIf="user && user.fullName" class="user-name">
+          User: {{ user.fullName }}
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+    <!-- *ngIf="user && user.isValidUser == true" -->
+    <p-menubar
+      [model]="mainmenuItems"
+      styleClass="main-menubar"
+      [autoDisplay]="false"
+    >
+      <div>
+        <p-button
+          (onClick)="logout($event)"
+          label="Logout"
+          icon="fa fa-sign-out"
+          style="margin-left:1em"
+        ></p-button>
+      </div>
+    </p-menubar>
+  </div>
+</div>
