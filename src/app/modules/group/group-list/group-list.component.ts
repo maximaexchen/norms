@@ -27,15 +27,25 @@ export class GroupListComponent implements OnInit, OnDestroy {
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'group') {
-          this.documentService.getGroups().then(res => {
-            this.groups = res;
-          });
+          this.documentService.getGroups().subscribe(
+            res => {
+              this.groups = res;
+            },
+            err => {
+              console.log(err);
+            }
+          );
         }
       });
 
-    this.documentService.getGroups().then(res => {
-      this.groups = res;
-    });
+    this.documentService.getGroups().subscribe(
+      res => {
+        this.groups = res;
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   public showDetail(id: string) {

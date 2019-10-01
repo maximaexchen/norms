@@ -28,16 +28,21 @@ export class UserListComponent implements OnInit, OnDestroy {
       .subscribe(
         message => {
           if (message.text === 'user') {
-            this.documentService.getUsers().then(res => {
-              this.users = res;
-            });
+            this.documentService.getUsers().subscribe(
+              res => {
+                this.users = res;
+              },
+              err => {
+                console.log(err);
+              }
+            );
           }
         },
         err => console.log('HTTP Error', err),
         () => console.log('HTTP request completed.')
       );
 
-    this.documentService.getUsers().then(
+    this.documentService.getUsers().subscribe(
       res => {
         this.users = res;
       },

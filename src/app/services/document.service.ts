@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Publisher } from '../modules/publisher/publisher.model';
 import { CouchDBService } from 'src/app//services/couchDB.service';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { User } from 'src/app/modules/user/user.model';
 import { Group } from 'src/app/modules/group/group.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -27,16 +27,10 @@ export class DocumentService {
     private couchDBService: CouchDBService
   ) {}
 
-  public async getDocuments(): Promise<NormDocument[]> {
-    return this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
-      .toPromise()
-      .then(responseData => {
-        return responseData;
-      })
-      .catch(response => {
-        return response.message;
-      });
+  public getDocuments(): Observable<any> {
+    return this.couchDBService.fetchEntries(
+      '/_design/norms/_view/all-norms?include_docs=true'
+    );
   }
 
   public getSelectedUsers(usersIds: string[]): User[] {
@@ -54,58 +48,32 @@ export class DocumentService {
     return this.selectedtUsers;
   }
 
-  public getUserByID(id: string): any {
-    // http://127.0.0.1:5984/norm_documents/_design/norms/_view/norm-users?startkey=
-    // ["2a350192903b8d08259b69d22700c2d4",1]&endkey=["2a350192903b8d08259b69d22700c2d4",10]&include_docs=true
+  public getUserByID(id: string): Observable<any> {
     return this.couchDBService.fetchEntry('/' + id);
   }
 
-  public async getPublishers(): Promise<Publisher[]> {
-    return this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-publishers?include_docs=true')
-      .toPromise()
-      .then(responseData => {
-        return responseData;
-      })
-      .catch(response => {
-        return response.message;
-      });
+  public getPublishers(): Observable<any> {
+    return this.couchDBService.fetchEntries(
+      '/_design/norms/_view/all-publishers?include_docs=true'
+    );
   }
 
-  public async getUsers(): Promise<User[]> {
-    return this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
-      .toPromise()
-      .then(responseData => {
-        return responseData;
-      })
-      .catch(response => {
-        return response.message;
-      });
+  public getUsers(): Observable<User[]> {
+    return this.couchDBService.fetchEntries(
+      '/_design/norms/_view/all-users?include_docs=true'
+    );
   }
 
-  public async getOwners(): Promise<User[]> {
-    return this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
-      .toPromise()
-      .then(responseData => {
-        return responseData;
-      })
-      .catch(response => {
-        return response.message;
-      });
+  public getOwners(): Observable<User[]> {
+    return this.couchDBService.fetchEntries(
+      '/_design/norms/_view/all-users?include_docs=true'
+    );
   }
 
-  public async getGroups(): Promise<Group[]> {
-    return this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-groups?include_docs=true')
-      .toPromise()
-      .then(responseData => {
-        return responseData;
-      })
-      .catch(response => {
-        return response.message;
-      });
+  public getGroups(): Observable<User[]> {
+    return this.couchDBService.fetchEntries(
+      '/_design/norms/_view/all-groups?include_docs=true'
+    );
   }
 
   public getDownload(id: string, documentName: string) {

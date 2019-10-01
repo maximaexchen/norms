@@ -27,14 +27,24 @@ export class PublisherListComponent implements OnInit, OnDestroy {
       .setStateUpdate()
       .subscribe(message => {
         if (message.text === 'publisher') {
-          this.documentService.getPublishers().then(res => {
-            this.publishers = res;
-          });
+          this.documentService.getPublishers().subscribe(
+            res => {
+              this.publishers = res;
+            },
+            err => {
+              console.log(err);
+            }
+          );
         }
       });
-    this.documentService.getPublishers().then(res => {
-      this.publishers = res;
-    });
+    this.documentService.getPublishers().subscribe(
+      res => {
+        this.publishers = res;
+      },
+      err => {
+        console.log(err);
+      }
+    );
   }
 
   ngOnDestroy() {

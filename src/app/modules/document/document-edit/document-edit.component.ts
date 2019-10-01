@@ -113,12 +113,19 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       // empty the select-box
       this.selectedtUsers = [];
       // fetch data for select-boxes
-      this.documentService.getPublishers().then(res => {
-        this.publishers = res;
-      });
-      this.documentService.getUsers().then(res => {
-        this.owners = res;
-      });
+      this.documentService.getPublishers().subscribe(
+        res => {
+          this.publishers = res;
+        },
+        err => {}
+      );
+      this.documentService.getUsers().subscribe(
+        res => {
+          this.owners = res;
+        },
+        err => {}
+      );
+
       this.getUsers();
 
       // check if we are updating

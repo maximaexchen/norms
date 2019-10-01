@@ -40,9 +40,15 @@ export class DocumentListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     console.log('ngOnInit: DocumentListComponent');
-    this.documentService.getDocuments().then(doc => {
-      this.documents = doc;
-    });
+    this.documentService.getDocuments().subscribe(
+      doc => {
+        this.documents = doc;
+      },
+      err => {
+        console.log(err);
+      },
+      () => {}
+    );
   }
 
   public getDownload(id: string, attachments: any) {

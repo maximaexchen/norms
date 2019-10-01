@@ -20,12 +20,11 @@ export class CouchDBService {
 
   constructor(private env: EnvService, private http: HttpClient) {}
 
-  public writeEntry(document: NormDocument) {
+  public writeEntry(document: NormDocument): Observable<any> {
     return this.http.post(this.dbRequest, document);
   }
 
   public updateEntry(document: NormDocument, id: string): Observable<any> {
-    console.log('updateEntry');
     return this.http.put(this.dbRequest + '/' + id, document);
   }
 
@@ -34,11 +33,6 @@ export class CouchDBService {
   }
 
   public fetchEntries(param: string): Observable<any> {
-    /* console.log('+++++++++++++++++++++++');
-    console.log(this.dbRequest + param);
-    console.log(this.dbRequest);
-    console.log(param);
-    console.log('+++++++++++++++++++++++'); */
     return this.http.get(this.dbRequest + param).pipe(
       map(responseData => {
         const entriesArray = [];
@@ -48,6 +42,7 @@ export class CouchDBService {
             entriesArray.push({ ...responseData['rows'][key]['doc'] });
           }
         }
+
         return entriesArray;
       })
     );
@@ -68,15 +63,7 @@ export class CouchDBService {
     return this.http.post(this.dbRequest + '/_find', object);
   }
 
-  public sendStateUpdate(message: string) {
-    this.updateSubject.next({ text: message });
-  }
-
-  public setStateUpdate(): Observable<any> {
-    return this.updateSubject.asObservable();
-  }
-
-  public getUsersForNorm(id: string) {
+  public getUsersForNorm(id: string): Observable<any> {
     // http://127.0.0.1:5984/norm_documents/_design/norms/_view/norm-users?
     // startkey=["2a350192903b8d08259b69d22700c2d4"]&endkey=["2a350192903b8d08259b69d22700c2d4",{},{}]&include_docs=true
 
@@ -89,6 +76,14 @@ export class CouchDBService {
         id +
         '",{},{}]&include_docs=true'
     );
+  }
+
+  public sendStateUpdate(message: string) {
+    this.updateSubject.next({ text: message });
+  }
+
+  public setStateUpdate(): Observable<any> {
+    return this.updateSubject.asObservable();
   }
 
   login(params: { username: string; password: string }): any {

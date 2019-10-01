@@ -99,13 +99,6 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   private getSelectedUsers(users: any[]) {
-    console.log(users);
-
-    for (let us of users[0]) {
-      console.log(us);
-      console.log('+++++++++++++');
-    }
-
     users.forEach(user => {
       this.getUserByID(user).subscribe(
         result => {
@@ -124,23 +117,20 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   private getUsers(): void {
-    this.documentService.getUsers().then(
+    this.documentService.getUsers().subscribe(
       results => {
         results.forEach(item => {
           const userObject = {} as User;
           userObject['id'] = item['_id'];
           userObject['name'] = item['lastName'] + ', ' + item['firstName'];
-          this.users.push({
-            label: userObject['name'],
-            value: userObject['id']
-          });
-          //this.users.push(userObject);
+          this.users.push(userObject);
         });
       },
       err => {
         console.log('Error on loading users');
       }
     );
+    console.log(this.users);
   }
 
   private getUserByID(id: string): any {
@@ -157,33 +147,15 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onItemSelect(item: any) {
-    console.log(item['itemName']);
-    console.log(this.selectedtUsers);
-  }
-  public onItemDeSelect(item: any) {
-    console.log(item);
-    console.log(this.selectedtUsers);
-  }
-  public onSelectAll(items: any) {
-    console.log(items);
-  }
-  public onDeSelectAll(items: any) {
-    console.log(items);
-  }
-
   private updateGroup(): void {
     console.log('onUpdateGroup: GroupEditComponent');
     this.createWriteItem();
-
-    console.log(this.writeItem);
-
     this.couchDBService
       .updateEntry(this.writeItem, this.groupForm.value._id)
       .subscribe(result => {
-        console.log(result);
+        // console.log(result);
         // Inform about Database change.
-        this.selectedtUsers = [];
+        // this.selectedtUsers = [];
         this.sendStateUpdate();
 
         // this.router.navigate(['../group']);
@@ -206,14 +178,11 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     this.writeItem['type'] = 'usergroup';
     this.writeItem['name'] = this.groupForm.value.name || '';
     this.writeItem['active'] = this.groupForm.value.active || false;
-    console.log('+++++++++++++++++++++++++');
-    console.log(this.groupForm.value.selectedtUsers);
+
     const selUsersId = [
-      ...new Set(
-        this.selectedtUsers.map(userId => this.groupForm.value.selectedtUsers)
-      )
+      ...new Set(this.selectedtUsers.map(userId => userId['id']))
     ];
-    console.log(this.selectedtUsers);
+
     this.writeItem['users'] = selUsersId || [];
 
     if (this.groupForm.value._id) {
@@ -241,6 +210,21 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   updateSelect() {
     console.log('updateSelect');
     this.selectedtUsers = [];
+  }
+
+  public onItemSelect(item: any) {
+    console.log(item);
+    console.log(this.selectedtUsers);
+  }
+  public onItemDeSelect(item: any) {
+    console.log(item);
+    console.log(this.selectedtUsers);
+  }
+  public onSelectAll(items: any) {
+    console.log(items);
+  }
+  public onDeSelectAll(items: any) {
+    console.log(items);
   }
 
   ngOnDestroy(): void {

@@ -47,19 +47,39 @@ export class SearchComponent implements OnInit, OnDestroy {
     console.log('DocumentSearchComponent');
 
     this.searchSubsscription = this.route.params.subscribe(results => {
-      this.documentService.getGroups().then(res => {
-        this.groups = res;
-      });
-      this.documentService.getUsers().then(res => {
-        this.users = res;
-      });
+      this.documentService.getGroups().subscribe(
+        res => {
+          this.groups = res;
+        },
+        err => {
+          console.log(err);
+        }
+      );
+      this.documentService.getUsers().subscribe(
+        res => {
+          this.users = res;
+        },
+        err => {
+          console.log(err);
+        }
+      );
 
-      this.documentService.getPublishers().then(res => {
-        this.publishers = res;
-      });
-      this.documentService.getUsers().then(res => {
-        this.owners = res;
-      });
+      this.documentService.getPublishers().subscribe(
+        res => {
+          this.publishers = res;
+        },
+        err => {
+          console.log(err);
+        }
+      );
+      this.documentService.getUsers().subscribe(
+        res => {
+          this.owners = res;
+        },
+        err => {
+          console.log(err);
+        }
+      );
     });
   }
 
