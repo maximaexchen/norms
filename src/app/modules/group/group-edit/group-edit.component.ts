@@ -99,6 +99,13 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   private getSelectedUsers(users: any[]) {
+    console.log(users);
+
+    for (let us of users[0]) {
+      console.log(us);
+      console.log('+++++++++++++');
+    }
+
     users.forEach(user => {
       this.getUserByID(user).subscribe(
         result => {
@@ -169,6 +176,8 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     console.log('onUpdateGroup: GroupEditComponent');
     this.createWriteItem();
 
+    console.log(this.writeItem);
+
     this.couchDBService
       .updateEntry(this.writeItem, this.groupForm.value._id)
       .subscribe(result => {
@@ -197,11 +206,14 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     this.writeItem['type'] = 'usergroup';
     this.writeItem['name'] = this.groupForm.value.name || '';
     this.writeItem['active'] = this.groupForm.value.active || false;
-
+    console.log('+++++++++++++++++++++++++');
+    console.log(this.groupForm.value.selectedtUsers);
     const selUsersId = [
-      ...new Set(this.selectedtUsers.map(userId => userId['id']))
+      ...new Set(
+        this.selectedtUsers.map(userId => this.groupForm.value.selectedtUsers)
+      )
     ];
-
+    console.log(this.selectedtUsers);
     this.writeItem['users'] = selUsersId || [];
 
     if (this.groupForm.value._id) {

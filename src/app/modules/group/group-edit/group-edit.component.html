@@ -68,7 +68,7 @@
                 type="text"
                 class="form-control"
                 i18n-placeholder
-                placeholder="Vorname"
+                placeholder="Name"
                 required
                 [(ngModel)]="name"
                 name="name"
@@ -90,6 +90,7 @@
               <p-multiSelect
                 [options]="users"
                 [(ngModel)]="selectedtUsers"
+                name="selectedtUsers"
                 [panelStyle]="{ minWidth: '12em' }"
               ></p-multiSelect>
 
