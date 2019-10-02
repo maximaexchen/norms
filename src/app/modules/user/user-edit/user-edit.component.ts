@@ -2,11 +2,13 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
+import { Subscription } from 'rxjs';
+import { ConfirmationService } from 'primeng/api';
+
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { NotificationsService } from 'src/app/services/notifications.service';
 import { User } from '../user.model';
-import { Subscription } from 'rxjs';
-import { ConfirmationService } from 'primeng/api';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-edit',
@@ -16,17 +18,14 @@ import { ConfirmationService } from 'primeng/api';
 export class UserEditComponent implements OnInit, OnDestroy {
   @ViewChild('userForm', { static: false }) userForm: NgForm;
 
-  updateSubscription: Subscription;
-  createSubscription: Subscription;
-  deleteSubscription: Subscription;
-  getUserSubscription: Subscription;
-  routeSubscription: Subscription;
+  alive = true;
+
+  formTitle: string;
+  formMode = false; // 0 = new - 1 = update
 
   writeItem: User;
   users: User[] = [];
 
-  formTitle: string;
-  formMode = false; // 0 = new - 1 = update
   id: string;
   rev: string;
   type: string;
@@ -49,15 +48,16 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   private getUser() {
-    this.routeSubscription = this.route.params.subscribe(results => {
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // check if we are updating
       if (results['id']) {
         console.log('Edit mode');
         this.formMode = true;
         this.formTitle = 'User bearbeiten';
 
-        this.getUserSubscription = this.couchDBService
+        this.couchDBService
           .fetchEntry('/' + results['id'])
+          .pipe(takeWhile(() => this.alive))
           .subscribe(entry => {
             this.id = entry['_id'];
             this.rev = entry['_rev'];
@@ -76,8 +76,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit(): void {
-    console.log('onSubmit in UserEdit');
-    console.log(this.userForm.value.formMode);
     if (this.userForm.value.formMode) {
       console.log('Update a user');
       this.onUpdateUser();
@@ -88,11 +86,11 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   private onUpdateUser(): void {
-    console.log('onUpdateUser: UserEditComponent');
     this.createWriteItem();
 
-    this.updateSubscription = this.couchDBService
+    this.couchDBService
       .updateEntry(this.writeItem, this.userForm.value._id)
+      .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
           // Inform about Database change.
@@ -107,12 +105,11 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   private onCreateUser(): void {
-    console.log('onCreateUser: UserEditComponent');
-
     this.createWriteItem();
 
-    this.createSubscription = this.couchDBService
+    this.couchDBService
       .writeEntry(this.writeItem)
+      .pipe(takeWhile(() => this.alive))
       .subscribe(result => {
         this.sendStateUpdate();
       });
@@ -122,8 +119,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.lastName + '?',
       accept: () => {
-        this.deleteSubscription = this.couchDBService
+        this.couchDBService
           .deleteEntry(this.id, this.rev)
+          .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
               this.sendStateUpdate();
@@ -140,7 +138,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   private createWriteItem() {
     this.writeItem = {};
-
     this.writeItem['type'] = 'user';
     this.writeItem['firstName'] = this.userForm.value.firstName || '';
     this.writeItem['lastName'] = this.userForm.value.lastName || '';
@@ -171,20 +168,6 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    if (this.getUserSubscription && !this.getUserSubscription.closed) {
-      this.getUserSubscription.unsubscribe();
-    }
-    if (this.updateSubscription && !this.updateSubscription.closed) {
-      this.updateSubscription.unsubscribe();
-    }
-    if (this.createSubscription && !this.createSubscription.closed) {
-      this.createSubscription.unsubscribe();
-    }
-    if (this.routeSubscription && !this.routeSubscription.closed) {
-      this.routeSubscription.unsubscribe();
-    }
-    if (this.deleteSubscription && !this.deleteSubscription.closed) {
-      this.deleteSubscription.unsubscribe();
-    }
+    this.alive = false;
   }
 }

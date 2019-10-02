@@ -8,14 +8,16 @@ import {
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
+import { ConfirmationService } from 'primeng/api';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
+import { NotificationsService } from 'src/app/services/notifications.service';
+
 import { Group } from '../group.model';
 import { User } from 'src/app/modules/user/user.model';
-import { NotificationsService } from 'src/app/services/notifications.service';
-import { ConfirmationService } from 'primeng/api';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-group-edit',
@@ -26,9 +28,10 @@ import { ConfirmationService } from 'primeng/api';
 export class GroupEditComponent implements OnInit, OnDestroy {
   @ViewChild('groupForm', { static: false }) groupForm: NgForm;
 
-  groupSubscription: Subscription = new Subscription();
-  userSubscription: Subscription = new Subscription();
-  deleteSubscription: Subscription;
+  alive = true;
+
+  formTitle: string;
+  formMode = false; // 0 = new - 1 = update
 
   writeItem: Group;
   groups: Group[] = [];
@@ -36,8 +39,6 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   selectedtUsers: User[] = [];
   dropdownSettings = {};
 
-  formTitle: string;
-  formMode = false; // 0 = new - 1 = update
   id: string;
   rev: string;
   type: string;
@@ -70,31 +71,32 @@ export class GroupEditComponent implements OnInit, OnDestroy {
       noDataLabel: 'Keinen Benutzer gefunden'
     };
 
-    // get all users for the select-box
     this.getUsers();
 
-    // wait for router resoler
-    this.route.params.subscribe(results => {
-      // empty the select-box
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       this.selectedtUsers = [];
 
       // check if we are updating
       if (results['id']) {
-        console.log('Edit mode');
         this.formMode = true;
         this.formTitle = 'Gruppe bearbeiten';
 
-        this.couchDBService.fetchEntry('/' + results['id']).subscribe(entry => {
-          this.id = entry['_id'];
-          this.rev = entry['_rev'];
-          this.name = entry['name'];
-          this.active = entry['active'];
+        this.couchDBService
+          .fetchEntry('/' + results['id'])
+          .pipe(takeWhile(() => this.alive))
+          .subscribe(
+            entry => {
+              this.id = entry['_id'];
+              this.rev = entry['_rev'];
+              this.name = entry['name'];
+              this.active = entry['active'];
 
-          // get all users of the group
-          this.getSelectedUsers(entry['users']);
-        });
+              this.getSelectedUsers(entry['users']);
+            },
+            error => console.log(error.message),
+            () => console.log('Group Observer got a complete notification')
+          );
       } else {
-        console.log('New mode');
         this.formTitle = 'Neue Gruppe anlegen';
         this.groups = [];
       }
@@ -107,12 +109,12 @@ export class GroupEditComponent implements OnInit, OnDestroy {
         result => {
           // build the Object for the selectbox in right format
           const selectedUserObject = {};
-          selectedUserObject['id'] = result._id;
+          selectedUserObject['id'] = result['_id'];
           selectedUserObject['name'] =
-            result.lastName + ', ' + result.firstName;
+            result['lastName'] + ', ' + result['firstName'];
           this.selectedtUsers.push(selectedUserObject);
         },
-        err => {
+        error => {
           this.showConfirm('error', 'Fehler beim Laden der Benutzer');
         }
       );
@@ -120,51 +122,49 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   private getUsers(): void {
-    this.documentService.getUsers().subscribe(
-      results => {
-        results.forEach(item => {
-          const userObject = {} as User;
-          userObject['id'] = item['_id'];
-          userObject['name'] = item['lastName'] + ', ' + item['firstName'];
-          this.users.push(userObject);
-        });
-      },
-      err => {
-        console.log('Error on loading users');
-      }
-    );
-    console.log(this.users);
+    this.documentService
+      .getUsers()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        results => {
+          results.forEach(item => {
+            const userObject = {} as User;
+            userObject['id'] = item['_id'];
+            userObject['name'] = item['lastName'] + ', ' + item['firstName'];
+            this.users.push(userObject);
+          });
+        },
+        err => {
+          console.log('Error on loading users');
+        }
+      );
   }
 
-  private getUserByID(id: string): any {
+  private getUserByID(id: string): Observable<any[]> {
     return this.couchDBService.fetchEntry('/' + id);
   }
 
   public onSubmit(): void {
-    console.log('onSubmit in GroupEdit');
-    console.log(this.groupForm.value.formMode);
     if (this.groupForm.value.formMode) {
-      console.log('Update a group');
       this.updateGroup();
     } else {
-      console.log('Create a group');
       this.createGroup();
     }
   }
 
   private updateGroup(): void {
-    console.log('onUpdateGroup: GroupEditComponent');
     this.createWriteItem();
     this.couchDBService
       .updateEntry(this.writeItem, this.groupForm.value._id)
-      .subscribe(result => {
-        // console.log(result);
-        // Inform about Database change.
-        // this.selectedtUsers = [];
-        this.sendStateUpdate();
-
-        // this.router.navigate(['../group']);
-      });
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        result => {
+          this.sendStateUpdate();
+        },
+        error => {
+          console.log('Error updating groupe' + error.message);
+        }
+      );
   }
 
   private createGroup(): void {
@@ -172,17 +172,27 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
     this.createWriteItem();
 
-    this.couchDBService.writeEntry(this.writeItem).subscribe(result => {
-      this.sendStateUpdate();
-    });
+    this.couchDBService
+      .writeEntry(this.writeItem)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        result => {
+          this.sendStateUpdate();
+        },
+        error => {
+          console.log('Error crrating group: ' + error.message);
+        }
+      );
   }
 
   public onDelete(): void {
+    console.log('delete');
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.name + '?',
       accept: () => {
-        this.deleteSubscription = this.couchDBService
+        this.couchDBService
           .deleteEntry(this.id, this.rev)
+          .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
               this.sendStateUpdate();
@@ -253,16 +263,6 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.groupSubscription && !this.groupSubscription.closed) {
-      this.groupSubscription.unsubscribe();
-    }
-
-    if (this.userSubscription && !this.userSubscription.closed) {
-      this.userSubscription.unsubscribe();
-    }
-
-    if (this.deleteSubscription && !this.deleteSubscription.closed) {
-      this.deleteSubscription.unsubscribe();
-    }
+    this.alive = true;
   }
 }

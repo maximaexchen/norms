@@ -10,6 +10,7 @@ const routes: Routes = [
     path: '',
     component: GroupComponent,
     children: [
+      { path: '', component: GroupEditComponent },
       { path: 'list', component: GroupListComponent },
       { path: 'new', component: GroupEditComponent },
       { path: ':id/edit', component: GroupEditComponent }

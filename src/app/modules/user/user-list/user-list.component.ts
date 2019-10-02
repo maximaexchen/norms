@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { User } from '../user.model';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-list',
@@ -13,9 +13,10 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit, OnDestroy {
-  users: User[] = [];
   userChangeSubscription: Subscription;
   getUserSubscription: Subscription;
+
+  users: User[] = [];
   userCount = 0;
 
   constructor(
@@ -40,7 +41,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.getUsers();
   }
 
-  public onFilter(event): void {
+  public onFilter(event: any): void {
     this.userCount = event.filteredValue.length;
   }
 
@@ -61,8 +62,6 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // unsubscribe to ensure no memory leaks
-
     if (this.userChangeSubscription && !this.userChangeSubscription.closed) {
       this.userChangeSubscription.unsubscribe();
     }

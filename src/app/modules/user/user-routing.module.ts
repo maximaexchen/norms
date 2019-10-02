@@ -9,6 +9,7 @@ const routes: Routes = [
     path: '',
     component: UserComponent,
     children: [
+      { path: '', component: UserEditComponent },
       { path: 'list', component: UserListComponent },
       { path: 'new', component: UserEditComponent },
       { path: ':id/edit', component: UserEditComponent }
