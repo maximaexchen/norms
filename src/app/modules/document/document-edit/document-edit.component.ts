@@ -15,6 +15,8 @@ import { NotificationsService } from 'src/app//services/notifications.service';
 
 import * as _ from 'underscore';
 import { EnvService } from 'src/app//services/env.service';
+import { takeWhile } from 'rxjs/operators';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-document-edit',
@@ -25,6 +27,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
 
   isLoading = false;
+  alive = true;
 
   uploadUrl = this.env.uploadUrl;
 
@@ -63,6 +66,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   publisher: Publisher;
   publisherId: string;
   normNumber: string;
+  number: string;
 
   name: string;
   revision: string;
@@ -89,7 +93,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private serverService: ServerService,
-    private notificationsService: NotificationsService
+    private notificationsService: NotificationsService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
@@ -277,7 +282,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.sendStateUpdate();
         this.isLoading = false;
         this.router.navigate(['../document']);
-        this.showConfirm();
+        //this.showConfirm();
       });
   }
 
@@ -323,6 +328,27 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
   }
 
+  public onDelete(): void {
+    this.confirmationService.confirm({
+      message: 'Sie wollen den Datensatz ' + this.number + '?',
+      accept: () => {
+        this.couchDBService
+          .deleteEntry(this.id, this.rev)
+          .pipe(takeWhile(() => this.alive))
+          .subscribe(
+            res => {
+              this.sendStateUpdate();
+              this.router.navigate(['../user']);
+            },
+            err => {
+              this.showConfirm('error', err.message);
+            }
+          );
+      },
+      reject: () => {}
+    });
+  }
+
   private convertToBase64(file: File): Observable<string> {
     return Observable.create((sub: Subscriber<string>): void => {
       const r = new FileReader();
@@ -338,12 +364,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private showConfirm() {
-    console.log('showConfirm');
+  private showConfirm(type: string, result: string) {
     this.notificationsService.addSingle(
-      'success',
-      'Datensatz wurde Gespeichert',
-      'ok'
+      type,
+      result,
+      type === 'success' ? 'ok' : 'error'
     );
   }
 

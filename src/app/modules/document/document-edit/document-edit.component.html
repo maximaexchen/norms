@@ -5,10 +5,23 @@
     animationDuration=".8s"
   ></p-progressSpinner>
 </div>
-<div class="col">
-  <h4>{{ formTitle }}</h4>
-  <h5 *ngIf="normNumber">{{ normNumber }} - {{ name }}</h5>
-  <hr />
+<div class="row detail-edit-header">
+  <div class="col-sm-4">
+    <h1 *ngIf="number">{{ number }}</h1>
+    <h1 *ngIf="!number" i18n="@@string-new-dataset">
+      Datensatz erstellen
+    </h1>
+  </div>
+  <div class="col-sm-8 text-right">
+    <app-crud-nav
+      [formMode]="formMode"
+      [validForm]="normForm.valid"
+      [routeNew]="'/document/new'"
+      (save)="onSubmit()"
+      (add)="onSubmit()"
+      (delete)="onDelete()"
+    ></app-crud-nav>
+  </div>
 </div>
 
 <div class="col">
