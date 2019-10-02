@@ -15,6 +15,7 @@ import { DocumentService } from 'src/app//services/document.service';
 import { Group } from '../group.model';
 import { User } from 'src/app/modules/user/user.model';
 import { NotificationsService } from 'src/app/services/notifications.service';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-group-edit',
@@ -27,6 +28,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
   groupSubscription: Subscription = new Subscription();
   userSubscription: Subscription = new Subscription();
+  deleteSubscription: Subscription;
 
   writeItem: Group;
   groups: Group[] = [];
@@ -45,9 +47,10 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   constructor(
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
-    private router: Router,
     private route: ActivatedRoute,
-    private notificationsService: NotificationsService
+    private router: Router,
+    private notificationsService: NotificationsService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
@@ -138,6 +141,8 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit(): void {
+    console.log('onSubmit in GroupEdit');
+    console.log(this.groupForm.value.formMode);
     if (this.groupForm.value.formMode) {
       console.log('Update a group');
       this.updateGroup();
@@ -169,6 +174,26 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
     this.couchDBService.writeEntry(this.writeItem).subscribe(result => {
       this.sendStateUpdate();
+    });
+  }
+
+  public onDelete(): void {
+    this.confirmationService.confirm({
+      message: 'Sie wollen den Datensatz ' + this.name + '?',
+      accept: () => {
+        this.deleteSubscription = this.couchDBService
+          .deleteEntry(this.id, this.rev)
+          .subscribe(
+            res => {
+              this.sendStateUpdate();
+              this.router.navigate(['../group']);
+            },
+            err => {
+              this.showConfirm('error', err.message);
+            }
+          );
+      },
+      reject: () => {}
     });
   }
 
@@ -207,7 +232,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     this.couchDBService.sendStateUpdate('group');
   }
 
-  updateSelect() {
+  private updateSelect() {
     console.log('updateSelect');
     this.selectedtUsers = [];
   }
@@ -228,7 +253,16 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.groupSubscription.unsubscribe();
-    this.userSubscription.unsubscribe();
+    if (this.groupSubscription && !this.groupSubscription.closed) {
+      this.groupSubscription.unsubscribe();
+    }
+
+    if (this.userSubscription && !this.userSubscription.closed) {
+      this.userSubscription.unsubscribe();
+    }
+
+    if (this.deleteSubscription && !this.deleteSubscription.closed) {
+      this.deleteSubscription.unsubscribe();
+    }
   }
 }

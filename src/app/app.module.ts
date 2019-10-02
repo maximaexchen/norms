@@ -1,3 +1,4 @@
+import { CrudNavComponent } from './components/shared/crud-nav/crud-nav.component';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';

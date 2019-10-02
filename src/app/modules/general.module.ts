@@ -10,11 +10,13 @@ import { ButtonModule } from 'primeng/button';
 import { TabViewModule } from 'primeng/tabview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { AuthComponent } from '../components/auth/auth.component';
+import { CrudNavComponent } from '../components/shared/crud-nav/crud-nav.component';
 
 @NgModule({
-  declarations: [AuthComponent],
+  declarations: [AuthComponent, CrudNavComponent],
   imports: [
     CommonModule,
     RouterModule,
@@ -25,7 +27,8 @@ import { AuthComponent } from '../components/auth/auth.component';
     ButtonModule,
     TabViewModule,
     SelectButtonModule,
-    MultiSelectModule
+    MultiSelectModule,
+    ConfirmDialogModule
   ],
   exports: [
     CommonModule,
@@ -37,7 +40,9 @@ import { AuthComponent } from '../components/auth/auth.component';
     ButtonModule,
     TabViewModule,
     SelectButtonModule,
-    MultiSelectModule
+    MultiSelectModule,
+    ConfirmDialogModule,
+    CrudNavComponent
   ]
 })
 export class GeneralModule {}

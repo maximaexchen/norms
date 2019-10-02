@@ -15,6 +15,8 @@ import { Router } from '@angular/router';
 export class UserListComponent implements OnInit, OnDestroy {
   users: User[] = [];
   userChangeSubscription: Subscription;
+  getUserSubscription: Subscription;
+  userCount = 0;
 
   constructor(
     private couchDBService: CouchDBService,
@@ -28,23 +30,25 @@ export class UserListComponent implements OnInit, OnDestroy {
       .subscribe(
         message => {
           if (message.text === 'user') {
-            this.documentService.getUsers().subscribe(
-              res => {
-                this.users = res;
-              },
-              err => {
-                console.log(err);
-              }
-            );
+            this.getUsers();
           }
         },
-        err => console.log('HTTP Error', err),
-        () => console.log('HTTP request completed.')
+        err => console.log('Error', err),
+        () => console.log('completed.')
       );
 
-    this.documentService.getUsers().subscribe(
+    this.getUsers();
+  }
+
+  public onFilter(event): void {
+    this.userCount = event.filteredValue.length;
+  }
+
+  private getUsers() {
+    this.getUserSubscription = this.documentService.getUsers().subscribe(
       res => {
         this.users = res;
+        this.userCount = this.users.length;
       },
       err => {
         console.log('Error on loading users');
@@ -56,12 +60,14 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.router.navigate(['../user/' + id + '/edit']);
   }
 
-  public userCount() {
-    return this.users.length;
-  }
-
   ngOnDestroy() {
     // unsubscribe to ensure no memory leaks
-    this.userChangeSubscription.unsubscribe();
+
+    if (this.userChangeSubscription && !this.userChangeSubscription.closed) {
+      this.userChangeSubscription.unsubscribe();
+    }
+    if (this.getUserSubscription && !this.getUserSubscription.closed) {
+      this.getUserSubscription.unsubscribe();
+    }
   }
 }
