@@ -5,10 +5,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, Observable, of, Subscriber } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
-import { NormDocument } from '../document.model';
+import { NormDocument } from '../../../models/document.model';
 import { RevisionDocument } from './../revision-document.model';
-import { Publisher } from '../../publisher/publisher.model';
-import { User } from 'src/app/modules/user/user.model';
+import { Publisher } from '../../../models/publisher.model';
+import { User } from '@app/models/user.model';
 import { DocumentService } from 'src/app//services/document.service';
 import { ServerService } from 'src/app//services/server.service';
 import { NotificationsService } from 'src/app//services/notifications.service';

@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Publisher } from '../modules/publisher/publisher.model';
+import { Publisher } from '../models/publisher.model';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { Subscription, Observable } from 'rxjs';
-import { User } from 'src/app/modules/user/user.model';
-import { Group } from 'src/app/modules/group/group.model';
+import { User } from '@app/models/user.model';
+import { Group } from '@app/models/group.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { NormDocument } from 'src/app/modules/document/document.model';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {

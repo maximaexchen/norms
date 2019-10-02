@@ -5,7 +5,7 @@ import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
-import { Publisher } from '../publisher.model';
+import { Publisher } from '../../../models/publisher.model';
 @Component({
   selector: 'app-publisher-edit',
   templateUrl: './publisher-edit.component.html',

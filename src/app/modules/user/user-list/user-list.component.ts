@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
-import { User } from '../user.model';
+import { User } from '../../../models/user.model';
 
 @Component({
   selector: 'app-user-list',

@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
-import { Group } from './../group.model';
+import { Group } from '../../../models/group.model';
 
 @Component({
   selector: 'app-group-list',

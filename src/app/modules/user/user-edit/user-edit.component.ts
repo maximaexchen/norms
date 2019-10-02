@@ -2,12 +2,11 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
-import { Subscription } from 'rxjs';
 import { ConfirmationService } from 'primeng/api';
 
-import { CouchDBService } from 'src/app//services/couchDB.service';
-import { NotificationsService } from 'src/app/services/notifications.service';
-import { User } from '../user.model';
+import { CouchDBService } from '@services/couchDB.service';
+import { NotificationsService } from '@services/notifications.service';
+import { User } from '../../../models/user.model';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({

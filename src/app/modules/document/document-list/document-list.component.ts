@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
-import { NormDocument } from '../document.model';
+import { NormDocument } from '../../../models/document.model';
 import { NotificationsService } from 'src/app/services/notifications.service';
 import { EnvService } from 'src/app//services/env.service';
 

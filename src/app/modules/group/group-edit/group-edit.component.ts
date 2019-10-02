@@ -15,8 +15,8 @@ import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { NotificationsService } from 'src/app/services/notifications.service';
 
-import { Group } from '../group.model';
-import { User } from 'src/app/modules/user/user.model';
+import { Group } from '../../../models/group.model';
+import { User } from '@app/models/user.model';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({
