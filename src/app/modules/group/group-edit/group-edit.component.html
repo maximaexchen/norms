@@ -1,50 +1,19 @@
 <div class="row detail-edit-header">
   <div class="col-sm-4">
-    <h1>{{ name }}</h1>
+    <h1 *ngIf="name">{{ name }}</h1>
+    <h1 *ngIf="!name" i18n="@@string-new-dataset">
+      Datensatz erstellen
+    </h1>
   </div>
   <div class="col-sm-8 text-right">
-    <div class="form-group">
-      <button
-        pButton
-        type="submit"
-        icon="fa fa-check"
-        iconPos="left"
-        label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
-        i18n-label="@@btn-new"
-        class="ui-button-secondary"
-        (click)="onSubmit()"
-        [disabled]="!groupForm.valid"
-      ></button>
-
-      <button
-        pButton
-        type="button"
-        icon="fa fa-file-o"
-        iconPos="left"
-        label="Neu"
-        i18n-label="@@btn-new"
-        class="ui-button-secondary"
-        [routerLink]="['/group/new']"
-      ></button>
-      <button
-        pButton
-        type="button"
-        icon="fa fa-pencil"
-        iconPos="left"
-        i18n-label="@@btn-edit"
-        class="ui-button-secondary-outline"
-        label="Bearbeiten"
-      ></button>
-      <button
-        pButton
-        type="button"
-        icon="fa fa-pencil"
-        iconPos="left"
-        i18n-label="@@btn-delete"
-        class="ui-button-secondary-outline"
-        label="Löschen"
-      ></button>
-    </div>
+    <app-crud-nav
+      [formMode]="formMode"
+      [validForm]="groupForm.valid"
+      [routeNew]="'/group/new'"
+      (save)="onSubmit()"
+      (add)="onSubmit()"
+      (delete)="onDelete()"
+    ></app-crud-nav>
   </div>
 </div>
 <p-tabView>

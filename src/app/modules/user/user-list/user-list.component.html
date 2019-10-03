@@ -1,13 +1,43 @@
 <div class="info-panel position-top">
-  <h1>Auswahl Benutzer</h1>
+  <h1 i18n="@@string-user-selection">Auswahl Benutzer</h1>
 </div>
-<p-table [value]="users" [paginator]="true" [rows]="13" class="table">
+
+<p-table
+  #dt
+  [value]="users"
+  [paginator]="true"
+  [rows]="13"
+  class="table"
+  [globalFilterFields]="['firstName', 'lastName']"
+  (onFilter)="onFilter($event)"
+>
+  <ng-template pTemplate="caption">
+    <div style="text-align: center;">
+      <i class="fa fa-search" style="margin:4px 6px 0 0;"></i>
+      <input
+        type="text"
+        pInputText
+        size="50"
+        i18n-placeholder
+        placeholder="Globale Suche"
+        (input)="dt.filterGlobal($event.target.value, 'contains')"
+        style="width:auto"
+      />
+    </div>
+  </ng-template>
   <ng-template pTemplate="header">
     <tr>
       <th width="30"></th>
-      <th>Vorname</th>
-      <th>Nachname</th>
-      <th>E-Mail</th>
+      <th [pSortableColumn]="'firstName'">
+        Vorname
+        <p-sortIcon [field]="'firstName'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'lastName'">
+        Nachname<p-sortIcon [field]="'lastName'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'email'">
+        E-Mail<p-sortIcon [field]="'email'"></p-sortIcon>
+      </th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-user>
@@ -22,9 +52,8 @@
   </ng-template>
 </p-table>
 <div class="info-panel position-bottom">
-  <p i18n="@@list-status-data-count">
-    Es wurden {userCount(), plural, =0 {0 Benutzer gefunden} =1 {1 Benutzer
-    gefunden} other
-    {{{userCount()}} Benutzer gefunden }}
+  <p i18n="@@user-status-data-count">
+    Es {userCount, plural, =0 {wurde keine Benutzer gefunden} =1 {wurde 1
+    Benutzer gefunden} other { wurden {{ userCount }} Benutzer gefunden }}
   </p>
 </div>

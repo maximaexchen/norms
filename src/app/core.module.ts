@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService } from 'primeng/api';
 import { APIResolver } from './shared/resolver/api.resolver';
 import { DocumentResolver } from './shared/resolver/document.resolver';
 import { EnvServiceProvider } from './/services/env.service.provider';
@@ -10,7 +10,8 @@ import { EnvServiceProvider } from './/services/env.service.provider';
     APIResolver,
     DocumentResolver,
     MessageService,
-    EnvServiceProvider
+    EnvServiceProvider,
+    ConfirmationService
   ]
 })
 export class CoreModule {}

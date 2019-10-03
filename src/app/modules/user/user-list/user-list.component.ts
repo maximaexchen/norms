@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
-import { User } from '../user.model';
-import { Router } from '@angular/router';
+import { User } from '../../../models/user.model';
 
 @Component({
   selector: 'app-user-list',
@@ -13,8 +13,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit, OnDestroy {
-  users: User[] = [];
   userChangeSubscription: Subscription;
+  getUserSubscription: Subscription;
+
+  users: User[] = [];
+  userCount = 0;
 
   constructor(
     private couchDBService: CouchDBService,
@@ -28,23 +31,25 @@ export class UserListComponent implements OnInit, OnDestroy {
       .subscribe(
         message => {
           if (message.text === 'user') {
-            this.documentService.getUsers().subscribe(
-              res => {
-                this.users = res;
-              },
-              err => {
-                console.log(err);
-              }
-            );
+            this.getUsers();
           }
         },
-        err => console.log('HTTP Error', err),
-        () => console.log('HTTP request completed.')
+        err => console.log('Error', err),
+        () => console.log('completed.')
       );
 
-    this.documentService.getUsers().subscribe(
+    this.getUsers();
+  }
+
+  public onFilter(event: any): void {
+    this.userCount = event.filteredValue.length;
+  }
+
+  private getUsers() {
+    this.getUserSubscription = this.documentService.getUsers().subscribe(
       res => {
         this.users = res;
+        this.userCount = this.users.length;
       },
       err => {
         console.log('Error on loading users');
@@ -56,12 +61,12 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.router.navigate(['../user/' + id + '/edit']);
   }
 
-  public userCount() {
-    return this.users.length;
-  }
-
   ngOnDestroy() {
-    // unsubscribe to ensure no memory leaks
-    this.userChangeSubscription.unsubscribe();
+    if (this.userChangeSubscription && !this.userChangeSubscription.closed) {
+      this.userChangeSubscription.unsubscribe();
+    }
+    if (this.getUserSubscription && !this.getUserSubscription.closed) {
+      this.getUserSubscription.unsubscribe();
+    }
   }
 }

@@ -1,0 +1,44 @@
+<div class="form-group">
+  <button
+    pButton
+    type="submit"
+    icon="fa fa-check"
+    iconPos="left"
+    label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
+    i18n-label="@@btn-new"
+    class="ui-button-secondary"
+    (click)="onSubmit()"
+    [disabled]="!validForm"
+  ></button>
+
+  <button
+    pButton
+    type="button"
+    icon="fa fa-file-o"
+    iconPos="left"
+    label="Neu"
+    i18n-label="@@btn-new"
+    class="ui-button-secondary"
+    (click)="onCreate()"
+  ></button>
+  <button
+    pButton
+    type="button"
+    icon="fa fa-pencil"
+    iconPos="left"
+    i18n-label="@@btn-edit"
+    class="ui-button-secondary-outline"
+    label="Bearbeiten"
+    (click)="onEdit()"
+  ></button>
+  <button
+    pButton
+    type="button"
+    icon="fa fa-trash"
+    iconPos="left"
+    i18n-label="@@btn-delete"
+    class="ui-button-secondary-outline"
+    label="Löschen"
+    (click)="onDelete()"
+  ></button>
+</div>

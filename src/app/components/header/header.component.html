@@ -3,7 +3,11 @@
   <!-- Ausgabe von Meldungen -->
   <p-toast [style]="{ marginTop: '80px' }"></p-toast>
   <app-notifications></app-notifications>
-
+  <p-confirmDialog
+    header="Confirmation"
+    icon="pi pi-exclamation-triangle"
+    [transitionOptions]="'60ms'"
+  ></p-confirmDialog>
   <div class="ui-g">
     <div class="ui-g-12">
       <div class="ui-g-10">

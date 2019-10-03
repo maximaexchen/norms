@@ -8,9 +8,9 @@ import * as _ from 'underscore';
 import { EnvService } from 'src/app//services/env.service';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from '../..//services/document.service';
-import { Group } from 'src/app/modules/group/group.model';
-import { User } from 'src/app/modules/user/user.model';
-import { Publisher } from 'src/app/modules/publisher/publisher.model';
+import { Group } from '@app/models/group.model';
+import { User } from '@app/models/user.model';
+import { Publisher } from '@app/models/publisher.model';
 
 @Component({
   selector: 'app-document-search',

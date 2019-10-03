@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
 import { EnvService } from './env.service';
-import { NormDocument } from 'src/app/modules/document/document.model';
+import { NormDocument } from '@models/index';
 
 // CouchDB Ubuntu Server
 /* $kP2ZernC */
