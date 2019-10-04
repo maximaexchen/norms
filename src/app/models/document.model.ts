@@ -2,22 +2,25 @@ export interface NormDocumentProperties {
   _id?: string;
   _rev?: string;
   type?: string;
-  publisher?: any;
   normNumber?: string;
-  name?: string;
   revision?: string;
-  outputDate?: string;
-  inputDate?: string;
-  normFilePath?: string;
+  revisionDate?: string;
+  publisher?: any;
+  scope?: string;
+  normLanguage?: string;
+  descriptionDE?: string;
+  descriptionEN?: string;
+  descriptionFR?: string;
   owner?: string;
-  activationInterval?: string;
-  source?: string;
-  sourceLogin?: string;
-  sourcePassword?: string;
+  group?: string;
+  references?: any;
+  released?: boolean;
+  history?: any;
   active?: boolean;
+  revisions?: any;
+  attachments?: any;
 }
 
-// export class NormDocument implements Iterable<string> {
 export class NormDocument {
   constructor(kwArgs: NormDocumentProperties = {}) {
     for (const key in kwArgs) {
@@ -26,10 +29,4 @@ export class NormDocument {
       }
     }
   }
-
-  /* *[Symbol.iterator](): Iterator<string> {
-    for (const key of Object.keys(this)) {
-      yield key;
-    }
-  } */
 }

@@ -1,3 +1,4 @@
+import localeDe from '@angular/common/locales/de';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,6 +16,8 @@ import { NotificationsService } from 'src/app//services/notifications.service';
 
 import * as _ from 'underscore';
 import { EnvService } from 'src/app//services/env.service';
+import { takeWhile } from 'rxjs/operators';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-document-edit',
@@ -24,18 +27,10 @@ import { EnvService } from 'src/app//services/env.service';
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
 
+  alive = true;
   isLoading = false;
 
   uploadUrl = this.env.uploadUrl;
-
-  routeSubsscription = new Subscription();
-  writeSubscription = new Subscription();
-  publisherSubscription = new Subscription();
-  documentSubscription = new Subscription();
-  userSubscription = new Subscription();
-  updateSubscription = new Subscription();
-  fileUploadSubscription = new Subscription();
-
   activationIntervals = [
     'Kein update nötig',
     'Aktive Versorgung durch Kunden',
@@ -56,6 +51,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
+
   id: string;
   createId: string;
   rev: string;
@@ -66,9 +62,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   name: string;
   revision: string;
-  outputDate: Date;
-  inputDate: Date;
-  normFilePath: string;
+  revisionDate: Date;
+  scope: string;
+  normLanguage: string;
+  descriptionDE: string;
+  descriptionEN: string;
+  descriptionFR: string;
   normFilePathTemp: string;
   revisionDocument: RevisionDocument;
   owner: User;
@@ -89,7 +88,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private serverService: ServerService,
-    private notificationsService: NotificationsService
+    private notificationsService: NotificationsService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
@@ -109,22 +109,28 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       noDataLabel: 'Keinen Benutzer gefunden'
     };
 
-    this.routeSubsscription = this.route.params.subscribe(results => {
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // empty the select-box
       this.selectedtUsers = [];
       // fetch data for select-boxes
-      this.documentService.getPublishers().subscribe(
-        res => {
-          this.publishers = res;
-        },
-        err => {}
-      );
-      this.documentService.getUsers().subscribe(
-        res => {
-          this.owners = res;
-        },
-        err => {}
-      );
+      this.documentService
+        .getPublishers()
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          res => {
+            this.publishers = res;
+          },
+          err => {}
+        );
+      this.documentService
+        .getUsers()
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          res => {
+            this.owners = res;
+          },
+          err => {}
+        );
 
       this.getUsers();
 
@@ -135,29 +141,34 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.formTitle = 'Norm bearbeiten';
 
         // fetch document which should be upated
-        this.documentSubscription = this.couchDBService
+        this.couchDBService
           .fetchEntry('/' + results['id'])
+          .pipe(takeWhile(() => this.alive))
           .subscribe(entry => {
             console.log(entry);
             this.id = entry['_id'];
             this.rev = entry['_rev'];
             this.type = 'norm';
+            this.normNumber = entry['normNumber'];
+            this.revision = entry['revision'];
+            this.revisionDate = new Date(entry['revisionDate']);
             this.publisher = entry['publisher'];
-            this.publisherId = entry['publisher']._id;
-            this.normNumber = entry['number'];
+            this.scope = entry['scope'];
+            this.normLanguage = entry['normLanguage'];
+
+            if (entry.description) {
+              this.descriptionDE = entry.description.de;
+              this.descriptionEN = entry.description.en;
+              this.descriptionFR = entry.description.fr;
+            }
+
             this.revisionDocuments = _.sortBy(
               entry['revisionDocuments'],
               'revisionID'
             ).reverse();
 
             this.name = entry['name'];
-            this.revision = entry['revision'];
-            this.outputDate = new Date(entry['outputDate']);
-            this.inputDate = new Date(entry['inputDate']);
-            this.normFilePath = entry['normFilePath'].replace(
-              this.env.uploadRoot,
-              ''
-            );
+
             this.owner = entry['owner'];
             this.ownerId = entry['owner']._id;
             this.activationInterval = entry['activationInterval'];
@@ -184,8 +195,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.createWriteItem();
 
-    this.writeSubscription = this.couchDBService
+    this.couchDBService
       .writeEntry(this.writeItem)
+      .pipe(takeWhile(() => this.alive))
       .subscribe(result => {
         this.createId = result['id'];
 
@@ -269,15 +281,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private writeUpdate() {
-    const updateSubscription = this.couchDBService
+    this.couchDBService
       .updateEntry(this.writeItem, this.normForm.value._id)
+      .pipe(takeWhile(() => this.alive))
       .subscribe(results => {
         this.selectedtUsers = [];
         // Inform about database change.
         this.sendStateUpdate();
         this.isLoading = false;
         this.router.navigate(['../document']);
-        this.showConfirm();
+        //this.showConfirm();
       });
   }
 
@@ -301,6 +314,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private getUsers(): void {
     this.couchDBService
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
+      .pipe(takeWhile(() => this.alive))
       .subscribe(results => {
         results.forEach(item => {
           const userObject = {} as User;
@@ -323,6 +337,27 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
   }
 
+  public onDelete(): void {
+    this.confirmationService.confirm({
+      message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
+      accept: () => {
+        this.couchDBService
+          .deleteEntry(this.id, this.rev)
+          .pipe(takeWhile(() => this.alive))
+          .subscribe(
+            res => {
+              this.sendStateUpdate();
+              this.router.navigate(['../document']);
+            },
+            err => {
+              this.showConfirm('error', err.message);
+            }
+          );
+      },
+      reject: () => {}
+    });
+  }
+
   private convertToBase64(file: File): Observable<string> {
     return Observable.create((sub: Subscriber<string>): void => {
       const r = new FileReader();
@@ -338,12 +373,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private showConfirm() {
-    console.log('showConfirm');
+  private showConfirm(type: string, result: string) {
     this.notificationsService.addSingle(
-      'success',
-      'Datensatz wurde Gespeichert',
-      'ok'
+      type,
+      result,
+      type === 'success' ? 'ok' : 'error'
     );
   }
 
@@ -351,19 +385,21 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem = {};
 
     console.log('createWriteItem');
+    console.log(this.normForm.value);
 
     this.writeItem['type'] = 'norm';
-    this.writeItem['number'] = this.normForm.value.normNumber || '';
-    this.writeItem['name'] = this.normForm.value.name || '';
+    this.writeItem['normNumber'] = this.normForm.value.normNumber || '';
     this.writeItem['revision'] = this.normForm.value.revision || '';
-    this.writeItem['outputDate'] = this.normForm.value.outputDate || '';
-    this.writeItem['inputDate'] = this.normForm.value.inputDate || '';
-    this.writeItem['normFilePath'] = this.normFilePath || '';
-    this.writeItem['activationInterval'] =
-      this.normForm.value.activationInterval || '';
-    this.writeItem['source'] = this.normForm.value.source || '';
-    this.writeItem['sourceLogin'] = this.normForm.value.sourceLogin || '';
-    this.writeItem['sourcePassword'] = this.normForm.value.sourcePassword || '';
+    this.writeItem['revisionDate'] = this.normForm.value.revisionDate || '';
+    this.writeItem['normLanguage'] = this.normForm.value.normLanguage || '';
+    this.writeItem['description'] = {};
+    this.writeItem['description']['de'] =
+      this.normForm.value.descriptionDE || '';
+    this.writeItem['description']['en'] =
+      this.normForm.value.descriptionEN || '';
+    this.writeItem['description']['fr'] =
+      this.normForm.value.descriptionFR || '';
+    this.writeItem['scope'] = this.normForm.value.scope || false;
     this.writeItem['active'] = this.normForm.value.active || false;
 
     if (this.normForm.value._id) {
@@ -405,6 +441,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.attachment) {
       this.writeItem['_attachments'] = this.attachment;
     }
+
+    console.log(this.writeItem);
     return this.writeItem;
   }
 
@@ -429,12 +467,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.routeSubsscription.unsubscribe();
-    this.writeSubscription.unsubscribe();
-    this.publisherSubscription.unsubscribe();
-    this.documentSubscription.unsubscribe();
-    this.userSubscription.unsubscribe();
-    this.updateSubscription.unsubscribe();
-    this.fileUploadSubscription.unsubscribe();
+    this.alive = false;
   }
 }

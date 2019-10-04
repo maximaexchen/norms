@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { Group } from '../../../models/group.model';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-group-list',
@@ -13,9 +14,9 @@ import { Group } from '../../../models/group.model';
   styleUrls: ['./group-list.component.scss']
 })
 export class GroupListComponent implements OnInit, OnDestroy {
+  alive = true;
+
   groups: Group[] = [];
-  changeSubscription: Subscription;
-  getGroupSubscription: Subscription;
   groupCount = 0;
 
   constructor(
@@ -25,8 +26,9 @@ export class GroupListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.changeSubscription = this.couchDBService
+    this.couchDBService
       .setStateUpdate()
+      .pipe(takeWhile(() => this.alive))
       .subscribe(message => {
         if (message.text === 'group') {
           this.getGroups();
@@ -37,15 +39,18 @@ export class GroupListComponent implements OnInit, OnDestroy {
   }
 
   private getGroups() {
-    this.getGroupSubscription = this.documentService.getGroups().subscribe(
-      res => {
-        this.groups = res;
-        this.groupCount = this.groups.length;
-      },
-      err => {
-        console.log('Error on loading groups');
-      }
-    );
+    this.documentService
+      .getGroups()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        res => {
+          this.groups = res;
+          this.groupCount = this.groups.length;
+        },
+        err => {
+          console.log('Error on loading groups');
+        }
+      );
   }
 
   public onFilter(event): void {
@@ -57,13 +62,6 @@ export class GroupListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // unsubscribe to ensure no memory leaks
-    if (this.changeSubscription && !this.changeSubscription.closed) {
-      this.changeSubscription.unsubscribe();
-    }
-
-    if (this.getGroupSubscription && !this.getGroupSubscription.closed) {
-      this.getGroupSubscription.unsubscribe();
-    }
+    this.alive = false;
   }
 }

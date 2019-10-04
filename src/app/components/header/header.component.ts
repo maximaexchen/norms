@@ -32,7 +32,7 @@ export class HeaderComponent implements OnInit {
     this.mainmenuItems.push({
       icon: 'fa fa-list',
       label: 'Normen',
-      routerLink: 'document/list'
+      routerLink: 'document'
     });
     this.mainmenuItems.push({
       icon: 'fa fa-indent',

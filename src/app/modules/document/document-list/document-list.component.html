@@ -1,62 +1,72 @@
-<div class="col">
-  <a class="btn btn-success" [routerLink]="['/document/new']">Neues Document</a>
+<div class="info-panel position-top">
+  <h1 i18n="@@string-user-selection">Auswahl Benutzer</h1>
 </div>
-<hr />
-<div class="col">
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Bereich</th>
-        <th>Nummer</th>
-        <th>Name</th>
-        <th>Revision</th>
-        <th>Revisionsdatum</th>
-        <th>Eingangsdatum ACP</th>
-        <th>Owner</th>
-        <th>User</th>
-        <th>Optionen</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let document of documents">
-        <td>
-          <span *ngIf="document.publisher">
-            {{ document.publisher.name }}
-          </span>
-        </td>
 
-        <td>
-          <a
-            *ngIf="document.normFilePath"
-            (click)="getDownload(document._id, document._attachments)"
-            target="_blank"
-            download
-            >{{ document.number }}</a
-          >
-          <span *ngIf="!document.normFilePath">{{ document.number }}</span>
-        </td>
-        <td>{{ document.name }}</td>
-        <td>{{ document.revision }}</td>
-        <td>{{ document.outputDate | date }}</td>
-        <td>{{ document.inputDate | date }}</td>
-        <td>
-          <span *ngIf="document.owner"
-            >{{ document.owner.lastName }}, {{ document.owner.firstName }}</span
-          >
-        </td>
-        <td>
-          <p *ngFor="let user of document.users">
-            {{ user.lastName }}, {{ user.firstName }}
-          </p>
-        </td>
-        <td>
-          <a
-            [routerLink]="'../' + [document._id] + '/edit'"
-            class="btn btn-primary"
-            >Bearbeiten</a
-          >
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<p-table
+  #dt
+  [value]="documents"
+  [paginator]="true"
+  [rows]="13"
+  class="table"
+  [globalFilterFields]="['name', 'normNumber']"
+  (onFilter)="onFilter($event)"
+>
+  <ng-template pTemplate="caption">
+    <div style="text-align: center;">
+      <i class="fa fa-search" style="margin:4px 6px 0 0;"></i>
+      <input
+        type="text"
+        pInputText
+        size="50"
+        i18n-placeholder
+        placeholder="Globale Suche"
+        (input)="dt.filterGlobal($event.target.value, 'contains')"
+        style="width:auto"
+      />
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th width="30"></th>
+
+      <th [pSortableColumn]="'normNumber'">
+        Nummer<p-sortIcon [field]="'normNumber'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'publisher'">
+        Herausgeber
+        <p-sortIcon [field]="'publisher'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'description'">
+        Beschreibung<p-sortIcon [field]="'description'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'revision'">
+        Revision<p-sortIcon [field]="'revision'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'revisionDate'">
+        Revisionsdatum<p-sortIcon [field]="'revisionDate'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'owner'">
+        Owner<p-sortIcon [field]="'owner'"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-document>
+    <tr>
+      <td>
+        <a class="fa fa-folder" (click)="showDetail(document._id)"></a>
+      </td>
+      <td>{{ document.normNumber }}</td>
+      <td>{{ document.publisher }}</td>
+      <td>{{ document.descriptionDE }}</td>
+      <td>{{ document.revision }}</td>
+      <td>{{ document.revisionDate | date }}</td>
+      <td>{{ document.owner.lastName }}, {{ document.owner.firstName }}</td>
+    </tr>
+  </ng-template>
+</p-table>
+<div class="info-panel position-bottom">
+  <p i18n="@@document-status-data-count">
+    Es {documentCount, plural, =0 {wurde keine Dokument gefunden} =1 {wurde 1
+    Dokument gefunden} other { wurden {{ documentCount }} Dokumente gefunden }}
+  </p>
 </div>
