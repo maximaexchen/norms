@@ -10,6 +10,7 @@ const routes: Routes = [
     path: '',
     component: TagComponent,
     children: [
+      { path: '', component: TagEditComponent },
       { path: 'list', component: TagListComponent },
       { path: 'new', component: TagEditComponent },
       { path: ':id/edit', component: TagEditComponent }

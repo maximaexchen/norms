@@ -1,1 +1,37 @@
-<p>tag-list works!</p>
+<div class="info-panel">
+  <h1 i18n="@@string-tag-selection">Auswahl Tags</h1>
+</div>
+
+<div class="info-panel small">
+  <h1 i18n="@@string-tagLevel1-selection">1. Stufe: Normherausgeber</h1>
+</div>
+<div class="tag-items">
+  <a *ngFor="let item of tagsLevel1" (click)="showDetail(item['_id'])"
+    ><span class="badge tag-level1-item">
+      {{ item['name'] }}
+    </span></a
+  >
+</div>
+
+<div class="info-panel small">
+  <h1 i18n="@@string-tagLevel4-selection">2. Stufe: Typ</h1>
+</div>
+
+<div class="tag-items">
+  <a *ngFor="let item of tagsLevel2" (click)="showDetail(item['_id'])"
+    ><span class="badge tag-level2-item">
+      {{ item['name'] }}
+    </span></a
+  >
+</div>
+
+<div class="info-panel small">
+  <h1 i18n="@@string-tagLevel3-selection">3. Stufe: Untertyp</h1>
+</div>
+<div class="tag-items">
+  <a *ngFor="let item of tagsLevel3" (click)="showDetail(item['_id'])"
+    ><span class="badge tag-level3-item">
+      {{ item['name'] }}
+    </span></a
+  >
+</div>

@@ -20,6 +20,12 @@
     border-left: 1px solid $gray-400;
   }
 
+  &.small {
+    padding: 10px 20px;
+    margin: 10px 0;
+    border: 0;
+  }
+
   h1 {
     color: $gray-600;
     font-size: 150%;
@@ -30,6 +36,26 @@
   p {
     margin-bottom: 0;
     font-weight: 700;
+  }
+}
+
+.tag-items {
+  .badge {
+    padding: 10px 20px;
+    margin-right: 10px;
+    color: $white;
+    cursor: pointer;
+
+    &.tag-level1-item {
+      background-color: rgb(155, 192, 210);
+    }
+
+    &.tag-level2-item {
+      background-color: rgb(250, 192, 142);
+    }
+    &.tag-level3-item {
+      background-color: rgb(193, 213, 152);
+    }
   }
 }
 

@@ -63,6 +63,12 @@ export class DocumentService {
     );
   }
 
+  public getTags(): Observable<User[]> {
+    return this.couchDBService.fetchEntries(
+      '/_design/norms/_view/all-tags?include_docs=true'
+    );
+  }
+
   public getOwners(): Observable<User[]> {
     return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-users?include_docs=true'
