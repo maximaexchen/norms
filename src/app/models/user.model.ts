@@ -7,7 +7,7 @@ export interface UserProperties {
   firstName?: string;
   lastName?: string;
   username?: string;
-  role: Role;
+  role?: Role;
   token?: string;
   active?: boolean;
 }

@@ -11,6 +11,7 @@ import { DocumentService } from '../..//services/document.service';
 import { Group } from '@app/models/group.model';
 import { User } from '@app/models/user.model';
 import { Publisher } from '@app/models/publisher.model';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-document-search',
@@ -20,7 +21,7 @@ import { Publisher } from '@app/models/publisher.model';
 export class SearchComponent implements OnInit, OnDestroy {
   @ViewChild('searchForm', { static: false }) searchForm: NgForm;
 
-  searchSubsscription = new Subscription();
+  alive = true;
   foundDocuments: Document[];
   newUserArray: any[];
   display = false;
@@ -46,40 +47,52 @@ export class SearchComponent implements OnInit, OnDestroy {
   ngOnInit() {
     console.log('DocumentSearchComponent');
 
-    this.searchSubsscription = this.route.params.subscribe(results => {
-      this.documentService.getGroups().subscribe(
-        res => {
-          this.groups = res;
-        },
-        err => {
-          console.log(err);
-        }
-      );
-      this.documentService.getUsers().subscribe(
-        res => {
-          this.users = res;
-        },
-        err => {
-          console.log(err);
-        }
-      );
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
+      this.documentService
+        .getGroups()
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          res => {
+            this.groups = res;
+          },
+          err => {
+            console.log(err);
+          }
+        );
+      this.documentService
+        .getUsers()
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          res => {
+            this.users = res;
+          },
+          err => {
+            console.log(err);
+          }
+        );
 
-      this.documentService.getPublishers().subscribe(
-        res => {
-          this.publishers = res;
-        },
-        err => {
-          console.log(err);
-        }
-      );
-      this.documentService.getUsers().subscribe(
-        res => {
-          this.owners = res;
-        },
-        err => {
-          console.log(err);
-        }
-      );
+      this.documentService
+        .getPublishers()
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          res => {
+            this.publishers = res;
+          },
+          err => {
+            console.log(err);
+          }
+        );
+      this.documentService
+        .getUsers()
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          res => {
+            this.owners = res;
+          },
+          err => {
+            console.log(err);
+          }
+        );
     });
   }
 
@@ -142,14 +155,16 @@ export class SearchComponent implements OnInit, OnDestroy {
       console.log('No search parameters');
     }
 
-    this.searchSubsscription = this.couchDBService
+    this.couchDBService
       .search(searchObject)
+      .pipe(takeWhile(() => this.alive))
       .subscribe(results => {
         this.foundDocuments = results.docs;
         results.docs.forEach(norm => {
           if (norm.publisher) {
             const publisherItem = this.couchDBService
               .fetchEntry('/' + norm.publisher._id)
+              .pipe(takeWhile(() => this.alive))
               .subscribe(publisherC => {
                 norm.publisher = publisherC.name;
               });
@@ -158,6 +173,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           if (norm.owner) {
             const ownerItem = this.couchDBService
               .fetchEntry('/' + norm.owner._id)
+              .pipe(takeWhile(() => this.alive))
               .subscribe(ownerC => {
                 norm.owner = ownerC.firstName + ' ' + ownerC.lastName;
               });
@@ -219,6 +235,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.searchSubsscription.unsubscribe();
+    this.alive = false;
   }
 }

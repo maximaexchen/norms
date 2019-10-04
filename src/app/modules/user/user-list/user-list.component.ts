@@ -6,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { User } from '../../../models/user.model';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-list',
@@ -13,8 +14,7 @@ import { User } from '../../../models/user.model';
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit, OnDestroy {
-  userChangeSubscription: Subscription;
-  getUserSubscription: Subscription;
+  alive = true;
 
   users: User[] = [];
   userCount = 0;
@@ -26,8 +26,9 @@ export class UserListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.userChangeSubscription = this.couchDBService
+    this.couchDBService
       .setStateUpdate()
+      .pipe(takeWhile(() => this.alive))
       .subscribe(
         message => {
           if (message.text === 'user') {
@@ -46,15 +47,18 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   private getUsers() {
-    this.getUserSubscription = this.documentService.getUsers().subscribe(
-      res => {
-        this.users = res;
-        this.userCount = this.users.length;
-      },
-      err => {
-        console.log('Error on loading users');
-      }
-    );
+    this.documentService
+      .getUsers()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        res => {
+          this.users = res;
+          this.userCount = this.users.length;
+        },
+        err => {
+          console.log('Error on loading users');
+        }
+      );
   }
 
   public showDetail(id: string) {
@@ -62,11 +66,6 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.userChangeSubscription && !this.userChangeSubscription.closed) {
-      this.userChangeSubscription.unsubscribe();
-    }
-    if (this.getUserSubscription && !this.getUserSubscription.closed) {
-      this.getUserSubscription.unsubscribe();
-    }
+    this.alive = false;
   }
 }

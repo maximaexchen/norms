@@ -7,8 +7,8 @@
 </div>
 <div class="row detail-edit-header">
   <div class="col-sm-4">
-    <h1 *ngIf="number">{{ number }}</h1>
-    <h1 *ngIf="!number" i18n="@@string-new-dataset">
+    <h1 *ngIf="normNumber">{{ normNumber }}</h1>
+    <h1 *ngIf="!normNumber" i18n="@@string-new-dataset">
       Datensatz erstellen
     </h1>
   </div>
@@ -24,235 +24,283 @@
   </div>
 </div>
 
-<div class="col">
-  <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
-    <input type="hidden" [(ngModel)]="formMode" name="formMode" />
-    <input type="hidden" [(ngModel)]="id" name="_id" />
-    <input type="hidden" [(ngModel)]="rev" name="_rev" />
-    <div class="form-group">
-      <label class="form-label">Bereich</label>
+<form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
+  <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+  <input type="hidden" [(ngModel)]="id" name="_id" />
+  <input type="hidden" [(ngModel)]="rev" name="_rev" />
+  <p-tabView>
+    <p-tabPanel header="Stammdaten">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="row">
+            <div class="col-sm-8">
+              <div class="form-group row">
+                <label for="normNumber" class="col-sm-3 col-form-label"
+                  >Nummer</label
+                >
+                <div class="col-sm-9">
+                  <input
+                    type="text"
+                    class="form-control"
+                    i18n-placeholder
+                    placeholder="Nummer"
+                    [(ngModel)]="normNumber"
+                    name="normNumber"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Revision</label>
+                <div class="col-sm-8">
+                  <input
+                    type="text"
+                    class="form-control"
+                    i18n-placeholder
+                    placeholder="Revision"
+                    [(ngModel)]="revision"
+                    name="revision"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-8">
+              <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Herausgeber</label>
+                <div class="col-sm-9">
+                  <select
+                    class="form-control"
+                    [(ngModel)]="publisherId"
+                    name="publisherId"
+                  >
+                    <option value="">Herausgeber wählen</option>
+                    <option
+                      *ngFor="let item of publishers"
+                      [value]="item._id"
+                      [selected]="item._id == publisherId"
+                    >
+                      {{ item.name }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="form-group row">
+                <label class="col-sm-4 col-form-label" for="revisionDate"
+                  >Datum</label
+                >
+                <div class="col-sm-8">
+                  <p-calendar
+                    [(ngModel)]="revisionDate"
+                    [showIcon]="false"
+                    [inline]="false"
+                    dateFormat="dd.mm.yy"
+                    id="revisionDate"
+                    name="revisionDate"
+                  ></p-calendar>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Sprache</label>
+            <div class="col-sm-10">
+              <p-selectButton
+                [options]="[
+                  {
+                    label: 'de',
+                    value: 'de'
+                  },
+                  {
+                    label: 'en',
+                    value: 'en'
+                  },
+                  {
+                    label: 'fr',
+                    value: 'fr'
+                  }
+                ]"
+                name="normLanguage"
+                [(ngModel)]="normLanguage"
+              ></p-selectButton>
+            </div>
+          </div>
 
-      <select class="form-control" [(ngModel)]="publisherId" name="publisherId">
-        <option value="">Bereich wählen</option>
-        <option
-          *ngFor="let item of publishers"
-          [value]="item._id"
-          [selected]="item._id == publisherId"
-        >
-          {{ item.name }}
-        </option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Nummer</label>
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Nummer"
-        [(ngModel)]="normNumber"
-        name="normNumber"
-        required
-      />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Name</label>
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Name"
-        required
-        [(ngModel)]="name"
-        name="name"
-      />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Ausgabe / Revision</label>
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Ausgabe / Revision"
-        [(ngModel)]="revision"
-        name="revision"
-      />
-    </div>
-    <div class="form-group">
-      <label
-        class="form-label"
-        for="outputDate"
-        style="width: 100%; display: inline-block;"
-        >Ausgabedatum:</label
-      >
-      <p-calendar
-        [(ngModel)]="outputDate"
-        [showIcon]="false"
-        [inline]="false"
-        id="outputDate"
-        name="outputDate"
-      ></p-calendar>
-      <!-- <div>{{ outputDate | date }}</div> -->
-    </div>
-    <div class="form-group">
-      <label
-        class="form-label"
-        for="inputDate"
-        style="width: 100%; display: inline-block;"
-        >Eingangsdatum ACP:</label
-      >
-      <p-calendar
-        [(ngModel)]="inputDate"
-        [showIcon]="false"
-        [inline]="false"
-        id="inputDate"
-        name="inputDate"
-      ></p-calendar>
-      <!-- <div>{{ inputDate | date }}</div> -->
-    </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Beschreibung de</label>
+            <div class="col-sm-10">
+              <textarea
+                class="form-control"
+                i18n-placeholder
+                placeholder="Beschreibung de"
+                required
+                [(ngModel)]="descriptionDE"
+                name="descriptionDE"
+              ></textarea>
+            </div>
+          </div>
 
-    <div class="form-group">
-      <label class="form-label">Benutzer</label>
-      <angular2-multiselect
-        name="users"
-        [data]="users"
-        [(ngModel)]="selectedtUsers"
-        [settings]="dropdownSettings"
-        (onSelect)="onItemSelect($event)"
-        (onDeSelect)="onItemDeSelect($event)"
-        (onSelectAll)="onSelectAll($event)"
-        (onDeSelectAll)="onDeSelectAll($event)"
-      >
-        <c-item>
-          <ng-template let-item="item">
-            <label> {{ item.name }}</label>
-          </ng-template>
-        </c-item>
-      </angular2-multiselect>
-    </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Beschreibung en</label>
+            <div class="col-sm-10">
+              <textarea
+                class="form-control"
+                i18n-placeholder
+                placeholder="Beschreibung en"
+                [(ngModel)]="descriptionEN"
+                name="descriptionEN"
+              ></textarea>
+            </div>
+          </div>
 
-    <hr />
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Beschreibung fr</label>
+            <div class="col-sm-10">
+              <textarea
+                class="form-control"
+                i18n-placeholder
+                placeholder="Beschreibung fr"
+                [(ngModel)]="descriptionFR"
+                name="descriptionFR"
+              ></textarea>
+            </div>
+          </div>
 
-    <div class="form-group">
-      <label class="form-label" style="display: block; width: 100%;"
-        >Normdatei (pdf)</label
-      >
-      <!-- File input for upload without using the plugin. -->
-      <input
-        type="file"
-        name="fileUpload"
-        [(ngModel)]="fileUpload"
-        observeFiles
-      />
-    </div>
-    <hr />
-    <a
-      *ngIf="normFilePath"
-      href="/{{ normFilePath }}"
-      target="_blank"
-      download
-      >{{ normFilePath.split('/').pop() }}</a
-    >
-    <hr />
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Scope</label>
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Scope"
+                [(ngModel)]="scope"
+                name="scope"
+              />
+            </div>
+          </div>
+        </div>
 
-    <p-fieldset
-      legend="Revision History"
-      [toggleable]="true"
-      [transitionOptions]="'100ms'"
-      [collapsed]="true"
-    >
-      <div *ngFor="let revDoc of revisionDocuments">
-        <a
-          *ngIf="revDoc.path"
-          href="/{{ revDoc.path.replace('./src', '') }}"
-          target="_blank"
-          download
-          >{{ revDoc.path.split('/').pop() }}</a
-        >
-        ({{ revDoc.revisionID }})
+        <div class="col-sm-6">
+          <div class="col-sm-6">
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">Staus</label>
+              <div class="col-sm-10">
+                <p-selectButton
+                  [options]="[
+                    {
+                      label: 'aktiv',
+                      value: true
+                    },
+                    {
+                      label: 'gesperrt',
+                      value: false
+                    }
+                  ]"
+                  name="active"
+                  [(ngModel)]="active"
+                ></p-selectButton>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            Veröffentlicht
+          </div>
+
+          <div class="form-group row">
+            <label class="form-label" style="display: block; width: 100%;"
+              >Normdatei (pdf)</label
+            >
+            <!-- File input for upload without using the plugin. -->
+            <input
+              type="file"
+              name="fileUpload"
+              [(ngModel)]="fileUpload"
+              observeFiles
+            />
+            <hr />
+            <a
+              *ngIf="normFilePath"
+              href="/{{ normFilePath }}"
+              target="_blank"
+              download
+              >{{ normFilePath.split('/').pop() }}</a
+            >
+          </div>
+
+          <hr />
+
+          <p-fieldset
+            legend="Revision History"
+            [toggleable]="true"
+            [transitionOptions]="'100ms'"
+            [collapsed]="true"
+          >
+            <div *ngFor="let revDoc of revisionDocuments">
+              <a
+                *ngIf="revDoc.path"
+                href="/{{ revDoc.path.replace('./src', '') }}"
+                target="_blank"
+                download
+                >{{ revDoc.path.split('/').pop() }}</a
+              >
+              ({{ revDoc.revisionID }})
+            </div>
+          </p-fieldset>
+        </div>
       </div>
-    </p-fieldset>
+    </p-tabPanel>
 
-    <hr />
+    <p-tabPanel header="User">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Owner</label>
+            <div class="col-sm-10">
+              <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
+                <option value="" selected="selected">Owner wählen</option>
+                <option
+                  *ngFor="let owner of owners"
+                  [value]="owner._id"
+                  [selected]="owner._id == ownerId"
+                >
+                  {{ owner.lastName }}, {{ owner.firstName }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Benutzer</label>
+            <div class="col-sm-10">
+              <angular2-multiselect
+                name="users"
+                [data]="users"
+                [(ngModel)]="selectedtUsers"
+                [settings]="dropdownSettings"
+                (onSelect)="onItemSelect($event)"
+                (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAll($event)"
+              >
+                <c-item>
+                  <ng-template let-item="item">
+                    <label> {{ item.name }}</label>
+                  </ng-template>
+                </c-item>
+              </angular2-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
 
-    <div class="form-group">
-      <label class="form-label">Owner</label>
-      <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
-        <option value="" selected="selected">Owner wählen</option>
-        <option
-          *ngFor="let owner of owners"
-          [value]="owner._id"
-          [selected]="owner._id == ownerId"
-        >
-          {{ owner.lastName }}, {{ owner.firstName }}
-        </option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Aktivierungs Intervall</label>
-      <select
-        class="form-control"
-        [(ngModel)]="activationInterval"
-        name="activationInterval"
-        ng-init="activationInterval = options[0]"
-      >
-        <option value="" selected="selected"
-          >Aktivierungs Intervall wählen</option
-        >
-        <option
-          *ngFor="let activationIntervalItem of activationIntervals"
-          [value]="activationIntervalItem"
-          [selected]="activationIntervalItem == activationInterval"
-        >
-          {{ activationIntervalItem }}
-        </option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Bezugsquelle</label>
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Bezugsquelle"
-        [(ngModel)]="source"
-        name="source"
-      />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Bezugsquelle Login</label>
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Bezugsquelle Login"
-        [(ngModel)]="sourceLogin"
-        name="sourceLogin"
-      />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Bezugsquelle Passwort</label>
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Bezugsquelle Passwort"
-        [(ngModel)]="sourcePassword"
-        name="sourcePassword"
-      />
-    </div>
-
-    <div class="checkbox">
-      <label
-        ><input
-          type="checkbox"
-          class="form-control"
-          [(ngModel)]="active"
-          name="active"
-        />Aktiv ?</label
-      >
-    </div>
-
-    <hr />
-
-    <div class="form-group">
-      <button class="btn btn-success" type="submit">
-        {{ formMode ? 'Speichern' : 'Erstellen' }}
-      </button>
-    </div>
-  </form>
-</div>
+    <p-tabPanel header="Historie">
+      Historie
+    </p-tabPanel>
+  </p-tabView>
+</form>

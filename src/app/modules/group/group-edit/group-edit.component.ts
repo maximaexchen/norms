@@ -263,6 +263,6 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.alive = true;
+    this.alive = false;
   }
 }

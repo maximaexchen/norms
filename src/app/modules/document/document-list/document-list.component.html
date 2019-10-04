@@ -29,8 +29,8 @@
     <tr>
       <th width="30"></th>
 
-      <th [pSortableColumn]="'number'">
-        Nummer<p-sortIcon [field]="'number'"></p-sortIcon>
+      <th [pSortableColumn]="'normNumber'">
+        Nummer<p-sortIcon [field]="'normNumber'"></p-sortIcon>
       </th>
       <th [pSortableColumn]="'publisher'">
         Herausgeber
@@ -55,9 +55,9 @@
       <td>
         <a class="fa fa-folder" (click)="showDetail(document._id)"></a>
       </td>
-      <td>{{ document.number }}</td>
+      <td>{{ document.normNumber }}</td>
       <td>{{ document.publisher }}</td>
-      <td>{{ document.description.de }}</td>
+      <td>{{ document.descriptionDE }}</td>
       <td>{{ document.revision }}</td>
       <td>{{ document.revisionDate | date }}</td>
       <td>{{ document.owner.lastName }}, {{ document.owner.firstName }}</td>

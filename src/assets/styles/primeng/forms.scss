@@ -1,0 +1,24 @@
+app-login input {
+  width: 80%;
+}
+
+.ui-calendar {
+  .ui-inputtext {
+    width: 100%;
+  }
+}
+
+body .ui-tabview-panel .ui-inputtext {
+  font-size: 14px;
+  color: #333333;
+  background: #ffffff;
+  padding: 0.429em;
+  border: 1px solid #ced4da;
+  -webkit-transition: border-color 0.2s;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  @extend .form-control;
+}

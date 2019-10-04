@@ -117,6 +117,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.alive = true;
+    this.alive = false;
   }
 }
