@@ -1,9 +1,8 @@
-import localeDe from '@angular/common/locales/de';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Subscription, Observable, of, Subscriber } from 'rxjs';
+import { Observable, Subscriber } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { NormDocument } from '../../../models/document.model';
@@ -48,6 +47,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   selectedtUsers: User[] = [];
   revisionDocuments: RevisionDocument[] = [];
   attachment: any;
+  attachmentName: string;
 
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
@@ -178,6 +178,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.active = entry['active'];
             this.setSelectedUsers(entry['users']);
             this.attachment = entry['_attachments'];
+            this.attachmentName = Object.keys(this.attachment).toString();
           });
       } else {
         console.log('New mode');
@@ -292,6 +293,61 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.router.navigate(['../document']);
         //this.showConfirm();
       });
+  }
+
+  uploadPDF(event) {
+    for (const file of event.files) {
+      this.fileUpload = file;
+    }
+    this.showConfirm('success', 'Files added');
+  }
+
+  public getDownload(id: string, attachments: any) {
+    this.documentService
+      .getDownload(id, Object.keys(attachments)[0])
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        res => {
+          // It is necessary to create a new blob object with mime-type explicitly set
+          // otherwise only Chrome works like it should
+          const newBlob = new Blob([res], { type: 'application/pdf' });
+
+          // IE doesn't allow using a blob object directly as link href
+          // instead it is necessary to use msSaveOrOpenBlob
+          if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(newBlob);
+            return;
+          }
+
+          // For other browsers:
+          // Create a link pointing to the ObjectURL containing the blob.
+          const data = window.URL.createObjectURL(newBlob);
+
+          const link = document.createElement('a');
+          link.href = data;
+          link.download = Object.keys(attachments)[0];
+          // this is necessary as link.click() does not work on the latest firefox
+          link.dispatchEvent(
+            new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window
+            })
+          );
+
+          setTimeout(() => {
+            // For Firefox it is necessary to delay revoking the ObjectURL
+            window.URL.revokeObjectURL(data);
+            link.remove();
+          }, 100);
+        },
+        error => {
+          console.log('download error:', JSON.stringify(error));
+        },
+        () => {
+          console.log('Completed file download.');
+        }
+      );
   }
 
   private setSelectedUsers(users: any[]) {

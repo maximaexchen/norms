@@ -208,15 +208,35 @@
               </div>
             </div>
           </div>
-          <div class="col-sm-6">
-            Veröffentlicht
-          </div>
+
+          <hr />
 
           <div class="form-group row">
+            <label class="col-sm-12 col-form-label text-left"
+              >Normdatei (PDF upload)</label
+            >
+            <div class="col-sm-12">
+              <p-fileUpload
+                mode="basic"
+                name="files"
+                (onSelect)="uploadPDF($event)"
+                accept="application/pdf"
+                showUploadButton="true"
+                showCancelButtonZZ="false"
+                chooseLabel="Norm wählen (PDF)"
+              ></p-fileUpload>
+            </div>
+          </div>
+
+          <div *ngIf="attachment">
+            <a (click)="getDownload(id, attachment)"> {{ attachmentName }}</a>
+          </div>
+
+          <!-- <div class="form-group row">
             <label class="form-label" style="display: block; width: 100%;"
               >Normdatei (pdf)</label
             >
-            <!-- File input for upload without using the plugin. -->
+            //  File input for upload without using the plugin.
             <input
               type="file"
               name="fileUpload"
@@ -231,7 +251,7 @@
               download
               >{{ normFilePath.split('/').pop() }}</a
             >
-          </div>
+          </div> -->
 
           <hr />
 

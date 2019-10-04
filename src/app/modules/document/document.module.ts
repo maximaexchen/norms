@@ -13,6 +13,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { ToastModule } from 'primeng/toast';
 import { FieldsetModule } from 'primeng/fieldset';
 import { DialogModule } from 'primeng/dialog';
+import { FileUploadModule } from 'primeng/fileupload';
 
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { GeneralModule } from 'src/app/modules/general.module';
@@ -30,6 +31,7 @@ import { GeneralModule } from 'src/app/modules/general.module';
     ProgressSpinnerModule,
     CalendarModule,
     ToastModule,
+    FileUploadModule,
     AngularMultiSelectModule,
     FieldsetModule,
     DialogModule,

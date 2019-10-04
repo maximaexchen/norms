@@ -55,6 +55,11 @@ export class TagListComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         res => {
+          this.tags = [];
+          this.tagsLevel1 = [];
+          this.tagsLevel2 = [];
+          this.tagsLevel3 = [];
+
           this.tags = res;
           this.tagCount = this.tags.length;
 
