@@ -21,7 +21,7 @@ var Service = require('node-windows').Service;
 
 // Create a new service object
 var svc = new Service({
-  name: 'ACPNormsUploader',
+  name: 'ACPNormsUploader2',
   description: 'Normenverwaltung Uploader Node Service',
   script: 'D:\\ACP.extranet\\public\\acpold\\airweb\\norms\\server.js',
   nodeOptions: [
