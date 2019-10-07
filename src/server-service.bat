@@ -3,8 +3,12 @@ echo Run as Administrator!
 pause
 
 REM go to folder where this file resides
-%~dp0
+cd %~dp0
 set mypath=%cd%
+
+REM install node-windows
+npm install -g node-windows
+npm link node-windows
 
 REM remove service (if exists)
 sc delete acpnormenverwaltunguploadhandler.exe
