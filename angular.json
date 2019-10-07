@@ -28,7 +28,8 @@
               "src/assets",
               "src/env.js",
               "src/server.js",
-              "src/server-service.js"
+              "src/server-service.js",
+              "src/server-service.bat"
             ],
             "styles": [
               "src/styles.scss"
