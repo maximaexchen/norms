@@ -19,3 +19,11 @@ body {
 .selected-list .c-list .c-token {
   background: $primary;
 }
+
+body .ui-fieldset .ui-fieldset-legend {
+  font-size: 0.8rem !important;
+
+  a {
+    padding: 0.371em 0.8em !important;
+  }
+}

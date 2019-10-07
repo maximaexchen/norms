@@ -19,7 +19,7 @@
       [routeNew]="'/document/new'"
       (save)="onSubmit()"
       (add)="onSubmit()"
-      (delete)="onDelete()"
+      (delete)="deleteDocument()"
     ></app-crud-nav>
   </div>
 </div>
@@ -219,7 +219,7 @@
               <p-fileUpload
                 mode="basic"
                 name="files"
-                (onSelect)="uploadPDF($event)"
+                (onSelect)="prepareUpload($event)"
                 accept="application/pdf"
                 showUploadButton="true"
                 showCancelButtonZZ="false"
@@ -228,9 +228,21 @@
             </div>
           </div>
 
-          <div *ngIf="attachment">
-            <a (click)="getDownload(id, attachment)"> {{ attachmentName }}</a>
-          </div>
+          <hr />
+
+          <p-button
+            *ngIf="attachmentName"
+            icon="fa fa-download "
+            iconPos="left"
+            title="{{ attachmentName }}"
+            label="{{
+              attachmentName.length > 20
+                ? (attachmentName | slice: 0:20) + '...'
+                : attachmentName
+            }}"
+            class="attachmentDownload"
+            (click)="getDownload(id, attachment)"
+          ></p-button>
 
           <!-- <div class="form-group row">
             <label class="form-label" style="display: block; width: 100%;"
@@ -261,15 +273,25 @@
             [transitionOptions]="'100ms'"
             [collapsed]="true"
           >
-            <div *ngFor="let revDoc of revisionDocuments">
+            <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a
                 *ngIf="revDoc.path"
                 href="/{{ revDoc.path.replace('./src', '') }}"
                 target="_blank"
+                title="{{ revDoc.path.split('/').pop() }}"
+                class="text-left"
                 download
-                >{{ revDoc.path.split('/').pop() }}</a
+                >{{
+                  revDoc.path.split('/').pop().length > 15
+                    ? (revDoc.path.split('/').pop() | slice: 0:15) + '..'
+                    : revDoc.path.split('/').pop()
+                }}</a
               >
               ({{ revDoc.revisionID }})
+              <div style="display: inline-block; float: right;">
+                {{ revDoc.date | date }}
+              </div>
+              <hr *ngIf="i < revisionDocuments.length - 1" />
             </div>
           </p-fieldset>
         </div>

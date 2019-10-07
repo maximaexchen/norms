@@ -13,8 +13,7 @@ export class ServerService {
 
   public findDirectory(id: string): Observable<HttpEvent<any>> {
     const url = 'http://localhost:4000/api/findDirectory/' + id;
-    const req = new HttpRequest('GET', url);
-    return this.http.request(req);
+    return this.http.request(new HttpRequest('GET', url));
   }
 
   public uploadFile(
@@ -25,12 +24,12 @@ export class ServerService {
   ): Observable<HttpEvent<any>> {
     const formData = new FormData();
 
-    console.log('ppppppppp');
+    console.log('-------------------------------------');
     console.log(file);
     console.log(file.name);
     console.log(createID);
     console.log(uploadDir);
-    console.log('ppppppppp');
+    console.log('-------------------------------------');
     formData.append('uploadFile', file, file.name);
     formData.append('createID', createID);
     formData.append('uploadDir', uploadDir);
@@ -42,7 +41,6 @@ export class ServerService {
       reportProgress: true
     };
 
-    const req = new HttpRequest('POST', url, formData, options);
-    return this.http.request(req);
+    return this.http.request(new HttpRequest('POST', url, formData, options));
   }
 }

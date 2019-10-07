@@ -48,6 +48,8 @@ export class DocumentService {
   }
 
   public getUserByID(id: string): Observable<any> {
+    // http://127.0.0.1:5984/norm_documents/_design/norms/_view/norm-users?startkey=
+    // ["2a350192903b8d08259b69d22700c2d4",1]&endkey=["2a350192903b8d08259b69d22700c2d4",10]&include_docs=true
     return this.couchDBService.fetchEntry('/' + id);
   }
 
@@ -93,7 +95,6 @@ export class DocumentService {
   /**
    * Helperfunctions
    */
-
   public renameKeys(keysMap, obj) {
     // debugger;
 

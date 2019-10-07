@@ -30,20 +30,23 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
     private router: Router
-  ) {
-    this.changeSubscription = this.couchDBService
+  ) {}
+
+  ngOnInit() {
+    console.log('ngOnInit: DocumentListComponent');
+
+    this.couchDBService
       .setStateUpdate()
       .pipe(takeWhile(() => this.alive))
       .subscribe(message => {
         if (message.text === 'document') {
-          // this.onFetchDocument();
-          // this.documents = this.documentService.getDocuments();
+          this.getDocuments();
         }
       });
+    this.getDocuments();
   }
 
-  ngOnInit() {
-    console.log('ngOnInit: DocumentListComponent');
+  private getDocuments() {
     this.documentService
       .getDocuments()
       .pipe(takeWhile(() => this.alive))

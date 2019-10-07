@@ -15,4 +15,16 @@ body {
       background-color: theme-color('primary-light');
     }
   }
+
+  .ui-selectbutton .ui-button.ui-state-active {
+    background-color: theme-color('primary-light');
+    border-color: theme-color('primary-light');
+    color: $white;
+  }
+
+  .ui-fileupload-choose {
+    background-color: transparent;
+    border-color: theme-color('primary');
+    color: theme-color('primary');
+  }
 }
