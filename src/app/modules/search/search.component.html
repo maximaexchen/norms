@@ -1,63 +1,63 @@
-<div class="row">
-  <div class="col-sm-5">
-    <h4>Suche</h4>
-    <hr />
-    <form class="form" (ngSubmit)="onSubmit()" #searchForm="ngForm">
-      <div class="form-group">
-        <label class="form-label">Bereich</label>
-        <select class="form-control" [(ngModel)]="publisherId" name="publisherId">
-          <option [value]="undefined" selected="selected"
-            >Bereich wählen</option
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="info-panel position-top position-bottom">
+        <form class="form-inline" (ngSubmit)="onSubmit()" #searchForm="ngForm">
+          <h2
+            style="color: black; margin: 0 30px 0 10px; font-weight: 700; font-size: 1.1rem;"
           >
-          <option *ngFor="let item of publishers" [value]="item._id">
-            {{ item.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">User</label>
-        <select class="form-control" [(ngModel)]="userId" name="userId">
-          <option [value]="undefined" selected="selected"
-            >Benutzer wählen </option
-          ><option *ngFor="let item of users" [value]="item._id">
-            {{ item.lastName }}, {{ item.firstName }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Gruppe</label>
-        <select class="form-control" [(ngModel)]="groupId" name="groupId">
-          <option [value]="undefined" selected="selected">Gruppe wählen</option>
-          <option *ngFor="let item of groups" [value]="item._id">
-            {{ item.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Owner</label>
-        <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
-          <option [value]="undefined" selected="selected">Owner wählen</option>
-          <option
-            *ngFor="let owner of owners"
-            [value]="owner._id"
-            [selected]="owner._id == owner"
+            <span class="fa fa-newspaper-o" style="margin: 0 20px 0 0px; ">
+            </span
+            >Normen
+          </h2>
+          <label class="form-label">Bereich</label>
+          <select
+            class="form-control"
+            [(ngModel)]="publisherId"
+            name="publisherId"
           >
-            {{ owner.lastName }}, {{ owner.firstName }}
-          </option>
-        </select>
-      </div>
+            <option [ngValue]="null" selected="selected">Bereich wählen</option>
+            <option *ngFor="let item of publishers" [value]="item._id">
+              {{ item.name }}
+            </option>
+          </select>
+          <!-- <label class="form-label">User</label>
+          <select class="form-control" [(ngModel)]="userId" name="userId">
+            <option [value]="undefined" selected="selected"
+              >Benutzer wählen </option
+            ><option *ngFor="let item of users" [value]="item._id">
+              {{ item.lastName }}, {{ item.firstName }}
+            </option>
+          </select> -->
 
-      <hr />
+          <!--  <label class="form-label">Gruppe</label>
+          <select class="form-control" [(ngModel)]="groupId" name="groupId">
+            <option [value]="undefined" selected="selected"
+              >Gruppe wählen</option
+            >
+            <option *ngFor="let item of groups" [value]="item._id">
+              {{ item.name }}
+            </option>
+          </select> -->
 
-      <div class="form-group">
-        <button class="btn btn-success" type="submit">
-          Suche
-        </button>
+          <label class="form-label">Owner</label>
+          <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
+            <option [ngValue]="null" selected="selected">Owner wählen</option>
+            <option
+              *ngFor="let owner of owners"
+              [value]="owner._id"
+              [selected]="owner._id == owner"
+            >
+              {{ owner.lastName }}, {{ owner.firstName }}
+            </option>
+          </select>
+
+          <button class="btn btn-success" type="submit">
+            Suche
+          </button>
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </div>
 <div class="row">

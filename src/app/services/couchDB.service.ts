@@ -56,6 +56,18 @@ export class CouchDBService {
     return this.http.post(this.dbRequest + '/_bulk_docs', bulkObject);
   }
 
+  public findDocuments(searchObject?: any): Observable<any> {
+    if (searchObject) {
+      console.log('search');
+      return this.http.post(this.dbRequest + '/_find', searchObject);
+    } else {
+      console.log('alll');
+      return this.fetchEntries(
+        '/_design/norms/_view/all-norms?include_docs=true'
+      );
+    }
+  }
+
   public search(object: any): Observable<any> {
     console.log('search');
     console.log(object);

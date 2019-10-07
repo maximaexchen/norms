@@ -1,3 +1,4 @@
+import { SearchModule } from './../search/search.module';
 import { UserModule } from './../user/user.module';
 import { NgModule } from '@angular/core';
 
@@ -36,7 +37,8 @@ import { GeneralModule } from 'src/app/modules/general.module';
     FieldsetModule,
     DialogModule,
     GroupModule,
-    UserModule
+    UserModule,
+    SearchModule
   ],
   exports: []
 })

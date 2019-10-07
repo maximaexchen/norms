@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
@@ -8,6 +8,7 @@ import { NormDocument } from '../../../models/document.model';
 import { EnvService } from 'src/app//services/env.service';
 import { Router } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
+import { SearchService } from '@app/services/search.service';
 
 @Component({
   selector: 'app-document-list',
@@ -16,6 +17,8 @@ import { takeWhile } from 'rxjs/operators';
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
   alive = true;
+
+  docs: Array<NormDocument> = [];
 
   documents: NormDocument[] = [];
   documentCount = 0;
@@ -29,8 +32,15 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     private env: EnvService,
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
+    private searchService: SearchService,
     private router: Router
-  ) {}
+  ) {
+    this.searchService.searchResultData.subscribe(result => {
+      this.documents = result;
+      console.log('this.docs');
+      console.log(this.docs);
+    });
+  }
 
   ngOnInit() {
     console.log('ngOnInit: DocumentListComponent');
@@ -47,8 +57,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private getDocuments() {
-    this.documentService
-      .getDocuments()
+    this.couchDBService
+      .findDocuments()
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
@@ -61,6 +71,20 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         },
         () => {}
       );
+    /* this.documentService
+      .getDocuments()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        result => {
+          this.documents = result;
+          console.log(result);
+          this.documentCount = this.documents.length;
+        },
+        error => {
+          console.log(error.message);
+        },
+        () => {}
+      ); */
   }
 
   public getDownload(id: string, attachments: any) {

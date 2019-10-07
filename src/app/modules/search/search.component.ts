@@ -1,13 +1,11 @@
+import { SearchService } from './../../services/search.service';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
-import { Subscription } from 'rxjs';
 import * as _ from 'underscore';
 
-import { EnvService } from 'src/app//services/env.service';
-import { CouchDBService } from 'src/app//services/couchDB.service';
-import { DocumentService } from '../..//services/document.service';
+import { DocumentService } from '../../services/document.service';
 import { Group } from '@app/models/group.model';
 import { User } from '@app/models/user.model';
 import { Publisher } from '@app/models/publisher.model';
@@ -29,18 +27,17 @@ export class SearchComponent implements OnInit, OnDestroy {
   modalContent = '';
 
   publishers: Publisher[];
-  publisherId: string;
+  publisherId = null;
   owners: User[];
-  ownerId: string;
+  ownerId = null;
   users: User[];
   userId: string;
   groups: Group[];
   groupId: string;
 
   constructor(
-    private env: EnvService,
     private route: ActivatedRoute,
-    private couchDBService: CouchDBService,
+    private searchService: SearchService,
     private documentService: DocumentService
   ) {}
 
@@ -98,6 +95,11 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     // console.log(this.searchForm);
+    const searchObject = {};
+    this.publisherId = 'undefined';
+    this.ownerId = 'undefined';
+    this.groupId = 'undefined';
+    this.userId = 'undefined';
 
     if (this.searchForm.value.publisherId !== undefined) {
       this.publisherId = this.searchForm.value.publisherId;
@@ -115,47 +117,49 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.userId = this.searchForm.value.userId;
     }
 
-    // Build the searchObjectStatement for couchDB _find method
-    // only for norm documents >> type: { $eq: 'norm' },
-    const searchObject = {
-      use_index: ['_design/search_norm'],
-      selector: {
-        _id: { $gt: null },
-        type: { $eq: 'norm' },
-        $or: [
-          {
-            publisher: {
-              _id: { $eq: this.publisherId }
-            }
-          },
-          {
-            owner: {
-              _id: { $eq: this.ownerId }
-            }
-          },
-          {
-            users: {
-              $elemMatch: {
-                id: {
-                  $eq: this.userId
+    // same as below
+    // if (!this.publisherId  && !this.ownerId) {
+    if (this.publisherId === null && this.ownerId === null) {
+      console.log('No search parameters');
+      this.searchService.search(undefined);
+    } else {
+      console.log('Search parameters');
+
+      // Build the searchObjectStatement for couchDB _find method
+      // only for norm documents >> type: { $eq: 'norm' },
+      let searchObject = {
+        use_index: ['_design/search_norm'],
+        selector: {
+          _id: { $gt: null },
+          type: { $eq: 'norm' },
+          $or: [
+            {
+              publisher: {
+                _id: { $eq: this.publisherId }
+              }
+            },
+            {
+              owner: {
+                _id: { $eq: this.ownerId }
+              }
+            },
+            {
+              users: {
+                $elemMatch: {
+                  id: {
+                    $eq: this.userId
+                  }
                 }
               }
             }
-          }
-        ]
-      }
-    };
+          ]
+        }
+      };
 
-    if (
-      this.searchForm.value.publisherId === undefined &&
-      this.searchForm.value.ownerId === undefined &&
-      this.searchForm.value.groupId === undefined &&
-      this.searchForm.value.userId === undefined
-    ) {
-      console.log('No search parameters');
+      this.searchService.search(searchObject);
     }
 
-    this.couchDBService
+    /* this.couchDBService
       .search(searchObject)
       .pipe(takeWhile(() => this.alive))
       .subscribe(results => {
@@ -202,7 +206,7 @@ export class SearchComponent implements OnInit, OnDestroy {
               });
           }
         });
-      });
+      }); */
   }
 
   showDialog(users: User[]) {
