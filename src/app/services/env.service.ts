@@ -15,8 +15,8 @@ export class EnvService {
   public dbName = 'norm_rep2';
 
   public uploadUrl = 'http://localhost:4000/api/upload';
-  public uploadDir = './dist/wakandaAngular/assets/uploads/';
-  public uploadRoot = './dist/wakandaAngular/';
+  public uploadDir = './dist/norms/assets/uploads/';
+  public uploadRoot = './dist/norms/';
 
   constructor() {}
 }

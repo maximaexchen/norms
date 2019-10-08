@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "wakandaAngular": {
+    "norms": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/wakandaAngular",
+            "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -31,9 +31,7 @@
               "src/server-service.js",
               "src/server-service.bat"
             ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "styles": ["src/styles.scss"],
             "scripts": []
           },
           "configurations": {
@@ -105,28 +103,28 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "wakandaAngular:build"
+            "browserTarget": "norms:build"
           },
           "configurations": {
             "de": {
               "aot": true,
-              "browserTarget": "wakandaAngular:build:de",
+              "browserTarget": "norms:build:de",
               "baseHref": "/"
             },
             "en": {
               "aot": true,
-              "browserTarget": "wakandaAngular:build:en",
+              "browserTarget": "norms:build:en",
               "baseHref": "/en/"
             },
             "production": {
-              "browserTarget": "wakandaAngular:build:production"
+              "browserTarget": "norms:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "wakandaAngular:build"
+            "browserTarget": "norms:build"
           }
         },
         "test": {
@@ -136,13 +134,8 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss"
-            ],
+            "assets": ["src/favicon.ico", "src/assets"],
+            "styles": ["src/styles.scss"],
             "scripts": [
               "node_modules/chart.js/dist/Chart.js",
               "node_modules/quill/dist/quill.js"
@@ -157,25 +150,23 @@
               "tsconfig.spec.json",
               "e2e/tsconfig.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         },
         "e2e": {
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "wakandaAngular:serve"
+            "devServerTarget": "norms:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "wakandaAngular:serve:production"
+              "devServerTarget": "norms:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "wakandaAngular"
+  "defaultProject": "norms"
 }

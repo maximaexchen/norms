@@ -92,7 +92,7 @@ app.post('/api/upload', function(req, res) {
       let copyPath =
         req.body.uploadDir + req.body.createID + '/' + req.files[0].filename;
       /* let copyPath =
-        './dist/wakandaAngular/assets/uploads/' +
+        './dist/norms/assets/uploads/' +
         req.body.createID +
         '/' +
         req.files[0].filename; */
