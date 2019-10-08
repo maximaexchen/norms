@@ -1,3 +1,4 @@
+import { Tag } from '@app/models/tag.model';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -36,10 +37,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   publishers: Publisher[] = [];
   owners: User[] = [];
   users: User[] = [];
-  selectedtUsers: User[] = [];
+  selectedUsers: User[] = [];
   revisionDocuments: RevisionDocument[] = [];
   attachment: any;
   attachmentName: string;
+  tags: Tag[] = [];
+  selectedTags: Tag[] = [];
 
   id: string;
   createId: string;
@@ -63,7 +66,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   ownerId: string;
   active: boolean;
 
-  dropdownSettings = {};
+  userDropdownSettings = {};
+  tagDropdownSettings = {};
   fileUpload: File | null;
   rawPDF: string;
 
@@ -87,8 +91,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // fetch data for select-boxes
       this.getPublishers();
-      // Set user and owner select
       this.getUsers();
+      this.getTags();
 
       // check if we are updating
       if (results['id']) {
@@ -100,10 +104,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setStartValues() {
-    // empty the select-box
-    this.selectedtUsers = [];
-
-    this.dropdownSettings = {
+    this.refreshFields();
+    this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',
       text: 'Benutzer wählen',
@@ -115,6 +117,25 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'User Auswahl',
       noDataLabel: 'Keinen Benutzer gefunden'
     };
+
+    this.tagDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Tag wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Tag Auswahl',
+      noDataLabel: 'Keinen Tag gefunden',
+      classes: 'tagClass'
+    };
+  }
+
+  private refreshFields() {
+    this.selectedUsers = [];
+    this.selectedTags = [];
   }
 
   private newDocument() {
@@ -238,7 +259,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .updateEntry(this.writeItem, this.normForm.value._id)
       .pipe(takeWhile(() => this.alive))
       .subscribe(results => {
-        this.selectedtUsers = [];
+        this.selectedUsers = [];
+        this.selectedTags = [];
         // Inform about database change.
         this.sendStateUpdate();
         this.isLoading = false;
@@ -299,8 +321,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .pipe(takeWhile(() => this.alive))
       .subscribe(results => {
+        // Add all users for the selectable owner dropdown
         this.owners = results;
 
+        // Also add to the users
         results.forEach(item => {
           const userObject = {} as User;
           userObject['id'] = item._id;
@@ -321,6 +345,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         },
         err => {}
       );
+  }
+
+  private getTags(): void {
+    this.couchDBService
+      .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(results => {
+        results.forEach(tag => {
+          const tagObject = {} as Tag;
+          tagObject['id'] = tag._id;
+          tagObject['name'] = tag.name;
+          tagObject['tagType'] = tag.tagType;
+          tagObject['active'] = tag.active;
+          this.tags.push(tagObject);
+        });
+      });
   }
 
   public onSubmit(): void {
@@ -356,6 +396,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
+    this.refreshFields();
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
@@ -383,6 +424,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     if (entry['users']) {
       this.setSelectedUsers(entry['users']);
+    }
+
+    if (entry['tags']) {
+      this.setSelectedTags(entry['tags']);
     }
 
     if (entry['_attachments']) {
@@ -422,7 +467,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // values from selectBox
     const selectedUserObjects = [
       ...new Set(
-        this.selectedtUsers.map(user => {
+        this.selectedUsers.map(user => {
           const nameArr = user['name'].split(', ');
           const newUser = {};
           newUser['id'] = user['id'];
@@ -434,6 +479,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       )
     ];
     this.writeItem['users'] = selectedUserObjects || [];
+
+    const selectedTagObjects = [
+      ...new Set(
+        this.selectedTags.map(tag => {
+          const newTag = {};
+          newTag['id'] = tag['id'];
+          newTag['name'] = tag['name'];
+          newTag['tagType'] = tag['tagType'];
+          newTag['active'] = tag['active'];
+          return newTag;
+        })
+      )
+    ];
+    this.writeItem['tags'] = selectedTagObjects || [];
 
     const selPublisher = this.publishers.find(
       pub => pub['_id'] === this.normForm.value.publisherId
@@ -461,7 +520,19 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       selectedUserObject['email'] = user.email;
       return selectedUserObject;
     });
-    this.selectedtUsers = userMap;
+    this.selectedUsers = userMap;
+  }
+
+  private setSelectedTags(tags: any[]) {
+    const tagMap: Tag[] = tags.map(tag => {
+      const selectedTagObject = {};
+      selectedTagObject['id'] = tag.id;
+      selectedTagObject['name'] = tag.name;
+      selectedTagObject['tagType'] = tag.tagType;
+      selectedTagObject['active'] = tag.active;
+      return selectedTagObject;
+    });
+    this.selectedTags = tagMap;
   }
 
   private showConfirmation(type: string, result: string) {
@@ -494,11 +565,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   public onItemSelect(item: any) {
     console.log(item['itemName']);
-    console.log(this.selectedtUsers);
+    console.log(this.selectedUsers);
+    console.log('uuuuuuuuuuuuuuuuuuuuuuuu');
+    console.log(this.selectedTags);
   }
   public onItemDeSelect(item: any) {
     console.log(item);
-    console.log(this.selectedtUsers);
+    console.log(this.selectedUsers);
   }
   public onSelectAll(items: any) {
     console.log(items);

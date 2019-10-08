@@ -185,6 +185,35 @@
             </div>
           </div>
 
+          <div class="form-group row document-tags">
+            <label class="col-sm-4 col-form-label">Tags</label>
+            <div class="col-sm-8">
+              <angular2-multiselect
+                name="tags"
+                [data]="tags"
+                [(ngModel)]="selectedTags"
+                [settings]="tagDropdownSettings"
+                (onSelect)="onItemSelect($event)"
+                (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAll($event)"
+              >
+                <c-badge>
+                  <ng-template let-item="item">
+                    <label class="badge {{ item.tagType }}">{{
+                      item.name
+                    }}</label>
+                  </ng-template>
+                </c-badge>
+                <c-item>
+                  <ng-template let-item="item">
+                    <label class="{{ item.tagType }}"> {{ item.name }}</label>
+                  </ng-template>
+                </c-item>
+              </angular2-multiselect>
+            </div>
+          </div>
+
           <div class="form-group row">
             <label class="col-sm-4 col-form-label">Referenzen</label>
             <div class="col-sm-8"></div>
@@ -327,8 +356,8 @@
               <angular2-multiselect
                 name="users"
                 [data]="users"
-                [(ngModel)]="selectedtUsers"
-                [settings]="dropdownSettings"
+                [(ngModel)]="selectedUsers"
+                [settings]="userDropdownSettings"
                 (onSelect)="onItemSelect($event)"
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"

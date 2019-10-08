@@ -59,6 +59,37 @@
   }
 }
 
+.document-tags {
+  label {
+    padding: 10px 30px 10px 15px;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    font-size: 0.8rem;
+    font-weight: normal;
+  }
+  label.level1 {
+    background-color: rgb(155, 192, 210);
+  }
+  label.level2 {
+    background-color: rgb(250, 192, 142);
+  }
+  label.level3 {
+    background-color: rgb(193, 213, 152);
+  }
+
+  .selected-list .c-list .c-token {
+    background: transparent;
+  }
+
+  .selected-list .c-list .c-token .c-remove {
+  }
+}
+.tagClass {
+  .c-token {
+    padding: 0 !important;
+  }
+}
+
 /*
   FORMS
 */
