@@ -40,10 +40,6 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.getUsers();
   }
 
-  public onFilter(event: any): void {
-    this.userCount = event.filteredValue.length;
-  }
-
   private getUsers() {
     this.documentService
       .getUsers()
@@ -57,6 +53,10 @@ export class UserListComponent implements OnInit, OnDestroy {
           console.log('Error on loading users');
         }
       );
+  }
+
+  public onFilter(event: any): void {
+    this.userCount = event.filteredValue.length;
   }
 
   public showDetail(id: string) {

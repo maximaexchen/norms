@@ -23,6 +23,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   documents: NormDocument[] = [];
   documentCount = 0;
 
+  descriptionDE: string;
+
   messages: any[] = [];
   changeSubscription: Subscription;
 

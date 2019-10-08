@@ -10,6 +10,7 @@ const routes: Routes = [
     path: '',
     component: PublisherComponent,
     children: [
+      { path: '', component: PublisherEditComponent },
       { path: 'list', component: PublisherListComponent },
       { path: 'new', component: PublisherEditComponent },
       { path: ':id/edit', component: PublisherEditComponent }

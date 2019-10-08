@@ -57,7 +57,13 @@
       </td>
       <td>{{ document.normNumber }}</td>
       <td>{{ document.publisher.name }}</td>
-      <td>{{ document.descriptionDE }}</td>
+      <td>
+        {{
+          document.description.de.length > 40
+            ? (document.description.de | slice: 0:40) + '...'
+            : document.description.de
+        }}
+      </td>
       <td>{{ document.revision }}</td>
       <td>{{ document.revisionDate | date }}</td>
       <td>{{ document.owner.lastName }}, {{ document.owner.firstName }}</td>

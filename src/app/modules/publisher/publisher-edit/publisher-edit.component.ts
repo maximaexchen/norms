@@ -1,11 +1,14 @@
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
 import { Subscription } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { Publisher } from '../../../models/publisher.model';
+import { NotificationsService } from '@app/services/notifications.service';
+import { ConfirmationService } from 'primeng/api';
+import { takeWhile } from 'rxjs/operators';
 @Component({
   selector: 'app-publisher-edit',
   templateUrl: './publisher-edit.component.html',
@@ -14,7 +17,7 @@ import { Publisher } from '../../../models/publisher.model';
 export class PublisherEditComponent implements OnInit, OnDestroy {
   @ViewChild('publisherForm', { static: false }) normForm: NgForm;
 
-  updateRelatedSubsscription = new Subscription();
+  alive = true;
 
   writeItem: Publisher;
   publishers: Publisher[] = [];
@@ -29,19 +32,25 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
 
   constructor(
     private couchDBService: CouchDBService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router,
+    private notificationsService: NotificationsService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit() {
     console.log('PublisherEditComponent');
 
-    this.route.params.subscribe(results => {
+    this.getPublisher();
+  }
+
+  private getPublisher() {
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // check if we are updating
       if (results['id']) {
         console.log('Edit mode');
         this.formMode = true;
         this.formTitle = 'Bereich bearbeiten';
-
         this.couchDBService.fetchEntry('/' + results['id']).subscribe(entry => {
           this.id = entry['_id'];
           this.rev = entry['_rev'];
@@ -66,12 +75,34 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
     }
   }
 
+  public onDelete(): void {
+    this.confirmationService.confirm({
+      message: 'Sie wollen den Datensatz ' + this.name + '?',
+      accept: () => {
+        this.couchDBService
+          .deleteEntry(this.id, this.rev)
+          .pipe(takeWhile(() => this.alive))
+          .subscribe(
+            res => {
+              this.sendStateUpdate();
+              this.router.navigate(['../publisher']);
+            },
+            err => {
+              this.showConfirm('error', err.message);
+            }
+          );
+      },
+      reject: () => {}
+    });
+  }
+
   private onUpdatePublisher(): void {
     console.log('onUpdatePublisher: PublisherEditComponent');
     this.createWriteItem();
 
     this.couchDBService
       .updateEntry(this.writeItem, this.normForm.value._id)
+      .pipe(takeWhile(() => this.alive))
       .subscribe(result => {
         // Query for NormDocuments having the changed publisher
         const updateQuery = {
@@ -86,8 +117,9 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
         };
 
         // Update all NormDocuments with the changed publisher
-        this.updateRelatedSubsscription = this.couchDBService
+        this.couchDBService
           .search(updateQuery)
+          .pipe(takeWhile(() => this.alive))
           .subscribe(results => {
             this.updateRelated(results);
           });
@@ -102,9 +134,12 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
 
     this.createWriteItem();
 
-    this.couchDBService.writeEntry(this.writeItem).subscribe(result => {
-      this.sendStateUpdate();
-    });
+    this.couchDBService
+      .writeEntry(this.writeItem)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(result => {
+        this.sendStateUpdate();
+      });
   }
 
   private createWriteItem() {
@@ -138,12 +173,20 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
     });
   }
 
+  private showConfirm(type: string, result: string) {
+    this.notificationsService.addSingle(
+      type,
+      result,
+      type === 'success' ? 'ok' : 'error'
+    );
+  }
+
   sendStateUpdate(): void {
     // send message to subscribers via observable subject
     this.couchDBService.sendStateUpdate('publisher');
   }
 
   ngOnDestroy(): void {
-    this.updateRelatedSubsscription.unsubscribe();
+    this.alive = false;
   }
 }

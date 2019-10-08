@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { Publisher } from '../../../models/publisher.model';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
+import { Router } from '@angular/router';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-publisher-list',
@@ -11,20 +13,24 @@ import { DocumentService } from 'src/app//services/document.service';
   styleUrls: ['./publisher-list.component.scss']
 })
 export class PublisherListComponent implements OnInit, OnDestroy {
+  alive = true;
+
   publishers: Publisher[] = [];
-  changeSubscription: Subscription;
+  publisherCount = 0;
 
   constructor(
     private couchDBService: CouchDBService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private router: Router
   ) {}
 
   ngOnInit() {
     console.log('PublisherListComponent ngOnInit');
 
     // Listen for new publisher created
-    this.changeSubscription = this.couchDBService
+    this.couchDBService
       .setStateUpdate()
+      .pipe(takeWhile(() => this.alive))
       .subscribe(message => {
         if (message.text === 'publisher') {
           this.documentService.getPublishers().subscribe(
@@ -37,9 +43,15 @@ export class PublisherListComponent implements OnInit, OnDestroy {
           );
         }
       });
+
+    this.getPublishers();
+  }
+
+  private getPublishers() {
     this.documentService.getPublishers().subscribe(
       res => {
         this.publishers = res;
+        this.publisherCount = this.publishers.length;
       },
       err => {
         console.log(err);
@@ -47,8 +59,15 @@ export class PublisherListComponent implements OnInit, OnDestroy {
     );
   }
 
+  public onFilter(event: any): void {
+    this.publisherCount = event.filteredValue.length;
+  }
+
+  public showDetail(id: string) {
+    this.router.navigate(['../publisher/' + id + '/edit']);
+  }
+
   ngOnDestroy() {
-    // unsubscribe to ensure no memory leaks
-    this.changeSubscription.unsubscribe();
+    this.alive = false;
   }
 }

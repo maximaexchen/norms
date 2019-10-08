@@ -129,7 +129,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tagClass'
+      classes: 'tagClass',
+      groupBy: 'tagType'
     };
   }
 
@@ -259,8 +260,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .updateEntry(this.writeItem, this.normForm.value._id)
       .pipe(takeWhile(() => this.alive))
       .subscribe(results => {
-        this.selectedUsers = [];
-        this.selectedTags = [];
         // Inform about database change.
         this.sendStateUpdate();
         this.isLoading = false;
@@ -427,7 +426,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
 
     if (entry['tags']) {
-      this.setSelectedTags(entry['tags']);
+      const ent = _.sortBy(entry['tags'], 'tagType');
+      this.setSelectedTags(ent);
     }
 
     if (entry['_attachments']) {
