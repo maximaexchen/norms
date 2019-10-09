@@ -62,6 +62,7 @@
                     placeholder="Revision"
                     [(ngModel)]="revision"
                     name="revision"
+                    required
                   />
                 </div>
               </div>
@@ -213,11 +214,6 @@
               </angular2-multiselect>
             </div>
           </div>
-
-          <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Referenzen</label>
-            <div class="col-sm-8"></div>
-          </div>
         </div>
 
         <div class="col-sm-6">
@@ -253,7 +249,7 @@
               <p-fileUpload
                 mode="basic"
                 name="files"
-                (onSelect)="prepareUpload($event)"
+                (onSelect)="processUpload($event)"
                 accept="application/pdf"
                 showUploadButton="true"
                 showCancelButtonZZ="false"
@@ -263,7 +259,7 @@
           </div>
 
           <hr />
-
+          {{ attachmentName | json }}
           <p-button
             *ngIf="attachmentName"
             icon="fa fa-download "
@@ -275,7 +271,7 @@
                 : attachmentName
             }}"
             class="attachmentDownload"
-            (click)="getDownload(id, attachment)"
+            (click)="getDownload(id, attachmentName)"
           ></p-button>
 
           <!-- <div class="form-group row">
@@ -302,7 +298,7 @@
           <hr />
 
           <p-fieldset
-            legend="Revision History"
+            legend="Revision Historie"
             [toggleable]="true"
             [transitionOptions]="'100ms'"
             [collapsed]="true"
@@ -312,24 +308,29 @@
                 *ngIf="revDoc.path"
                 href="/{{ revDoc.path.replace('./src', '') }}"
                 target="_blank"
-                title="{{ revDoc.path.split('/').pop() }}"
+                title="{{ revDoc['name'] }}"
                 class="text-left"
                 download
-                >{{
-                  revDoc.name.length > 15
-                    ? (revDoc.name | slice: 0:15) + '...'
-                    : revDoc.name
+                >{{ revDoc | json
+                }}{{
+                  revDoc['name'].length > 15
+                    ? (revDoc['name'] | slice: 0:15) + '...'
+                    : revDoc['name']
                 }}</a
               >
-              ({{ revDoc.revisionID }})
+              ({{ revDoc['revisionID'] }})
               <div style="display: inline-block; float: right;">
-                {{ revDoc.date | date }}
+                {{ revDoc['date'] | date: 'dd.MM.y' }}
               </div>
               <hr *ngIf="i < revisionDocuments.length - 1" />
             </div>
           </p-fieldset>
         </div>
       </div>
+    </p-tabPanel>
+
+    <p-tabPanel header="Referenzen">
+      Referenzen
     </p-tabPanel>
 
     <p-tabPanel header="User">

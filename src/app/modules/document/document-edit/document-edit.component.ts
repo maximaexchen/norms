@@ -61,8 +61,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   descriptionDE: string;
   descriptionEN: string;
   descriptionFR: string;
-  normFilePathTemp: string;
   revisionDocument: RevisionDocument;
+  uploadPath: string;
   owner: User;
   ownerId: string;
   active: boolean;
@@ -161,6 +161,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       });
   }
 
+  private uploadPDF(): Observable<any> {
+    return this.serverService.uploadFile(
+      this.uploadUrl + '/',
+      this.fileUpload,
+      this.createId,
+      this.env.uploadDir
+    );
+  }
+
   private saveDocument(): void {
     console.log('onCreate: DocumentEditComponent');
 
@@ -173,17 +182,17 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.createId = result['id'];
 
         if (this.fileUpload) {
-          this.serverService
-            .uploadFile(
-              this.uploadUrl + '/',
-              this.fileUpload,
-              this.createId,
-              this.env.uploadDir
-            )
+          this.uploadPDF()
             .pipe(takeWhile(() => this.alive))
             .subscribe(
-              result => this.showConfirmation('sucess', 'Upload erfolgreich'),
-              error => this.showConfirmation('error', error.message)
+              res => {},
+              error => {
+                console.log(error);
+                this.showConfirmation('error', error.message);
+              },
+              () => {
+                this.showConfirmation('sucess', 'Upload erfolgreich');
+              }
             );
         }
         this.sendStateUpdate();
@@ -194,77 +203,53 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private updateDocument(): void {
     console.log('onUpdateDocument: DocumentEditComponent');
     this.setDocumentData();
-    // TODO: updates with no new Document should not loose the attachment in database
-    this.uploadPDF();
-  }
-
-  private uploadPDF() {
     if (this.fileUpload) {
-      // upload file to server
-      const fileUploadSubscription = this.serverService
-        .uploadFile(
-          this.uploadUrl + '/',
-          this.fileUpload,
-          this.id,
-          this.env.uploadDir
-        )
-        .toPromise()
-        .then(res => {
-          // after upload, save the file to couchDB
-          this.convertToBase64(this.fileUpload)
-            .pipe(takeWhile(() => this.alive))
-            .subscribe(encodedPDF => {
-              // remove the base64 link from converted pdf Data
-              encodedPDF = this.saveUpload(encodedPDF, res);
-              this.writeUpdate();
-            });
-        })
-        .catch(error => {
-          this.showConfirmation('error', error.message);
-          this.isLoading = false;
-        });
+      this.uploadPDF()
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          result => {},
+          error => {
+            console.log(error);
+            this.showConfirmation('error', error.message);
+          },
+          () => {
+            this.writeUpdate();
+            this.showConfirmation('sucess', 'Upload erfolgreich');
+          }
+        );
     } else {
       this.writeUpdate();
     }
   }
 
-  public prepareUpload(event) {
+  public processUpload(event) {
+    this.isLoading = true;
+
     for (const file of event.files) {
       this.fileUpload = file;
     }
-    this.showConfirmation('success', 'Files added');
-  }
 
-  private saveUpload(encodedPDF: string, res) {
-    console.log('saveUpload');
-    encodedPDF = encodedPDF.replace('data:application/pdf;base64,', '');
-    const pathToUpload = res['body'].file.replace(this.env.uploadRoot, '');
+    this.convertToBase64(this.fileUpload)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        result => {
+          this.attachment = {
+            [this.fileUpload.name]: {
+              data: result,
+              content_type: 'application/pdf'
+            }
+          };
 
-    this.revisionDocument = {};
-    this.revisionDocument['date'] = new Date();
-    this.revisionDocument['name'] = pathToUpload.split('/').pop();
-    this.revisionDocument['path'] = pathToUpload;
-    this.revisionDocument['revisionID'] = this.revision;
-    this.revisionDocuments.push(this.revisionDocument);
-    this.writeItem['revisions'] = this.revisionDocuments || [];
-    // add _attacment to write object
-    this.attachment = {
-      [res['body'].fileName]: {
-        data: encodedPDF,
-        content_type: 'application/pdf'
-      }
-    };
-
-    const tempAttachmentObject = this.attachments;
-    this.attachments = { ...tempAttachmentObject, ...this.attachment };
-    this.writeItem['_attachments'] = this.attachments || [];
-    /* this.writeItem['_attachments'] = {
-      [res['body'].fileName]: {
-        data: encodedPDF,
-        content_type: 'application/pdf'
-      }
-    }; */
-    return encodedPDF;
+          this.isLoading = false;
+        },
+        error => {
+          console.log(error.message);
+        },
+        () => {
+          console.log('COMPETE');
+          this.showConfirmation('success', 'Files added');
+        }
+      );
   }
 
   private writeUpdate() {
@@ -279,9 +264,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       });
   }
 
-  public getDownload(id: string, attachments: any) {
+  public getDownload(id: string, attachmentName: any) {
     this.documentService
-      .getDownload(id, Object.keys(attachments)[0])
+      .getDownload(id, attachmentName)
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         res => {
@@ -302,7 +287,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
           const link = document.createElement('a');
           link.href = data;
-          link.download = Object.keys(attachments)[0];
+          link.download = attachmentName;
           // this is necessary as link.click() does not work on the latest firefox
           link.dispatchEvent(
             new MouseEvent('click', {
@@ -441,17 +426,59 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       const ent = _.sortBy(entry['tags'], 'tagType');
       this.setSelectedTags(ent);
     }
-    let temp = 0;
+
+    console.log();
+
     if (entry['_attachments']) {
-      const even = _.find(entry['_attachments'], num => {
+      /* const JSArray = entry['_attachments'];
+      console.log(Object.keys(JSArray)[Object.keys(JSArray).length - 1]); // writes 'c'
+      console.log(
+        JSArray[Object.keys(JSArray)[Object.keys(JSArray).length - 1]]
+      );
+      console.log(_.sortBy(entry['_attachments'], 'revpos').reverse()); */
+      /*  const even = _.find(entry['_attachments'], num => {
         if (temp < num['revpos']) {
           temp = num['revpos'];
           this.attachment = num;
         }
-      });
+      }); */
 
-      this.attachment = entry['_attachments'];
-      this.attachmentName = Object.keys(this.attachment).toString();
+      const sorted = _.sortBy(entry['_attachments'], (object, key) => {
+        object['id'] = key;
+        return object['revpos'];
+      }).reverse();
+
+      const sortedFirst = _.first(sorted);
+
+      const newestAttachment = {
+        [sortedFirst.id]: {
+          content_type: sortedFirst.content_type,
+          digest: sortedFirst.digest,
+          length: sortedFirst,
+          revpos: sortedFirst.revpos,
+          stub: sortedFirst.stub
+        }
+      };
+
+      console.log(newestAttachment);
+
+      /*  this.attachment = {
+        [this.fileUpload.name]: {
+          data: result,
+          content_type: 'application/pdf'
+        }
+      }; */
+      /* let a = {"_attachments": { entry['_attachments'] }};
+      console.log(entry['_attachments']);
+
+      Object.entries(a).forEach((o, index) => {
+        Object.entries(a[o[index]]).forEach((k, v) => {
+          console.log(k[0] + '=' + a[o[index]][k[0]].revpos);
+        });
+      }); */
+
+      this.attachments = entry['_attachments'];
+      this.attachmentName = Object.keys(entry['_attachments']).toString();
     }
   }
 
@@ -522,16 +549,23 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       own => own['_id'] === this.normForm.value.ownerId
     );
     this.writeItem['owner'] = selOwner || '';
+
+    console.log('ADD revisionDocument');
     console.log(this.attachment);
     if (this.attachment) {
-      // this.writeItem['_attachments'] = this.attachment;
+      console.log('ADD revisionDocument');
+      this.revisionDocument = {};
+      this.revisionDocument['date'] = new Date();
+      this.revisionDocument['name'] = Object.keys(this.attachment)[0];
+      this.revisionDocument['revisionID'] = this.revision;
+      /*this.revisionDocument['path'] = this.uploadPath;*/
+      this.revisionDocuments.push(this.revisionDocument);
+      this.writeItem['revisions'] = this.revisionDocuments || [];
 
       const tempAttachmentObject = this.attachments;
       this.attachments = { ...tempAttachmentObject, ...this.attachment };
       this.writeItem['_attachments'] = this.attachments || [];
     }
-
-    console.log(this.writeItem);
     return this.writeItem;
   }
 
@@ -572,11 +606,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private convertToBase64(file: File): Observable<string> {
-    return Observable.create((sub: Subscriber<string>): void => {
+    return new Observable((sub: Subscriber<string>): void => {
       const r = new FileReader();
       // if success
       r.onload = (ev: ProgressEvent): void => {
-        sub.next((ev.target as any).result);
+        const encodedPDF = (ev.target as any).result.replace(
+          'data:application/pdf;base64,',
+          ''
+        );
+        sub.next(encodedPDF);
       };
       // if failed
       r.onerror = (ev: ProgressEvent): void => {
