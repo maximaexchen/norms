@@ -39,7 +39,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   users: User[] = [];
   selectedUsers: User[] = [];
   revisionDocuments: RevisionDocument[] = [];
-  attachments: any[] = [];
+  attachments: any = {};
   attachment: any;
   attachmentName: string;
   tags: Tag[] = [];
@@ -236,6 +236,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private saveUpload(encodedPDF: string, res) {
+    console.log('saveUpload');
     encodedPDF = encodedPDF.replace('data:application/pdf;base64,', '');
     const pathToUpload = res['body'].file.replace(this.env.uploadRoot, '');
 
@@ -521,7 +522,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       own => own['_id'] === this.normForm.value.ownerId
     );
     this.writeItem['owner'] = selOwner || '';
-
+    console.log(this.attachment);
     if (this.attachment) {
       // this.writeItem['_attachments'] = this.attachment;
 
