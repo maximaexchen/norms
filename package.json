@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --source-map --proxy-config proxy.conf.json --base-href /",
+    "start": "ng serve --source-map --proxy-config proxy.conf.json --base-href ./",
     "build": "ng build",
     "build-acp": "ng build --prod --aot --build-optimizer --vendor-chunk --base-href /airweb/norms/",
     "test": "ng test",

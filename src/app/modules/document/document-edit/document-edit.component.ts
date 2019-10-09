@@ -39,6 +39,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   users: User[] = [];
   selectedUsers: User[] = [];
   revisionDocuments: RevisionDocument[] = [];
+  attachments: any[] = [];
   attachment: any;
   attachmentName: string;
   tags: Tag[] = [];
@@ -246,12 +247,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.revisionDocuments.push(this.revisionDocument);
     this.writeItem['revisions'] = this.revisionDocuments || [];
     // add _attacment to write object
-    this.writeItem['_attachments'] = {
+    this.attachment = {
       [res['body'].fileName]: {
         data: encodedPDF,
         content_type: 'application/pdf'
       }
     };
+
+    const tempAttachmentObject = this.attachments;
+    this.attachments = { ...tempAttachmentObject, ...this.attachment };
+    this.writeItem['_attachments'] = this.attachments || [];
+    /* this.writeItem['_attachments'] = {
+      [res['body'].fileName]: {
+        data: encodedPDF,
+        content_type: 'application/pdf'
+      }
+    }; */
     return encodedPDF;
   }
 
@@ -429,8 +440,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       const ent = _.sortBy(entry['tags'], 'tagType');
       this.setSelectedTags(ent);
     }
-
+    let temp = 0;
     if (entry['_attachments']) {
+      const even = _.find(entry['_attachments'], num => {
+        if (temp < num['revpos']) {
+          temp = num['revpos'];
+          this.attachment = num;
+        }
+      });
+
       this.attachment = entry['_attachments'];
       this.attachmentName = Object.keys(this.attachment).toString();
     }
@@ -505,7 +523,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem['owner'] = selOwner || '';
 
     if (this.attachment) {
-      this.writeItem['_attachments'] = this.attachment;
+      // this.writeItem['_attachments'] = this.attachment;
+
+      const tempAttachmentObject = this.attachments;
+      this.attachments = { ...tempAttachmentObject, ...this.attachment };
+      this.writeItem['_attachments'] = this.attachments || [];
     }
 
     console.log(this.writeItem);
