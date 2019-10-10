@@ -26,7 +26,7 @@ export class ServerService {
   ): Observable<HttpEvent<any>> {
     const formData = new FormData();
 
-    revision = revision.replace(/\s/g, '');
+    revision = revision.replace(/\s/g, '').toLowerCase();
 
     console.log('-------------------------------------');
     console.log(file);

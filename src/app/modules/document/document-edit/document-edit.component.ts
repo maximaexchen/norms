@@ -232,13 +232,37 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       );
   }
 
-  public processUpload(event) {
-    console.log('processUpload: start');
-    this.isLoading = true;
+  public checkUpload(event) {
+    console.log('checkUpload: start');
 
     for (const file of event.files) {
       this.fileUpload = file;
     }
+
+    console.log(this.attachments);
+    console.log(this.revision.replace(/\s/g, '').toLowerCase());
+
+    const isIn = this.checkForExistingAttachment(
+      this.attachments,
+      this.revision.replace(/\s/g, '').toLowerCase()
+    );
+
+    if (isIn) {
+      this.confirmationService.confirm({
+        message:
+          'Es gibt bereits eine Datei zur Revision: ' + this.revision + '?',
+        accept: () => {
+          this.processUpload();
+        },
+        reject: () => {}
+      });
+    } else {
+      this.processUpload();
+    }
+  }
+
+  public processUpload() {
+    console.log('processUpload: start');
 
     this.convertToBase64(this.fileUpload)
       .pipe(takeWhile(() => this.alive))
@@ -248,7 +272,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           const uploadName =
             this.id +
             '-' +
-            this.revision.replace(/\s/g, '') +
+            this.revision.replace(/\s/g, '').toLowerCase() +
             '.' +
             this.fileUpload.name.split('.').pop();
           this.attachment = {
@@ -268,6 +292,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.showConfirmation('success', 'Files added');
         }
       );
+  }
+
+  private checkForExistingAttachment(obj, searchKey): boolean {
+    return Object.keys(obj).some(prop => {
+      return prop.includes(searchKey);
+    });
   }
 
   private uploadPDF(): Observable<any> {
@@ -444,6 +474,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
 
     if (entry['_attachments']) {
+      // Sort by revision => revpos
       const sortedByRevision = _.sortBy(
         entry['_attachments'],
         (object, key) => {
@@ -452,6 +483,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         }
       ).reverse();
 
+      // take the first
       const latest = _.first(sortedByRevision);
       const latestAttachment = {
         [latest['id']]: {

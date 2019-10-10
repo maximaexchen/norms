@@ -35,7 +35,10 @@
           <div class="row">
             <div class="col-sm-8">
               <div class="form-group row">
-                <label for="normNumber" class="col-sm-6 col-form-label"
+                <label
+                  for="normNumber"
+                  class="col-sm-6 col-form-label"
+                  i18n="@@string-number-dataset"
                   >Nummer</label
                 >
                 <div class="col-sm-6">
@@ -53,7 +56,11 @@
             </div>
             <div class="col-sm-4">
               <div class="form-group row">
-                <label class="col-sm-4 col-form-label">Revision</label>
+                <label
+                  class="col-sm-4 col-form-label"
+                  i18n="@@string-revision-dataset"
+                  >Revision</label
+                >
                 <div class="col-sm-8">
                   <input
                     type="text"
@@ -71,7 +78,11 @@
           <div class="row">
             <div class="col-sm-8">
               <div class="form-group row">
-                <label class="col-sm-6 col-form-label">Herausgeber</label>
+                <label
+                  class="col-sm-6 col-form-label"
+                  i18n="@@string-distributor-dataset"
+                  >Herausgeber</label
+                >
                 <div class="col-sm-6">
                   <select
                     class="form-control"
@@ -81,10 +92,10 @@
                     <option value="">Herausgeber wählen</option>
                     <option
                       *ngFor="let item of publishers"
-                      [value]="item._id"
-                      [selected]="item._id == publisherId"
+                      [value]="item['_id']"
+                      [selected]="item['_id'] == publisherId"
                     >
-                      {{ item.name }}
+                      {{ item['name'] }}
                     </option>
                   </select>
                 </div>
@@ -92,7 +103,10 @@
             </div>
             <div class="col-sm-4">
               <div class="form-group row">
-                <label class="col-sm-4 col-form-label" for="revisionDate"
+                <label
+                  class="col-sm-4 col-form-label"
+                  for="revisionDate"
+                  i18n="@@string-date-dataset"
                   >Datum</label
                 >
                 <div class="col-sm-8">
@@ -109,7 +123,11 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Sprache</label>
+            <label
+              class="col-sm-4 col-form-label"
+              i18n="@@string-language-dataset"
+              >Sprache</label
+            >
             <div class="col-sm-8">
               <p-selectButton
                 [options]="[
@@ -133,7 +151,11 @@
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Beschreibung de</label>
+            <label
+              class="col-sm-4 col-form-label"
+              i18n="@@string-descriptionDE-dataset"
+              >Beschreibung de</label
+            >
             <div class="col-sm-8">
               <textarea
                 class="form-control"
@@ -147,7 +169,11 @@
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Beschreibung en</label>
+            <label
+              class="col-sm-4 col-form-label"
+              i18n="@@string-descriptionEN-dataset"
+              >Beschreibung en</label
+            >
             <div class="col-sm-8">
               <textarea
                 class="form-control"
@@ -160,7 +186,11 @@
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Beschreibung fr</label>
+            <label
+              class="col-sm-4 col-form-label"
+              i18n="@@string-descriptionFR-dataset"
+              >Beschreibung fr</label
+            >
             <div class="col-sm-8">
               <textarea
                 class="form-control"
@@ -173,7 +203,9 @@
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label">Scope</label>
+            <label class="col-sm-4 col-form-label" i18n="@@string-scope-dataset"
+              >Scope</label
+            >
             <div class="col-sm-8">
               <input
                 type="text"
@@ -187,7 +219,9 @@
           </div>
 
           <div class="form-group row document-tags">
-            <label class="col-sm-4 col-form-label">Tags</label>
+            <label class="col-sm-4 col-form-label" i18n="@@string-tags-dataset"
+              >Tags</label
+            >
             <div class="col-sm-8">
               <angular2-multiselect
                 name="tags"
@@ -219,7 +253,11 @@
         <div class="col-sm-6">
           <div class="col-sm-6">
             <div class="form-group row">
-              <label class="col-sm-4 col-form-label">Status</label>
+              <label
+                class="col-sm-4 col-form-label"
+                i18n="@@string-status-dataset"
+                >Status</label
+              >
               <div class="col-sm-8">
                 <p-selectButton
                   [options]="[
@@ -242,21 +280,28 @@
           <hr />
 
           <div class="form-group row">
-            <label class="col-sm-12 col-form-label text-left"
+            <label
+              class="col-sm-12 col-form-label text-left"
+              i18n="@@string-normfileUpload-dataset"
               >Normdatei (PDF upload)</label
             >
             <div class="col-sm-12">
               <p-fileUpload
                 [disabled]="normForm.invalid"
-                mode="basic"
                 name="files"
-                (onSelect)="processUpload($event)"
+                (onSelect)="checkUpload($event)"
                 accept="application/pdf"
-                showUploadButton="true"
-                showCancelButtonZZ="false"
+                [showUploadButton]="false"
+                [showCancelButton]="true"
+                showButtons="true"
                 chooseLabel="Norm wählen (PDF)"
               ></p-fileUpload>
-              <p *ngIf="!normForm.valid">Bitte erst das Formular ausfüllen</p>
+              <p
+                *ngIf="!normForm.valid"
+                i18n="@@string-fillRecomendedFields-dataset"
+              >
+                Bitte erst die Pflichtfelder ausfüllen
+              </p>
             </div>
           </div>
 
@@ -321,7 +366,7 @@
       </div>
     </p-tabPanel>
 
-    <p-tabPanel header="Referenzen">
+    <p-tabPanel header="Referenzen" i18n="@@string-references-dataset">
       Referenzen
     </p-tabPanel>
 
@@ -329,7 +374,9 @@
       <div class="row">
         <div class="col-sm-6">
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Owner</label>
+            <label class="col-sm-2 col-form-label" i18n="@@string-owner-dataset"
+              >Owner</label
+            >
             <div class="col-sm-10">
               <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
                 <option value="" selected="selected">Owner wählen</option>
@@ -344,7 +391,9 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Benutzer</label>
+            <label class="col-sm-2 col-form-label" i18n="@@string-user-dataset"
+              >Benutzer</label
+            >
             <div class="col-sm-10">
               <angular2-multiselect
                 name="users"
@@ -368,7 +417,7 @@
       </div>
     </p-tabPanel>
 
-    <p-tabPanel header="Historie">
+    <p-tabPanel header="Historie" i18n="@@string-history-dataset">
       Historie
     </p-tabPanel>
   </p-tabView>
