@@ -105,7 +105,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setStartValues() {
-    this.refreshFields();
+    this.restFields();
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',
@@ -135,7 +135,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     };
   }
 
-  private refreshFields() {
+  private restFields() {
     this.selectedUsers = [];
     this.selectedTags = [];
   }
@@ -171,10 +171,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private saveDocument(): void {
-    console.log('onCreate: DocumentEditComponent');
+    console.log('saveDocument: DocumentEditComponent');
+    this.isLoading = true;
+    this.processFormData();
 
-    this.setDocumentData();
-
+    // First save to get a document id for the attachment path and name
     this.couchDBService
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
@@ -195,14 +196,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               }
             );
         }
-        this.sendStateUpdate();
         this.isLoading = false;
+        this.sendStateUpdate();
       });
   }
 
   private updateDocument(): void {
     console.log('onUpdateDocument: DocumentEditComponent');
-    this.setDocumentData();
+    this.processFormData();
     if (this.fileUpload) {
       this.uploadPDF()
         .pipe(takeWhile(() => this.alive))
@@ -214,12 +215,30 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           },
           () => {
             this.writeUpdate();
-            this.showConfirmation('sucess', 'Upload erfolgreich');
           }
         );
     } else {
       this.writeUpdate();
     }
+  }
+
+  private writeUpdate() {
+    this.isLoading = true;
+    this.couchDBService
+      .updateEntry(this.writeItem, this.normForm.value._id)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        results => {
+          // Inform about database change.
+        },
+        error => {},
+        () => {
+          this.sendStateUpdate();
+          this.isLoading = false;
+          this.showConfirmation('sucess', 'Updated');
+          this.router.navigate(['../document']);
+        }
+      );
   }
 
   public processUpload(event) {
@@ -239,29 +258,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               content_type: 'application/pdf'
             }
           };
-
-          this.isLoading = false;
         },
         error => {
           console.log(error.message);
         },
         () => {
           console.log('COMPETE');
+          this.isLoading = false;
           this.showConfirmation('success', 'Files added');
         }
       );
-  }
-
-  private writeUpdate() {
-    this.couchDBService
-      .updateEntry(this.writeItem, this.normForm.value._id)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(results => {
-        // Inform about database change.
-        this.sendStateUpdate();
-        this.isLoading = false;
-        this.router.navigate(['../document']);
-      });
   }
 
   public getDownload(id: string, attachmentName: any) {
@@ -392,7 +398,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
-    this.refreshFields();
+    this.restFields();
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
@@ -427,64 +433,33 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.setSelectedTags(ent);
     }
 
-    console.log();
+    console.log(entry['_attachments']);
 
     if (entry['_attachments']) {
-      /* const JSArray = entry['_attachments'];
-      console.log(Object.keys(JSArray)[Object.keys(JSArray).length - 1]); // writes 'c'
-      console.log(
-        JSArray[Object.keys(JSArray)[Object.keys(JSArray).length - 1]]
-      );
-      console.log(_.sortBy(entry['_attachments'], 'revpos').reverse()); */
-      /*  const even = _.find(entry['_attachments'], num => {
-        if (temp < num['revpos']) {
-          temp = num['revpos'];
-          this.attachment = num;
+      const sortedByRevision = _.sortBy(
+        entry['_attachments'],
+        (object, key) => {
+          object['id'] = key;
+          return object['revpos'];
         }
-      }); */
+      ).reverse();
 
-      const sorted = _.sortBy(entry['_attachments'], (object, key) => {
-        object['id'] = key;
-        return object['revpos'];
-      }).reverse();
-
-      const sortedFirst = _.first(sorted);
-
-      const newestAttachment = {
-        [sortedFirst.id]: {
-          content_type: sortedFirst.content_type,
-          digest: sortedFirst.digest,
-          length: sortedFirst,
-          revpos: sortedFirst.revpos,
-          stub: sortedFirst.stub
+      const latest = _.first(sortedByRevision);
+      const latestAttachment = {
+        [latest['id']]: {
+          content_type: latest['content_type'],
+          digest: latest['digest'],
+          length: latest['length'],
+          revpos: latest['revpos'],
+          stub: latest['stub']
         }
       };
-
-      console.log(newestAttachment);
-
-      /*  this.attachment = {
-        [this.fileUpload.name]: {
-          data: result,
-          content_type: 'application/pdf'
-        }
-      }; */
-      /* let a = {"_attachments": { entry['_attachments'] }};
-      console.log(entry['_attachments']);
-
-      Object.entries(a).forEach((o, index) => {
-        Object.entries(a[o[index]]).forEach((k, v) => {
-          console.log(k[0] + '=' + a[o[index]][k[0]].revpos);
-        });
-      }); */
-
       this.attachments = entry['_attachments'];
-      this.attachmentName = Object.keys(entry['_attachments']).toString();
+      this.attachmentName = latest['id'];
     }
   }
 
-  private setDocumentData() {
-    console.log('createDocument');
-
+  private processFormData() {
     this.writeItem = {};
     this.writeItem['type'] = 'norm';
     this.writeItem['normNumber'] = this.normForm.value.normNumber || '';
@@ -509,8 +484,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
 
-    // reformat key and values for the User Object from
-    // values from selectBox
     const selectedUserObjects = [
       ...new Set(
         this.selectedUsers.map(user => {
