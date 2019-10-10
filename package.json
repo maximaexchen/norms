@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --source-map --proxy-config proxy.conf.json --base-href /",
-    "build": "ng build",
+    "build": "ng build --prod --aot --build-optimizer --vendor-chunk --base-href /",
     "build-acp": "ng build --prod --aot --build-optimizer --vendor-chunk --base-href /airweb/norms/",
     "test": "ng test",
     "lint": "ng lint",

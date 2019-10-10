@@ -30,6 +30,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   alive = true;
   isLoading = false;
   uploadUrl = this.env.uploadUrl;
+  uploadDir = this.env.uploadDir;
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
 
@@ -46,7 +47,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   selectedTags: Tag[] = [];
 
   id: string;
-  createId: string;
   rev: string;
   type: string;
   publisher: Publisher;
@@ -161,15 +161,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       });
   }
 
-  private uploadPDF(): Observable<any> {
-    return this.serverService.uploadFile(
-      this.uploadUrl + '/',
-      this.fileUpload,
-      this.createId,
-      this.env.uploadDir
-    );
-  }
-
   private saveDocument(): void {
     console.log('saveDocument: DocumentEditComponent');
     this.isLoading = true;
@@ -180,7 +171,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
       .subscribe(result => {
-        this.createId = result['id'];
+        console.log('saveDocument:' + result);
+        this.id = result['id'];
 
         if (this.fileUpload) {
           this.uploadPDF()
@@ -228,11 +220,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .updateEntry(this.writeItem, this.normForm.value._id)
       .pipe(takeWhile(() => this.alive))
       .subscribe(
-        results => {
-          // Inform about database change.
-        },
+        results => {},
         error => {},
         () => {
+          // Inform about database change.
           this.sendStateUpdate();
           this.isLoading = false;
           this.showConfirmation('sucess', 'Updated');
@@ -242,6 +233,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public processUpload(event) {
+    console.log('processUpload: start');
     this.isLoading = true;
 
     for (const file of event.files) {
@@ -252,22 +244,41 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
+          console.log('processUpload: result');
+          const uploadName =
+            this.id +
+            '-' +
+            this.revision.replace(/\s/g, '') +
+            '.' +
+            this.fileUpload.name.split('.').pop();
           this.attachment = {
-            [this.fileUpload.name]: {
+            [uploadName]: {
               data: result,
               content_type: 'application/pdf'
             }
           };
         },
         error => {
+          console.log('processUpload: error');
           console.log(error.message);
         },
         () => {
-          console.log('COMPETE');
+          console.log('processUpload: complete');
           this.isLoading = false;
           this.showConfirmation('success', 'Files added');
         }
       );
+  }
+
+  private uploadPDF(): Observable<any> {
+    console.log('uploadPDF:' + this.id);
+    return this.serverService.uploadFile(
+      this.uploadUrl + '/',
+      this.fileUpload,
+      this.id,
+      this.env.uploadDir,
+      this.revision
+    );
   }
 
   public getDownload(id: string, attachmentName: any) {
@@ -368,10 +379,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public onSubmit(): void {
     this.isLoading = true;
     if (this.normForm.value.formMode) {
-      console.log('Update a norm');
       this.updateDocument();
     } else {
-      console.log('Create a norm');
       this.saveDocument();
     }
   }
@@ -384,12 +393,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .deleteEntry(this.id, this.rev)
           .pipe(takeWhile(() => this.alive))
           .subscribe(
-            res => {
-              this.sendStateUpdate();
-              this.router.navigate(['../document']);
-            },
+            res => {},
             err => {
               this.showConfirmation('error', err.message);
+            },
+            () => {
+              this.sendStateUpdate();
+              this.router.navigate(['../document']);
             }
           );
       },
@@ -432,8 +442,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       const ent = _.sortBy(entry['tags'], 'tagType');
       this.setSelectedTags(ent);
     }
-
-    console.log(entry['_attachments']);
 
     if (entry['_attachments']) {
       const sortedByRevision = _.sortBy(
@@ -523,18 +531,19 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
     this.writeItem['owner'] = selOwner || '';
 
-    console.log('ADD revisionDocument');
-    console.log(this.attachment);
     if (this.attachment) {
-      console.log('ADD revisionDocument');
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
       this.revisionDocument['name'] = Object.keys(this.attachment)[0];
       this.revisionDocument['revisionID'] = this.revision;
-      /*this.revisionDocument['path'] = this.uploadPath;*/
+      this.revisionDocument['path'] = this.uploadDir.replace(
+        this.uploadDir.match(/[^\/]*\/[^\/]*/)[0],
+        ''
+      );
       this.revisionDocuments.push(this.revisionDocument);
       this.writeItem['revisions'] = this.revisionDocuments || [];
 
+      // Add new attachment by merge
       const tempAttachmentObject = this.attachments;
       this.attachments = { ...tempAttachmentObject, ...this.attachment };
       this.writeItem['_attachments'] = this.attachments || [];
@@ -566,11 +575,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private showConfirmation(type: string, result: string) {
-    this.notificationsService.addSingle(
-      type,
-      result,
-      type === 'success' ? 'ok' : 'error'
-    );
+    this.notificationsService.addSingle(type, result, type);
   }
 
   private sendStateUpdate(): void {
@@ -588,6 +593,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           ''
         );
         sub.next(encodedPDF);
+        sub.complete();
       };
       // if failed
       r.onerror = (ev: ProgressEvent): void => {

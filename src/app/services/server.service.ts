@@ -3,7 +3,8 @@ import {
   HttpClient,
   HttpParams,
   HttpRequest,
-  HttpEvent
+  HttpEvent,
+  HttpHeaders
 } from '@angular/common/http';
 import { Subscription, Observable } from 'rxjs';
 
@@ -19,26 +20,37 @@ export class ServerService {
   public uploadFile(
     url: string,
     file: File,
-    createID: string,
-    uploadDir: string
+    createid: string,
+    uploadDir: string,
+    revision: string
   ): Observable<HttpEvent<any>> {
     const formData = new FormData();
+
+    revision = revision.replace(/\s/g, '');
 
     console.log('-------------------------------------');
     console.log(file);
     console.log(file.name);
-    console.log(createID);
+    console.log(createid);
     console.log(uploadDir);
+    console.log(revision);
     console.log('-------------------------------------');
     formData.append('uploadFile', file, file.name);
-    formData.append('createID', createID);
+    formData.append('createID', createid);
     formData.append('uploadDir', uploadDir);
+    formData.append('revision', revision);
 
     const params = new HttpParams();
 
+    const headers = new HttpHeaders({
+      revision,
+      createid
+    });
+
     const options = {
       params,
-      reportProgress: true
+      reportProgress: true,
+      headers
     };
 
     return this.http.request(new HttpRequest('POST', url, formData, options));

@@ -4,6 +4,11 @@
   }
 }
 
+a.dynamic-link {
+  cursor: pointer;
+  color: theme-color('primary') !important;
+}
+
 .info-panel {
   padding: 20px;
   text-align: center;

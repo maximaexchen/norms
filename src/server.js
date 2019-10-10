@@ -19,7 +19,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var allowCrossDomain = function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization, revision, createid'
+  );
 
   // intercept OPTIONS method
   if ('OPTIONS' == req.method) {
@@ -72,8 +75,11 @@ var storage = multer.diskStorage({
   },
   filename: (req, file, callback) => {
     fileName =
-      file.originalname + '-' + Date.now() + path.extname(file.originalname);
-    fileName = fileName.split(' ').join('_');
+      req.headers.createid +
+      '-' +
+      req.headers.revision +
+      '.' +
+      file.originalname.split('.').pop();
     callback(null, fileName);
   }
 });
@@ -84,19 +90,9 @@ app.post('/api/upload', function(req, res) {
     if (err) {
       return res.end('Error uploading file.');
     } else {
-      console.log('req.body');
-      console.log(req.body);
-      console.log(req.files[0].filename);
       let tempPath = './' + req.files[0].path;
-
       let copyPath =
         req.body.uploadDir + req.body.createID + '/' + req.files[0].filename;
-      /* let copyPath =
-        './dist/norms/assets/uploads/' +
-        req.body.createID +
-        '/' +
-        req.files[0].filename; */
-
       // Move file in synamic generated Directory
       fs.move(tempPath, copyPath, function(err) {
         if (err) return console.error(err);

@@ -247,6 +247,7 @@
             >
             <div class="col-sm-12">
               <p-fileUpload
+                [disabled]="normForm.invalid"
                 mode="basic"
                 name="files"
                 (onSelect)="processUpload($event)"
@@ -255,6 +256,7 @@
                 showCancelButtonZZ="false"
                 chooseLabel="Norm wählen (PDF)"
               ></p-fileUpload>
+              <p *ngIf="!normForm.valid">Bitte erst das Formular ausfüllen</p>
             </div>
           </div>
 
@@ -275,27 +277,6 @@
             (click)="getDownload(id, attachmentName)"
           ></p-button>
 
-          <!-- <div class="form-group row">
-            <label class="form-label" style="display: block; width: 100%;"
-              >Normdatei (pdf)</label
-            >
-            //  File input for upload without using the plugin.
-            <input
-              type="file"
-              name="fileUpload"
-              [(ngModel)]="fileUpload"
-              observeFiles
-            />
-            <hr />
-            <a
-              *ngIf="normFilePath"
-              href="/{{ normFilePath }}"
-              target="_blank"
-              download
-              >{{ normFilePath.split('/').pop() }}</a
-            >
-          </div> -->
-
           <hr />
 
           <p-fieldset
@@ -306,14 +287,24 @@
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a
-                *ngIf="revDoc.path"
-                href="/{{ revDoc.path.replace('./src', '') }}"
+                class="dynamic-link"
+                (click)="getDownload(id, revDoc['name'])"
+                >{{
+                  revDoc['name'].length > 15
+                    ? (revDoc['name'] | slice: 0:15) + '...'
+                    : revDoc['name']
+                }}</a
+              ><br />
+
+              Link to the server file
+              <a
+                *ngIf="revDoc['path']"
+                href="{{ revDoc['path'] }}{{ id }}/{{ revDoc['name'] }}"
                 target="_blank"
                 title="{{ revDoc['name'] }}"
                 class="text-left"
                 download
-                >{{ revDoc | json
-                }}{{
+                >{{
                   revDoc['name'].length > 15
                     ? (revDoc['name'] | slice: 0:15) + '...'
                     : revDoc['name']
