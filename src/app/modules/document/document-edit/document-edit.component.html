@@ -340,8 +340,7 @@
                 #fileUploadInput
                 [disabled]="normForm.invalid"
                 name="files"
-                (onSelect)="checkUpload($event, uploadField)"
-                (onUpload)="uploadReady($event, uploadField)"
+                (onSelect)="checkUpload($event, fileUploadInput)"
                 accept="application/pdf"
                 [showUploadButton]="false"
                 [showCancelButton]="true"

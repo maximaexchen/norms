@@ -253,10 +253,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       );
   }
 
-  public uploadReady(event, uploadField) {
-    console.log('uploadReady: ready');
-  }
-
   public checkUpload(event, uploadField) {
     console.log('checkUpload: start');
 
