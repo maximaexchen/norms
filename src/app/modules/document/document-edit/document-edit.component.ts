@@ -42,7 +42,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   revisionDocuments: RevisionDocument[] = [];
   attachments: any = {};
   attachment: any;
-  attachmentName: string;
+  newAttachmentName: string;
+  latestAttachmentName: string;
   tags: Tag[] = [];
   selectedTags: Tag[] = [];
 
@@ -174,6 +175,19 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         console.log('saveDocument:' + result);
         this.id = result['id'];
 
+        this.newAttachmentName =
+          this.id +
+          '-' +
+          this.revision.replace(/\s/g, '').toLowerCase() +
+          '.' +
+          this.fileUpload.name.split('.').pop();
+        this.attachment = {
+          [this.newAttachmentName]: {
+            data: result,
+            content_type: 'application/pdf'
+          }
+        };
+
         if (this.fileUpload) {
           this.uploadPDF()
             .pipe(takeWhile(() => this.alive))
@@ -239,9 +253,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.fileUpload = file;
     }
 
-    console.log(this.attachments);
-    console.log(this.revision.replace(/\s/g, '').toLowerCase());
-
     const isIn = this.checkForExistingAttachment(
       this.attachments,
       this.revision.replace(/\s/g, '').toLowerCase()
@@ -269,18 +280,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           console.log('processUpload: result');
-          const uploadName =
+          this.newAttachmentName =
             this.id +
             '-' +
             this.revision.replace(/\s/g, '').toLowerCase() +
             '.' +
             this.fileUpload.name.split('.').pop();
           this.attachment = {
-            [uploadName]: {
+            [this.newAttachmentName]: {
               data: result,
               content_type: 'application/pdf'
             }
           };
+
+          console.log('processUpload: this.newAttachmentName');
+          console.log(this.newAttachmentName);
+          console.log('++++++++++++++++++++++++++++++++++++++');
         },
         error => {
           console.log('processUpload: error');
@@ -311,9 +326,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  public getDownload(id: string, attachmentName: any) {
+  public getDownload(id: string, name: any) {
     this.documentService
-      .getDownload(id, attachmentName)
+      .getDownload(id, name)
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         res => {
@@ -334,7 +349,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
           const link = document.createElement('a');
           link.href = data;
-          link.download = attachmentName;
+          link.download = name;
           // this is necessary as link.click() does not work on the latest firefox
           link.dispatchEvent(
             new MouseEvent('click', {
@@ -495,7 +510,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         }
       };
       this.attachments = entry['_attachments'];
-      this.attachmentName = latest['id'];
+      this.latestAttachmentName = latest['id'];
     }
   }
 
@@ -563,10 +578,23 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
     this.writeItem['owner'] = selOwner || '';
 
+    console.log('processFormData: this.newAttachmentName');
+    console.log(this.attachment);
+    console.log(this.newAttachmentName);
+    console.log('++++++++++++++++++++++++++++++++++++++');
+
+    // If there is a new PDF upload
     if (this.attachment) {
+      this.newAttachmentName =
+        this.id +
+        '-' +
+        this.revision.replace(/\s/g, '').toLowerCase() +
+        '.' +
+        this.fileUpload.name.split('.').pop();
+
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
-      this.revisionDocument['name'] = Object.keys(this.attachment)[0];
+      this.revisionDocument['name'] = this.newAttachmentName;
       this.revisionDocument['revisionID'] = this.revision;
       this.revisionDocument['path'] = this.uploadDir.replace(
         this.uploadDir.match(/[^\/]*\/[^\/]*/)[0],

@@ -309,17 +309,17 @@
 
           <p-button
             type="button"
-            *ngIf="attachmentName"
+            *ngIf="latestAttachmentName"
             icon="fa fa-download "
             iconPos="left"
-            title="{{ attachmentName }}"
+            title="{{ latestAttachmentName }}"
             label="{{
-              attachmentName.length > 20
-                ? (attachmentName | slice: 0:20) + '...'
-                : attachmentName
+              latestAttachmentName.length > 20
+                ? (latestAttachmentName | slice: 0:20) + '...'
+                : latestAttachmentName
             }}"
             class="attachmentDownload"
-            (click)="getDownload(id, attachmentName)"
+            (click)="getDownload(id, latestAttachmentName)"
           ></p-button>
 
           <hr />
