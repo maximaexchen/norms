@@ -44,6 +44,12 @@ a.dynamic-link {
   }
 }
 
+angular2-multiselect.ng-invalid {
+  .cuppa-dropdown {
+    border-left: 4px solid $red;
+  }
+}
+
 .tag-items {
   .badge {
     padding: 10px 20px;
@@ -65,6 +71,9 @@ a.dynamic-link {
 }
 
 .document-tags {
+  p {
+    margin-top: 5px;
+  }
   div label {
     padding: 5px 25px 5px 15px;
     margin-bottom: 2px;

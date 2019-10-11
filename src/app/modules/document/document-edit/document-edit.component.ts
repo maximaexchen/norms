@@ -5,6 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable, Subscriber } from 'rxjs';
 
+import uuidv4 from '@bundled-es-modules/uuid/v4.js';
+
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { NormDocument } from '../../../models/document.model';
 import { RevisionDocument } from './../revision-document.model';
@@ -18,11 +20,6 @@ import * as _ from 'underscore';
 import { EnvService } from 'src/app//services/env.service';
 import { takeWhile } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
-
-import uuidv1 from '@bundled-es-modules/uuid/v1.js';
-import uuidv3 from '@bundled-es-modules/uuid/v3.js';
-import uuidv4 from '@bundled-es-modules/uuid/v4.js';
-import uuidv5 from '@bundled-es-modules/uuid/v5.js';
 
 @Component({
   selector: 'app-document-edit',
@@ -49,8 +46,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   attachment: any;
   newAttachmentName: string;
   latestAttachmentName: string;
-  tags: Tag[] = [];
-  selectedTags: Tag[] = [];
+  tagsLevel1: Tag[] = [];
+  tagsLevel2: Tag[] = [];
+  tagsLevel3: Tag[] = [];
+  selectedTags1: Tag[] = [];
+  selectedTags2: Tag[] = [];
+  selectedTags3: Tag[] = [];
 
   id: string;
   rev: string;
@@ -136,14 +137,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tagClass',
-      groupBy: 'tagType'
+      classes: 'tagClass'
     };
   }
 
   private restFields() {
     this.selectedUsers = [];
-    this.selectedTags = [];
+    this.selectedTags1 = [];
+    this.selectedTags2 = [];
+    this.selectedTags3 = [];
   }
 
   private newDocument() {
@@ -408,7 +410,17 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           tagObject['name'] = tag.name;
           tagObject['tagType'] = tag.tagType;
           tagObject['active'] = tag.active;
-          this.tags.push(tagObject);
+          switch (tag.tagType) {
+            case 'level1':
+              this.tagsLevel1.push(tagObject);
+              break;
+            case 'level2':
+              this.tagsLevel2.push(tagObject);
+              break;
+            case 'level3':
+              this.tagsLevel3.push(tagObject);
+              break;
+          }
         });
       });
   }
@@ -477,7 +489,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     if (entry['tags']) {
       const ent = _.sortBy(entry['tags'], 'tagType');
-      this.setSelectedTags(ent);
+      // console.log(ent);
+      ent.forEach(element => {
+        switch (element['tagType']) {
+          case 'level1':
+            this.selectedTags1.push(element);
+            break;
+          case 'level2':
+            this.selectedTags2.push(element);
+            break;
+          case 'level3':
+            this.selectedTags3.push(element);
+            break;
+        }
+      });
     }
 
     if (entry['_attachments']) {
@@ -546,19 +571,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     ];
     this.writeItem['users'] = selectedUserObjects || [];
 
-    const selectedTagObjects = [
-      ...new Set(
-        this.selectedTags.map(tag => {
-          const newTag = {};
-          newTag['id'] = tag['id'];
-          newTag['name'] = tag['name'];
-          newTag['tagType'] = tag['tagType'];
-          newTag['active'] = tag['active'];
-          return newTag;
-        })
-      )
+    const selectedTags = [
+      ...this.selectedTags1,
+      ...this.selectedTags2,
+      ...this.selectedTags3
     ];
-    this.writeItem['tags'] = selectedTagObjects || [];
+
+    this.writeItem['tags'] = selectedTags || [];
 
     const selPublisher = this.publishers.find(
       pub => pub['_id'] === this.normForm.value.publisherId
@@ -569,11 +588,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       own => own['_id'] === this.normForm.value.ownerId
     );
     this.writeItem['owner'] = selOwner || '';
-
-    console.log('processFormData: this.newAttachmentName');
-    console.log(this.attachment);
-    console.log(this.newAttachmentName);
-    console.log('++++++++++++++++++++++++++++++++++++++');
 
     // If there is a new PDF upload
     if (this.attachment) {
@@ -607,16 +621,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedUsers = userMap;
   }
 
-  private setSelectedTags(tags: any[]) {
-    const tagMap: Tag[] = tags.map(tag => {
-      const selectedTagObject = {};
-      selectedTagObject['id'] = tag.id;
-      selectedTagObject['name'] = tag.name;
-      selectedTagObject['tagType'] = tag.tagType;
-      selectedTagObject['active'] = tag.active;
+  private setSelectedTags(tags: Tag[]): Tag {
+    return tags.map(tag => {
+      const selectedTagObject: Tag = {};
+      selectedTagObject['id'] = tag['id'];
+      selectedTagObject['name'] = tag['name'];
+      selectedTagObject['tagType'] = tag['tagType'];
+      selectedTagObject['active'] = tag['active'];
       return selectedTagObject;
     });
-    this.selectedTags = tagMap;
+    // this.selectedTags = tagMap;
   }
 
   private showConfirmation(type: string, result: string) {
@@ -648,12 +662,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  public onItemSelect(item: any) {
-    console.log(item['itemName']);
-    console.log(this.selectedUsers);
-    console.log('uuuuuuuuuuuuuuuuuuuuuuuu');
-    console.log(this.selectedTags);
-  }
+  public onItemSelect(item: any) {}
   public onItemDeSelect(item: any) {
     console.log(item);
     console.log(this.selectedUsers);

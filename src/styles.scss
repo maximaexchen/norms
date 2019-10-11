@@ -3,15 +3,11 @@
 @import '~bootstrap/scss/bootstrap';*/
 
 @import 'assets/styles/bootstrap/bootstrap_config.scss';
-@import '~primeicons/primeicons.css';
 @import 'assets/styles/primeng/primeng_config.scss';
-@import '~primeng/resources/themes/nova-light/theme.css';
-@import '~primeng/resources/primeng.min.css';
+@import 'assets/styles/acp/app.scss';
 @import '~font-awesome/css/font-awesome.min.css';
-
 @import 'assets/styles/styles_base.scss';
 @import 'assets/styles/styles_app.scss';
-@import 'assets/styles/acp/app.scss';
 
 .checkbox {
   input {

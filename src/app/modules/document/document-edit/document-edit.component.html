@@ -223,10 +223,60 @@
               >Tags</label
             >
             <div class="col-sm-8">
+              <p i18n="@@string-tag-level1-dataset">Level 1</p>
               <angular2-multiselect
-                name="tags"
-                [data]="tags"
-                [(ngModel)]="selectedTags"
+                required
+                name="tagsLevel1"
+                [data]="tagsLevel1"
+                [(ngModel)]="selectedTags1"
+                [settings]="tagDropdownSettings"
+                (onSelect)="onItemSelect($event)"
+                (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAll($event)"
+              >
+                <c-badge>
+                  <ng-template let-item="item">
+                    <label class="badge {{ item.tagType }}">{{
+                      item.name
+                    }}</label>
+                  </ng-template>
+                </c-badge>
+                <c-item>
+                  <ng-template let-item="item">
+                    <label class="{{ item.tagType }}"> {{ item.name }}</label>
+                  </ng-template>
+                </c-item>
+              </angular2-multiselect>
+              <p i18n="@@string-tag-level2-dataset">Level 2</p>
+              <angular2-multiselect
+                name="tagsLevel2"
+                [data]="tagsLevel2"
+                [(ngModel)]="selectedTags2"
+                [settings]="tagDropdownSettings"
+                (onSelect)="onItemSelect($event)"
+                (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAll($event)"
+              >
+                <c-badge>
+                  <ng-template let-item="item">
+                    <label class="badge {{ item.tagType }}">{{
+                      item.name
+                    }}</label>
+                  </ng-template>
+                </c-badge>
+                <c-item>
+                  <ng-template let-item="item">
+                    <label class="{{ item.tagType }}"> {{ item.name }}</label>
+                  </ng-template>
+                </c-item>
+              </angular2-multiselect>
+              <p i18n="@@string-tag-level3-dataset">Level 3</p>
+              <angular2-multiselect
+                name="tagsLevel3"
+                [data]="tagsLevel3"
+                [(ngModel)]="selectedTags3"
                 [settings]="tagDropdownSettings"
                 (onSelect)="onItemSelect($event)"
                 (onDeSelect)="onItemDeSelect($event)"
