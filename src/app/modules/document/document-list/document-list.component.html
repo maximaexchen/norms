@@ -69,10 +69,14 @@
       <td>{{ document.owner.lastName }}, {{ document.owner.firstName }}</td>
     </tr>
   </ng-template>
+  <ng-template pTemplate="summary" let-document>
+    <div
+      style="height:100px; font-size:90%; padding:10px"
+      i18n="@@document-status-data-count"
+    >
+      Es {documentCount, plural, =0 {wurde keine Dokument gefunden} =1 {wurde 1
+      Dokument gefunden} other { wurden {{ documentCount }} Dokumente gefunden
+      }}
+    </div>
+  </ng-template>
 </p-table>
-<div class="info-panel position-bottom">
-  <p i18n="@@document-status-data-count">
-    Es {documentCount, plural, =0 {wurde keine Dokument gefunden} =1 {wurde 1
-    Dokument gefunden} other { wurden {{ documentCount }} Dokumente gefunden }}
-  </p>
-</div>

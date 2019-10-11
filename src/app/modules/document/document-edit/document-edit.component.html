@@ -337,9 +337,11 @@
             >
             <div class="col-sm-12">
               <p-fileUpload
+                #fileUploadInput
                 [disabled]="normForm.invalid"
                 name="files"
-                (onSelect)="checkUpload($event)"
+                (onSelect)="checkUpload($event, uploadField)"
+                (onUpload)="uploadReady($event, uploadField)"
                 accept="application/pdf"
                 [showUploadButton]="false"
                 [showCancelButton]="true"
@@ -432,10 +434,10 @@
                 <option value="" selected="selected">Owner wählen</option>
                 <option
                   *ngFor="let owner of owners"
-                  [value]="owner._id"
-                  [selected]="owner._id == ownerId"
+                  [value]="owner['_id']"
+                  [selected]="owner['_id'] == ownerId"
                 >
-                  {{ owner.lastName }}, {{ owner.firstName }}
+                  {{ owner['lastName'] }}, {{ owner['firstName'] }}
                 </option>
               </select>
             </div>

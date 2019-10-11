@@ -1,5 +1,11 @@
 import { Tag } from '@app/models/tag.model';
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  ElementRef
+} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -20,6 +26,7 @@ import * as _ from 'underscore';
 import { EnvService } from 'src/app//services/env.service';
 import { takeWhile } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
+import { FileUploadModule, FileUpload } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-document-edit',
@@ -28,6 +35,7 @@ import { ConfirmationService } from 'primeng/api';
 })
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
+  @ViewChild('fileUploadInput', { static: true }) fileUploadInput: FileUpload;
 
   alive = true;
   isLoading = false;
@@ -95,20 +103,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     // Prepare the user multi select box
     this.setStartValues();
-
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      // fetch data for select-boxes
-      this.getPublishers();
-      this.getUsers();
-      this.getTags();
-
-      // check if we are updating
-      if (results['id']) {
-        this.editDocument(results);
-      } else {
-        this.newDocument();
-      }
-    });
   }
 
   private setStartValues() {
@@ -139,6 +133,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       noDataLabel: 'Keinen Tag gefunden',
       classes: 'tagClass'
     };
+
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
+      // fetch data for select-boxes
+      this.getPublishers();
+      this.getUsers();
+      this.getTags();
+
+      // check if we are updating
+      if (results['id']) {
+        this.editDocument(results);
+      } else {
+        this.newDocument();
+      }
+    });
   }
 
   private restFields() {
@@ -220,6 +228,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.writeUpdate();
     }
+    this.fileUploadInput.clear();
   }
 
   private writeUpdate() {
@@ -229,18 +238,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         results => {},
-        error => {},
+        error => {
+          console.log(error.message);
+          this.showConfirmation('error', error.message);
+        },
         () => {
           // Inform about database change.
           this.sendStateUpdate();
           this.isLoading = false;
           this.showConfirmation('sucess', 'Updated');
-          this.router.navigate(['../document']);
+          this.fileUploadInput.clear();
+          this.setStartValues();
         }
       );
   }
 
-  public checkUpload(event) {
+  public uploadReady(event, uploadField) {
+    console.log('uploadReady: ready');
+  }
+
+  public checkUpload(event, uploadField) {
     console.log('checkUpload: start');
 
     for (const file of event.files) {
@@ -257,16 +274,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         message:
           'Es gibt bereits eine Datei zur Revision: ' + this.revision + '?',
         accept: () => {
-          this.processUpload();
+          this.processUpload(uploadField);
         },
         reject: () => {}
       });
     } else {
-      this.processUpload();
+      this.processUpload(uploadField);
     }
   }
 
-  public processUpload() {
+  public processUpload(uploadField) {
     console.log('processUpload: start');
 
     this.convertToBase64(this.fileUpload)
@@ -286,10 +303,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               content_type: 'application/pdf'
             }
           };
-
-          console.log('processUpload: this.newAttachmentName');
-          console.log(this.newAttachmentName);
-          console.log('++++++++++++++++++++++++++++++++++++++');
         },
         error => {
           console.log('processUpload: error');
@@ -457,6 +470,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
+    console.log('getDocumentData');
     this.restFields();
     this.id = entry['_id'];
     this.rev = entry['_rev'];
@@ -532,6 +546,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processFormData() {
+    console.log('processFormData');
     this.writeItem = {};
     this.writeItem['type'] = 'norm';
     this.writeItem['normNumber'] = this.normForm.value.normNumber || '';
@@ -599,14 +614,21 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.uploadDir.match(/[^\/]*\/[^\/]*/)[0],
         ''
       );
+      console.log(this.revisionDocuments);
       this.revisionDocuments.push(this.revisionDocument);
-      this.writeItem['revisions'] = this.revisionDocuments || [];
+      console.log(this.revisionDocuments);
 
       // Add new attachment by merge
       const tempAttachmentObject = this.attachments;
+      console.log(tempAttachmentObject);
       this.attachments = { ...tempAttachmentObject, ...this.attachment };
-      this.writeItem['_attachments'] = this.attachments || [];
+      console.log(this.attachments);
+
+      console.log(':::::::::::::::::::::');
     }
+
+    this.writeItem['_attachments'] = this.attachments || [];
+    this.writeItem['revisions'] = this.revisionDocuments || [];
     return this.writeItem;
   }
 

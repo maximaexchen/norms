@@ -1,29 +1,34 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-sm-12">
-      <div class="info-panel position-top position-bottom">
-        <form class="form-inline" (ngSubmit)="onSubmit()" #searchForm="ngForm">
-          <h2
-            style="color: black; margin: 0 30px 0 10px; font-weight: 700; font-size: 1.1rem;"
+    <div class="col-sm-12 well well-sm">
+      <div class="card">
+        <div class="card-body">
+          <form
+            class="form-inline"
+            (ngSubmit)="onSubmit()"
+            #searchForm="ngForm"
           >
-            <span class="fa fa-newspaper-o" style="margin: 0 20px 0 0px; ">
-            </span
-            >Normen
-          </h2>
-          <label class="form-label">Herausgeber</label>
-          <select
-            class="form-control"
-            [(ngModel)]="publisherId"
-            name="publisherId"
-          >
-            <option [ngValue]="null" selected="selected"
-              >Herausgeber wählen</option
+            <h2
+              style="color: black; margin: 0 30px 0 10px; font-weight: 700; font-size: 1.1rem;"
             >
-            <option *ngFor="let item of publishers" [value]="item._id">
-              {{ item.name }}
-            </option>
-          </select>
-          <!-- <label class="form-label">User</label>
+              <span class="fa fa-newspaper-o" style="margin: 0 20px 0 0px; ">
+              </span
+              >Normen
+            </h2>
+            <label class="form-label">Herausgeber</label>
+            <select
+              class="form-control"
+              [(ngModel)]="publisherId"
+              name="publisherId"
+            >
+              <option [ngValue]="null" selected="selected"
+                >Herausgeber wählen</option
+              >
+              <option *ngFor="let item of publishers" [value]="item._id">
+                {{ item.name }}
+              </option>
+            </select>
+            <!-- <label class="form-label">User</label>
           <select class="form-control" [(ngModel)]="userId" name="userId">
             <option [value]="undefined" selected="selected"
               >Benutzer wählen </option
@@ -32,7 +37,7 @@
             </option>
           </select> -->
 
-          <!--  <label class="form-label">Gruppe</label>
+            <!--  <label class="form-label">Gruppe</label>
           <select class="form-control" [(ngModel)]="groupId" name="groupId">
             <option [value]="undefined" selected="selected"
               >Gruppe wählen</option
@@ -42,22 +47,23 @@
             </option>
           </select> -->
 
-          <label class="form-label">Owner</label>
-          <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
-            <option [ngValue]="null" selected="selected">Owner wählen</option>
-            <option
-              *ngFor="let owner of owners"
-              [value]="owner._id"
-              [selected]="owner._id == owner"
-            >
-              {{ owner.lastName }}, {{ owner.firstName }}
-            </option>
-          </select>
+            <label class="form-label">Owner</label>
+            <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
+              <option [ngValue]="null" selected="selected">Owner wählen</option>
+              <option
+                *ngFor="let owner of owners"
+                [value]="owner._id"
+                [selected]="owner._id == owner"
+              >
+                {{ owner.lastName }}, {{ owner.firstName }}
+              </option>
+            </select>
 
-          <button class="btn btn-success" type="submit">
-            Suche
-          </button>
-        </form>
+            <button class="btn btn-success" type="submit">
+              Suche
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
