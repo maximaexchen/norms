@@ -19,6 +19,11 @@ import { EnvService } from 'src/app//services/env.service';
 import { takeWhile } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
 
+import uuidv1 from '@bundled-es-modules/uuid/v1.js';
+import uuidv3 from '@bundled-es-modules/uuid/v3.js';
+import uuidv4 from '@bundled-es-modules/uuid/v4.js';
+import uuidv5 from '@bundled-es-modules/uuid/v5.js';
+
 @Component({
   selector: 'app-document-edit',
   templateUrl: './document-edit.component.html',
@@ -147,6 +152,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.formTitle = 'Neue Norm anlegen';
     this.publisher = '';
     this.owner = '';
+    this.id = uuidv4();
   }
 
   private editDocument(results) {
@@ -173,20 +179,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(result => {
         console.log('saveDocument:' + result);
-        this.id = result['id'];
-
-        this.newAttachmentName =
-          this.id +
-          '-' +
-          this.revision.replace(/\s/g, '').toLowerCase() +
-          '.' +
-          this.fileUpload.name.split('.').pop();
-        this.attachment = {
-          [this.newAttachmentName]: {
-            data: result,
-            content_type: 'application/pdf'
-          }
-        };
 
         if (this.fileUpload) {
           this.uploadPDF()
@@ -282,7 +274,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           console.log('processUpload: result');
           this.newAttachmentName =
             this.id +
-            '-' +
+            '_' +
             this.revision.replace(/\s/g, '').toLowerCase() +
             '.' +
             this.fileUpload.name.split('.').pop();
@@ -585,13 +577,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     // If there is a new PDF upload
     if (this.attachment) {
-      this.newAttachmentName =
-        this.id +
-        '-' +
-        this.revision.replace(/\s/g, '').toLowerCase() +
-        '.' +
-        this.fileUpload.name.split('.').pop();
-
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
       this.revisionDocument['name'] = this.newAttachmentName;
