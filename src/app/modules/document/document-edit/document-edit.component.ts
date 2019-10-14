@@ -1,11 +1,5 @@
 import { Tag } from '@app/models/tag.model';
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  OnDestroy,
-  ElementRef
-} from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -26,7 +20,7 @@ import * as _ from 'underscore';
 import { EnvService } from 'src/app//services/env.service';
 import { takeWhile } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
-import { FileUploadModule, FileUpload } from 'primeng/fileupload';
+import { FileUpload } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-document-edit',
@@ -49,6 +43,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   owners: User[] = [];
   users: User[] = [];
   selectedUsers: User[] = [];
+
+  relatedNorms: NormDocument[] = [];
+  selectedRelatedNorms: NormDocument[] = [];
+
   revisionDocuments: RevisionDocument[] = [];
   attachments: any = {};
   attachment: any;
@@ -84,6 +82,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   userDropdownSettings = {};
   tagDropdownSettings = {};
+  relatedDropdownSettings = {};
   fileUpload: File | null;
   rawPDF: string;
 
@@ -134,11 +133,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       classes: 'tagClass'
     };
 
+    this.relatedDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Referenz wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Referenz Auswahl',
+      noDataLabel: 'Keine Referenz gefunden',
+      classes: 'relatedClass'
+    };
+
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // fetch data for select-boxes
       this.getPublishers();
       this.getUsers();
       this.getTags();
+      this.getRelatedNorms();
 
       // check if we are updating
       if (results['id']) {
@@ -395,6 +409,17 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         });
       });
   }
+  private getRelatedNorms() {
+    this.documentService
+      .getDocuments()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        res => {
+          this.relatedNorms = res;
+        },
+        err => {}
+      );
+  }
 
   private getPublishers() {
     this.documentService
@@ -469,7 +494,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
-    console.log('getDocumentData');
     this.restFields();
     this.id = entry['_id'];
     this.rev = entry['_rev'];

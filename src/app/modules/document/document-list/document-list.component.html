@@ -58,9 +58,9 @@
       </td>
       <td>{{ document.normNumber }}</td>
       <td>
-        <!-- <div *ngFor="let tag of document.tags">
+        <span *ngFor="let tag of document.tags">
           <span *ngIf="tag.tagType === 'level1'">{{ tag.name }}</span>
-        </div> -->
+        </span>
       </td>
       <td>
         {{

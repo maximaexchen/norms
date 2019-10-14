@@ -416,7 +416,40 @@
     </p-tabPanel>
 
     <p-tabPanel header="Referenzen" i18n="@@string-references-dataset">
-      Referenzen
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group row">
+            <label
+              class="col-sm-2 col-form-label"
+              i18n="@@string-related-dataset"
+              >Referenzenz</label
+            >
+            <div class="col-sm-10">
+              <angular2-multiselect
+                name="relatedNorms"
+                [data]="relatedNorms"
+                [(ngModel)]="selectedRelatedNorms"
+                [settings]="relatedDropdownSettings"
+                (onSelect)="onItemSelect($event)"
+                (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAll($event)"
+              >
+                <c-badge>
+                  <ng-template let-item="item">
+                    <label class="badge">{{ item.normNumber }}</label>
+                  </ng-template>
+                </c-badge>
+                <c-item>
+                  <ng-template let-item="item">
+                    <label> {{ item.normNumber }}</label>
+                  </ng-template>
+                </c-item>
+              </angular2-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
     </p-tabPanel>
 
     <p-tabPanel header="User">

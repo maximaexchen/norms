@@ -33,11 +33,11 @@ export class HeaderComponent implements OnInit {
       label: 'Normen',
       routerLink: 'document'
     });
-    this.mainmenuItems.push({
+    /*  this.mainmenuItems.push({
       icon: 'fa fa-indent',
       label: 'Herausgeber',
       routerLink: 'publisher'
-    });
+    }); */
     this.mainmenuItems.push({
       icon: 'fa fa-tags',
       label: 'Tags',
