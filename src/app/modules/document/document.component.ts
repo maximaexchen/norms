@@ -6,10 +6,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./document.component.scss']
 })
 export class DocumentComponent implements OnInit {
+  showSidebar = true;
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  public onOpenSidebar() {
+    console.log('Open SideBar');
+    this.showSidebar = !this.showSidebar;
   }
-
+  public onCloseSidebar() {
+    this.showSidebar = !this.showSidebar;
+  }
 }

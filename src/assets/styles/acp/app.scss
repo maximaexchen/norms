@@ -1,4 +1,15 @@
 body {
+  .sidebar-content {
+    &.collapsed {
+      width: 60px;
+    }
+    .navbar-primary.collapsed {
+      width: 60px;
+      position: absolute;
+      z-index: 9000;
+    }
+  }
+
   .detail-edit-header {
     button {
       margin-left: 5px;
