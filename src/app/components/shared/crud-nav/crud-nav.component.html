@@ -6,7 +6,7 @@
     iconPos="left"
     label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
     i18n-label="@@btn-new"
-    class="ui-button-secondary"
+    class="btn btn-default btn-sm btn-headline"
     (click)="onSubmit()"
     [disabled]="!validForm"
   ></button>
@@ -18,7 +18,7 @@
     iconPos="left"
     label="Neu"
     i18n-label="@@btn-new"
-    class="ui-button-secondary"
+    class="btn btn-default btn-sm btn-headline"
     (click)="onCreate()"
   ></button>
   <button
@@ -27,7 +27,7 @@
     icon="fa fa-pencil"
     iconPos="left"
     i18n-label="@@btn-edit"
-    class="ui-button-secondary-outline"
+    class="btn btn-default btn-sm btn-headline"
     label="Bearbeiten"
     (click)="onEdit()"
   ></button>
@@ -37,7 +37,7 @@
     icon="fa fa-trash"
     iconPos="left"
     i18n-label="@@btn-delete"
-    class="ui-button-secondary-outline"
+    class="btn btn-default btn-sm btn-headline"
     label="Löschen"
     (click)="onDelete()"
   ></button>

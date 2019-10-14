@@ -1,0 +1,19 @@
+*.btn-default {
+  background-color: $white;
+  border-color: $panel-border-color;
+  color: $text-base-color;
+
+  &:hover {
+    color: $text-base-color;
+    background-color: $btn-bg-hover-color;
+    border-color: $panel-border-color;
+  }
+}
+
+.c-btn {
+  font-size: 0.75rem;
+  padding: 5px 10px;
+  cursor: pointer;
+  align-items: center;
+  min-height: 29px;
+}

@@ -13,17 +13,17 @@ body {
   .info-panel {
     padding: 20px;
     text-align: center;
-    background-color: #f4f4f4;
+    background-color: $panel-bg;
 
     &.position-top {
-      border-top: 1px solid $gray-400;
-      border-right: 1px solid $gray-400;
-      border-left: 1px solid $gray-400;
+      border-top: 1px solid $panel-border-color;
+      border-right: 1px solid $panel-border-color;
+      border-left: 1px solid $panel-border-color;
     }
     &.position-bottom {
-      border-bottom: 1px solid $gray-400;
-      border-right: 1px solid $gray-400;
-      border-left: 1px solid $gray-400;
+      border-bottom: 1px solid $panel-border-color;
+      border-right: 1px solid $panel-border-color;
+      border-left: 1px solid $panel-border-color;
     }
 
     &.small {
