@@ -57,7 +57,11 @@
         <a class="fa fa-folder" (click)="showDetail(document._id)"></a>
       </td>
       <td>{{ document.normNumber }}</td>
-      <td>{{ document.publisher.name }}</td>
+      <td>
+        <!-- <div *ngFor="let tag of document.tags">
+          <span *ngIf="tag.tagType === 'level1'">{{ tag.name }}</span>
+        </div> -->
+      </td>
       <td>
         {{
           document.description.de.length > 40

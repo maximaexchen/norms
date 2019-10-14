@@ -53,6 +53,7 @@ export class CouchDBService {
   }
 
   public bulkUpdate(bulkObject: any): Observable<any> {
+    console.log(bulkObject);
     return this.http.post(this.dbRequest + '/_bulk_docs', bulkObject);
   }
 
@@ -70,7 +71,7 @@ export class CouchDBService {
 
   public search(object: any): Observable<any> {
     console.log('search');
-    console.log(object);
+    console.log(JSON.stringify(object));
     console.log(this.dbRequest + '/_find', object);
     return this.http.post(this.dbRequest + '/_find', object);
   }

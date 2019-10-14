@@ -22,8 +22,8 @@
               <option [ngValue]="null" selected="selected"
                 >Herausgeber wählen</option
               >
-              <option *ngFor="let item of publishers" [value]="item._id">
-                {{ item.name }}
+              <option *ngFor="let item of publishers" [value]="item['_id']">
+                {{ item['name'] }}
               </option>
             </select>
             <!-- <label class="form-label">User</label>
@@ -50,10 +50,10 @@
               <option [ngValue]="null" selected="selected">Owner wählen</option>
               <option
                 *ngFor="let owner of owners"
-                [value]="owner._id"
-                [selected]="owner._id == owner"
+                [value]="owner['_id']"
+                [selected]="owner['_id'] == owner"
               >
-                {{ owner.lastName }}, {{ owner.firstName }}
+                {{ owner['lastName'] }}, {{ owner['firstName'] }}
               </option>
             </select>
 
@@ -89,31 +89,31 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of foundDocuments">
-          <td>{{ item.publisher }}</td>
+          <td>{{ item['publisher'] }}</td>
           <td>
             <a
-              *ngIf="item.normFilePath"
-              href="{{ item.normFilePath.replace('./src', '') }}"
+              *ngIf="item['normFilePath']"
+              href="{{ item['normFilePath'].replace('./src', '') }}"
               target="_blank"
-              >{{ item.number }}</a
+              >{{ item['number'] }}</a
             >
           </td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.revision }}</td>
-          <td>{{ item.outputDate | date: 'dd.MM.y' }}</td>
-          <td>{{ item.inputDate | date: 'dd.MM.y' }}</td>
-          <td>{{ item.owner }}</td>
+          <td>{{ item['name'] }}</td>
+          <td>{{ item['revision'] }}</td>
+          <td>{{ item['outputDate'] | date: 'dd.MM.y' }}</td>
+          <td>{{ item['inputDate'] | date: 'dd.MM.y' }}</td>
+          <td>{{ item['owner'] }}</td>
           <td>
             <button
               type="button"
-              (click)="showDialog(item.fetchedUser)"
+              (click)="showDialog(item['fetchedUser'])"
               pButton
               icon="pi pi-eye"
             ></button>
           </td>
           <td>
             <a
-              [routerLink]="'../document/' + [item._id] + '/edit'"
+              [routerLink]="'../document/' + [item['_id']] + '/edit'"
               class="btn btn-primary"
               >Bearbeiten</a
             >

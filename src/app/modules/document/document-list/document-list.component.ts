@@ -74,6 +74,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           this.documents = result;
+          console.log(this.documents);
           this.documentCount = this.documents.length;
         },
         error => {

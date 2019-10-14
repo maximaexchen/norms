@@ -54,8 +54,11 @@ export class DocumentService {
   }
 
   public getPublishers(): Observable<any> {
-    return this.couchDBService.fetchEntries(
+    /*  return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-publishers?include_docs=true'
+    ); */
+    return this.couchDBService.fetchEntries(
+      '/_design/norms/_view/all-level1-tags?include_docs=true'
     );
   }
 

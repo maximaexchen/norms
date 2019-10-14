@@ -409,6 +409,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getTags(): void {
+    this.tagsLevel1 = [];
+    this.tagsLevel2 = [];
+    this.tagsLevel3 = [];
     this.couchDBService
       .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
       .pipe(takeWhile(() => this.alive))
@@ -556,7 +559,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.normForm.value.descriptionEN || '';
     this.writeItem['description']['fr'] =
       this.normForm.value.descriptionFR || '';
-    this.writeItem['scope'] = this.normForm.value.scope || false;
+    this.writeItem['scope'] = this.normForm.value.scope || '';
     this.writeItem['active'] = this.normForm.value.active || false;
 
     if (this.normForm.value._id) {

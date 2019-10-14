@@ -75,8 +75,8 @@
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-sm-8">
+
+          <!-- <div class="col-sm-8">
               <div class="form-group row">
                 <label
                   class="col-sm-6 col-form-label"
@@ -100,28 +100,26 @@
                   </select>
                 </div>
               </div>
-            </div>
+            </div> -->
+          <div class="form-group row">
+            <label
+              class="col-sm-4 col-form-label"
+              for="revisionDate"
+              i18n="@@string-date-dataset"
+              >Datum</label
+            >
             <div class="col-sm-4">
-              <div class="form-group row">
-                <label
-                  class="col-sm-4 col-form-label"
-                  for="revisionDate"
-                  i18n="@@string-date-dataset"
-                  >Datum</label
-                >
-                <div class="col-sm-8">
-                  <p-calendar
-                    [(ngModel)]="revisionDate"
-                    [showIcon]="false"
-                    [inline]="false"
-                    dateFormat="dd.mm.yy"
-                    id="revisionDate"
-                    name="revisionDate"
-                  ></p-calendar>
-                </div>
-              </div>
+              <p-calendar
+                [(ngModel)]="revisionDate"
+                [showIcon]="false"
+                [inline]="false"
+                dateFormat="dd.mm.yy"
+                id="revisionDate"
+                name="revisionDate"
+              ></p-calendar>
             </div>
           </div>
+
           <div class="form-group row">
             <label
               class="col-sm-4 col-form-label"
@@ -223,7 +221,7 @@
               >Tags</label
             >
             <div class="col-sm-8">
-              <p i18n="@@string-tag-level1-dataset">Level 1</p>
+              <p i18n="@@string-tag-level1-dataset">Level 1 (Herausgeber)</p>
               <angular2-multiselect
                 required
                 name="tagsLevel1"

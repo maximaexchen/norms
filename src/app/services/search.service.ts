@@ -25,7 +25,7 @@ export class SearchService {
 
   public search(searchObject?: any) {
     console.log('searchObject');
-    console.log(searchObject);
+    console.log(JSON.stringify(searchObject));
     if (searchObject) {
       console.log('search');
       this.http

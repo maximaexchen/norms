@@ -10,6 +10,7 @@ import { Group } from '@app/models/group.model';
 import { User } from '@app/models/user.model';
 import { Publisher } from '@app/models/publisher.model';
 import { takeWhile } from 'rxjs/operators';
+import { ConsoleReporter } from 'jasmine';
 
 @Component({
   selector: 'app-document-search',
@@ -95,7 +96,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     // console.log(this.searchForm);
-    const searchObject = {};
+    let searchObject = {};
     this.publisherId = 'undefined';
     this.ownerId = 'undefined';
     this.groupId = 'undefined';
@@ -127,15 +128,17 @@ export class SearchComponent implements OnInit, OnDestroy {
 
       // Build the searchObjectStatement for couchDB _find method
       // only for norm documents >> type: { $eq: 'norm' },
-      let searchObject = {
+      searchObject = {
         use_index: ['_design/search_norm'],
         selector: {
           _id: { $gt: null },
           type: { $eq: 'norm' },
           $or: [
             {
-              publisher: {
-                _id: { $eq: this.publisherId }
+              tags: {
+                $elemMatch: {
+                  id: { $eq: this.publisherId }
+                }
               }
             },
             {
