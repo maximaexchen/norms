@@ -164,6 +164,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private restFields() {
+    this.selectedRelatedNorms = [];
     this.selectedUsers = [];
     this.selectedTags1 = [];
     this.selectedTags2 = [];
@@ -410,12 +411,19 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       });
   }
   private getRelatedNorms() {
+    this.relatedNorms = [];
     this.documentService
       .getDocuments()
       .pipe(takeWhile(() => this.alive))
       .subscribe(
-        res => {
-          this.relatedNorms = res;
+        result => {
+          // Also add to the users
+          result.forEach(item => {
+            const relatedObject = {} as NormDocument;
+            relatedObject['id'] = item._id;
+            relatedObject['normNumber'] = item.normNumber;
+            this.relatedNorms.push(relatedObject);
+          });
         },
         err => {}
       );
@@ -524,6 +532,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.setSelectedUsers(entry['users']);
     }
 
+    if (entry['relatedNorms']) {
+      this.setRelatedNorms(entry['relatedNorms']);
+    }
+
     if (entry['tags']) {
       const ent = _.sortBy(entry['tags'], 'tagType');
       // console.log(ent);
@@ -594,6 +606,18 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
 
+    const selectedRelatedObjects = [
+      ...new Set(
+        this.selectedRelatedNorms.map(related => {
+          const newRelated = {};
+          newRelated['id'] = related['id'];
+          newRelated['normNumber'] = related['normNumber'];
+          return newRelated;
+        })
+      )
+    ];
+    this.writeItem['relatedNorms'] = selectedRelatedObjects || [];
+
     const selectedUserObjects = [
       ...new Set(
         this.selectedUsers.map(user => {
@@ -637,22 +661,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.uploadDir.match(/[^\/]*\/[^\/]*/)[0],
         ''
       );
-      console.log(this.revisionDocuments);
       this.revisionDocuments.push(this.revisionDocument);
-      console.log(this.revisionDocuments);
 
       // Add new attachment by merge
       const tempAttachmentObject = this.attachments;
-      console.log(tempAttachmentObject);
       this.attachments = { ...tempAttachmentObject, ...this.attachment };
-      console.log(this.attachments);
-
-      console.log(':::::::::::::::::::::');
     }
 
     this.writeItem['_attachments'] = this.attachments || [];
     this.writeItem['revisions'] = this.revisionDocuments || [];
     return this.writeItem;
+  }
+
+  private setRelatedNorms(relatedNorms: any[]) {
+    const relatedMap: NormDocument[] = relatedNorms.map(related => {
+      const selectedRelatedObject = {};
+      selectedRelatedObject['id'] = related.id;
+      selectedRelatedObject['normNumber'] = related.normNumber;
+      return selectedRelatedObject;
+    });
+    this.selectedRelatedNorms = relatedMap;
   }
 
   private setSelectedUsers(users: any[]) {
@@ -676,6 +704,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       return selectedTagObject;
     });
     // this.selectedTags = tagMap;
+  }
+
+  public showRelated(id: string) {
+    this.router.navigate(['../document/' + id + '/edit']);
   }
 
   private showConfirmation(type: string, result: string) {

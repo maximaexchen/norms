@@ -39,7 +39,7 @@ body {
 
     &.small {
       padding: 10px 20px;
-      margin: 10px 0;
+      margin: 10px 0 0;
       border: 0;
     }
 
@@ -67,6 +67,7 @@ body {
       padding: 10px 20px;
       margin-right: 10px;
       color: $white;
+      margin-top: 10px;
       cursor: pointer;
 
       &.tag-level1-item {

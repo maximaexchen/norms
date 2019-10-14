@@ -450,6 +450,29 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="row">
+            <label
+              class="col-sm-2 col-form-label"
+              i18n="@@string-related-dataset"
+              >Referenzenz</label
+            >
+            <div class="col-sm-10">
+              <ul class="list-group">
+                <li
+                  class="list-group-item"
+                  *ngFor="let related of selectedRelatedNorms"
+                >
+                  <a class="fa fa-folder" (click)="showRelated(related.id)">
+                    {{ related.normNumber }}</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </p-tabPanel>
 
     <p-tabPanel header="User">
