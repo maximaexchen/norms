@@ -12,11 +12,11 @@ export class DocumentComponent implements OnInit {
 
   ngOnInit() {}
 
-  public onOpenSidebar() {
+  public onOpenSidebar(event) {
     console.log('Open SideBar');
     this.showSidebar = !this.showSidebar;
   }
-  public onCloseSidebar() {
+  public onCloseSidebar(event) {
     this.showSidebar = !this.showSidebar;
   }
 }
