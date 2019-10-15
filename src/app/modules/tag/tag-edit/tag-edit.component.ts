@@ -142,7 +142,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
     bulkUpdateObject['docs'] = [];
     related.docs.forEach(norm => {
       // reasing the new name to the found Norm with tag
-      _.findWhere(norm['tags'], { id: this.id }).name = this.name;
+      _.findWhere(norm['tags'], { id: this.id })['name'] = this.name;
       bulkUpdateObject['docs'].push(norm);
     });
 

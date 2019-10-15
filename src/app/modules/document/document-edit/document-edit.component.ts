@@ -37,6 +37,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   uploadDir = this.env.uploadDir;
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
+  selectedTab = 0;
 
   writeItem: NormDocument;
   publishers: Publisher[] = [];
@@ -164,11 +165,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private restFields() {
+    console.log('resetFields');
     this.selectedRelatedNorms = [];
     this.selectedUsers = [];
     this.selectedTags1 = [];
     this.selectedTags2 = [];
     this.selectedTags3 = [];
+    this.selectedTab = 0;
   }
 
   private newDocument() {

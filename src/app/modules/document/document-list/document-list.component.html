@@ -56,7 +56,7 @@
       <td>
         <a class="fa fa-folder" (click)="showDetail(document._id)"></a>
       </td>
-      <td>{{ document.normNumber }}</td>
+      <td>{{ document.normNumber }} <br />({{ document.active }})</td>
       <td>
         <span *ngFor="let tag of document.tags">
           <span *ngIf="tag.tagType === 'level1'">{{ tag.name }}</span>

@@ -28,7 +28,10 @@
   <input type="hidden" [(ngModel)]="formMode" name="formMode" />
   <input type="hidden" [(ngModel)]="id" name="_id" />
   <input type="hidden" [(ngModel)]="rev" name="_rev" />
-  <p-tabView>
+  <p-tabView
+    [(activeIndex)]="selectedTab"
+    (onChange)="selectedTab = $event.index"
+  >
     <p-tabPanel header="Stammdaten">
       <div class="row">
         <div class="col-sm-6">

@@ -1,4 +1,9 @@
 body {
+  app-document-search {
+    button {
+      margin-left: 50px;
+    }
+  }
   .sidebar-content {
     &.collapsed {
       width: 60px;
@@ -130,7 +135,12 @@ body {
   FORMS
 */
 
+  label {
+    font-weight: 700;
+  }
+
   .col-form-label {
+    font-size: 85%;
     font-weight: 700;
     text-align: right;
     padding-right: 0;

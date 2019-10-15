@@ -10,7 +10,6 @@ import { Group } from '@app/models/group.model';
 import { User } from '@app/models/user.model';
 import { Publisher } from '@app/models/publisher.model';
 import { takeWhile } from 'rxjs/operators';
-import { ConsoleReporter } from 'jasmine';
 
 @Component({
   selector: 'app-document-search',
@@ -26,6 +25,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   display = false;
   modalTitle = '';
   modalContent = '';
+  activeNorms = true;
 
   publishers: Publisher[];
   publisherId = null;
@@ -96,7 +96,13 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     // console.log(this.searchForm);
-    let searchObject = {};
+    const searchObject = {
+      use_index: ['_design/search_norm'],
+      selector: {
+        _id: { $gt: null },
+        type: { $eq: 'norm' }
+      }
+    };
     this.publisherId = 'undefined';
     this.ownerId = 'undefined';
     this.groupId = 'undefined';
@@ -118,6 +124,53 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.userId = this.searchForm.value.userId;
     }
 
+    // Abfrage ist leer
+    // Abfrage ist leer mit active-flag
+    // Abfrage mit hearausgeber
+    // Abfrage mit Owner
+
+    if (
+      this.searchForm.value.activeNorms !== undefined &&
+      this.searchForm.value.activeNorms !== false
+    ) {
+      this.activeNorms = this.searchForm.value.activeNorms;
+
+      Object.assign(searchObject['selector'], {
+        active: { $eq: this.activeNorms }
+      });
+    }
+
+    if (!!this.publisherId || !!this.ownerId) {
+      Object.assign(searchObject['selector'], {
+        $or: []
+      });
+    }
+
+    if (!!this.publisherId) {
+      Object.assign(
+        searchObject['selector']['$or'].push({
+          tags: {
+            $elemMatch: {
+              id: { $eq: this.publisherId }
+            }
+          }
+        })
+      );
+    }
+
+    if (!!this.ownerId) {
+      Object.assign(
+        searchObject['selector']['$or'].push({
+          owner: {
+            _id: { $eq: this.ownerId }
+          }
+        })
+      );
+    }
+
+    console.log(JSON.stringify(searchObject));
+    console.log('-----');
+
     // same as below
     // if (!this.publisherId  && !this.ownerId) {
     if (this.publisherId === null && this.ownerId === null) {
@@ -125,91 +178,8 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.searchService.search(undefined);
     } else {
       console.log('Search parameters');
-
-      // Build the searchObjectStatement for couchDB _find method
-      // only for norm documents >> type: { $eq: 'norm' },
-      searchObject = {
-        use_index: ['_design/search_norm'],
-        selector: {
-          _id: { $gt: null },
-          type: { $eq: 'norm' },
-          $or: [
-            {
-              tags: {
-                $elemMatch: {
-                  id: { $eq: this.publisherId }
-                }
-              }
-            },
-            {
-              owner: {
-                _id: { $eq: this.ownerId }
-              }
-            },
-            {
-              users: {
-                $elemMatch: {
-                  id: {
-                    $eq: this.userId
-                  }
-                }
-              }
-            }
-          ]
-        }
-      };
-
       this.searchService.search(searchObject);
     }
-
-    /* this.couchDBService
-      .search(searchObject)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(results => {
-        this.foundDocuments = results.docs;
-        results.docs.forEach(norm => {
-          if (norm.publisher) {
-            const publisherItem = this.couchDBService
-              .fetchEntry('/' + norm.publisher._id)
-              .pipe(takeWhile(() => this.alive))
-              .subscribe(publisherC => {
-                norm.publisher = publisherC.name;
-              });
-          }
-
-          if (norm.owner) {
-            const ownerItem = this.couchDBService
-              .fetchEntry('/' + norm.owner._id)
-              .pipe(takeWhile(() => this.alive))
-              .subscribe(ownerC => {
-                norm.owner = ownerC.firstName + ' ' + ownerC.lastName;
-              });
-          }
-
-          if (norm.users) {
-            this.couchDBService
-              .getUsersForNorm(norm._id)
-              .subscribe(userResult => {
-                let fetchedUserArr = [];
-                const wantedUser = _.tail(userResult['rows']);
-
-                if (wantedUser) {
-                  wantedUser.forEach(user => {
-                    const newUser = {
-                      firstName: user['value']._id.firstName,
-                      lastName: user['value']._id.lastName,
-                      email: user['value']._id.email
-                    };
-                    fetchedUserArr.push(newUser);
-                  });
-
-                  fetchedUserArr = _.sortBy(fetchedUserArr, 'lastName');
-                }
-                norm.fetchedUser = fetchedUserArr;
-              });
-          }
-        });
-      }); */
   }
 
   showDialog(users: User[]) {

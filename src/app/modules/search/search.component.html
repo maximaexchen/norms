@@ -8,11 +8,11 @@
             (ngSubmit)="onSubmit()"
             #searchForm="ngForm"
           >
-            <h2 class="panel-headline">
+            <h1 class="search-title panel-headline">
               <span class="fa fa-newspaper-o" style="margin: 0 20px 0 0px; ">
               </span
               >Normen
-            </h2>
+            </h1>
             <label class="form-label">Herausgeber</label>
             <select
               class="form-control"
@@ -56,7 +56,15 @@
                 {{ owner['lastName'] }}, {{ owner['firstName'] }}
               </option>
             </select>
-
+            <div class="form-check mb-2 mr-sm-2">
+              <p-checkbox
+                name="activeNorms"
+                binary="true"
+                [(ngModel)]="activeNorms"
+                label="nur aktive Datensätze"
+                labelStyleClass="form-label"
+              ></p-checkbox>
+            </div>
             <button class="btn btn-default" type="submit">
               Suche
             </button>
