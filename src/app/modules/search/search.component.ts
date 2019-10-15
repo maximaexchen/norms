@@ -138,6 +138,8 @@ export class SearchComponent implements OnInit, OnDestroy {
       Object.assign(searchObject['selector'], {
         active: { $eq: this.activeNorms }
       });
+    } else {
+      this.activeNorms = null;
     }
 
     if (!!this.publisherId || !!this.ownerId) {
@@ -173,7 +175,11 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     // same as below
     // if (!this.publisherId  && !this.ownerId) {
-    if (this.publisherId === null && this.ownerId === null) {
+    if (
+      this.publisherId === null &&
+      this.ownerId === null &&
+      this.activeNorms === null
+    ) {
       console.log('No search parameters');
       this.searchService.search(undefined);
     } else {

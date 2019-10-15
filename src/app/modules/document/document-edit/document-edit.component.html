@@ -16,6 +16,7 @@
     <app-crud-nav
       [formMode]="formMode"
       [validForm]="normForm.valid"
+      [dirtyForm]="normForm.dirty"
       [routeNew]="'/document/new'"
       (save)="onSubmit()"
       (add)="onSubmit()"
@@ -425,7 +426,7 @@
             <label
               class="col-sm-2 col-form-label"
               i18n="@@string-related-dataset"
-              >Referenzenz</label
+              >Referenzen</label
             >
             <div class="col-sm-10">
               <angular2-multiselect
@@ -459,7 +460,7 @@
             <label
               class="col-sm-2 col-form-label"
               i18n="@@string-related-dataset"
-              >Referenzenz</label
+              >Referenzen</label
             >
             <div class="col-sm-10">
               <ul class="list-group">

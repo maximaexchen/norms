@@ -24,8 +24,6 @@ export class SearchService {
   searchResultData = this.searchResult.asObservable();
 
   public search(searchObject?: any) {
-    console.log('searchObject');
-    console.log(JSON.stringify(searchObject));
     if (searchObject) {
       console.log('search');
       this.http
@@ -35,7 +33,7 @@ export class SearchService {
           console.log(result['docs']);
         });
     } else {
-      console.log('alll');
+      console.log('all');
       this.couchDBService
         .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
         .subscribe(result => {
