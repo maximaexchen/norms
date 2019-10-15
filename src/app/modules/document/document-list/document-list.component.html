@@ -10,6 +10,9 @@
   [rows]="13"
   class="table"
   [globalFilterFields]="['name', 'normNumber']"
+  selectionMode="single"
+  [(selection)]="selectedDocument"
+  (onRowSelect)="onRowSelect($event)"
   (onFilter)="onFilter($event)"
 >
   <ng-template pTemplate="caption">
@@ -28,8 +31,6 @@
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
-      <th width="30"></th>
-
       <th [pSortableColumn]="'normNumber'">
         Nummer<p-sortIcon [field]="'normNumber'"></p-sortIcon>
       </th>
@@ -50,10 +51,7 @@
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-document>
-    <tr>
-      <td>
-        <a class="fa fa-folder" (click)="showDetail(document._id)"></a>
-      </td>
+    <tr [pSelectableRow]="document">
       <td>{{ document.normNumber }} <br />({{ document.active }})</td>
       <td>
         <span *ngFor="let tag of document.tags">

@@ -425,6 +425,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             const relatedObject = {} as NormDocument;
             relatedObject['id'] = item._id;
             relatedObject['normNumber'] = item.normNumber;
+            relatedObject['revision'] = item.revision;
+            relatedObject['scope'] = item.scope;
             this.relatedNorms.push(relatedObject);
           });
         },

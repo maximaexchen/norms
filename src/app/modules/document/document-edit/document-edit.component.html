@@ -366,11 +366,7 @@
             icon="fa fa-download "
             iconPos="left"
             title="{{ latestAttachmentName }}"
-            label="{{
-              latestAttachmentName.length > 20
-                ? (latestAttachmentName | slice: 0:20) + '...'
-                : latestAttachmentName
-            }}"
+            label="Download Norm"
             class="attachmentDownload"
             (click)="getDownload(id, latestAttachmentName)"
           ></p-button>
@@ -463,16 +459,36 @@
               >Referenzen</label
             >
             <div class="col-sm-10">
-              <ul class="list-group">
-                <li
-                  class="list-group-item"
-                  *ngFor="let related of selectedRelatedNorms"
-                >
-                  <a class="fa fa-folder" (click)="showRelated(related.id)">
-                    {{ related.normNumber }}</a
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Nummer</th>
+                    <th scope="col">Revison</th>
+                    <th scope="col">Scope</th>
+                    <th scope="col">Download</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="clickable"
+                    *ngFor="let related of selectedRelatedNorms"
+                    (click)="showRelated(related.id)"
                   >
-                </li>
-              </ul>
+                    <td>
+                      {{ related.normNumber }}
+                    </td>
+                    <td>{{ related.revision }}</td>
+                    <td>{{ related.scope }}</td>
+                    <td>
+                      <a
+                        class="dynamic-link"
+                        (click)="getDownload(related.id, related.normNumber)"
+                        >Download <i class="fa fa-download"></i
+                      ></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

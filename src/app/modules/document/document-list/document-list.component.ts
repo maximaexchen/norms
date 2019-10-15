@@ -1,3 +1,4 @@
+import { NormDocument } from '@models/index';
 import {
   Component,
   OnInit,
@@ -31,6 +32,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
   documents: NormDocument[] = [];
   documentCount = 0;
+  selectedDocument: NormDocument;
 
   descriptionDE: string;
 
@@ -143,6 +145,11 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           console.log('Completed file download.');
         }
       );
+  }
+
+  public onRowSelect(event) {
+    console.log(event.data);
+    this.router.navigate(['../document/' + event.data._id + '/edit']);
   }
 
   public onFilter(event: any): void {

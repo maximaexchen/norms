@@ -15,6 +15,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   alive = true;
 
   users: User[] = [];
+  selectedUser: User;
   userCount = 0;
 
   constructor(
@@ -53,6 +54,11 @@ export class UserListComponent implements OnInit, OnDestroy {
           console.log('Error on loading users');
         }
       );
+  }
+
+  public onRowSelect(event) {
+    console.log(event.data);
+    this.router.navigate(['../user/' + event.data._id + '/edit']);
   }
 
   public onFilter(event: any): void {
