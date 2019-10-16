@@ -1,10 +1,8 @@
-import { DocumentService } from './document.service';
 import { Injectable } from '@angular/core';
 import { NormDocument } from '@app/models';
 import { EnvService } from './env.service';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { CouchDBService } from './couchDB.service';
 
 @Injectable({ providedIn: 'root' })

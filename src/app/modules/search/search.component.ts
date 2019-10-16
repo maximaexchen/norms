@@ -9,7 +9,8 @@ import { DocumentService } from '../../services/document.service';
 import { Group } from '@app/models/group.model';
 import { User } from '@app/models/user.model';
 import { Publisher } from '@app/models/publisher.model';
-import { takeWhile } from 'rxjs/operators';
+import { takeWhile, groupBy } from 'rxjs/operators';
+import { Tag } from '@app/models/tag.model';
 
 @Component({
   selector: 'app-document-search',
@@ -35,6 +36,10 @@ export class SearchComponent implements OnInit, OnDestroy {
   userId: string;
   groups: Group[];
   groupId: string;
+  tags: Tag[] = [];
+  selectedTags: Tag[] = [];
+  tagDropdownSettings = {};
+  tagIds: string[];
 
   constructor(
     private route: ActivatedRoute,
@@ -44,6 +49,21 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('DocumentSearchComponent');
+
+    this.tagDropdownSettings = {
+      singleSelection: false,
+      primaryKey: '_id',
+      text: 'Tag wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Tag Auswahl',
+      noDataLabel: 'Keinen Tag gefunden',
+      classes: 'tagClass',
+      groupBy: 'tagType'
+    };
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       this.documentService
@@ -80,6 +100,18 @@ export class SearchComponent implements OnInit, OnDestroy {
             console.log(err);
           }
         );
+
+      this.documentService
+        .getTags()
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          res => {
+            this.tags = res;
+          },
+          err => {
+            console.log(err);
+          }
+        );
       this.documentService
         .getUsers()
         .pipe(takeWhile(() => this.alive))
@@ -95,7 +127,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit(): void {
-    // console.log(this.searchForm);
+    console.log(this.searchForm.value);
     const searchObject = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -107,6 +139,10 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.ownerId = 'undefined';
     this.groupId = 'undefined';
     this.userId = 'undefined';
+
+    if (this.searchForm.value.tags.length > 0) {
+      this.tagIds = _.pluck(this.searchForm.value.tags, '_id');
+    }
 
     if (this.searchForm.value.publisherId !== undefined) {
       this.publisherId = this.searchForm.value.publisherId;
@@ -129,9 +165,12 @@ export class SearchComponent implements OnInit, OnDestroy {
     // Abfrage mit hearausgeber
     // Abfrage mit Owner
 
+    console.log(this.searchForm.value);
+
     if (
       this.searchForm.value.activeNorms !== undefined &&
-      this.searchForm.value.activeNorms !== false
+      this.searchForm.value.activeNorms !== false &&
+      this.tagIds.length > 0
     ) {
       this.activeNorms = this.searchForm.value.activeNorms;
 
@@ -148,7 +187,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
     }
 
-    if (!!this.publisherId) {
+    /* if (!!this.publisherId) {
       Object.assign(
         searchObject['selector']['$or'].push({
           tags: {
@@ -158,6 +197,21 @@ export class SearchComponent implements OnInit, OnDestroy {
           }
         })
       );
+    } */
+
+    if (this.tagIds.length > 0) {
+      this.tagIds.forEach(val => {
+        console.log(val);
+        Object.assign(
+          searchObject['selector']['$or'].push({
+            tags: {
+              $elemMatch: {
+                id: val
+              }
+            }
+          })
+        );
+      });
     }
 
     if (!!this.ownerId) {

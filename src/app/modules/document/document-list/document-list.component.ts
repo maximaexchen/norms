@@ -1,4 +1,3 @@
-import { NormDocument } from '@models/index';
 import {
   Component,
   OnInit,
