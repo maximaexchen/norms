@@ -76,14 +76,14 @@ body {
       cursor: pointer;
 
       &.tag-level1-item {
-        background-color: rgb(44, 151, 201);
+        background-color: royalblue; // rgb(44, 151, 201);
       }
 
       &.tag-level2-item {
-        background-color: rgb(237, 130, 42);
+        background-color: orange; // rgb(237, 130, 42);
       }
       &.tag-level3-item {
-        background-color: rgb(138, 181, 45);
+        background-color: limegreen; // rgb(138, 181, 45);
       }
     }
   }
@@ -114,13 +114,13 @@ body {
       font-weight: normal;
     }
     label.level1 {
-      background-color: rgb(44, 151, 201);
+      background-color: #0071bd;
     }
     label.level2 {
-      background-color: rgb(237, 130, 42);
+      background-color: #bd0000;
     }
     label.level3 {
-      background-color: rgb(138, 181, 45);
+      background-color: #319a31;
     }
 
     .selected-list .c-list .c-token {
