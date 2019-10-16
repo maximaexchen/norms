@@ -2,14 +2,21 @@
   <span class="nav-label">Auswahl Artikel</span>
   <span class="nav-button fa fa-chevron-left" (click)="toggleSidebar()"></span>
 </div>
-
+<!-- (sortFunction)="tableSort($event)"
+  [customSort]="true" -->
 <p-table
   #dt
   [value]="documents"
   [paginator]="true"
   [rows]="13"
   class="table"
-  [globalFilterFields]="['name', 'normNumber']"
+  [globalFilterFields]="[
+    'revision',
+    'normNumber',
+    'description.de',
+    'publisher',
+    'owner.userName'
+  ]"
   selectionMode="single"
   [(selection)]="selectedDocument"
   (onRowSelect)="onRowSelect($event)"
@@ -31,43 +38,57 @@
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
-      <th [pSortableColumn]="'normNumber'">
+      <th [pSortableColumn]="'normNumber'" width="120">
         Nummer<p-sortIcon [field]="'normNumber'"></p-sortIcon>
       </th>
-      <th [pSortableColumn]="'tags'">
-        Herausgeber
-        <p-sortIcon [field]="'tags'"></p-sortIcon>
-      </th>
-      <th>Beschreibung<p-sortIcon [field]="'description'"></p-sortIcon></th>
-      <th [pSortableColumn]="'revision'">
+      <th [pSortableColumn]="'revision'" width="90">
         Revision<p-sortIcon [field]="'revision'"></p-sortIcon>
       </th>
-      <th [pSortableColumn]="'revisionDate'">
-        Revisionsdatum<p-sortIcon [field]="'revisionDate'"></p-sortIcon>
+      <th [pSortableColumn]="'publisher'" width="110">
+        Herausgeber
+        <p-sortIcon [field]="'publisher'"></p-sortIcon>
       </th>
-      <th [pSortableColumn]="'owner'">
+      <th>Beschreibung</th>
+
+      <th [pSortableColumn]="'revisionDate'" width="110">
+        Rev-Datum<p-sortIcon [field]="'revisionDate'"></p-sortIcon>
+      </th>
+      <th [pSortableColumn]="'owner.lastName'">
         Owner<p-sortIcon [field]="'owner'"></p-sortIcon>
+      </th>
+      <th width="40">
+        Aktiv
       </th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-document>
     <tr [pSelectableRow]="document">
-      <td>{{ document.normNumber }} <br />({{ document.active }})</td>
-      <td>
-        <span *ngFor="let tag of document.tags">
-          <span *ngIf="tag.tagType === 'level1'">{{ tag.name }}</span>
-        </span>
-      </td>
-      <td>
+      <td>{{ document.normNumber }}</td>
+      <td>{{ document.revision }}</td>
+      <td>{{ document.publisher }}</td>
+      <td pTooltip="{{ document.description.de }}" tooltipPosition="top">
         {{
-          document.description.de.length > 40
-            ? (document.description.de | slice: 0:40) + '...'
+          document.description.de.length > 15
+            ? (document.description.de | slice: 0:15) + '...'
             : document.description.de
         }}
       </td>
-      <td>{{ document.revision }}</td>
+
       <td>{{ document.revisionDate | date }}</td>
-      <td>{{ document.owner.lastName }}, {{ document.owner.firstName }}</td>
+      <td>
+        {{ document.owner.lastName }},
+        {{ document.owner.firstName }}
+      </td>
+      <td>
+        <i
+          [ngStyle]="{
+            'font-size': '16px',
+            color: document.active ? 'green' : 'red '
+          }"
+          [ngClass]="document.active ? 'fa fa-check-circle' : 'fa fa-ban'"
+          aria-hidden="true"
+        ></i>
+      </td>
     </tr>
   </ng-template>
   <ng-template pTemplate="summary" let-document>

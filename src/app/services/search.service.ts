@@ -28,7 +28,6 @@ export class SearchService {
         .post(this.dbRequest + '/_find', searchObject)
         .subscribe(result => {
           this.searchResult.next(result['docs']);
-          console.log(result['docs']);
         });
     } else {
       console.log('all');

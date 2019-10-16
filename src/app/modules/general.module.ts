@@ -11,6 +11,7 @@ import { TabViewModule } from 'primeng/tabview';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CheckboxModule } from 'primeng/checkbox';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { AuthComponent } from '../components/auth/auth.component';
 import { CrudNavComponent } from '../components/shared/crud-nav/crud-nav.component';
@@ -28,7 +29,8 @@ import { CrudNavComponent } from '../components/shared/crud-nav/crud-nav.compone
     TabViewModule,
     SelectButtonModule,
     MultiSelectModule,
-    CheckboxModule
+    CheckboxModule,
+    TooltipModule
   ],
   exports: [
     CommonModule,
@@ -42,7 +44,8 @@ import { CrudNavComponent } from '../components/shared/crud-nav/crud-nav.compone
     SelectButtonModule,
     MultiSelectModule,
     CrudNavComponent,
-    CheckboxModule
+    CheckboxModule,
+    TooltipModule
   ]
 })
 export class GeneralModule {}

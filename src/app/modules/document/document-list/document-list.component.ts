@@ -15,6 +15,7 @@ import { EnvService } from 'src/app//services/env.service';
 import { Router } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
 import { SearchService } from '@app/services/search.service';
+import _ = require('underscore');
 
 @Component({
   selector: 'app-document-list',
@@ -76,26 +77,20 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         result => {
           this.documents = result;
           this.documentCount = this.documents.length;
+
+          this.documents.forEach(norm => {
+            norm['tags'].forEach(tag => {
+              if (tag.tagType === 'level1') {
+                norm['publisher'] = tag.name;
+              }
+            });
+          });
         },
         error => {
           console.log(error.message);
         },
         () => {}
       );
-    /* this.documentService
-      .getDocuments()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          this.documents = result;
-          console.log(result);
-          this.documentCount = this.documents.length;
-        },
-        error => {
-          console.log(error.message);
-        },
-        () => {}
-      ); */
   }
 
   public getDownload(id: string, attachments: any) {
@@ -146,7 +141,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       );
   }
 
-  public onRowSelect(event) {
+  public onRowSelect(event: any) {
     console.log(event.data);
     this.router.navigate(['../document/' + event.data._id + '/edit']);
   }

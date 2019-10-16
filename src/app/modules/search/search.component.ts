@@ -127,7 +127,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit(): void {
-    console.log(this.searchForm.value);
     const searchObject = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -164,10 +163,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     // Abfrage ist leer mit active-flag
     // Abfrage mit hearausgeber
     // Abfrage mit Owner
-
-    console.log(this.searchForm.value);
-
+    console.log('this.activeNorms: ' + this.searchForm.value.activeNorms);
     if (
+      this.searchForm.value.activeNorms !== null &&
       this.searchForm.value.activeNorms !== undefined &&
       this.searchForm.value.activeNorms !== false &&
       this.tagIds.length > 0
@@ -201,7 +199,6 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     if (this.tagIds.length > 0) {
       this.tagIds.forEach(val => {
-        console.log(val);
         Object.assign(
           searchObject['selector']['$or'].push({
             tags: {
