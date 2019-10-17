@@ -1,0 +1,28 @@
+body {
+  .ui-table {
+    .ui-table-tbody > tr.ui-state-highlight {
+      background-color: theme-color('primary');
+      color: $white;
+    }
+    .ui-table-tbody > tr:nth-child(even).ui-state-highlight {
+      background-color: theme-color('primary');
+      color: $white;
+    }
+    .ui-table-caption,
+    .ui-table-summary {
+      background-color: $panel-bg;
+      border-color: $panel-border-color;
+    }
+
+    .ui-sortable-column:not(.ui-state-highlight):hover {
+      background-color: $panel-bg;
+      color: $text-base-color;
+    }
+  }
+
+  .ui-paginator {
+    background-color: $panel-bg;
+    border: 1px solid $panel-border-color;
+    padding: 0;
+  }
+}

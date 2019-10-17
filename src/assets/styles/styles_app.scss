@@ -9,7 +9,6 @@
   -moz-transition: all 0.1s ease-in-out;
   transition: all 0.1s ease-in-out;
   background-color: $navbar-primary-bg-color;
-  width: 670px;
   margin: 0 0 0 15px;
   padding: 0;
   float: left;
@@ -58,11 +57,13 @@
 }
 
 .main-content {
-  margin-left: 700px;
+  margin-left: 0;
+  margin-left: 0;
 }
 
 .main-content.collapsed {
-  margin-left: 80px;
+  margin-left: 0;
+  padding-left: 80px;
 }
 
 /* styles selectable rows */
@@ -127,6 +128,8 @@ table.panel-table th {
 body .ui-table .ui-table-thead > tr > th {
   font-size: 90%;
   padding: 6px 6px;
+  background-color: $panel-bg;
+  border: 1px solid $panel-border-color;
 }
 
 body .ui-table .ui-table-tbody > tr {
@@ -303,7 +306,7 @@ select.ng-valid[required] {
 }
 
 .form-inline .btn {
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 /* PrimeNg OrderList */

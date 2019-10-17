@@ -1,4 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter
+} from '@angular/core';
 
 import { Subscription, Observable } from 'rxjs';
 
@@ -9,6 +15,7 @@ import { EnvService } from 'src/app//services/env.service';
 import { Router } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
 import { SearchService } from '@app/services/search.service';
+import _ = require('underscore');
 
 @Component({
   selector: 'app-document-list',
@@ -16,12 +23,17 @@ import { SearchService } from '@app/services/search.service';
   styleUrls: ['./document-list.component.scss']
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
+  @Output() openSideBar: EventEmitter<any> = new EventEmitter();
+  @Output() closeSideBar: EventEmitter<any> = new EventEmitter();
   alive = true;
+  visible = true;
+  filterInputCheck = true;
 
   docs: Array<NormDocument> = [];
 
   documents: NormDocument[] = [];
   documentCount = 0;
+  selectedDocument: NormDocument;
 
   descriptionDE: string;
 
@@ -39,8 +51,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   ) {
     this.searchService.searchResultData.subscribe(result => {
       this.documents = result;
-      console.log('this.docs');
-      console.log(this.docs);
+      this.setOwnerFromTags();
+      console.log('this.documents');
+      console.log(this.documents);
     });
   }
 
@@ -66,26 +79,24 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         result => {
           this.documents = result;
           this.documentCount = this.documents.length;
+
+          this.setOwnerFromTags();
         },
         error => {
           console.log(error.message);
         },
         () => {}
       );
-    /* this.documentService
-      .getDocuments()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          this.documents = result;
-          console.log(result);
-          this.documentCount = this.documents.length;
-        },
-        error => {
-          console.log(error.message);
-        },
-        () => {}
-      ); */
+  }
+
+  private setOwnerFromTags() {
+    this.documents.forEach(norm => {
+      norm['tags'].forEach(tag => {
+        if (tag.tagType === 'level1') {
+          norm['publisher'] = tag.name;
+        }
+      });
+    });
   }
 
   public getDownload(id: string, attachments: any) {
@@ -136,12 +147,35 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       );
   }
 
-  public onFilter(event: any): void {
+  public onRowSelect(event: any) {
+    console.log(event.data);
+
+    //
+    this.router.navigate(['../document/' + event.data._id + '/edit']);
+  }
+
+  public onFilter(event: any, dt: any): void {
+    // Check for simple ASCII Characters and give warning
+    if (!_.isEmpty(event.filters.global)) {
+      this.filterInputCheck = /^(?:(?!["';<=>\\])[\x20-\x7E])+$/u.test(
+        event.filters.global.value
+      );
+    }
+
     this.documentCount = event.filteredValue.length;
   }
 
   public showDetail(id: string) {
     this.router.navigate(['../document/' + id + '/edit']);
+  }
+
+  public toggleSidebar() {
+    this.visible = !this.visible;
+    if (this.visible) {
+      this.closeSideBar.emit(null); //emit event here
+    } else {
+      this.openSideBar.emit(null);
+    }
   }
 
   ngOnDestroy() {

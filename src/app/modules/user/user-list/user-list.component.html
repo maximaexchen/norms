@@ -8,6 +8,9 @@
   [paginator]="true"
   [rows]="13"
   class="table"
+  selectionMode="single"
+  [(selection)]="selectedUser"
+  (onRowSelect)="onRowSelect($event)"
   [globalFilterFields]="['firstName', 'lastName']"
   (onFilter)="onFilter($event)"
 >
@@ -27,7 +30,6 @@
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
-      <th width="30"></th>
       <th [pSortableColumn]="'firstName'">
         Vorname
         <p-sortIcon [field]="'firstName'"></p-sortIcon>
@@ -41,10 +43,7 @@
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-user>
-    <tr>
-      <td>
-        <a class="fa fa-folder" (click)="showDetail(user._id)"></a>
-      </td>
+    <tr [pSelectableRow]="user">
       <td>{{ user.firstName }}</td>
       <td>{{ user.lastName }}</td>
       <td>{{ user.email }}</td>

@@ -16,9 +16,12 @@
     <app-crud-nav
       [formMode]="formMode"
       [validForm]="normForm.valid"
+      [dirtyForm]="normForm.dirty"
       [routeNew]="'/document/new'"
+      [editable]="editable"
       (save)="onSubmit()"
       (add)="onSubmit()"
+      (edit)="onEdit()"
       (delete)="deleteDocument()"
     ></app-crud-nav>
   </div>
@@ -28,7 +31,10 @@
   <input type="hidden" [(ngModel)]="formMode" name="formMode" />
   <input type="hidden" [(ngModel)]="id" name="_id" />
   <input type="hidden" [(ngModel)]="rev" name="_rev" />
-  <p-tabView>
+  <p-tabView
+    [(activeIndex)]="selectedTab"
+    (onChange)="selectedTab = $event.index"
+  >
     <p-tabPanel header="Stammdaten">
       <div class="row">
         <div class="col-sm-6">
@@ -47,10 +53,10 @@
                     class="form-control"
                     i18n-placeholder
                     placeholder="Nummer"
-                    [(ngModel)]="normNumber"
-                    name="normNumber"
+                    [(ngModel)]="normNumber" 
+                    name="normNumber" 
                     required
-                  />
+                    [readOnly]="!editable" />
                 </div>
               </div>
             </div>
@@ -70,13 +76,14 @@
                     [(ngModel)]="revision"
                     name="revision"
                     required
+                    [readOnly]="!editable"
                   />
                 </div>
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-sm-8">
+
+          <!-- <div class="col-sm-8">
               <div class="form-group row">
                 <label
                   class="col-sm-6 col-form-label"
@@ -100,28 +107,27 @@
                   </select>
                 </div>
               </div>
-            </div>
+            </div> -->
+          <div class="form-group row">
+            <label
+              class="col-sm-4 col-form-label"
+              for="revisionDate"
+              i18n="@@string-date-dataset"
+              >Datum</label
+            >
             <div class="col-sm-4">
-              <div class="form-group row">
-                <label
-                  class="col-sm-4 col-form-label"
-                  for="revisionDate"
-                  i18n="@@string-date-dataset"
-                  >Datum</label
-                >
-                <div class="col-sm-8">
-                  <p-calendar
-                    [(ngModel)]="revisionDate"
-                    [showIcon]="false"
-                    [inline]="false"
-                    dateFormat="dd.mm.yy"
-                    id="revisionDate"
-                    name="revisionDate"
-                  ></p-calendar>
-                </div>
-              </div>
+              <p-calendar
+                [(ngModel)]="revisionDate"
+                [showIcon]="false"
+                [inline]="false"
+                dateFormat="dd.mm.yy"
+                id="revisionDate"
+                name="revisionDate"
+                [disabled]="!editable"
+              ></p-calendar>
             </div>
           </div>
+
           <div class="form-group row">
             <label
               class="col-sm-4 col-form-label"
@@ -146,6 +152,7 @@
                 ]"
                 name="normLanguage"
                 [(ngModel)]="normLanguage"
+                [disabled]="!editable"
               ></p-selectButton>
             </div>
           </div>
@@ -164,6 +171,7 @@
                 required
                 [(ngModel)]="descriptionDE"
                 name="descriptionDE"
+                [disabled]="!editable"
               ></textarea>
             </div>
           </div>
@@ -181,6 +189,7 @@
                 placeholder="Beschreibung en"
                 [(ngModel)]="descriptionEN"
                 name="descriptionEN"
+                [disabled]="!editable"
               ></textarea>
             </div>
           </div>
@@ -198,6 +207,7 @@
                 placeholder="Beschreibung fr"
                 [(ngModel)]="descriptionFR"
                 name="descriptionFR"
+                [disabled]="!editable"
               ></textarea>
             </div>
           </div>
@@ -207,14 +217,8 @@
               >Scope</label
             >
             <div class="col-sm-8">
-              <input
-                type="text"
-                class="form-control"
-                i18n-placeholder
-                placeholder="Scope"
-                [(ngModel)]="scope"
-                name="scope"
-              />
+              <textarea class="form-control" i18n-placeholder placeholder="Scope" [(ngModel)]="scope"
+                name="scope" [disabled]="!editable"></textarea>
             </div>
           </div>
 
@@ -223,7 +227,7 @@
               >Tags</label
             >
             <div class="col-sm-8">
-              <p i18n="@@string-tag-level1-dataset">Level 1</p>
+              <p i18n="@@string-tag-level1-dataset">Level 1 (Herausgeber)</p>
               <angular2-multiselect
                 required
                 name="tagsLevel1"
@@ -234,6 +238,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -322,6 +327,7 @@
                   ]"
                   name="active"
                   [(ngModel)]="active"
+                  [disabled]="!editable"
                 ></p-selectButton>
               </div>
             </div>
@@ -338,10 +344,9 @@
             <div class="col-sm-12">
               <p-fileUpload
                 #fileUploadInput
-                [disabled]="normForm.invalid"
+                [disabled]="normForm.invalid || !editable"
                 name="files"
-                (onSelect)="checkUpload($event, uploadField)"
-                (onUpload)="uploadReady($event, uploadField)"
+                (onSelect)="checkUpload($event, fileUploadInput)"
                 accept="application/pdf"
                 [showUploadButton]="false"
                 [showCancelButton]="true"
@@ -358,29 +363,27 @@
           </div>
 
           <hr />
-
+          
           <p-button
             type="button"
             *ngIf="latestAttachmentName"
             icon="fa fa-download "
             iconPos="left"
             title="{{ latestAttachmentName }}"
-            label="{{
-              latestAttachmentName.length > 20
-                ? (latestAttachmentName | slice: 0:20) + '...'
-                : latestAttachmentName
-            }}"
+            label="Download Norm"
             class="attachmentDownload"
             (click)="getDownload(id, latestAttachmentName)"
+            [disabled]="!editable"
           ></p-button>
 
           <hr />
 
           <p-fieldset
-            legend="Revision Historie"
+            legend="Dokumenten Historie"
             [toggleable]="true"
             [transitionOptions]="'100ms'"
-            [collapsed]="true"
+            [collapsed]="false"
+            
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a
@@ -419,7 +422,83 @@
     </p-tabPanel>
 
     <p-tabPanel header="Referenzen" i18n="@@string-references-dataset">
-      Referenzen
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="form-group row">
+            <label
+              class="col-sm-2 col-form-label"
+              i18n="@@string-related-dataset"
+              >Referenzen</label
+            >
+            <div class="col-sm-10">
+              <angular2-multiselect
+                name="relatedNorms"
+                [data]="relatedNorms"
+                [(ngModel)]="selectedRelatedNorms"
+                [settings]="relatedDropdownSettings"
+                (onSelect)="onItemSelect($event)"
+                (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAll($event)"
+              >
+                <c-badge>
+                  <ng-template let-item="item">
+                    <label class="badge">{{ item.normNumber }}</label>
+                  </ng-template>
+                </c-badge>
+                <c-item>
+                  <ng-template let-item="item">
+                    <label> {{ item.normNumber }}</label>
+                  </ng-template>
+                </c-item>
+              </angular2-multiselect>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="selectedRelatedNorms.length > 0">
+        <div class="col-sm-6">
+          <div class="row">
+            <label
+              class="col-sm-2 col-form-label"
+              i18n="@@string-related-dataset"
+              >Referenzen</label
+            >
+            <div class="col-sm-10">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col">Nummer</th>
+                    <th scope="col">Revison</th>
+                    <th scope="col">Scope</th>
+                    <th scope="col">Download</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="clickable"
+                    *ngFor="let related of selectedRelatedNorms"
+                    (click)="showRelated(related.id)"
+                  >
+                    <td>
+                      {{ related.normNumber }}
+                    </td>
+                    <td>{{ related.revision }}</td>
+                    <td>{{ related.scope }}</td>
+                    <td>
+                      <a
+                        class="dynamic-link"
+                        (click)="getDownload(related.id, related.normNumber)"
+                        >Download <i class="fa fa-download"></i
+                      ></a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </p-tabPanel>
 
     <p-tabPanel header="User">
@@ -430,7 +509,7 @@
               >Owner</label
             >
             <div class="col-sm-10">
-              <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
+              <select class="form-control" [(ngModel)]="ownerId" name="ownerId" [disabled]="!editable">
                 <option value="" selected="selected">Owner wählen</option>
                 <option
                   *ngFor="let owner of owners"

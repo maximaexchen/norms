@@ -27,6 +27,7 @@
               "src/favicon.ico",
               "src/assets",
               "src/env.js",
+              "src/env.acpu.js",
               "src/server.js",
               "src/server-service.js",
               "src/server-service.bat"

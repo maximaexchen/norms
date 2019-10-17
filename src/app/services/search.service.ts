@@ -1,10 +1,8 @@
-import { DocumentService } from './document.service';
 import { Injectable } from '@angular/core';
 import { NormDocument } from '@app/models';
 import { EnvService } from './env.service';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { CouchDBService } from './couchDB.service';
 
 @Injectable({ providedIn: 'root' })
@@ -24,18 +22,15 @@ export class SearchService {
   searchResultData = this.searchResult.asObservable();
 
   public search(searchObject?: any) {
-    console.log('searchObject');
-    console.log(searchObject);
     if (searchObject) {
       console.log('search');
       this.http
         .post(this.dbRequest + '/_find', searchObject)
         .subscribe(result => {
           this.searchResult.next(result['docs']);
-          console.log(result['docs']);
         });
     } else {
-      console.log('alll');
+      console.log('all');
       this.couchDBService
         .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
         .subscribe(result => {

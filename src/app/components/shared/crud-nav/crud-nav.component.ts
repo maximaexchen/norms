@@ -19,6 +19,8 @@ export class CrudNavComponent implements OnInit {
   @Input() formMode: string;
   @Input() routeNew: string;
   @Input() validForm: boolean;
+  @Input() dirtyForm: boolean;
+  @Input() editable: boolean;
   @Output() save = new EventEmitter();
   @Output() create = new EventEmitter();
   @Output() edit = new EventEmitter();
