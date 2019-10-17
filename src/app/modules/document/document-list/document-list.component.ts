@@ -151,7 +151,15 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.router.navigate(['../document/' + event.data._id + '/edit']);
   }
 
-  public onFilter(event: any): void {
+  /**
+   * onFilterChange
+   */
+  public onFilterChange(event: any, dt: any) {
+    console.log(dt);
+    console.log(event);
+  }
+
+  public onFilter(event: any, dt: any): void {
     this.documentCount = event.filteredValue.length;
   }
 

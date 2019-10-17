@@ -34,7 +34,7 @@
         size="50"
         i18n-placeholder
         placeholder="Globale Suche"
-        (input)="dt.filterGlobal($event.target.value, 'contains')"
+        (input)="onFilterChange($event, dt)"
         style="width:auto"
       />
     </div>
