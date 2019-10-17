@@ -1,7 +1,5 @@
 // Required
-@import '~bootstrap/scss/functions';
-@import 'assets/styles/bootstrap/variables.scss';
-@import '~bootstrap/scss/variables';
+
 @import '~bootstrap/scss/mixins';
 
 // Optional
@@ -41,4 +39,8 @@
 @import '~bootstrap/scss/utilities';
 // @import 'print';
 
-@import 'assets/styles/bootstrap/form.scss';
+body {
+  @import 'assets/styles/bootstrap/form.scss';
+  @import 'assets/styles/bootstrap/components.scss';
+  @import 'assets/styles/bootstrap/elements.scss';
+}

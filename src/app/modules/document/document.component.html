@@ -2,10 +2,18 @@
   <app-document-search></app-document-search>
 </div>
 <div class="row">
-  <div class="col-lg-5">
-    <app-document-list></app-document-list>
+  <div class="sidebar-content" [ngClass]="showSidebar ? 'col-sm-5' : ''">
+    <div class="navbar-primary" [ngClass]="showSidebar ? '' : 'collapsed'">
+      <app-document-list
+        (openSideBar)="onOpenSidebar($event)"
+        (closeSideBar)="onCloseSidebar($event)"
+      ></app-document-list>
+    </div>
   </div>
-  <div class="col-lg-7">
+  <div
+    class="main-content"
+    [ngClass]="showSidebar ? 'col-sm-7' : 'col-sm-12 collapsed'"
+  >
     <router-outlet></router-outlet>
   </div>
 </div>

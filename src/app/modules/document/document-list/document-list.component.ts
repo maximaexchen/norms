@@ -1,4 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { NormDocument } from '@models/index';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Output,
+  EventEmitter
+} from '@angular/core';
 
 import { Subscription, Observable } from 'rxjs';
 
@@ -16,12 +23,16 @@ import { SearchService } from '@app/services/search.service';
   styleUrls: ['./document-list.component.scss']
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
+  @Output() openSideBar: EventEmitter<any> = new EventEmitter();
+  @Output() closeSideBar: EventEmitter<any> = new EventEmitter();
   alive = true;
+  visible = true;
 
   docs: Array<NormDocument> = [];
 
   documents: NormDocument[] = [];
   documentCount = 0;
+  selectedDocument: NormDocument;
 
   descriptionDE: string;
 
@@ -136,12 +147,26 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       );
   }
 
+  public onRowSelect(event) {
+    console.log(event.data);
+    this.router.navigate(['../document/' + event.data._id + '/edit']);
+  }
+
   public onFilter(event: any): void {
     this.documentCount = event.filteredValue.length;
   }
 
   public showDetail(id: string) {
     this.router.navigate(['../document/' + id + '/edit']);
+  }
+
+  public toggleSidebar() {
+    this.visible = !this.visible;
+    if (this.visible) {
+      this.closeSideBar.emit(null); //emit event here
+    } else {
+      this.openSideBar.emit(null);
+    }
   }
 
   ngOnDestroy() {

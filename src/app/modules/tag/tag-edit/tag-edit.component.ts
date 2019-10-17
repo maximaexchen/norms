@@ -9,6 +9,7 @@ import { ConfirmationService } from 'primeng/api';
 import { Tag } from '@app/models/tag.model';
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
+import _ = require('underscore');
 
 @Component({
   selector: 'app-tag-edit',
@@ -44,9 +45,20 @@ export class TagEditComponent implements OnInit, OnDestroy {
   public ngOnInit() {
     console.log('TagEditComponent');
     this.getTag();
+    this.restFields();
+  }
+
+  private restFields() {
+    this.id = '';
+    this.rev = '';
+    this.type = '';
+    this.name = '';
+    this.tagType = '';
+    this.active = null;
   }
 
   private getTag() {
+    this.restFields();
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // check if we are updating
       if (results['id']) {
@@ -79,6 +91,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
       this.onUpdateTag();
     } else {
       console.log('Create a tag');
+      this.restFields();
       this.onCreateTag();
     }
   }
@@ -91,6 +104,28 @@ export class TagEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
+          // Query for NormDocuments having the changed publisher
+          const updateQuery = {
+            use_index: ['_design/search_norm'],
+            selector: {
+              _id: { $gt: null },
+              type: { $eq: 'norm' },
+              tags: {
+                $elemMatch: {
+                  id: { $eq: result.id }
+                }
+              }
+            }
+          };
+
+          // Update all NormDocuments with the changed publisher
+          this.couchDBService
+            .search(updateQuery)
+            .pipe(takeWhile(() => this.alive))
+            .subscribe(results => {
+              this.updateRelated(results);
+            });
+
           // Inform about Database change.
           this.getTag();
           this.sendStateUpdate();
@@ -100,6 +135,20 @@ export class TagEditComponent implements OnInit, OnDestroy {
           this.showConfirm('error', err.message);
         }
       );
+  }
+
+  private updateRelated(related: any) {
+    const bulkUpdateObject = {};
+    bulkUpdateObject['docs'] = [];
+    related.docs.forEach(norm => {
+      // reasing the new name to the found Norm with tag
+      _.findWhere(norm['tags'], { id: this.id })['name'] = this.name;
+      bulkUpdateObject['docs'].push(norm);
+    });
+
+    this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(res => {
+      console.log(res);
+    });
   }
 
   private onCreateTag(): void {

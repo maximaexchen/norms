@@ -8,13 +8,11 @@
             (ngSubmit)="onSubmit()"
             #searchForm="ngForm"
           >
-            <h2
-              style="color: black; margin: 0 30px 0 10px; font-weight: 700; font-size: 1.1rem;"
-            >
+            <h1 class="search-title panel-headline">
               <span class="fa fa-newspaper-o" style="margin: 0 20px 0 0px; ">
               </span
               >Normen
-            </h2>
+            </h1>
             <label class="form-label">Herausgeber</label>
             <select
               class="form-control"
@@ -24,8 +22,8 @@
               <option [ngValue]="null" selected="selected"
                 >Herausgeber wählen</option
               >
-              <option *ngFor="let item of publishers" [value]="item._id">
-                {{ item.name }}
+              <option *ngFor="let item of publishers" [value]="item['_id']">
+                {{ item['name'] }}
               </option>
             </select>
             <!-- <label class="form-label">User</label>
@@ -52,14 +50,22 @@
               <option [ngValue]="null" selected="selected">Owner wählen</option>
               <option
                 *ngFor="let owner of owners"
-                [value]="owner._id"
-                [selected]="owner._id == owner"
+                [value]="owner['_id']"
+                [selected]="owner['_id'] == owner"
               >
-                {{ owner.lastName }}, {{ owner.firstName }}
+                {{ owner['lastName'] }}, {{ owner['firstName'] }}
               </option>
             </select>
-
-            <button class="btn btn-success" type="submit">
+            <div class="form-check mb-2 mr-sm-2">
+              <p-checkbox
+                name="activeNorms"
+                binary="true"
+                [(ngModel)]="activeNorms"
+                label="nur aktive Datensätze"
+                labelStyleClass="form-label"
+              ></p-checkbox>
+            </div>
+            <button class="btn btn-default" type="submit">
               Suche
             </button>
           </form>
@@ -91,31 +97,31 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of foundDocuments">
-          <td>{{ item.publisher }}</td>
+          <td>{{ item['publisher'] }}</td>
           <td>
             <a
-              *ngIf="item.normFilePath"
-              href="{{ item.normFilePath.replace('./src', '') }}"
+              *ngIf="item['normFilePath']"
+              href="{{ item['normFilePath'].replace('./src', '') }}"
               target="_blank"
-              >{{ item.number }}</a
+              >{{ item['number'] }}</a
             >
           </td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.revision }}</td>
-          <td>{{ item.outputDate | date: 'dd.MM.y' }}</td>
-          <td>{{ item.inputDate | date: 'dd.MM.y' }}</td>
-          <td>{{ item.owner }}</td>
+          <td>{{ item['name'] }}</td>
+          <td>{{ item['revision'] }}</td>
+          <td>{{ item['outputDate'] | date: 'dd.MM.y' }}</td>
+          <td>{{ item['inputDate'] | date: 'dd.MM.y' }}</td>
+          <td>{{ item['owner'] }}</td>
           <td>
             <button
               type="button"
-              (click)="showDialog(item.fetchedUser)"
+              (click)="showDialog(item['fetchedUser'])"
               pButton
               icon="pi pi-eye"
             ></button>
           </td>
           <td>
             <a
-              [routerLink]="'../document/' + [item._id] + '/edit'"
+              [routerLink]="'../document/' + [item['_id']] + '/edit'"
               class="btn btn-primary"
               >Bearbeiten</a
             >

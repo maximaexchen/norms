@@ -1,7 +1,14 @@
 .form-control {
   font-size: 13px;
   font-weight: 400;
-  height: 26px;
   margin: 2px 0;
   padding: 0px 10px !important;
+}
+
+.form-check {
+  padding-top: 10px;
+}
+
+.clickable {
+  cursor: pointer;
 }

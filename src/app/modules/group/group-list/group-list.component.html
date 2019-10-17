@@ -7,6 +7,9 @@
   [paginator]="true"
   [rows]="13"
   class="table"
+  selectionMode="single"
+  [(selection)]="selectedGroup"
+  (onRowSelect)="onRowSelect($event)"
   [globalFilterFields]="['name']"
   (onFilter)="onFilter($event)"
 >
@@ -26,15 +29,11 @@
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
-      <th width="30"></th>
       <th>Name</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-group>
-    <tr>
-      <td>
-        <a class="fa fa-folder" (click)="showDetail(group._id)"></a>
-      </td>
+    <tr [pSelectableRow]="group">
       <td>{{ group.name }}</td>
     </tr>
   </ng-template>

@@ -1,11 +1,5 @@
 import { Tag } from '@app/models/tag.model';
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  OnDestroy,
-  ElementRef
-} from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -26,7 +20,7 @@ import * as _ from 'underscore';
 import { EnvService } from 'src/app//services/env.service';
 import { takeWhile } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
-import { FileUploadModule, FileUpload } from 'primeng/fileupload';
+import { FileUpload } from 'primeng/fileupload';
 
 @Component({
   selector: 'app-document-edit',
@@ -43,12 +37,17 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   uploadDir = this.env.uploadDir;
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
+  selectedTab = 0;
 
   writeItem: NormDocument;
   publishers: Publisher[] = [];
   owners: User[] = [];
   users: User[] = [];
   selectedUsers: User[] = [];
+
+  relatedNorms: NormDocument[] = [];
+  selectedRelatedNorms: NormDocument[] = [];
+
   revisionDocuments: RevisionDocument[] = [];
   attachments: any = {};
   attachment: any;
@@ -84,6 +83,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   userDropdownSettings = {};
   tagDropdownSettings = {};
+  relatedDropdownSettings = {};
   fileUpload: File | null;
   rawPDF: string;
 
@@ -134,11 +134,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       classes: 'tagClass'
     };
 
+    this.relatedDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Referenz wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Referenz Auswahl',
+      noDataLabel: 'Keine Referenz gefunden',
+      classes: 'relatedClass'
+    };
+
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // fetch data for select-boxes
       this.getPublishers();
       this.getUsers();
       this.getTags();
+      this.getRelatedNorms();
 
       // check if we are updating
       if (results['id']) {
@@ -150,10 +165,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private restFields() {
+    console.log('resetFields');
+    this.selectedRelatedNorms = [];
     this.selectedUsers = [];
     this.selectedTags1 = [];
     this.selectedTags2 = [];
     this.selectedTags3 = [];
+    this.selectedTab = 0;
   }
 
   private newDocument() {
@@ -251,10 +269,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.setStartValues();
         }
       );
-  }
-
-  public uploadReady(event, uploadField) {
-    console.log('uploadReady: ready');
   }
 
   public checkUpload(event, uploadField) {
@@ -399,6 +413,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         });
       });
   }
+  private getRelatedNorms() {
+    this.relatedNorms = [];
+    this.documentService
+      .getDocuments()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        result => {
+          // Also add to the users
+          result.forEach(item => {
+            const relatedObject = {} as NormDocument;
+            relatedObject['id'] = item._id;
+            relatedObject['normNumber'] = item.normNumber;
+            relatedObject['revision'] = item.revision;
+            relatedObject['scope'] = item.scope;
+            this.relatedNorms.push(relatedObject);
+          });
+        },
+        err => {}
+      );
+  }
 
   private getPublishers() {
     this.documentService
@@ -413,6 +447,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getTags(): void {
+    this.tagsLevel1 = [];
+    this.tagsLevel2 = [];
+    this.tagsLevel3 = [];
     this.couchDBService
       .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
       .pipe(takeWhile(() => this.alive))
@@ -470,7 +507,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
-    console.log('getDocumentData');
     this.restFields();
     this.id = entry['_id'];
     this.rev = entry['_rev'];
@@ -499,6 +535,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     if (entry['users']) {
       this.setSelectedUsers(entry['users']);
+    }
+
+    if (entry['relatedNorms']) {
+      this.setRelatedNorms(entry['relatedNorms']);
     }
 
     if (entry['tags']) {
@@ -560,7 +600,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.normForm.value.descriptionEN || '';
     this.writeItem['description']['fr'] =
       this.normForm.value.descriptionFR || '';
-    this.writeItem['scope'] = this.normForm.value.scope || false;
+    this.writeItem['scope'] = this.normForm.value.scope || '';
     this.writeItem['active'] = this.normForm.value.active || false;
 
     if (this.normForm.value._id) {
@@ -570,6 +610,18 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.normForm.value._rev) {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
+
+    const selectedRelatedObjects = [
+      ...new Set(
+        this.selectedRelatedNorms.map(related => {
+          const newRelated = {};
+          newRelated['id'] = related['id'];
+          newRelated['normNumber'] = related['normNumber'];
+          return newRelated;
+        })
+      )
+    ];
+    this.writeItem['relatedNorms'] = selectedRelatedObjects || [];
 
     const selectedUserObjects = [
       ...new Set(
@@ -614,22 +666,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.uploadDir.match(/[^\/]*\/[^\/]*/)[0],
         ''
       );
-      console.log(this.revisionDocuments);
       this.revisionDocuments.push(this.revisionDocument);
-      console.log(this.revisionDocuments);
 
       // Add new attachment by merge
       const tempAttachmentObject = this.attachments;
-      console.log(tempAttachmentObject);
       this.attachments = { ...tempAttachmentObject, ...this.attachment };
-      console.log(this.attachments);
-
-      console.log(':::::::::::::::::::::');
     }
 
     this.writeItem['_attachments'] = this.attachments || [];
     this.writeItem['revisions'] = this.revisionDocuments || [];
     return this.writeItem;
+  }
+
+  private setRelatedNorms(relatedNorms: any[]) {
+    const relatedMap: NormDocument[] = relatedNorms.map(related => {
+      const selectedRelatedObject = {};
+      selectedRelatedObject['id'] = related.id;
+      selectedRelatedObject['normNumber'] = related.normNumber;
+      return selectedRelatedObject;
+    });
+    this.selectedRelatedNorms = relatedMap;
   }
 
   private setSelectedUsers(users: any[]) {
@@ -653,6 +709,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       return selectedTagObject;
     });
     // this.selectedTags = tagMap;
+  }
+
+  public showRelated(id: string) {
+    this.router.navigate(['../document/' + id + '/edit']);
   }
 
   private showConfirmation(type: string, result: string) {

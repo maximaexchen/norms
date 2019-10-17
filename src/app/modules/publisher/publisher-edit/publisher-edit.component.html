@@ -16,6 +16,7 @@
     ></app-crud-nav>
   </div>
 </div>
+
 <p-tabView>
   <p-tabPanel header="Stammdaten">
     <form class="form" (ngSubmit)="onSubmit()" #publisherForm="ngForm">
@@ -42,14 +43,6 @@
             name="active"
           />Aktiv ?</label
         >
-      </div>
-
-      <hr />
-
-      <div class="form-group">
-        <button class="btn btn-success" type="submit">
-          {{ formMode ? 'Aktualisieren' : 'Erstellen' }}
-        </button>
       </div>
     </form>
   </p-tabPanel>

@@ -1,5 +1,6 @@
-<div class="info-panel position-top">
-  <h1 i18n="@@string-user-selection">Auswahl Normen</h1>
+<div class="btn-expand-collapse">
+  <span class="nav-label">Auswahl Artikel</span>
+  <span class="nav-button fa fa-chevron-left" (click)="toggleSidebar()"></span>
 </div>
 
 <p-table
@@ -9,6 +10,9 @@
   [rows]="13"
   class="table"
   [globalFilterFields]="['name', 'normNumber']"
+  selectionMode="single"
+  [(selection)]="selectedDocument"
+  (onRowSelect)="onRowSelect($event)"
   (onFilter)="onFilter($event)"
 >
   <ng-template pTemplate="caption">
@@ -27,18 +31,14 @@
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
-      <th width="30"></th>
-
       <th [pSortableColumn]="'normNumber'">
         Nummer<p-sortIcon [field]="'normNumber'"></p-sortIcon>
       </th>
-      <th [pSortableColumn]="'publisher'">
+      <th [pSortableColumn]="'tags'">
         Herausgeber
-        <p-sortIcon [field]="'publisher'"></p-sortIcon>
+        <p-sortIcon [field]="'tags'"></p-sortIcon>
       </th>
-      <th [pSortableColumn]="'description'">
-        Beschreibung<p-sortIcon [field]="'description'"></p-sortIcon>
-      </th>
+      <th>Beschreibung<p-sortIcon [field]="'description'"></p-sortIcon></th>
       <th [pSortableColumn]="'revision'">
         Revision<p-sortIcon [field]="'revision'"></p-sortIcon>
       </th>
@@ -51,12 +51,13 @@
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-document>
-    <tr>
+    <tr [pSelectableRow]="document">
+      <td>{{ document.normNumber }} <br />({{ document.active }})</td>
       <td>
-        <a class="fa fa-folder" (click)="showDetail(document._id)"></a>
+        <span *ngFor="let tag of document.tags">
+          <span *ngIf="tag.tagType === 'level1'">{{ tag.name }}</span>
+        </span>
       </td>
-      <td>{{ document.normNumber }}</td>
-      <td>{{ document.publisher.name }}</td>
       <td>
         {{
           document.description.de.length > 40
