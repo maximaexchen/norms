@@ -170,6 +170,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private restFields() {
     console.log('resetFields');
+    this.editable = false;
     this.selectedRelatedNorms = [];
     this.selectedUsers = [];
     this.selectedTags1 = [];
@@ -185,6 +186,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.publisher = '';
     this.owner = '';
     this.id = uuidv4();
+    this.editable = true;
   }
 
   private editDocument(results) {

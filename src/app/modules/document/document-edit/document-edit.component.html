@@ -123,6 +123,7 @@
                 dateFormat="dd.mm.yy"
                 id="revisionDate"
                 name="revisionDate"
+                required
                 [disabled]="!editable"
               ></p-calendar>
             </div>
@@ -190,6 +191,7 @@
                 [(ngModel)]="descriptionEN"
                 name="descriptionEN"
                 [disabled]="!editable"
+                required
               ></textarea>
             </div>
           </div>
@@ -255,6 +257,7 @@
               </angular2-multiselect>
               <p i18n="@@string-tag-level2-dataset">Level 2</p>
               <angular2-multiselect
+                required
                 name="tagsLevel2"
                 [data]="tagsLevel2"
                 [(ngModel)]="selectedTags2"

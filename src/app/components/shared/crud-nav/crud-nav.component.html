@@ -22,6 +22,7 @@
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onCreate()"
+    *ngIf="formMode"
   ></button>
   <button
     pButton
@@ -43,5 +44,6 @@
     class="btn btn-default btn-sm btn-headline"
     label="Löschen"
     (click)="onDelete()"
+    *ngIf="formMode"
   ></button>
 </div>

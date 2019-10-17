@@ -72,11 +72,39 @@
       <td>{{ document.normNumber }}</td>
       <td>{{ document.revision }}</td>
       <td>{{ document.publisher }}</td>
-      <td pTooltip="{{ document.description.de }}" tooltipPosition="top">
+      <td
+        *ngIf="document.normLanguage === 'de'"
+        pTooltip="{{ document.description.de }}"
+        tooltipPosition="top"
+      >
         {{
           document.description.de.length > 15
             ? (document.description.de | slice: 0:15) + '...'
             : document.description.de
+        }}
+      </td>
+
+      <td
+        *ngIf="document.normLanguage === 'en'"
+        pTooltip="{{ document.description.en }}"
+        tooltipPosition="top"
+      >
+        {{
+          document.description.en.length > 15
+            ? (document.description.en | slice: 0:15) + '...'
+            : document.description.en
+        }}
+      </td>
+
+      <td
+        *ngIf="document.normLanguage === 'fr'"
+        pTooltip="{{ document.description.fr }}"
+        tooltipPosition="top"
+      >
+        {{
+          document.description.fr.length > 15
+            ? (document.description.fr | slice: 0:15) + '...'
+            : document.description.fr
         }}
       </td>
 
