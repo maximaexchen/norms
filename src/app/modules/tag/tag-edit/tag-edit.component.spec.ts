@@ -1,0 +1,70 @@
+import { Tag } from './../../../models/tag.model';
+import { MessageService } from 'primeng/components/common/messageservice';
+import { DocumentModule } from './../../document/document.module';
+import { GroupModule } from './../../group/group.module';
+import { PublisherModule } from './../../publisher/publisher.module';
+import { RoleModule } from './../../role/role.module';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { TagEditComponent } from './tag-edit.component';
+import { CrudNavComponent } from '@app/components/shared/crud-nav/crud-nav.component';
+import { CouchDBService } from '@app/services/couchDB.service';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { NotificationsService } from '@app/services/notifications.service';
+import { ConfirmationService } from 'primeng/api';
+import { GeneralModule } from '@app/modules/general.module';
+import { RoleRoutingModule } from '@app/modules/role/role-routing.module';
+import { UserModule } from '@app/modules/user/user.module';
+import { TagModule } from '../tag.module';
+import { SearchModule } from '@app/modules/search/search.module';
+
+describe('TagEditComponent', () => {
+  let component: TagEditComponent;
+  let fixture: ComponentFixture<TagEditComponent>;
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [],
+      imports: [
+        RouterModule.forRoot([]),
+        GeneralModule,
+        TagModule,
+        SearchModule,
+        UserModule,
+        RoleModule,
+        PublisherModule,
+        GroupModule,
+        DocumentModule,
+        RoleRoutingModule
+      ],
+      providers: [
+        CouchDBService,
+        NotificationsService,
+        ConfirmationService,
+        MessageService
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TagEditComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('Entering email and password emits loggedIn event', () => {
+    let tag: Tag;
+    name.nativeElement.value = 'Tag Name';
+
+    passwordEl.nativeElement.value = '123456';
+    component.loggedIn.subscribe(value => (tag = value));
+    submitEl.triggerEventHandler('click', null);
+
+    expect(tag.name).toBe('test@example.com');
+    expect(tag.tagType).toBe('Level 1');
+  });
+});

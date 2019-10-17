@@ -1,4 +1,4 @@
-export interface TagProperties {
+/* export interface TagProperties {
   _id?: string;
   _rev?: string;
   type?: string;
@@ -15,4 +15,16 @@ export class Tag {
       }
     }
   }
+}
+ */
+
+export class Tag {
+  _id?: string;
+  _rev?: string;
+  type?: string;
+  name?: string;
+  tagType?: string;
+  active?: boolean;
+
+  constructor() {}
 }
