@@ -50,8 +50,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   ) {
     this.searchService.searchResultData.subscribe(result => {
       this.documents = result;
-      console.log('this.docs');
-      console.log(this.docs);
+      this.setOwnerFromTags();
+      console.log('this.documents');
+      console.log(this.documents);
     });
   }
 
@@ -78,19 +79,23 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.documents = result;
           this.documentCount = this.documents.length;
 
-          this.documents.forEach(norm => {
-            norm['tags'].forEach(tag => {
-              if (tag.tagType === 'level1') {
-                norm['publisher'] = tag.name;
-              }
-            });
-          });
+          this.setOwnerFromTags();
         },
         error => {
           console.log(error.message);
         },
         () => {}
       );
+  }
+
+  private setOwnerFromTags() {
+    this.documents.forEach(norm => {
+      norm['tags'].forEach(tag => {
+        if (tag.tagType === 'level1') {
+          norm['publisher'] = tag.name;
+        }
+      });
+    });
   }
 
   public getDownload(id: string, attachments: any) {

@@ -21,6 +21,7 @@
                 [(ngModel)]="selectedTags"
                 [settings]="tagDropdownSettings"
                 style="width: 150px;"
+                (onDeSelectAll)="onDeSelectAll($event)"
               >
                 <c-badge>
                   <ng-template let-item="item">

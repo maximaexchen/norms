@@ -18,8 +18,10 @@
       [validForm]="normForm.valid"
       [dirtyForm]="normForm.dirty"
       [routeNew]="'/document/new'"
+      [editable]="editable"
       (save)="onSubmit()"
       (add)="onSubmit()"
+      (edit)="onEdit()"
       (delete)="deleteDocument()"
     ></app-crud-nav>
   </div>
@@ -51,10 +53,10 @@
                     class="form-control"
                     i18n-placeholder
                     placeholder="Nummer"
-                    [(ngModel)]="normNumber"
-                    name="normNumber"
+                    [(ngModel)]="normNumber" 
+                    name="normNumber" 
                     required
-                  />
+                    [readOnly]="!editable" />
                 </div>
               </div>
             </div>
@@ -74,6 +76,7 @@
                     [(ngModel)]="revision"
                     name="revision"
                     required
+                    [readOnly]="!editable"
                   />
                 </div>
               </div>
@@ -120,6 +123,7 @@
                 dateFormat="dd.mm.yy"
                 id="revisionDate"
                 name="revisionDate"
+                [disabled]="!editable"
               ></p-calendar>
             </div>
           </div>
@@ -148,6 +152,7 @@
                 ]"
                 name="normLanguage"
                 [(ngModel)]="normLanguage"
+                [disabled]="!editable"
               ></p-selectButton>
             </div>
           </div>
@@ -166,6 +171,7 @@
                 required
                 [(ngModel)]="descriptionDE"
                 name="descriptionDE"
+                [disabled]="!editable"
               ></textarea>
             </div>
           </div>
@@ -183,6 +189,7 @@
                 placeholder="Beschreibung en"
                 [(ngModel)]="descriptionEN"
                 name="descriptionEN"
+                [disabled]="!editable"
               ></textarea>
             </div>
           </div>
@@ -200,6 +207,7 @@
                 placeholder="Beschreibung fr"
                 [(ngModel)]="descriptionFR"
                 name="descriptionFR"
+                [disabled]="!editable"
               ></textarea>
             </div>
           </div>
@@ -209,14 +217,8 @@
               >Scope</label
             >
             <div class="col-sm-8">
-              <input
-                type="text"
-                class="form-control"
-                i18n-placeholder
-                placeholder="Scope"
-                [(ngModel)]="scope"
-                name="scope"
-              />
+              <textarea class="form-control" i18n-placeholder placeholder="Scope" [(ngModel)]="scope"
+                name="scope" [disabled]="!editable"></textarea>
             </div>
           </div>
 
@@ -236,6 +238,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -324,6 +327,7 @@
                   ]"
                   name="active"
                   [(ngModel)]="active"
+                  [disabled]="!editable"
                 ></p-selectButton>
               </div>
             </div>
@@ -340,7 +344,7 @@
             <div class="col-sm-12">
               <p-fileUpload
                 #fileUploadInput
-                [disabled]="normForm.invalid"
+                [disabled]="normForm.invalid || !editable"
                 name="files"
                 (onSelect)="checkUpload($event, fileUploadInput)"
                 accept="application/pdf"
@@ -359,7 +363,7 @@
           </div>
 
           <hr />
-
+          
           <p-button
             type="button"
             *ngIf="latestAttachmentName"
@@ -369,15 +373,17 @@
             label="Download Norm"
             class="attachmentDownload"
             (click)="getDownload(id, latestAttachmentName)"
+            [disabled]="!editable"
           ></p-button>
 
           <hr />
 
           <p-fieldset
-            legend="Revision Historie"
+            legend="Dokumenten Historie"
             [toggleable]="true"
             [transitionOptions]="'100ms'"
-            [collapsed]="true"
+            [collapsed]="false"
+            
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a
@@ -503,7 +509,7 @@
               >Owner</label
             >
             <div class="col-sm-10">
-              <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
+              <select class="form-control" [(ngModel)]="ownerId" name="ownerId" [disabled]="!editable">
                 <option value="" selected="selected">Owner wählen</option>
                 <option
                   *ngFor="let owner of owners"

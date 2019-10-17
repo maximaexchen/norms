@@ -11,13 +11,16 @@
   [rows]="13"
   class="table"
   [globalFilterFields]="[
-    'revision',
     'normNumber',
-    'description.de',
+    'revision',
     'publisher',
+    'description.de',
+    'revisionDate',
     'owner.userName'
   ]"
   selectionMode="single"
+  sortField="normNumber"
+  [sortOrder]="1"
   [(selection)]="selectedDocument"
   (onRowSelect)="onRowSelect($event)"
   (onFilter)="onFilter($event)"

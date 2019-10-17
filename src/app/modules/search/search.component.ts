@@ -126,7 +126,17 @@ export class SearchComponent implements OnInit, OnDestroy {
     });
   }
 
+  private resetSearchFields() {
+    this.publisherId = 'undefined';
+    this.ownerId = 'undefined';
+    this.groupId = 'undefined';
+    this.userId = 'undefined';
+    this.tagIds = [];
+  }
+
   public onSubmit(): void {
+    this.resetSearchFields();
+
     const searchObject = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -134,18 +144,18 @@ export class SearchComponent implements OnInit, OnDestroy {
         type: { $eq: 'norm' }
       }
     };
-    this.publisherId = 'undefined';
-    this.ownerId = 'undefined';
-    this.groupId = 'undefined';
-    this.userId = 'undefined';
+
+    console.log(this.tagIds);
+    console.log(this.searchForm.value.tags);
 
     if (this.searchForm.value.tags.length > 0) {
       this.tagIds = _.pluck(this.searchForm.value.tags, '_id');
     }
+    console.log(this.tagIds);
 
-    if (this.searchForm.value.publisherId !== undefined) {
+    /* if (this.searchForm.value.publisherId !== undefined) {
       this.publisherId = this.searchForm.value.publisherId;
-    }
+    } */
 
     if (this.searchForm.value.ownerId !== undefined) {
       this.ownerId = this.searchForm.value.ownerId;
@@ -167,19 +177,21 @@ export class SearchComponent implements OnInit, OnDestroy {
     if (
       this.searchForm.value.activeNorms !== null &&
       this.searchForm.value.activeNorms !== undefined &&
-      this.searchForm.value.activeNorms !== false &&
-      this.tagIds.length > 0
+      this.searchForm.value.activeNorms === true
     ) {
       this.activeNorms = this.searchForm.value.activeNorms;
 
       Object.assign(searchObject['selector'], {
         active: { $eq: this.activeNorms }
       });
-    } else {
-      this.activeNorms = null;
     }
 
-    if (!!this.publisherId || !!this.ownerId) {
+    console.log(!!this.publisherId);
+    console.log(!!this.ownerId);
+    console.log(this.tagIds.length > 0);
+    console.log(!!this.publisherId || !!this.ownerId || this.tagIds.length > 0);
+
+    if (!!this.ownerId || this.tagIds.length > 0) {
       Object.assign(searchObject['selector'], {
         $or: []
       });
@@ -227,9 +239,9 @@ export class SearchComponent implements OnInit, OnDestroy {
     // same as below
     // if (!this.publisherId  && !this.ownerId) {
     if (
-      this.publisherId === null &&
       this.ownerId === null &&
-      this.activeNorms === null
+      this.activeNorms === null &&
+      this.tagIds.length < 0
     ) {
       console.log('No search parameters');
       this.searchService.search(undefined);
@@ -266,6 +278,10 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.modalContent += '</tr>';
     });
     this.modalContent += '</tbody></table>';
+  }
+
+  public onDeSelectAll(items: any) {
+    this.searchForm.value.tags = [];
   }
 
   ngOnDestroy(): void {

@@ -49,10 +49,19 @@ body {
     line-height: 1.2rem !important;
   }
 
+  .ui-state-disabled {
+    cursor: not-allowed !important;
+  }
+
   .c-btn {
     background: $btn-background;
     border: 1px solid $btn-border;
     color: $btn-text-color;
+
+    &.disabled {
+      cursor: not-allowed;
+      background: $input-disabled-background;
+    }
   }
   .selected-list {
     .c-list {

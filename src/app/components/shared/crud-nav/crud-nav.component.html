@@ -8,6 +8,7 @@
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onSubmit()"
+    *ngIf="editable"
     [disabled]="!validForm"
     [ngClass]="{ 'ready-save-btn': dirtyForm }"
   ></button>
@@ -30,6 +31,7 @@
     i18n-label="@@btn-edit"
     class="btn btn-default btn-sm btn-headline"
     label="Bearbeiten"
+    *ngIf="!editable"
     (click)="onEdit()"
   ></button>
   <button

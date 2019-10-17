@@ -33,6 +33,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   alive = true;
   isLoading = false;
+  editable = false;
   uploadUrl = this.env.uploadUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
@@ -117,7 +118,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       unSelectAllText: 'Auswahl aufheben',
       enableSearchFilter: true,
       searchPlaceholderText: 'User Auswahl',
-      noDataLabel: 'Keinen Benutzer gefunden'
+      noDataLabel: 'Keinen Benutzer gefunden',
+      disabled: true
     };
 
     this.tagDropdownSettings = {
@@ -131,7 +133,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tagClass'
+      classes: 'tagClass',
+      disabled: true
     };
 
     this.relatedDropdownSettings = {
@@ -145,7 +148,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Referenz Auswahl',
       noDataLabel: 'Keine Referenz gefunden',
-      classes: 'relatedClass'
+      classes: 'relatedClass',
+      disabled: true
     };
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
@@ -218,10 +222,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
                 this.showConfirmation('error', error.message);
               },
               () => {
+                this.router.navigate(['../document/' + this.id + '/edit']);
                 this.showConfirmation('sucess', 'Upload erfolgreich');
               }
             );
         }
+        this.router.navigate(['../document/' + this.id + '/edit']);
         this.isLoading = false;
         this.sendStateUpdate();
       });
@@ -414,6 +420,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         });
       });
   }
+
+  // f8848d43-e241-437b-96e7-5d67dd
+
   private getRelatedNorms() {
     this.relatedNorms = [];
     this.documentService
@@ -750,6 +759,24 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       };
       r.readAsDataURL(file);
     });
+  }
+
+  public onEdit() {
+    console.log(this.editable);
+    this.editable = true;
+
+    this.tagDropdownSettings['disabled'] = false;
+    this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
+
+    this.userDropdownSettings['disabled'] = false;
+    this.userDropdownSettings = Object.assign({}, this.userDropdownSettings);
+
+    this.relatedDropdownSettings['disabled'] = false;
+    this.relatedDropdownSettings = Object.assign(
+      {},
+      this.relatedDropdownSettings
+    );
+    console.log(this.editable);
   }
 
   public onItemSelect(item: any) {}

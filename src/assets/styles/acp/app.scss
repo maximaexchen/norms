@@ -76,14 +76,15 @@ body {
       cursor: pointer;
 
       &.tag-level1-item {
-        background-color: royalblue; // rgb(44, 151, 201);
+        background-color: rgb(44, 151, 201);
       }
 
       &.tag-level2-item {
-        background-color: orange; // rgb(237, 130, 42);
+        background-color: rgb(237, 130, 42);
       }
+
       &.tag-level3-item {
-        background-color: limegreen; // rgb(138, 181, 45);
+        background-color: rgb(138, 181, 45);
       }
     }
   }
@@ -112,15 +113,18 @@ body {
       margin-top: 2px;
       font-size: 0.8rem;
       font-weight: normal;
+      color: $white;
+      border-radius: 25px;
     }
+
     label.level1 {
-      background-color: #0071bd;
+      background-color: rgb(44, 151, 201); // #0071bd;
     }
     label.level2 {
-      background-color: #bd0000;
+      background-color: rgb(237, 130, 42); // #bd0000;
     }
     label.level3 {
-      background-color: #319a31;
+      background-color: rgb(138, 181, 45); // #319a31;
     }
 
     .selected-list .c-list .c-token {
