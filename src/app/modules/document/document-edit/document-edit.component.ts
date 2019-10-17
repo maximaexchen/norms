@@ -7,17 +7,17 @@ import { Observable, Subscriber } from 'rxjs';
 
 import uuidv4 from '@bundled-es-modules/uuid/v4.js';
 
-import { CouchDBService } from 'src/app//services/couchDB.service';
+import { CouchDBService } from 'src/app/services/couchDB.service';
 import { NormDocument } from '../../../models/document.model';
 import { RevisionDocument } from './../revision-document.model';
 import { Publisher } from '../../../models/publisher.model';
 import { User } from '@app/models/user.model';
-import { DocumentService } from 'src/app//services/document.service';
-import { ServerService } from 'src/app//services/server.service';
-import { NotificationsService } from 'src/app//services/notifications.service';
+import { DocumentService } from 'src/app/services/document.service';
+import { ServerService } from 'src/app/services/server.service';
+import { NotificationsService } from 'src/app/services/notifications.service';
 
 import * as _ from 'underscore';
-import { EnvService } from 'src/app//services/env.service';
+import { EnvService } from 'src/app/services/env.service';
 import { takeWhile } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
@@ -33,6 +33,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   alive = true;
   isLoading = false;
+  editable = false;
   uploadUrl = this.env.uploadUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
@@ -117,7 +118,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       unSelectAllText: 'Auswahl aufheben',
       enableSearchFilter: true,
       searchPlaceholderText: 'User Auswahl',
-      noDataLabel: 'Keinen Benutzer gefunden'
+      noDataLabel: 'Keinen Benutzer gefunden',
+      disabled: true
     };
 
     this.tagDropdownSettings = {
@@ -131,7 +133,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tagClass'
+      classes: 'tagClass',
+      disabled: true
     };
 
     this.relatedDropdownSettings = {
@@ -145,7 +148,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Referenz Auswahl',
       noDataLabel: 'Keine Referenz gefunden',
-      classes: 'relatedClass'
+      classes: 'relatedClass',
+      disabled: true
     };
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
@@ -218,10 +222,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
                 this.showConfirmation('error', error.message);
               },
               () => {
+                this.router.navigate(['../document/' + this.id + '/edit']);
                 this.showConfirmation('sucess', 'Upload erfolgreich');
               }
             );
         }
+        this.router.navigate(['../document/' + this.id + '/edit']);
         this.isLoading = false;
         this.sendStateUpdate();
       });
@@ -267,6 +273,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.showConfirmation('sucess', 'Updated');
           this.fileUploadInput.clear();
           this.setStartValues();
+          this.normForm.form.markAsPristine();
         }
       );
   }
@@ -413,6 +420,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         });
       });
   }
+
+  // f8848d43-e241-437b-96e7-5d67dd
+
   private getRelatedNorms() {
     this.relatedNorms = [];
     this.documentService
@@ -623,28 +633,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     ];
     this.writeItem['relatedNorms'] = selectedRelatedObjects || [];
 
-    const selectedUserObjects = [
-      ...new Set(
-        this.selectedUsers.map(user => {
-          const nameArr = user['name'].split(', ');
-          const newUser = {};
-          newUser['id'] = user['id'];
-          newUser['firstName'] = nameArr[1];
-          newUser['lastName'] = nameArr[0];
-          newUser['email'] = user['email'];
-          return newUser;
-        })
-      )
-    ];
-    this.writeItem['users'] = selectedUserObjects || [];
+    this.setSelectedUser();
 
-    const selectedTags = [
-      ...this.selectedTags1,
-      ...this.selectedTags2,
-      ...this.selectedTags3
-    ];
-
-    this.writeItem['tags'] = selectedTags || [];
+    this.setSelectedTags();
 
     const selPublisher = this.publishers.find(
       pub => pub['_id'] === this.normForm.value.publisherId
@@ -678,6 +669,32 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     return this.writeItem;
   }
 
+  private setSelectedTags() {
+    const selectedTags = [
+      ...this.selectedTags1,
+      ...this.selectedTags2,
+      ...this.selectedTags3
+    ];
+    this.writeItem['tags'] = selectedTags || [];
+  }
+
+  private setSelectedUser() {
+    const selectedUserObjects = [
+      ...new Set(
+        this.selectedUsers.map(user => {
+          const nameArr = user['name'].split(', ');
+          const newUser = {};
+          newUser['id'] = user['id'];
+          newUser['firstName'] = nameArr[1];
+          newUser['lastName'] = nameArr[0];
+          newUser['email'] = user['email'];
+          return newUser;
+        })
+      )
+    ];
+    this.writeItem['users'] = selectedUserObjects || [];
+  }
+
   private setRelatedNorms(relatedNorms: any[]) {
     const relatedMap: NormDocument[] = relatedNorms.map(related => {
       const selectedRelatedObject = {};
@@ -699,7 +716,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedUsers = userMap;
   }
 
-  private setSelectedTags(tags: Tag[]): Tag {
+  /* private setSelectedTags(tags: Tag[]): Tag {
     return tags.map(tag => {
       const selectedTagObject: Tag = {};
       selectedTagObject['id'] = tag['id'];
@@ -709,7 +726,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       return selectedTagObject;
     });
     // this.selectedTags = tagMap;
-  }
+  } */
 
   public showRelated(id: string) {
     this.router.navigate(['../document/' + id + '/edit']);
@@ -742,6 +759,24 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       };
       r.readAsDataURL(file);
     });
+  }
+
+  public onEdit() {
+    console.log(this.editable);
+    this.editable = true;
+
+    this.tagDropdownSettings['disabled'] = false;
+    this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
+
+    this.userDropdownSettings['disabled'] = false;
+    this.userDropdownSettings = Object.assign({}, this.userDropdownSettings);
+
+    this.relatedDropdownSettings['disabled'] = false;
+    this.relatedDropdownSettings = Object.assign(
+      {},
+      this.relatedDropdownSettings
+    );
+    console.log(this.editable);
   }
 
   public onItemSelect(item: any) {}

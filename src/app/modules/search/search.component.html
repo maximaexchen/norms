@@ -14,7 +14,30 @@
               >Normen
             </h1>
             <label class="form-label">Herausgeber</label>
-            <select
+            <div class="document-tags searchbar-tags">
+              <angular2-multiselect
+                name="tags"
+                [data]="tags"
+                [(ngModel)]="selectedTags"
+                [settings]="tagDropdownSettings"
+                style="width: 150px;"
+                (onDeSelectAll)="onDeSelectAll($event)"
+              >
+                <c-badge>
+                  <ng-template let-item="item">
+                    <label class="badge {{ item.tagType }}">{{
+                      item.name
+                    }}</label>
+                  </ng-template>
+                </c-badge>
+                <c-item>
+                  <ng-template let-item="item">
+                    <label class="{{ item.tagType }}"> {{ item.name }}</label>
+                  </ng-template>
+                </c-item>
+              </angular2-multiselect>
+            </div>
+            <!-- <select
               class="form-control"
               [(ngModel)]="publisherId"
               name="publisherId"
@@ -25,25 +48,7 @@
               <option *ngFor="let item of publishers" [value]="item['_id']">
                 {{ item['name'] }}
               </option>
-            </select>
-            <!-- <label class="form-label">User</label>
-          <select class="form-control" [(ngModel)]="userId" name="userId">
-            <option [value]="undefined" selected="selected"
-              >Benutzer wählen </option
-            ><option *ngFor="let item of users" [value]="item._id">
-              {{ item.lastName }}, {{ item.firstName }}
-            </option>
-          </select> -->
-
-            <!--  <label class="form-label">Gruppe</label>
-          <select class="form-control" [(ngModel)]="groupId" name="groupId">
-            <option [value]="undefined" selected="selected"
-              >Gruppe wählen</option
-            >
-            <option *ngFor="let item of groups" [value]="item._id">
-              {{ item.name }}
-            </option>
-          </select> -->
+            </select> -->
 
             <label class="form-label">Owner</label>
             <select class="form-control" [(ngModel)]="ownerId" name="ownerId">
@@ -68,66 +73,28 @@
             <button class="btn btn-default" type="submit">
               Suche
             </button>
+
+            <!-- <label class="form-label">User</label>
+                      <select class="form-control" [(ngModel)]="userId" name="userId">
+                        <option [value]="undefined" selected="selected"
+                          >Benutzer wählen </option
+                        ><option *ngFor="let item of users" [value]="item._id">
+                          {{ item.lastName }}, {{ item.firstName }}
+                        </option>
+                      </select> -->
+
+            <!--  <label class="form-label">Gruppe</label>
+                      <select class="form-control" [(ngModel)]="groupId" name="groupId">
+                        <option [value]="undefined" selected="selected"
+                          >Gruppe wählen</option
+                        >
+                        <option *ngFor="let item of groups" [value]="item._id">
+                          {{ item.name }}
+                        </option>
+                      </select> -->
           </form>
         </div>
       </div>
     </div>
-  </div>
-</div>
-<div class="row">
-  <div class="col" *ngIf="foundDocuments">
-    <h4>Gefundene Normen</h4>
-    <hr />
-    <p-dialog header="{{ modalTitle }}" [(visible)]="display">
-      <div [innerHTML]="modalContent"></div>
-    </p-dialog>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>Bereich</th>
-          <th>Nummer</th>
-          <th>Name</th>
-          <th>Revision</th>
-          <th>Revisionsdatum</th>
-          <th>Eingangsdatum ACP</th>
-          <th>Owner</th>
-          <th>User</th>
-          <th>Optionen</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of foundDocuments">
-          <td>{{ item['publisher'] }}</td>
-          <td>
-            <a
-              *ngIf="item['normFilePath']"
-              href="{{ item['normFilePath'].replace('./src', '') }}"
-              target="_blank"
-              >{{ item['number'] }}</a
-            >
-          </td>
-          <td>{{ item['name'] }}</td>
-          <td>{{ item['revision'] }}</td>
-          <td>{{ item['outputDate'] | date: 'dd.MM.y' }}</td>
-          <td>{{ item['inputDate'] | date: 'dd.MM.y' }}</td>
-          <td>{{ item['owner'] }}</td>
-          <td>
-            <button
-              type="button"
-              (click)="showDialog(item['fetchedUser'])"
-              pButton
-              icon="pi pi-eye"
-            ></button>
-          </td>
-          <td>
-            <a
-              [routerLink]="'../document/' + [item['_id']] + '/edit'"
-              class="btn btn-primary"
-              >Bearbeiten</a
-            >
-          </td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </div>

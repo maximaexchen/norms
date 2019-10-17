@@ -31,7 +31,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
   rev: string;
   type: string;
   name: string;
-  tagType: string;
+  tagType = 'level1';
   active = 0;
 
   constructor(
@@ -53,7 +53,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.rev = '';
     this.type = '';
     this.name = '';
-    this.tagType = '';
+    this.tagType = 'level1';
     this.active = null;
   }
 

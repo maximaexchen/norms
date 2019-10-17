@@ -8,25 +8,26 @@
     icon="pi pi-exclamation-triangle"
     [transitionOptions]="'60ms'"
   ></p-confirmDialog>
-  <div class="ui-g">
-    <div class="ui-g-12">
-      <div class="ui-g-10">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-8">
         <div class="header-company-icon ">
           <!-- Logo der Firma -->
-          <img src="assets/images/src_assets_images_acp_logo_group.png" />
+          <img src="assets/images/LOGO_ACPUEB_weiss.png" />
           <!-- Name der Anwendung -->
           <p class="application-name">{{ this.title }}</p>
         </div>
       </div>
-
-      <div class="ui-g-2 header-application-icon">
-        <img
-          class=" application-icon"
-          src="assets/images/src_assets_images_icons_apps_hg_ohne_text_watzmann_weiss.png"
-        />
-        <!-- <div *ngIf="user && user.fullName" class="user-name">
-          User: {{ user.fullName }}
-        </div> -->
+      <div class="col-4 float-right">
+        <div class="header-application-icon">
+          <img
+            class=" application-icon"
+            src="assets/images/100px-ACP-GRP_blau_normen_ohne_text.jpg"
+          />
+          <!-- <div *ngIf="user && user.fullName" class="user-name">
+                  User: {{ user.fullName }}
+                </div> -->
+        </div>
       </div>
     </div>
   </div>
@@ -38,13 +39,13 @@
       styleClass="main-menubar"
       [autoDisplay]="false"
     >
-      <div>
+      <!-- <div>
         <p-button
           (onClick)="logout($event)"
           label="Logout"
           icon="fa fa-sign-out"
         ></p-button>
-      </div>
+      </div> -->
     </p-menubar>
   </div>
 </div>
