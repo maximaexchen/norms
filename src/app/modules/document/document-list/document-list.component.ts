@@ -27,6 +27,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   @Output() closeSideBar: EventEmitter<any> = new EventEmitter();
   alive = true;
   visible = true;
+  filterInputCheck = true;
 
   docs: Array<NormDocument> = [];
 
@@ -148,18 +149,19 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
   public onRowSelect(event: any) {
     console.log(event.data);
+
+    //
     this.router.navigate(['../document/' + event.data._id + '/edit']);
   }
 
-  /**
-   * onFilterChange
-   */
-  public onFilterChange(event: any, dt: any) {
-    console.log(dt);
-    console.log(event);
-  }
-
   public onFilter(event: any, dt: any): void {
+    // Check for simple ASCII Characters and give warning
+    if (!_.isEmpty(event.filters.global)) {
+      this.filterInputCheck = /^(?:(?!["';<=>\\])[\x20-\x7E])+$/u.test(
+        event.filters.global.value
+      );
+    }
+
     this.documentCount = event.filteredValue.length;
   }
 

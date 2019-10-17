@@ -23,7 +23,7 @@
   [sortOrder]="1"
   [(selection)]="selectedDocument"
   (onRowSelect)="onRowSelect($event)"
-  (onFilter)="onFilter($event)"
+  (onFilter)="onFilter($event, dt)"
 >
   <ng-template pTemplate="caption">
     <div style="text-align: center;">
@@ -34,9 +34,12 @@
         size="50"
         i18n-placeholder
         placeholder="Globale Suche"
-        (input)="onFilterChange($event, dt)"
+        (input)="dt.filterGlobal($event.target.value, 'contains')"
         style="width:auto"
       />
+    </div>
+    <div *ngIf="!filterInputCheck" class="alert alert-danger" role="alert">
+      Erlaubt ASCII_Zeichen von 32 bis 126
     </div>
   </ng-template>
   <ng-template pTemplate="header">
