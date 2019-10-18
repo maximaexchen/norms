@@ -61,7 +61,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tagClass',
+      classes: 'tag-multiselect',
       groupBy: 'tagType'
     };
 

@@ -67,120 +67,180 @@ body {
     }
   }
 
-  .tag-items {
-    .badge {
-      padding: 10px 20px;
-      margin-right: 10px;
-      color: $white;
-      margin-top: 10px;
-      cursor: pointer;
-
-      &.tag-level1-item {
-        background-color: rgb(44, 151, 201);
-      }
-
-      &.tag-level2-item {
-        background-color: rgb(237, 130, 42);
-      }
-
-      &.tag-level3-item {
-        background-color: rgb(138, 181, 45);
-      }
-    }
-  }
-
-  .ready-save-btn {
-    background-color: $success;
-    color: $white;
-
-    &:hover {
-      background-color: $success !important;
-      color: $white !important;
-    }
-  }
-
   .document-tags {
-    .cuppa-dropdown {
-      margin-bottom: 10px;
-    }
-    p {
-      margin-top: 5px;
-      margin-bottom: 5px;
-    }
-    div label {
-      padding: 5px 25px 5px 15px;
-      margin-bottom: 2px;
-      margin-top: 2px;
-      font-size: 0.8rem;
-      font-weight: normal;
-      color: $white;
-      border-radius: 25px;
-    }
-
-    label.level1 {
-      background-color: rgb(44, 151, 201); // #0071bd;
-    }
-    label.level2 {
-      background-color: rgb(237, 130, 42); // #bd0000;
-    }
-    label.level3 {
-      background-color: rgb(138, 181, 45); // #319a31;
-    }
-
-    .selected-list .c-list .c-token {
-      background: transparent;
+    angular2-multiselect {
+      p {
+        margin-top: 5px;
+        margin-bottom: 5px;
+      }
     }
   }
 
   .searchbar-tags {
     width: 250px;
     margin-right: 15px;
+    angular2-multiselect {
+      .cuppa-dropdown {
+        margin-bottom: 0px !important;
+      }
+    }
+  }
+
+  angular2-multiselect {
     .cuppa-dropdown {
-      margin-bottom: 0px;
-    }
-    p {
-      margin-top: 5px;
-      margin-bottom: 5px;
-    }
-    div label {
-      display: inline-block;
-      margin-right: 0 !important;
-    }
-  }
-
-  .tagClass {
-    .grp-item {
-      padding-left: 10px !important;
-
-      input[type='checkbox'] + label {
-        padding-left: 0;
+      .selected-list .c-list .c-token {
+        padding: 10px 30px 10px 15px;
+        font-weight: 700;
+        font-size: 0.6rem;
+        border-radius: 0.25rem;
+        .c-label {
+          color: $white;
+        }
       }
     }
-    .c-token {
-      padding: 0 !important;
-    }
-    .pure-checkbox {
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
+    &.tag-multiselect {
+      .cuppa-dropdown {
+        margin-bottom: 10px;
 
-      label {
-        text-align: left;
+        div label {
+          @extend .badge;
+          cursor: pointer;
+          font-size: 0.6rem;
+          padding: 10px 30px 10px 15px;
+          margin-right: 0px;
+          margin-top: 0;
+          margin-bottom: 2px;
+          margin-top: 2px;
+        }
+
+        div label {
+          &.level1 {
+            color: $white;
+            background-color: rgb(44, 151, 201); // #0071bd;
+          }
+
+          &.level2 {
+            color: $white;
+            background-color: rgb(237, 130, 42); // #bd0000;
+          }
+
+          &.level3 {
+            color: $white;
+            background-color: rgb(138, 181, 45); // #319a31;
+          }
+        }
+
+        .c-btn {
+          padding: 0 0 2px;
+
+          span:first-child {
+            margin-left: 8px;
+          }
+          .c-list {
+            margin-left: 0px;
+            .c-token {
+              background: transparent;
+              padding: 0;
+              margin-right: 0;
+
+              .c-label {
+                label {
+                  @extend .badge;
+                  font-size: 0.6rem;
+                  padding: 10px 25px 10px 10px;
+                  margin: 0;
+                }
+              }
+
+              .c-remove {
+                right: 8px;
+              }
+            }
+          }
+        }
+        .selected-list {
+        }
+
+        .dropdown-list {
+          .list-area {
+            .list-filter {
+              padding-left: 38px;
+
+              .c-search {
+                left: 16px;
+              }
+            }
+            .pure-checkbox {
+              padding: 0 0 0 15px;
+
+              input[type='checkbox'] + label {
+                padding-left: 2em;
+              }
+
+              &.select-all {
+                input[type='checkbox'] + label {
+                  padding-left: 2.5em;
+                  span {
+                    font-size: 0.75rem;
+                  }
+                }
+              }
+
+              &.grp-title {
+                label {
+                  padding-left: 2.5em;
+                  font-size: 0.75rem;
+                }
+              }
+
+              &.grp-item {
+                padding: 0 0 0 25px !important;
+                label {
+                  padding-left: 2.5em;
+                  padding: 10px 20px 10px 20px !important;
+                  font-size: 0.6rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .tag-items {
+      span {
+        @extend .badge;
+        font-size: 0.6rem;
+        padding: 10px 30px 10px 15px;
+
+        margin-right: 8px;
+        color: $white;
+        margin-top: 0;
+        cursor: pointer;
+        margin-bottom: 2px;
+        margin-top: 2px;
+        &.tag-level1-item {
+          background-color: rgb(44, 151, 201);
+        }
+
+        &.tag-level2-item {
+          background-color: rgb(237, 130, 42);
+        }
+
+        &.tag-level3-item {
+          background-color: rgb(138, 181, 45);
+        }
       }
     }
   }
+}
 
-  /*
-  FORMS
-*/
+.ready-save-btn {
+  background-color: $success;
+  color: $white;
 
-  label {
-    font-weight: 700;
-  }
-
-  .col-form-label {
-    font-size: 85%;
-    font-weight: 700;
-    text-align: right;
-    padding-right: 0;
+  &:hover {
+    background-color: $success !important;
+    color: $white !important;
   }
 }

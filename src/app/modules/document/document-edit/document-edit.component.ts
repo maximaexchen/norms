@@ -122,6 +122,21 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       disabled: true
     };
 
+    this.relatedDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Referenz wählen',
+      textField: 'normNumber',
+      labelKey: 'normNumber',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Referenz Auswahl',
+      noDataLabel: 'Keine Referenz gefunden',
+      classes: 'relatedClass',
+      disabled: true
+    };
+
     this.tagDropdownSettings = {
       singleSelection: false,
       idField: 'id',
@@ -133,22 +148,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tagClass',
-      disabled: true
-    };
-
-    this.relatedDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Referenz wählen',
-      textField: 'name',
-      labelKey: 'name',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'Referenz Auswahl',
-      noDataLabel: 'Keine Referenz gefunden',
-      classes: 'relatedClass',
+      classes: 'tag-multiselect',
       disabled: true
     };
 

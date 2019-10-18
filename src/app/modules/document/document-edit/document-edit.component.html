@@ -53,10 +53,11 @@
                     class="form-control"
                     i18n-placeholder
                     placeholder="Nummer"
-                    [(ngModel)]="normNumber" 
-                    name="normNumber" 
+                    [(ngModel)]="normNumber"
+                    name="normNumber"
                     required
-                    [readOnly]="!editable" />
+                    [readOnly]="!editable"
+                  />
                 </div>
               </div>
             </div>
@@ -219,8 +220,14 @@
               >Scope</label
             >
             <div class="col-sm-8">
-              <textarea class="form-control" i18n-placeholder placeholder="Scope" [(ngModel)]="scope"
-                name="scope" [disabled]="!editable"></textarea>
+              <textarea
+                class="form-control"
+                i18n-placeholder
+                placeholder="Scope"
+                [(ngModel)]="scope"
+                name="scope"
+                [disabled]="!editable"
+              ></textarea>
             </div>
           </div>
 
@@ -366,7 +373,7 @@
           </div>
 
           <hr />
-          
+
           <p-button
             type="button"
             *ngIf="latestAttachmentName"
@@ -386,7 +393,6 @@
             [toggleable]="true"
             [transitionOptions]="'100ms'"
             [collapsed]="false"
-            
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a
@@ -444,11 +450,6 @@
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
               >
-                <c-badge>
-                  <ng-template let-item="item">
-                    <label class="badge">{{ item.normNumber }}</label>
-                  </ng-template>
-                </c-badge>
                 <c-item>
                   <ng-template let-item="item">
                     <label> {{ item.normNumber }}</label>
@@ -512,7 +513,12 @@
               >Owner</label
             >
             <div class="col-sm-10">
-              <select class="form-control" [(ngModel)]="ownerId" name="ownerId" [disabled]="!editable">
+              <select
+                class="form-control"
+                [(ngModel)]="ownerId"
+                name="ownerId"
+                [disabled]="!editable"
+              >
                 <option value="" selected="selected">Owner wählen</option>
                 <option
                   *ngFor="let owner of owners"
