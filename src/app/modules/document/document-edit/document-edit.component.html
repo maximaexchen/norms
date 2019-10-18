@@ -398,14 +398,10 @@
               <a
                 class="dynamic-link"
                 (click)="getDownload(id, revDoc['name'])"
-                >{{
-                  revDoc['name'].length > 15
-                    ? (revDoc['name'] | slice: 0:15) + '...'
-                    : revDoc['name']
-                }}</a
-              ><br />
+                >{{ revDoc['revisionID'] }}</a
+              >
 
-              Link to the server file
+              <!-- Link to the server file
               <a
                 *ngIf="revDoc['path']"
                 href="{{ revDoc['path'] }}{{ id }}/{{ revDoc['name'] }}"
@@ -418,11 +414,11 @@
                     ? (revDoc['name'] | slice: 0:15) + '...'
                     : revDoc['name']
                 }}</a
-              >
-              ({{ revDoc['revisionID'] }})
-              <div style="display: inline-block; float: right;">
-                {{ revDoc['date'] | date: 'dd.MM.y' }}
-              </div>
+              > -->
+
+              <span style="display: inline-block; float: right;">
+                vom {{ revDoc['date'] | date: 'dd.MM.y' }}
+              </span>
               <hr *ngIf="i < revisionDocuments.length - 1" />
             </div>
           </p-fieldset>
