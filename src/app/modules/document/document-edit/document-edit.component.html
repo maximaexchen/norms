@@ -395,10 +395,8 @@
             [collapsed]="false"
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
-              <a
-                class="dynamic-link"
-                (click)="getDownload(id, revDoc['name'])"
-                >{{ revDoc['revisionID'] }}</a
+              <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"
+                ><i class="fa fa-download"></i> {{ revDoc['revisionID'] }}</a
               >
 
               <!-- Link to the server file
@@ -416,7 +414,7 @@
                 }}</a
               > -->
 
-              <span style="display: inline-block; float: right;">
+              <span style="float: right;">
                 vom {{ revDoc['date'] | date: 'dd.MM.y' }}
               </span>
               <hr *ngIf="i < revisionDocuments.length - 1" />
