@@ -10,8 +10,8 @@
   window.__env.dbBaseUrl = 'http://116.203.220.19:5984/';
   window.__env.dbName = 'norm_rep2';
 
-  window.__env.uploadUrl = 'http://116.203.220.19:4000/api/upload';
+  window.__env.uploadUrl = 'http://192.9.155.184:4000/api/upload';
 
-  window.__env.uploadDir = './dist/assets/uploads/';
-  window.__env.uploadRoot = './dist/';
+  window.__env.uploadDir = './assets/uploads/';
+  window.__env.uploadRoot = './';
 })(this);

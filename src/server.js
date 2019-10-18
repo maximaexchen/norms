@@ -34,7 +34,7 @@ var allowCrossDomain = function(req, res, next) {
 app.use(allowCrossDomain);
 
 app.post('/api/test', function(req, res) {
-  //return res.end('api test');
+  return res.end('api test');
 });
 
 //middleware
@@ -88,12 +88,14 @@ var upload = multer({ storage: storage }).any();
 app.post('/api/upload', function(req, res) {
   upload(req, res, function(err) {
     if (err) {
-      return res.end('Error uploading file.');
+      return res.end('Error uploading file: ' + err);
     } else {
       let tempPath = './' + req.files[0].path;
       let copyPath =
         req.body.uploadDir + req.body.createID + '/' + req.files[0].filename;
       // Move file in synamic generated Directory
+      console.log('tempPath: ' + tempPath);
+      console.log('copyPath: ' + copyPath);
       fs.move(tempPath, copyPath, function(err) {
         if (err) return console.error(err);
       });
