@@ -36,14 +36,13 @@
     (click)="onEdit()"
   ></button>
   <button
-    pButton
     type="button"
-    icon="fa fa-trash"
-    iconPos="left"
-    i18n-label="@@btn-delete"
-    class="btn btn-default btn-sm btn-headline"
-    label="Löschen"
     (click)="onDelete()"
+    [disabled]="!editable"
+    class="btn btn-default"
+    i18n-label="@@btn-delete"
     *ngIf="formMode"
-  ></button>
+  >
+    Löschen
+  </button>
 </div>

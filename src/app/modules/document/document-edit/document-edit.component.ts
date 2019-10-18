@@ -7,6 +7,7 @@ import { Observable, Subscriber } from 'rxjs';
 
 import uuidv4 from '@bundled-es-modules/uuid/v4.js';
 
+import { faFileDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { NormDocument } from '../../../models/document.model';
 import { RevisionDocument } from './../revision-document.model';
@@ -30,6 +31,8 @@ import { FileUpload } from 'primeng/fileupload';
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
   @ViewChild('fileUploadInput', { static: true }) fileUploadInput: FileUpload;
+  faTrash = faTrash;
+  faFileDownload = faFileDownload;
 
   alive = true;
   isLoading = false;

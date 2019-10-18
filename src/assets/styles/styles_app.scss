@@ -126,6 +126,10 @@ table.panel-table th {
   width: 32px;
 }
 
+body .ui-table .ui-sortable-column.ui-state-highlight {
+  background-color: theme-color('primary');
+}
+
 body .ui-table .ui-table-thead > tr > th {
   font-size: 90%;
   padding: 6px 6px;

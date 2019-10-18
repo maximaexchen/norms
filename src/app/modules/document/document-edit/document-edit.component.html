@@ -374,17 +374,15 @@
 
           <hr />
 
-          <p-button
-            type="button"
-            *ngIf="latestAttachmentName"
-            icon="fa fa-download "
-            iconPos="left"
-            title="{{ latestAttachmentName }}"
-            label="Download Norm"
-            class="attachmentDownload"
+          <button 
+            type="button" 
             (click)="getDownload(id, latestAttachmentName)"
             [disabled]="!editable"
-          ></p-button>
+            *ngIf="latestAttachmentName" 
+            title="{{ latestAttachmentName }}" 
+            class="btn btn-acp attachmentDownload">
+           
+            <fa-icon [icon]="faFileDownload"></fa-icon> Download Norm</button>
 
           <hr />
 

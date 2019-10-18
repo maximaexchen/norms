@@ -206,31 +206,31 @@ body {
         }
       }
     }
+  }
+}
 
-    .tag-items {
-      span {
-        @extend .badge;
-        font-size: 0.6rem;
-        padding: 10px 30px 10px 15px;
+.tag-items {
+  span {
+    @extend .badge;
+    font-size: 0.6rem;
+    padding: 10px 30px 10px 15px;
 
-        margin-right: 8px;
-        color: $white;
-        margin-top: 0;
-        cursor: pointer;
-        margin-bottom: 2px;
-        margin-top: 2px;
-        &.tag-level1-item {
-          background-color: rgb(44, 151, 201);
-        }
+    margin-right: 8px;
+    color: $white;
+    margin-top: 0;
+    cursor: pointer;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    &.tag-level1-item {
+      background-color: rgb(44, 151, 201);
+    }
 
-        &.tag-level2-item {
-          background-color: rgb(237, 130, 42);
-        }
+    &.tag-level2-item {
+      background-color: rgb(237, 130, 42);
+    }
 
-        &.tag-level3-item {
-          background-color: rgb(138, 181, 45);
-        }
-      }
+    &.tag-level3-item {
+      background-color: rgb(138, 181, 45);
     }
   }
 }
