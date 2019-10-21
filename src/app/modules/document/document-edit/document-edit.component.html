@@ -204,6 +204,8 @@
               >Beschreibung fr</label
             >
             <div class="col-sm-8">
+              {{ editable | json }}
+              {{ !formMode | json }}
               <textarea
                 class="form-control"
                 i18n-placeholder
@@ -238,7 +240,6 @@
             <div class="col-sm-8">
               <p i18n="@@string-tag-level1-dataset">Level 1 (Herausgeber)</p>
               <angular2-multiselect
-                required
                 name="tagsLevel1"
                 [data]="tagsLevel1"
                 [(ngModel)]="selectedTags1"
@@ -247,6 +248,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                required
                 [disabled]="!editable"
               >
                 <c-badge>
@@ -379,7 +381,6 @@
           <button
             type="button"
             (click)="getDownload(id, latestAttachmentName)"
-            [disabled]="!editable"
             *ngIf="latestAttachmentName"
             title="{{ latestAttachmentName }}"
             class="btn btn-acp attachmentDownload"
@@ -397,7 +398,8 @@
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"
-                ><i class="fas fa-file-download"></i> {{ revDoc['revisionID'] }}</a
+                ><i class="fas fa-file-download"></i>
+                {{ revDoc['revisionID'] }}</a
               >
 
               <!-- Link to the server file

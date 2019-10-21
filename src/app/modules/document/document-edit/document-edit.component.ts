@@ -106,11 +106,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setStartValues() {
-    this.resetComponent();
-
-    if (this.normForm) {
-      this.normForm.form.markAsPristine();
-    }
+    console.log('setStartValues');
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // fetch data for select-boxes
@@ -131,6 +127,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private newDocument() {
     console.log('New mode');
     this.resetComponent();
+    this.enableMultiselect();
     this.editable = true;
     this.formMode = false;
     this.formTitle = 'Neue Norm anlegen';
@@ -247,7 +244,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private resetComponent() {
+    console.log('??????????????????????????????????');
     console.log('restComponent');
+    if (this.normForm) {
+      this.normForm.form.markAsPristine();
+    }
     this.editable = false;
     this.selectedRelatedNorms = [];
     this.selectedUsers = [];
@@ -255,10 +256,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedTags2 = [];
     this.selectedTags3 = [];
     this.selectedTab = 0;
-    this.initMultiselectConfig();
+    this.assignMultiselectConfig();
   }
 
-  private initMultiselectConfig() {
+  private assignMultiselectConfig() {
+    console.log('assignMultiselectConfig');
+    console.log(this.editable);
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',
@@ -270,7 +273,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'User Auswahl',
       noDataLabel: 'Keinen Benutzer gefunden',
-      disabled: this.editable || this.formMode
+      disabled: !this.editable
     };
     this.relatedDropdownSettings = {
       singleSelection: false,
@@ -284,7 +287,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'Referenz Auswahl',
       noDataLabel: 'Keine Referenz gefunden',
       classes: 'relatedClass',
-      disabled: this.editable || this.formMode
+      disabled: !this.editable
     };
     this.tagDropdownSettings = {
       singleSelection: false,
@@ -298,7 +301,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
       classes: 'tag-multiselect',
-      disabled: this.editable || this.formMode
+      disabled: !this.editable
     };
   }
 
@@ -788,9 +791,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public onEdit() {
-    console.log(this.editable);
+    this.enableMultiselect();
     this.editable = true;
+  }
 
+  private enableMultiselect() {
     this.tagDropdownSettings['disabled'] = false;
     this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
 
@@ -802,7 +807,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       {},
       this.relatedDropdownSettings
     );
-    console.log(this.editable);
+  }
+
+  private disableMultiselect() {
+    this.tagDropdownSettings['disabled'] = true;
+    this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
+
+    this.userDropdownSettings['disabled'] = true;
+    this.userDropdownSettings = Object.assign({}, this.userDropdownSettings);
+
+    this.relatedDropdownSettings['disabled'] = true;
+    this.relatedDropdownSettings = Object.assign(
+      {},
+      this.relatedDropdownSettings
+    );
   }
 
   public onItemSelect(item: any) {}
