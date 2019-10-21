@@ -146,15 +146,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private editDocument(results) {
     console.log('Edit mode');
+    this.resetComponent();
     this.formMode = true;
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
     this.couchDBService
       .fetchEntry('/' + results['id'])
       .pipe(takeWhile(() => this.alive))
-      .subscribe(entry => {
-        this.getDocumentData(entry);
-      });
+      .subscribe(
+        entry => {
+          this.getDocumentData(entry);
+        },
+        error => {
+          console.log(error.message);
+        },
+        () => {}
+      );
   }
 
   private saveDocument(): void {
@@ -167,28 +174,34 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        console.log('saveDocument:' + result);
+      .subscribe(
+        result => {
+          console.log('saveDocument:' + result);
 
-        if (this.fileUpload) {
-          this.uploadPDF()
-            .pipe(takeWhile(() => this.alive))
-            .subscribe(
-              res => {},
-              error => {
-                console.log(error);
-                this.showConfirmation('error', error.message);
-              },
-              () => {
-                this.router.navigate(['../document/' + this.id + '/edit']);
-                this.showConfirmation('success', 'Upload erfolgreich');
-              }
-            );
-        }
-        this.router.navigate(['../document/' + this.id + '/edit']);
-        this.isLoading = false;
-        this.sendStateUpdate();
-      });
+          if (this.fileUpload) {
+            this.uploadPDF()
+              .pipe(takeWhile(() => this.alive))
+              .subscribe(
+                res => {},
+                error => {
+                  console.log(error);
+                  this.showConfirmation('error', error.message);
+                },
+                () => {
+                  this.router.navigate(['../document/' + this.id + '/edit']);
+                  this.showConfirmation('success', 'Upload erfolgreich');
+                }
+              );
+          }
+          this.router.navigate(['../document/' + this.id + '/edit']);
+          this.isLoading = false;
+          this.sendStateUpdate();
+        },
+        error => {
+          console.log(error.message);
+        },
+        () => {}
+      );
   }
 
   private updateDocument(): void {
@@ -223,7 +236,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         results => {},
         error => {
-          console.log(error.message);
+          console.log(error);
           this.showConfirmation('error', error.message);
         },
         () => {
@@ -533,7 +546,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
-    this.resetComponent();
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
