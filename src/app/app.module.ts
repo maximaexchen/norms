@@ -25,8 +25,6 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { LogoutComponent } from './components/logout/logout.component';
 
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
 @NgModule({

@@ -15,7 +15,6 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { AuthComponent } from '../components/auth/auth.component';
 import { CrudNavComponent } from '../components/shared/crud-nav/crud-nav.component';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   declarations: [AuthComponent, CrudNavComponent],
@@ -31,8 +30,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     SelectButtonModule,
     MultiSelectModule,
     CheckboxModule,
-    TooltipModule,
-    FontAwesomeModule
+    TooltipModule
   ],
   exports: [
     CommonModule,
@@ -47,8 +45,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     MultiSelectModule,
     CrudNavComponent,
     CheckboxModule,
-    TooltipModule,
-    FontAwesomeModule
+    TooltipModule
   ]
 })
 export class GeneralModule {}

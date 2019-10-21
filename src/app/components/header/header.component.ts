@@ -29,32 +29,32 @@ export class HeaderComponent implements OnInit {
    */
   private initMainMenu() {
     this.mainmenuItems.push({
-      icon: 'fa fa-list',
+      icon: 'fas fa-check-square',
       label: 'Normen',
       routerLink: 'document'
     });
     /*  this.mainmenuItems.push({
-      icon: 'fa fa-indent',
+      icon: 'fas fa-indent',
       label: 'Herausgeber',
       routerLink: 'publisher'
     }); */
     this.mainmenuItems.push({
-      icon: 'fa fa-tags',
+      icon: 'fas fa-tags',
       label: 'Tags',
       routerLink: 'tag'
     });
     this.mainmenuItems.push({
-      icon: 'fa fa-group',
+      icon: 'fas fa-users',
       label: 'Gruppen',
       routerLink: 'group'
     });
     this.mainmenuItems.push({
-      icon: 'fa fa-user',
+      icon: 'fas fa-user',
       label: 'Benutzer',
       routerLink: 'user'
     });
     /* this.mainmenuItems.push({
-      icon: 'fa fa-chain',
+      icon: 'fas fa-link',
       label: 'Rollen',
       routerLink: 'role'
     }); */

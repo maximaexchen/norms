@@ -384,7 +384,7 @@
             title="{{ latestAttachmentName }}"
             class="btn btn-acp attachmentDownload"
           >
-            <fa-icon [icon]="faFileDownload"></fa-icon> Download Norm
+            <i class="fas fa-file-download"></i> Download Norm
           </button>
 
           <hr />
@@ -397,7 +397,7 @@
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"
-                ><i class="fa fa-download"></i> {{ revDoc['revisionID'] }}</a
+                ><i class="fas fa-file-download"></i> {{ revDoc['revisionID'] }}</a
               >
 
               <!-- Link to the server file
@@ -488,7 +488,7 @@
                       <a
                         class="dynamic-link"
                         (click)="getDownload(related.id, related.normNumber)"
-                        >Download <i class="fa fa-download"></i
+                        >Download <i class="fas fa-file-download"></i
                       ></a>
                     </td>
                   </tr>
