@@ -105,8 +105,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('DocumentEditComponent');
-
-    // Prepare the user multi select box
     this.setStartValues();
   }
 

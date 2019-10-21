@@ -19,7 +19,6 @@
       [dirtyForm]="normForm.dirty"
       [routeNew]="'/document/new'"
       [editable]="editable"
-      [deletable]="deletable"
       (save)="onSubmit()"
       (add)="onSubmit()"
       (edit)="onEdit()"
@@ -248,6 +247,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -273,6 +273,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -297,6 +298,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">

@@ -9,7 +9,9 @@
     <app-crud-nav
       [formMode]="formMode"
       [validForm]="tagForm.valid"
+      [dirtyForm]="tagForm.dirty"
       [routeNew]="'/tag/new'"
+      [editable]="editable"
       (save)="onSubmit()"
       (add)="onSubmit()"
       (edit)="onEdit()"
@@ -43,7 +45,7 @@
                 [(ngModel)]="name"
                 name="name"
                 #nameCheck="ngModel"
-                [disabled]="tagForm.invalid || !editable"
+                [disabled]="!editable"
               />
               <small
                 class="form-text text-muted"
@@ -66,7 +68,7 @@
                   label="Stufe 1"
                   [(ngModel)]="tagType"
                   inputId="level1"
-                  [disabled]="tagForm.invalid || !editable"
+                  [disabled]="!editable"
                 ></p-radioButton>
               </div>
               <div class="ui-g-12">
@@ -76,7 +78,7 @@
                   label="Stufe 2"
                   [(ngModel)]="tagType"
                   inputId="level2"
-                  [disabled]="tagForm.invalid || !editable"
+                  [disabled]="!editable"
                 ></p-radioButton>
               </div>
               <div class="ui-g-12">
@@ -85,8 +87,8 @@
                   value="level3"
                   label="Stufe 3"
                   [(ngModel)]="tagType"
-                  [disabled]="tagForm.invalid || !editable"
                   inputId="level3"
+                  [disabled]="!editable"
                 ></p-radioButton>
               </div>
             </div>
@@ -109,7 +111,7 @@
                 ]"
                 name="active"
                 [(ngModel)]="active"
-                [disabled]="tagForm.invalid || !editable"
+                [disabled]="!editable"
               ></p-selectButton>
             </div>
           </div>
