@@ -37,10 +37,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   alive = true;
   isLoading = false;
   editable = false;
+  deletable = false;
   uploadUrl = this.env.uploadUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
-  formMode = false; // 0 = new - 1 = update
+  formMode = false; // 0 = new / 1 = update
   selectedTab = 0;
 
   writeItem: NormDocument;
@@ -110,50 +111,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setStartValues() {
-    this.restFields();
-    this.userDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Benutzer wählen',
-      textField: 'name',
-      labelKey: 'name',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'User Auswahl',
-      noDataLabel: 'Keinen Benutzer gefunden',
-      disabled: true
-    };
+    this.resetComponent();
 
-    this.relatedDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Referenz wählen',
-      textField: 'normNumber',
-      labelKey: 'normNumber',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'Referenz Auswahl',
-      noDataLabel: 'Keine Referenz gefunden',
-      classes: 'relatedClass',
-      disabled: true
-    };
-
-    this.tagDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Tag wählen',
-      textField: 'name',
-      labelKey: 'name',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'Tag Auswahl',
-      noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tag-multiselect',
-      disabled: true
-    };
+    if (this.normForm) {
+      this.normForm.form.markAsPristine();
+    }
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // fetch data for select-boxes
@@ -171,25 +133,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private restFields() {
-    console.log('resetFields');
-    this.editable = false;
-    this.selectedRelatedNorms = [];
-    this.selectedUsers = [];
-    this.selectedTags1 = [];
-    this.selectedTags2 = [];
-    this.selectedTags3 = [];
-    this.selectedTab = 0;
-  }
-
   private newDocument() {
     console.log('New mode');
+    this.resetComponent();
+    this.editable = true;
     this.formMode = false;
     this.formTitle = 'Neue Norm anlegen';
     this.publisher = '';
     this.owner = '';
     this.id = uuidv4();
-    this.editable = true;
   }
 
   private editDocument(results) {
@@ -209,6 +161,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('saveDocument: DocumentEditComponent');
     this.isLoading = true;
     this.processFormData();
+    this.normForm.form.markAsPristine();
 
     // First save to get a document id for the attachment path and name
     this.couchDBService
@@ -228,7 +181,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               },
               () => {
                 this.router.navigate(['../document/' + this.id + '/edit']);
-                this.showConfirmation('sucess', 'Upload erfolgreich');
+                this.showConfirmation('success', 'Upload erfolgreich');
               }
             );
         }
@@ -240,7 +193,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private updateDocument(): void {
     console.log('onUpdateDocument: DocumentEditComponent');
+
     this.processFormData();
+
     if (this.fileUpload) {
       this.uploadPDF()
         .pipe(takeWhile(() => this.alive))
@@ -275,12 +230,68 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           // Inform about database change.
           this.sendStateUpdate();
           this.isLoading = false;
-          this.showConfirmation('sucess', 'Updated');
+          this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
           this.setStartValues();
           this.normForm.form.markAsPristine();
         }
       );
+  }
+
+  private resetComponent() {
+    console.log('restComponent');
+    this.editable = false;
+    this.selectedRelatedNorms = [];
+    this.selectedUsers = [];
+    this.selectedTags1 = [];
+    this.selectedTags2 = [];
+    this.selectedTags3 = [];
+    this.selectedTab = 0;
+    this.initMultiselectConfig();
+  }
+
+  private initMultiselectConfig() {
+    this.userDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Benutzer wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'User Auswahl',
+      noDataLabel: 'Keinen Benutzer gefunden',
+      disabled: this.editable || this.formMode
+    };
+    this.relatedDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Referenz wählen',
+      textField: 'normNumber',
+      labelKey: 'normNumber',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Referenz Auswahl',
+      noDataLabel: 'Keine Referenz gefunden',
+      classes: 'relatedClass',
+      disabled: this.editable || this.formMode
+    };
+    this.tagDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Tag wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Tag Auswahl',
+      noDataLabel: 'Keinen Tag gefunden',
+      classes: 'tag-multiselect',
+      disabled: this.editable || this.formMode
+    };
   }
 
   public checkUpload(event, uploadField) {
@@ -522,7 +533,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
-    this.restFields();
+    this.resetComponent();
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
@@ -738,6 +749,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private showConfirmation(type: string, result: string) {
+    console.log('++++++++++++++++++++++++++');
+    console.log(type);
+    console.log('++++++++++++++++++++++++++');
     this.notificationsService.addSingle(type, result, type);
   }
 

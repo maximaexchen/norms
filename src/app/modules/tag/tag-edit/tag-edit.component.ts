@@ -20,6 +20,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
   @ViewChild('tagForm', { static: false }) tagForm: NgForm;
 
   alive = true;
+  editable = false;
 
   formTitle: string;
   formMode = false; // 0 = new - 1 = update
@@ -45,10 +46,10 @@ export class TagEditComponent implements OnInit, OnDestroy {
   public ngOnInit() {
     console.log('TagEditComponent');
     this.getTag();
-    this.restFields();
   }
 
   private restFields() {
+    this.editable = false;
     this.id = '';
     this.rev = '';
     this.type = '';
@@ -94,6 +95,11 @@ export class TagEditComponent implements OnInit, OnDestroy {
       this.restFields();
       this.onCreateTag();
     }
+  }
+
+  public onEdit() {
+    console.log(this.editable);
+    this.editable = true;
   }
 
   private onUpdateTag(): void {

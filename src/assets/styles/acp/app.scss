@@ -207,6 +207,16 @@ body {
       }
     }
   }
+
+  .ready-save-btn {
+    background-color: $success;
+    color: $white;
+
+    &:hover {
+      background-color: $success !important;
+      color: $white !important;
+    }
+  }
 }
 
 .tag-items {
@@ -232,15 +242,5 @@ body {
     &.tag-level3-item {
       background-color: rgb(138, 181, 45);
     }
-  }
-}
-
-.ready-save-btn {
-  background-color: $success;
-  color: $white;
-
-  &:hover {
-    background-color: $success !important;
-    color: $white !important;
   }
 }

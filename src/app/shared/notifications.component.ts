@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs/Subscription';
 @Component({
   selector: 'app-notifications',
   template: `
-    <p-toast life="3000" position="top-right"></p-toast>
+    <p-toast sticky="true" position="top-right"></p-toast>
   `
 })
 export class NotificationsComponent implements OnInit, OnDestroy {

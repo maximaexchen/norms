@@ -1,20 +1,6 @@
 <div class="form-group">
   <button
     pButton
-    type="submit"
-    icon="fa fa-check"
-    iconPos="left"
-    label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
-    i18n-label="@@btn-new"
-    class="btn btn-default btn-sm btn-headline"
-    (click)="onSubmit()"
-    *ngIf="editable"
-    [disabled]="!validForm"
-    [ngClass]="{ 'ready-save-btn': dirtyForm }"
-  ></button>
-
-  <button
-    pButton
     type="button"
     icon="fa fa-file-o"
     iconPos="left"
@@ -24,6 +10,20 @@
     (click)="onCreate()"
     *ngIf="formMode"
   ></button>
+  <button
+    pButton
+    type="submit"
+    icon="fa fa-check"
+    iconPos="left"
+    label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
+    i18n-label="@@btn-new"
+    class="btn btn-default btn-sm btn-headline"
+    (click)="onSubmit()"
+    *ngIf="editable"
+    [disabled]="!validForm"
+    [ngClass]="{ 'ready-save-btn': dirtyForm && validForm }"
+  ></button>
+
   <button
     pButton
     type="button"
@@ -36,13 +36,14 @@
     (click)="onEdit()"
   ></button>
   <button
+    pButton
     type="button"
+    icon="fa fa-trash"
+    iconPos="left"
+    label="Löschen"
     (click)="onDelete()"
-    [disabled]="!editable"
-    class="btn btn-default"
+    class="btn btn-default btn-sm btn-headline"
     i18n-label="@@btn-delete"
     *ngIf="formMode"
-  >
-    Löschen
-  </button>
+  ></button>
 </div>
