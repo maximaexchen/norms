@@ -59,10 +59,10 @@ export class CouchDBService {
 
   public findDocuments(searchObject?: any): Observable<any> {
     if (searchObject) {
-      console.log('search');
+      console.log('findDocuments');
       return this.http.post(this.dbRequest + '/_find', searchObject);
     } else {
-      console.log('alll');
+      console.log('findDocuments all');
       return this.fetchEntries(
         '/_design/norms/_view/all-norms?include_docs=true'
       );

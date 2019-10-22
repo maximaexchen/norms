@@ -156,15 +156,16 @@ export class TagEditComponent implements OnInit, OnDestroy {
             .subscribe(
               results => {
                 this.updateRelated(results);
+
+                // Inform about Database change.
+                this.sendStateUpdate();
+                this.router.navigate(['../tag']);
               },
               error => {
                 console.log(error);
-              }
+              },
+              () => {}
             );
-
-          // Inform about Database change.
-          this.sendStateUpdate();
-          this.router.navigate(['../tag']);
         },
         err => {
           console.log(err);
@@ -174,15 +175,20 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private updateRelated(related: any) {
+    console.log('updateRelated');
+    console.log(related);
     const bulkUpdateObject = {};
     bulkUpdateObject['docs'] = [];
     related.docs.forEach(norm => {
       // reasing the new name to the found Norm with tag
       _.findWhere(norm['tags'], { id: this.id })['name'] = this.name;
+      console.log('norm');
+      console.log(norm);
       bulkUpdateObject['docs'].push(norm);
     });
 
     this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(res => {
+      console.log('bulkUpdate');
       console.log(res);
     });
   }
