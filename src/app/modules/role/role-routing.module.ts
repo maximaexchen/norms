@@ -10,6 +10,7 @@ const routes: Routes = [
     path: '',
     component: RoleComponent,
     children: [
+      { path: '', component: RoleEditComponent },
       { path: 'list', component: RoleListComponent },
       { path: 'new', component: RoleEditComponent },
       { path: ':id/edit', component: RoleEditComponent }

@@ -53,11 +53,11 @@ export class HeaderComponent implements OnInit {
       label: 'Benutzer',
       routerLink: 'user'
     });
-    /* this.mainmenuItems.push({
+    this.mainmenuItems.push({
       icon: 'fas fa-link',
       label: 'Rollen',
       routerLink: 'role'
-    }); */
+    });
   }
 
   public logout(event: Event) {
