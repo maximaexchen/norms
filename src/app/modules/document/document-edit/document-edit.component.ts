@@ -149,6 +149,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         entry => {
+          console.log('fetchEntry: entry');
+          console.log(entry);
           this.getDocumentData(entry);
         },
         error => {
@@ -193,6 +195,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         },
         error => {
           console.log(error.message);
+          this.isLoading = false;
         },
         () => {}
       );
@@ -231,6 +234,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         error => {
           console.log(error);
           this.showConfirmation('error', error.message);
+          this.isLoading = false;
         },
         () => {
           // Inform about database change.
@@ -359,6 +363,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         error => {
           console.log('processUpload: error');
           console.log(error.message);
+          this.isLoading = false;
         },
         () => {
           console.log('processUpload: complete');
@@ -553,6 +558,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
+    console.log('getDocumentData');
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
@@ -585,11 +591,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (entry['relatedNorms']) {
       this.setRelatedNorms(entry['relatedNorms']);
     }
-
+    console.log('entry["tags"]');
+    console.log(entry['tags']);
     if (entry['tags']) {
       const ent = _.sortBy(entry['tags'], 'tagType');
-      // console.log(ent);
+      console.log('ent');
+      console.log(ent);
       ent.forEach(element => {
+        console.log('ent.forEach');
         switch (element['tagType']) {
           case 'level1':
             this.selectedTags1.push(element);
