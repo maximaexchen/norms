@@ -7,7 +7,6 @@ import { Observable, Subscriber } from 'rxjs';
 
 import uuidv4 from '@bundled-es-modules/uuid/v4.js';
 
-import { faFileDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { NormDocument } from '../../../models/document.model';
 import { RevisionDocument } from './../revision-document.model';
@@ -31,8 +30,6 @@ import { FileUpload } from 'primeng/fileupload';
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
   @ViewChild('fileUploadInput', { static: true }) fileUploadInput: FileUpload;
-  faTrash = faTrash;
-  faFileDownload = faFileDownload;
 
   alive = true;
   isLoading = false;
@@ -41,7 +38,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   uploadUrl = this.env.uploadUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
-  isNewDocument = true; // 1 = new / 0 = update
+  isNew = true; // 1 = new / 0 = update
   selectedTab = 0;
 
   writeItem: NormDocument;
@@ -105,17 +102,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('DocumentEditComponent');
-
-    // Prepare the user multi select box
     this.setStartValues();
   }
 
   private setStartValues() {
-    this.resetComponent();
-
-    if (this.normForm) {
-      this.normForm.form.markAsPristine();
-    }
+    console.log('setStartValues');
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // fetch data for select-boxes
@@ -136,8 +127,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private newDocument() {
     console.log('New mode');
     this.resetComponent();
+    this.setMultiselects();
     this.editable = true;
-    this.isNewDocument = true;
+    this.isNew = true;
     this.formTitle = 'Neue Norm anlegen';
     this.publisher = '';
     this.owner = '';
@@ -146,15 +138,24 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private editDocument(results) {
     console.log('Edit mode');
-    this.isNewDocument = false;
+
+    this.isNew = false;
+    this.resetComponent();
+
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
     this.couchDBService
       .fetchEntry('/' + results['id'])
       .pipe(takeWhile(() => this.alive))
-      .subscribe(entry => {
-        this.getDocumentData(entry);
-      });
+      .subscribe(
+        entry => {
+          this.getDocumentData(entry);
+        },
+        error => {
+          console.log(error.message);
+        },
+        () => {}
+      );
   }
 
   private saveDocument(): void {
@@ -167,28 +168,34 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        console.log('saveDocument:' + result);
+      .subscribe(
+        result => {
+          console.log('saveDocument:' + result);
 
-        if (this.fileUpload) {
-          this.uploadPDF()
-            .pipe(takeWhile(() => this.alive))
-            .subscribe(
-              res => {},
-              error => {
-                console.log(error);
-                this.showConfirmation('error', error.message);
-              },
-              () => {
-                this.router.navigate(['../document/' + this.id + '/edit']);
-                this.showConfirmation('success', 'Upload erfolgreich');
-              }
-            );
-        }
-        this.router.navigate(['../document/' + this.id + '/edit']);
-        this.isLoading = false;
-        this.sendStateUpdate();
-      });
+          if (this.fileUpload) {
+            this.uploadPDF()
+              .pipe(takeWhile(() => this.alive))
+              .subscribe(
+                res => {},
+                error => {
+                  console.log(error);
+                  this.showConfirmation('error', error.message);
+                },
+                () => {
+                  this.router.navigate(['../document/' + this.id + '/edit']);
+                  this.showConfirmation('success', 'Upload erfolgreich');
+                }
+              );
+          }
+          this.router.navigate(['../document/' + this.id + '/edit']);
+          this.isLoading = false;
+          this.sendStateUpdate();
+        },
+        error => {
+          console.log(error.message);
+        },
+        () => {}
+      );
   }
 
   private updateDocument(): void {
@@ -212,7 +219,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.writeUpdate();
     }
-    this.fileUploadInput.clear();
   }
 
   private writeUpdate() {
@@ -223,7 +229,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         results => {},
         error => {
-          console.log(error.message);
+          console.log(error);
           this.showConfirmation('error', error.message);
         },
         () => {
@@ -239,7 +245,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private resetComponent() {
+    console.log('??????????????????????????????????');
     console.log('restComponent');
+
     this.editable = false;
     this.selectedRelatedNorms = [];
     this.selectedUsers = [];
@@ -247,10 +255,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedTags2 = [];
     this.selectedTags3 = [];
     this.selectedTab = 0;
-    this.initMultiselectConfig();
+    if (this.normForm) {
+      this.normForm.form.markAsPristine();
+    }
+    this.assignMultiselectConfig();
+    this.fileUploadInput.clear();
   }
 
-  private initMultiselectConfig() {
+  private assignMultiselectConfig() {
+    console.log('assignMultiselectConfig');
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',
@@ -262,7 +275,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'User Auswahl',
       noDataLabel: 'Keinen Benutzer gefunden',
-      disabled: this.editable || !this.isNewDocument
+      disabled: this.editable || !this.isNew
     };
     this.relatedDropdownSettings = {
       singleSelection: false,
@@ -276,7 +289,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'Referenz Auswahl',
       noDataLabel: 'Keine Referenz gefunden',
       classes: 'relatedClass',
-      disabled: this.editable || !this.isNewDocument
+      disabled: this.editable || !this.isNew
     };
     this.tagDropdownSettings = {
       singleSelection: false,
@@ -290,7 +303,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
       classes: 'tag-multiselect',
-      disabled: this.editable || !this.isNewDocument
+      disabled: this.editable || !this.isNew
     };
   }
 
@@ -313,7 +326,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         accept: () => {
           this.processUpload(uploadField);
         },
-        reject: () => {}
+        reject: () => {
+          this.fileUploadInput.clear();
+        }
       });
     } else {
       this.processUpload(uploadField);
@@ -355,7 +370,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private checkForExistingAttachment(obj, searchKey): boolean {
     return Object.keys(obj).some(prop => {
-      return prop.includes(searchKey);
+      console.log('checkForExistingAttachment');
+      console.log('prop1: ' + prop);
+      const needle = /_([^.]+)./.exec(prop)[1];
+      console.log('searchKey: ' + searchKey);
+      console.log('needle extracted from filename (prop): ' + needle);
+      console.log('prop2: ' + prop);
+      return needle.includes(searchKey);
     });
   }
 
@@ -503,7 +524,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     this.isLoading = true;
-    if (this.normForm.value.isNewDocument) {
+    if (this.normForm.value.isNew) {
       this.saveDocument();
     } else {
       this.updateDocument();
@@ -532,7 +553,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
-    this.resetComponent();
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
@@ -780,9 +800,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public onEdit() {
-    console.log(this.editable);
+    this.setMultiselects();
     this.editable = true;
+  }
 
+  private setMultiselects() {
     this.tagDropdownSettings['disabled'] = false;
     this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
 
@@ -794,7 +816,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       {},
       this.relatedDropdownSettings
     );
-    console.log(this.editable);
+  }
+
+  private disableMultiselect() {
+    this.tagDropdownSettings['disabled'] = true;
+    this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
+
+    this.userDropdownSettings['disabled'] = true;
+    this.userDropdownSettings = Object.assign({}, this.userDropdownSettings);
+
+    this.relatedDropdownSettings['disabled'] = true;
+    this.relatedDropdownSettings = Object.assign(
+      {},
+      this.relatedDropdownSettings
+    );
   }
 
   public onItemSelect(item: any) {}

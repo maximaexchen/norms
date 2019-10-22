@@ -14,12 +14,11 @@
   </div>
   <div class="col-sm-8 text-right">
     <app-crud-nav
-      [isNewDocument]="isNewDocument"
+      [isNew]="isNew"
       [validForm]="normForm.valid"
       [dirtyForm]="normForm.dirty"
       [routeNew]="'/document/new'"
       [editable]="editable"
-      [deletable]="deletable"
       (save)="onSubmit()"
       (add)="onSubmit()"
       (edit)="onEdit()"
@@ -29,7 +28,7 @@
 </div>
 
 <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
-  <input type="hidden" [(ngModel)]="isNewDocument" name="isNewDocument" />
+  <input type="hidden" [(ngModel)]="isNew" name="isNew" />
   <input type="hidden" [(ngModel)]="id" name="_id" />
   <input type="hidden" [(ngModel)]="rev" name="_rev" />
   <p-tabView
@@ -222,6 +221,7 @@
             >
             <div class="col-sm-8">
               <textarea
+                required
                 class="form-control"
                 i18n-placeholder
                 placeholder="Scope"
@@ -239,7 +239,6 @@
             <div class="col-sm-8">
               <p i18n="@@string-tag-level1-dataset">Level 1 (Herausgeber)</p>
               <angular2-multiselect
-                required
                 name="tagsLevel1"
                 [data]="tagsLevel1"
                 [(ngModel)]="selectedTags1"
@@ -248,6 +247,8 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                required
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -273,6 +274,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -297,6 +299,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -353,6 +356,12 @@
             >
             <div class="col-sm-12">
               <p-fileUpload
+                [ngClass]="{
+                  'ng-invalid': !false,
+                  'ng-valid': true,
+                  required: false,
+                  'w-100': true
+                }"
                 #fileUploadInput
                 [disabled]="normForm.invalid || !editable"
                 name="files"
@@ -362,6 +371,7 @@
                 [showCancelButton]="true"
                 showButtons="true"
                 chooseLabel="Norm wählen (PDF)"
+                required="true"
               ></p-fileUpload>
               <p
                 *ngIf="!normForm.valid"
@@ -377,12 +387,11 @@
           <button
             type="button"
             (click)="getDownload(id, latestAttachmentName)"
-            [disabled]="!editable"
             *ngIf="latestAttachmentName"
             title="{{ latestAttachmentName }}"
             class="btn btn-acp attachmentDownload"
           >
-            <fa-icon [icon]="faFileDownload"></fa-icon> Download Norm
+            <i class="fas fa-file-download"></i> Download Norm
           </button>
 
           <hr />
@@ -395,7 +404,8 @@
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"
-                ><i class="fa fa-download"></i> {{ revDoc['revisionID'] }}</a
+                ><i class="fas fa-file-download"></i>
+                {{ revDoc['revisionID'] }}</a
               >
 
               <!-- Link to the server file
@@ -486,7 +496,7 @@
                       <a
                         class="dynamic-link"
                         (click)="getDownload(related.id, related.normNumber)"
-                        >Download <i class="fa fa-download"></i
+                        >Download <i class="fas fa-file-download"></i
                       ></a>
                     </td>
                   </tr>

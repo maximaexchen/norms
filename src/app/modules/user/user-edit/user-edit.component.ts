@@ -20,7 +20,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   alive = true;
 
   formTitle: string;
-  formMode = false; // 0 = new - 1 = update
+  isNew = true; // 1 = new - 2 = update
 
   writeItem: User;
   users: User[] = [];
@@ -51,7 +51,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
       // check if we are updating
       if (results['id']) {
         console.log('Edit mode');
-        this.formMode = true;
+        this.isNew = false;
         this.formTitle = 'User bearbeiten';
 
         this.couchDBService
@@ -75,12 +75,12 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit(): void {
-    if (this.userForm.value.formMode) {
-      console.log('Update a user');
-      this.onUpdateUser();
-    } else {
+    if (this.userForm.value.isNew) {
       console.log('Create a user');
       this.onCreateUser();
+    } else {
+      console.log('Update a user');
+      this.onUpdateUser();
     }
   }
 

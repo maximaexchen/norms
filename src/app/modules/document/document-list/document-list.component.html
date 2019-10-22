@@ -1,6 +1,6 @@
 <div class="btn-expand-collapse">
   <span class="nav-label">Auswahl Artikel</span>
-  <span class="nav-button fa fa-chevron-left" (click)="toggleSidebar()"></span>
+  <span class="nav-button fas fa-chevron-left" (click)="toggleSidebar()"></span>
 </div>
 <!-- (sortFunction)="tableSort($event)"
   [customSort]="true" -->
@@ -27,7 +27,7 @@
 >
   <ng-template pTemplate="caption">
     <div style="text-align: center;">
-      <i class="fa fa-search" style="margin:4px 6px 0 0;"></i>
+      <i class="fas fa-search" style="margin:4px 6px 0 0;"></i>
       <input
         type="text"
         pInputText
@@ -83,9 +83,8 @@
             : document.description.de
         }}
       </td>
-
       <td
-        *ngIf="document.normLanguage === 'en'"
+        *ngIf="document.normLanguage === 'en' || document.normLanguage === ''"
         pTooltip="{{ document.description.en }}"
         tooltipPosition="top"
       >
@@ -121,7 +120,7 @@
             'font-size': '16px',
             color: document.active ? 'green' : 'red '
           }"
-          [ngClass]="document.active ? 'fa fa-check-circle' : 'fa fa-ban'"
+          [ngClass]="document.active ? 'fas fa-check-circle' : 'fas fa-ban'"
           aria-hidden="true"
         ></i>
       </td>

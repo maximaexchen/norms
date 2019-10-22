@@ -23,7 +23,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
   editable = false;
 
   formTitle: string;
-  formMode = false; // 0 = new - 1 = update
+  isNew = true; // 1 = new - 0 = update
 
   writeItem: Tag;
   tags: Tag[] = [];
@@ -45,10 +45,33 @@ export class TagEditComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     console.log('TagEditComponent');
-    this.getTag();
+    this.setStartValues();
   }
 
-  private restFields() {
+  private setStartValues() {
+    this.resetComponent();
+
+    if (this.tagForm) {
+      this.tagForm.form.markAsPristine();
+    }
+
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+      results => {
+        // check if we are updating
+        if (results['id']) {
+          this.editTag(results);
+        } else {
+          this.newTag();
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+
+  private resetComponent() {
+    console.log('restComponent');
     this.editable = false;
     this.id = '';
     this.rev = '';
@@ -58,42 +81,44 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.active = null;
   }
 
-  private getTag() {
-    this.restFields();
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      // check if we are updating
-      if (results['id']) {
-        console.log('Edit mode');
-        this.formMode = true;
-        this.formTitle = 'Tag bearbeiten';
+  private newTag() {
+    console.log('New mode');
+    this.isNew = true;
+    this.editable = true;
+    this.formTitle = 'Neuen Tag anlegen';
+    this.tags = [];
+  }
 
-        this.couchDBService
-          .fetchEntry('/' + results['id'])
-          .pipe(takeWhile(() => this.alive))
-          .subscribe(entry => {
-            this.id = entry['_id'];
-            this.rev = entry['_rev'];
-            this.type = 'tag';
-            this.name = entry['name'];
-            this.tagType = entry['tagType'];
-            this.active = entry['active'];
-          });
-      } else {
-        console.log('New mode');
-        this.formTitle = 'Neuen Tag anlegen';
-        this.tags = [];
-      }
-    });
+  private editTag(results) {
+    this.resetComponent();
+    this.isNew = false;
+    this.formTitle = 'Tag bearbeiten';
+
+    this.couchDBService
+      .fetchEntry('/' + results['id'])
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(entry => {
+        this.getTagData(entry);
+      });
+  }
+
+  private getTagData(entry: any) {
+    this.id = entry['_id'];
+    this.rev = entry['_rev'];
+    this.type = 'tag';
+    this.name = entry['name'];
+    this.tagType = entry['tagType'];
+    this.active = entry['active'];
   }
 
   public onSubmit(): void {
-    if (this.tagForm.value.formMode) {
+    if (this.tagForm.value.isNew) {
+      console.log('Create a tag');
+      this.resetComponent();
+      this.onCreateTag();
+    } else {
       console.log('Update a tag');
       this.onUpdateTag();
-    } else {
-      console.log('Create a tag');
-      this.restFields();
-      this.onCreateTag();
     }
   }
 
@@ -128,13 +153,18 @@ export class TagEditComponent implements OnInit, OnDestroy {
           this.couchDBService
             .search(updateQuery)
             .pipe(takeWhile(() => this.alive))
-            .subscribe(results => {
-              this.updateRelated(results);
-            });
+            .subscribe(
+              results => {
+                this.updateRelated(results);
+              },
+              error => {
+                console.log(error);
+              }
+            );
 
           // Inform about Database change.
-          this.getTag();
           this.sendStateUpdate();
+          this.router.navigate(['../tag']);
         },
         err => {
           console.log(err);
@@ -164,6 +194,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
       .subscribe(result => {
+        this.router.navigate(['../tag']);
         this.sendStateUpdate();
       });
   }

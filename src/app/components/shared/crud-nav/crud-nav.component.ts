@@ -16,7 +16,7 @@ import { Router } from '@angular/router';
 })
 export class CrudNavComponent implements OnInit {
   @Input() form: any;
-  @Input() formMode: string;
+  @Input() isNew: string;
   @Input() routeNew: string;
   @Input() validForm: boolean;
   @Input() dirtyForm: boolean;

@@ -31,7 +31,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   alive = true;
 
   formTitle: string;
-  formMode = false; // 0 = new - 1 = update
+  isNew = true; // 1 = new - 0 = update
 
   writeItem: Group;
   groups: Group[] = [];
@@ -78,7 +78,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
       // check if we are updating
       if (results['id']) {
-        this.formMode = true;
+        this.isNew = false;
         this.formTitle = 'Gruppe bearbeiten';
 
         this.couchDBService
@@ -145,10 +145,10 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit(): void {
-    if (this.groupForm.value.formMode) {
-      this.updateGroup();
-    } else {
+    if (this.groupForm.value.isNew) {
       this.createGroup();
+    } else {
+      this.updateGroup();
     }
   }
 

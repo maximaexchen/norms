@@ -23,7 +23,7 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
   publishers: Publisher[] = [];
 
   formTitle: string;
-  formMode = false; // 0 = new - 1 = update
+  isNew = true; // 1 = new - 0 = update
   id: string;
   rev: string;
   type: string;
@@ -49,7 +49,7 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
       // check if we are updating
       if (results['id']) {
         console.log('Edit mode');
-        this.formMode = true;
+        this.isNew = false;
         this.formTitle = 'Bereich bearbeiten';
         this.couchDBService.fetchEntry('/' + results['id']).subscribe(entry => {
           this.id = entry['_id'];
@@ -66,12 +66,12 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.normForm.value.formMode) {
-      console.log('Update a publisher');
-      this.onUpdatePublisher();
-    } else {
+    if (this.normForm.value.isNew) {
       console.log('Create a publisher');
       this.onCreatePublisher();
+    } else {
+      console.log('Update a publisher');
+      this.onUpdatePublisher();
     }
   }
 

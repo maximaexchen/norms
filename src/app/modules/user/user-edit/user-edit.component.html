@@ -7,7 +7,7 @@
   </div>
   <div class="col-sm-8 text-right">
     <app-crud-nav
-      [formMode]="formMode"
+      [isNew]="isNew"
       [validForm]="userForm.valid"
       [routeNew]="'/user/new'"
       (save)="onSubmit()"
@@ -23,7 +23,7 @@
       (ngSubmit)="onSubmit()"
       #userForm="ngForm"
     >
-      <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+      <input type="hidden" [(ngModel)]="isNew" name="isNew" />
       <input type="hidden" [(ngModel)]="id" name="_id" />
       <input type="hidden" [(ngModel)]="rev" name="_rev" />
       <div class="row">

@@ -2,20 +2,20 @@
   <button
     pButton
     type="button"
-    icon="fa fa-file-o"
+    icon="fas fa-file"
     iconPos="left"
     label="Neu"
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onCreate()"
-    *ngIf="formMode"
+    *ngIf="!isNew"
   ></button>
   <button
     pButton
     type="submit"
-    icon="fa fa-check"
+    icon="fas fa-check"
     iconPos="left"
-    label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
+    label="{{ isNew ? 'Erstellen' : 'Aktualisieren' }}"
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onSubmit()"
@@ -27,7 +27,7 @@
   <button
     pButton
     type="button"
-    icon="fa fa-pencil"
+    icon="fas fa-pen"
     iconPos="left"
     i18n-label="@@btn-edit"
     class="btn btn-default btn-sm btn-headline"
@@ -38,12 +38,12 @@
   <button
     pButton
     type="button"
-    icon="fa fa-trash"
+    icon="fas fa-trash"
     iconPos="left"
     label="Löschen"
     (click)="onDelete()"
     class="btn btn-default btn-sm btn-headline"
     i18n-label="@@btn-delete"
-    *ngIf="formMode"
+    *ngIf="!isNew"
   ></button>
 </div>
