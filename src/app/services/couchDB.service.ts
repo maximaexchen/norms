@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
 import { EnvService } from './env.service';
-import { NormDocument } from '@models/index';
+import { NormDocument, Role } from '@models/index';
 
 // CouchDB Ubuntu Server
 /* $kP2ZernC */
@@ -88,6 +88,12 @@ export class CouchDBService {
         '"]&endkey=["' +
         id +
         '",{},{}]&include_docs=true'
+    );
+  }
+
+  public getRoles(): Observable<any> {
+    return this.http.get(
+      this.dbRequest + '/_design/norms/_view/all-users?include_docs=true'
     );
   }
 

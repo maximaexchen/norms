@@ -7,7 +7,6 @@ import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { Group } from '../../../models/group.model';
 import { takeWhile } from 'rxjs/operators';
-import G = require('glob');
 
 @Component({
   selector: 'app-group-list',

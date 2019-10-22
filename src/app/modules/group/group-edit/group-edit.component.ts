@@ -8,7 +8,8 @@ import {
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Subscription, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
+import { takeWhile } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
@@ -17,7 +18,6 @@ import { NotificationsService } from 'src/app/services/notifications.service';
 
 import { Group } from '../../../models/group.model';
 import { User } from '@app/models/user.model';
-import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-group-edit',

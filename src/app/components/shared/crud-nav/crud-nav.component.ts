@@ -6,6 +6,7 @@ import {
   Output,
   ChangeDetectionStrategy
 } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
 
 @Component({

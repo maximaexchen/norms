@@ -1,23 +1,22 @@
-import { CouchDBService } from '@app/services/couchDB.service';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RoleListComponent } from './role-list.component';
+import { GroupEditComponent } from './group-edit.component';
 import { AppModule } from '@app/app.module';
 import { GeneralModule } from '@app/modules/general.module';
 
-describe('RoleListComponent', () => {
-  let component: RoleListComponent;
-  let fixture: ComponentFixture<RoleListComponent>;
+describe('RoleEditComponent', () => {
+  let component: GroupEditComponent;
+  let fixture: ComponentFixture<GroupEditComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [AppModule, GeneralModule],
-      declarations: [RoleListComponent]
+      declarations: [GroupEditComponent]
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RoleListComponent);
+    fixture = TestBed.createComponent(GroupEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

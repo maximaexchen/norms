@@ -1,1 +1,27 @@
-<p>role-edit works!</p>
+<div class="row detail-edit-header">
+  <div class="col-sm-4">
+    <h1 *ngIf="name">{{ name }}</h1>
+    <h1 *ngIf="!name" i18n="@@string-new-dataset">
+      Datensatz erstellen
+    </h1>
+  </div>
+  <div class="col-sm-8 text-right">
+    <app-crud-nav
+      [isNew]="isNew"
+      [validForm]="roleForm.valid"
+      [routeNew]="'/role/new'"
+      (save)="onSubmit()"
+      (add)="onSubmit()"
+      (delete)="onDelete()"
+    ></app-crud-nav>
+  </div>
+</div>
+<p-tabView>
+  <p-tabPanel header="Stammdaten">
+    <form
+      class="form form-horizontal"
+      (ngSubmit)="onSubmit()"
+      #roleForm="ngForm"
+    ></form>
+  </p-tabPanel>
+</p-tabView>

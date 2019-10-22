@@ -36,6 +36,7 @@
     "mysql": "^2.17.1",
     "nano": "^8.1.0",
     "ng2-file-upload": "^1.3.0",
+    "ngentest": "^0.4.1",
     "popper.js": "^1.15.0",
     "primeicons": "^2.0.0",
     "primeng": "^8.0.2",

@@ -1,6 +1,8 @@
+import { GeneralModule } from './../../general.module';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RoleEditComponent } from './role-edit.component';
+import { AppModule } from '@app/app.module';
 
 describe('RoleEditComponent', () => {
   let component: RoleEditComponent;
@@ -8,9 +10,9 @@ describe('RoleEditComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ RoleEditComponent ]
-    })
-    .compileComponents();
+      imports: [AppModule, GeneralModule],
+      declarations: [RoleEditComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
