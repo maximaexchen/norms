@@ -223,6 +223,7 @@
             >
             <div class="col-sm-8">
               <textarea
+                required
                 class="form-control"
                 i18n-placeholder
                 placeholder="Scope"
@@ -357,6 +358,12 @@
             >
             <div class="col-sm-12">
               <p-fileUpload
+                [ngClass]="{
+                  'ng-invalid': !false,
+                  'ng-valid': true,
+                  required: false,
+                  'w-100': true
+                }"
                 #fileUploadInput
                 [disabled]="normForm.invalid || !editable"
                 name="files"
@@ -366,6 +373,7 @@
                 [showCancelButton]="true"
                 showButtons="true"
                 chooseLabel="Norm wählen (PDF)"
+                required="true"
               ></p-fileUpload>
               <p
                 *ngIf="!normForm.valid"

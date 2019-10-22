@@ -217,7 +217,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.writeUpdate();
     }
-    this.fileUploadInput.clear();
   }
 
   private writeUpdate() {
@@ -246,9 +245,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private resetComponent() {
     console.log('??????????????????????????????????');
     console.log('restComponent');
-    if (this.normForm) {
-      this.normForm.form.markAsPristine();
-    }
+
     this.editable = false;
     this.selectedRelatedNorms = [];
     this.selectedUsers = [];
@@ -256,7 +253,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedTags2 = [];
     this.selectedTags3 = [];
     this.selectedTab = 0;
+    if (this.normForm) {
+      this.normForm.form.markAsPristine();
+    }
     this.assignMultiselectConfig();
+    this.fileUploadInput.clear();
   }
 
   private assignMultiselectConfig() {
@@ -324,7 +325,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         accept: () => {
           this.processUpload(uploadField);
         },
-        reject: () => {}
+        reject: () => {
+          this.fileUploadInput.clear();
+        }
       });
     } else {
       this.processUpload(uploadField);
@@ -366,7 +369,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private checkForExistingAttachment(obj, searchKey): boolean {
     return Object.keys(obj).some(prop => {
-      return prop.includes(searchKey);
+      console.log(/_([^.]+)./.exec(prop)[1]); // 1
+
+      console.log('prop1: ' + prop);
+      const needle = /_([^.]+)./.exec(prop)[1];
+      console.log('searchKey: ' + searchKey);
+      console.log('needle: ' + needle);
+      console.log('prop2: ' + prop);
+      return needle.includes(searchKey);
     });
   }
 
