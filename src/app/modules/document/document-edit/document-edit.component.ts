@@ -127,7 +127,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private newDocument() {
     console.log('New mode');
     this.resetComponent();
-    this.enableMultiselect();
+    this.setMultiselects();
     this.editable = true;
     this.formMode = false;
     this.formTitle = 'Neue Norm anlegen';
@@ -262,7 +262,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private assignMultiselectConfig() {
     console.log('assignMultiselectConfig');
-    console.log(this.editable);
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',
@@ -369,12 +368,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private checkForExistingAttachment(obj, searchKey): boolean {
     return Object.keys(obj).some(prop => {
-      console.log(/_([^.]+)./.exec(prop)[1]); // 1
-
+      console.log('checkForExistingAttachment');
       console.log('prop1: ' + prop);
       const needle = /_([^.]+)./.exec(prop)[1];
       console.log('searchKey: ' + searchKey);
-      console.log('needle: ' + needle);
+      console.log('needle extracted from filename (prop): ' + needle);
       console.log('prop2: ' + prop);
       return needle.includes(searchKey);
     });
@@ -801,11 +799,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public onEdit() {
-    this.enableMultiselect();
+    this.setMultiselects();
     this.editable = true;
   }
 
-  private enableMultiselect() {
+  private setMultiselects() {
     this.tagDropdownSettings['disabled'] = false;
     this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
 
