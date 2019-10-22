@@ -41,7 +41,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   uploadUrl = this.env.uploadUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
-  formMode = false; // 0 = new / 1 = update
+  isNewDocument = true; // 1 = new / 0 = update
   selectedTab = 0;
 
   writeItem: NormDocument;
@@ -137,7 +137,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('New mode');
     this.resetComponent();
     this.editable = true;
-    this.formMode = false;
+    this.isNewDocument = true;
     this.formTitle = 'Neue Norm anlegen';
     this.publisher = '';
     this.owner = '';
@@ -146,7 +146,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private editDocument(results) {
     console.log('Edit mode');
-    this.formMode = true;
+    this.isNewDocument = false;
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
     this.couchDBService
@@ -262,7 +262,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'User Auswahl',
       noDataLabel: 'Keinen Benutzer gefunden',
-      disabled: this.editable || this.formMode
+      disabled: this.editable || !this.isNewDocument
     };
     this.relatedDropdownSettings = {
       singleSelection: false,
@@ -276,7 +276,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'Referenz Auswahl',
       noDataLabel: 'Keine Referenz gefunden',
       classes: 'relatedClass',
-      disabled: this.editable || this.formMode
+      disabled: this.editable || !this.isNewDocument
     };
     this.tagDropdownSettings = {
       singleSelection: false,
@@ -290,7 +290,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
       classes: 'tag-multiselect',
-      disabled: this.editable || this.formMode
+      disabled: this.editable || !this.isNewDocument
     };
   }
 
@@ -503,13 +503,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     this.isLoading = true;
-    if (this.normForm.value.formMode) {
-      this.updateDocument();
-    } else {
+    if (this.normForm.value.isNewDocument) {
       this.saveDocument();
+    } else {
+      this.updateDocument();
     }
   }
-
   public deleteDocument(): void {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normNumber + '?',

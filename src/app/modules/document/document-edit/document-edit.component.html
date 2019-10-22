@@ -14,7 +14,7 @@
   </div>
   <div class="col-sm-8 text-right">
     <app-crud-nav
-      [formMode]="formMode"
+      [isNewDocument]="isNewDocument"
       [validForm]="normForm.valid"
       [dirtyForm]="normForm.dirty"
       [routeNew]="'/document/new'"
@@ -29,7 +29,7 @@
 </div>
 
 <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
-  <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+  <input type="hidden" [(ngModel)]="isNewDocument" name="isNewDocument" />
   <input type="hidden" [(ngModel)]="id" name="_id" />
   <input type="hidden" [(ngModel)]="rev" name="_rev" />
   <p-tabView
