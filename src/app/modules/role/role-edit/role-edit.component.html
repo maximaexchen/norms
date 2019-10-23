@@ -9,9 +9,12 @@
     <app-crud-nav
       [isNew]="isNew"
       [validForm]="roleForm.valid"
+      [dirtyForm]="roleForm.dirty"
       [routeNew]="'/role/new'"
+      [editable]="editable"
       (save)="onSubmit()"
       (add)="onSubmit()"
+      (edit)="onEdit()"
       (delete)="onDelete()"
     ></app-crud-nav>
   </div>
@@ -22,6 +25,58 @@
       class="form form-horizontal"
       (ngSubmit)="onSubmit()"
       #roleForm="ngForm"
-    ></form>
+    >
+      <input type="hidden" [(ngModel)]="isNew" name="isNew" />
+      <input type="hidden" [(ngModel)]="id" name="_id" />
+      <input type="hidden" [(ngModel)]="rev" name="_rev" />
+      <div class="row">
+        <div class="col-sm-8">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-name"
+              >Vorname</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Name"
+                required
+                [(ngModel)]="name"
+                name="name"
+                #nameCheck="ngModel"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-name-required"
+                *ngIf="!nameCheck.valid && nameCheck.touched"
+                >Bitte geben Sie einen Namen ein.</small
+              >
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Status</label>
+            <div class="col-sm-10">
+              <p-selectButton
+                [options]="[
+                  {
+                    label: 'aktiv',
+                    value: true
+                  },
+                  {
+                    label: 'gesperrt',
+                    value: false
+                  }
+                ]"
+                name="active"
+                [(ngModel)]="active"
+              ></p-selectButton>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
   </p-tabPanel>
 </p-tabView>

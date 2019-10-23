@@ -1,3 +1,5 @@
+import { Roles } from './models/role.model';
+import { PermissionManagerService } from './services/permissionManager.service';
 import { Component, OnInit, Injector } from '@angular/core';
 import { MessageService } from 'primeng/components/common/messageservice';
 
@@ -20,10 +22,12 @@ export class AppComponent implements OnInit {
   constructor(
     private couchDBService: CouchDBService,
     private injector: Injector,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private userS: PermissionManagerService
   ) {}
 
   ngOnInit() {
+    this.userS.authAs('External' as Roles);
     const params = {
       username: this.userName,
       password: this.passWord

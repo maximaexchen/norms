@@ -12,6 +12,7 @@
   (onRowSelect)="onRowSelect($event)"
   [globalFilterFields]="['name']"
   (onFilter)="onFilter($event)"
+  *ngIf="roles"
 >
   <ng-template pTemplate="caption">
     <div style="text-align: center;">
@@ -29,7 +30,7 @@
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
-      <th>Name</th>
+      <th [pSortableColumn]="'name'">Name</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-role>
@@ -39,7 +40,7 @@
   </ng-template>
 </p-table>
 <div class="info-panel position-bottom">
-  <p i18n="@@role-status-data-count">
+  <p i18n="@@role-status-data-count" *ngIf="roleCount">
     Es {roleCount, plural, =0 {wurde keine Rolle gefunden} =1 {wurde 1 Rolle
     gefunden} other { wurden {{ roleCount }} Gruppen gefunden }}
   </p>

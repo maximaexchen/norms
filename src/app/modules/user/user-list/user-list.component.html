@@ -51,7 +51,7 @@
   </ng-template>
 </p-table>
 <div class="info-panel position-bottom">
-  <p i18n="@@user-status-data-count">
+  <p i18n="@@user-status-data-count" *ngIf="userCount">
     Es {userCount, plural, =0 {wurde keine Benutzer gefunden} =1 {wurde 1
     Benutzer gefunden} other { wurden {{ userCount }} Benutzer gefunden }}
   </p>

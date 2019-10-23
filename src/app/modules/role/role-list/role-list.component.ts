@@ -17,8 +17,8 @@ export class RoleListComponent implements OnInit, OnDestroy {
   alive = true;
 
   roles: Role[] = [];
-  roleCount = 0;
   selectedRole: Role;
+  roleCount = 0;
 
   constructor(private couchDBService: CouchDBService, private router: Router) {}
 

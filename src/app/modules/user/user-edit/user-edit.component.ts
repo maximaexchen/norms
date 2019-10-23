@@ -7,7 +7,7 @@ import { takeWhile } from 'rxjs/operators';
 
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
-import { User } from '../../../models/user.model';
+import { User } from '@models/index';
 
 @Component({
   selector: 'app-user-edit',

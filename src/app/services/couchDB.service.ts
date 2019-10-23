@@ -91,9 +91,9 @@ export class CouchDBService {
     );
   }
 
-  public getRoles(): Observable<any> {
-    return this.http.get(
-      this.dbRequest + '/_design/norms/_view/all-users?include_docs=true'
+  public getRoles(): Observable<Role[]> {
+    return this.fetchEntries(
+      '/_design/norms/_view/all-roles?include_docs=true'
     );
   }
 
