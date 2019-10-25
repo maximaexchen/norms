@@ -14,6 +14,7 @@ import { Roles } from '@app/modules/auth/models/roles.enum';
 import { Router } from '@angular/router';
 
 import { LogoutComponent } from '@modules/auth/logout/logout.component';
+import { AuthenticationService } from './modules/auth/services/authentication.service';
 
 @Component({
   selector: 'app-root',
@@ -32,15 +33,13 @@ export class AppComponent implements OnInit {
     private couchDBService: CouchDBService,
     private injector: Injector,
     private messageService: MessageService,
-    private userS: PermissionManagerService,
+    private authService: AuthenticationService,
     private menu: ACP_Menu,
     private api: ApiService
   ) {}
 
   ngOnInit() {
-    this.userS.authAs('External' as Roles);
-
-    this.mainmenuItems = [];
+    /* this.mainmenuItems = [];
 
     this.api.userMenuSubjectChanges.pipe(pluck('routerLink')).subscribe(
       res => {
@@ -55,19 +54,19 @@ export class AppComponent implements OnInit {
       err => {
         this.mainmenuItems = [];
       }
-    );
+    ); */
   }
 
-  public setUserValidation(user) {
+  /* public setUserValidation(user) {
     this.user = user;
     this.initMainMenu();
-  }
+  } */
 
   /**
    * initialisiert das Haupt-Menü
    */
   private initMainMenu() {
-    from(
+    /* from(
       this.menu.initMainMenu({
         injector: this.injector,
         dataStore: this.dataStore
@@ -81,11 +80,12 @@ export class AppComponent implements OnInit {
       error => {
         console.log(error.message);
       }
-    );
+    ); */
   }
 
   public logout() {
-    from(this.couchDBService.logout()).subscribe(
+    this.authService.logout();
+    /* from(this.couchDBService.logout()).subscribe(
       res => {
         this.menu.clearMainMenu({ injector: this.injector });
         this.api.clearUserMenuSubject();
@@ -121,6 +121,6 @@ export class AppComponent implements OnInit {
           }
         );
       }
-    );
+    ); */
   }
 }

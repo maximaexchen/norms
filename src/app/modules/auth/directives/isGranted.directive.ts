@@ -7,13 +7,13 @@ export class IsGrantedDirective {
   constructor(
     private templateRef: TemplateRef<any>,
     private viewContainer: ViewContainerRef,
-    private permissionManagerS: PermissionManagerService
+    private permissionManagerService: PermissionManagerService
   ) {}
   @Input() set appIsGranted(permission: PermissionType) {
     this.isGranted(permission);
   }
   private isGranted(permission: PermissionType) {
-    if (this.permissionManagerS.isGranted(permission)) {
+    if (this.permissionManagerService.isGranted(permission)) {
       this.viewContainer.createEmbeddedView(this.templateRef);
     } else {
       this.viewContainer.clear();

@@ -105,31 +105,10 @@ export class CouchDBService {
     return this.updateSubject.asObservable();
   }
 
-  public login(params: { username: string; password: string }): any {
-    return new Promise(resolve => {
-      resolve({
-        success: true,
-        msg: 'Login ok'
-      });
-
-      this.checkLoginUser(params.username, params.password)
-        .then(result => {
-          console.log(result);
-          resolve({
-            success: true,
-            msg: 'Login ok'
-          });
-        })
-        .catch(err => {
-          resolve({
-            success: false,
-            msg: err.message
-          });
-        });
-    });
-  }
-
-  private checkLoginUser(username, password): Promise<any> {
+  public getLoginUser(params: {
+    username: string;
+    password: string;
+  }): Promise<any> {
     const updateQuery = {
       use_index: ['_design/check_user'],
       selector: {
@@ -137,12 +116,12 @@ export class CouchDBService {
         $and: [
           {
             userName: {
-              $eq: username
+              $eq: params.username
             }
           },
           {
             password: {
-              $eq: password
+              $eq: params.password
             }
           }
         ]
@@ -150,30 +129,5 @@ export class CouchDBService {
     };
 
     return this.http.post(this.dbRequest + '/_find', updateQuery).toPromise();
-  }
-
-  public logout(): any {
-    return new Promise(resolve => {
-      /* this._client.directory.logout().then(isLogedOut => {
-        resolve(isLogedOut);
-      }); */
-    });
-  }
-
-  get currentUser() {
-    return new Promise(resolve => {
-      /* this._client.directory
-        .getCurrentUser()
-        .then(result => {
-          result.success = true;
-          resolve(result);
-        })
-        .catch(err => {
-          resolve({
-            success: false,
-            msg: err.message
-          });
-        }); */
-    });
   }
 }

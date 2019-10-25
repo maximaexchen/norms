@@ -1,7 +1,5 @@
-import { LoginComponent } from './modules/auth/login/login.component';
-import { IsGrantedDirective } from './modules/auth/directives/isGranted.directive';
 import { FormsModule } from '@angular/forms';
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -16,16 +14,16 @@ import { DialogModule } from 'primeng/components/dialog/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { CoreModule } from './core.module';
-import { OrderByPipe } from './shared/pipes/orderBy.pipe';
-import { FileInputValueAccessor } from './/services/file-input-value.accessor';
+import { FileInputValueAccessor } from './services/file-input-value.accessor';
 import { NotificationsComponent } from './shared/notifications.component';
 
 import { HeaderComponent } from './components/header/header.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { AuthInterceptor } from './modules/auth/auth.interceptor';
-import { AuthModule } from './modules/auth/auth.module';
+import { AuthModule } from '@modules/auth/auth.module';
+import { AuthInterceptor } from '@modules/auth/auth.interceptor';
+import { AuthErrorHandler } from '@modules/auth/AuthError.handler';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
@@ -33,7 +31,6 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
   declarations: [
     AppComponent,
     HeaderComponent,
-    OrderByPipe,
     FileInputValueAccessor,
     NotificationsComponent
   ],
@@ -55,7 +52,11 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    } /* ,
+    {
+      provide: ErrorHandler,
+      useClass: AuthErrorHandler
+    } */
   ],
   bootstrap: [AppComponent]
 })

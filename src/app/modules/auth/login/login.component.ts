@@ -35,18 +35,7 @@ export class LoginComponent implements OnInit {
       password: this.passWord
     };
 
-    from(this.backend.login(params)).subscribe(res => {
-      console.log(res);
-    });
-    this.authService.login(this.userName, this.passWord).subscribe(
-      response => {
-        console.log(response);
-      },
-      error => {
-        console.log(error.message);
-      },
-      () => {}
-    );
+    this.authService.login(this.userName, this.passWord);
     /* console.log('LoginComponent login');
     this.headerMsg = '';
     const params = {

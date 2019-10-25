@@ -1,4 +1,4 @@
-import { PermissionType } from '@app/modules/auth/models/permissionType.enum';
+import { PermissionType } from '@modules/auth/models/permissionType.enum';
 import { PermissionBase } from '@modules/auth/permissions/permission.base';
 
 export class AdminPermission extends PermissionBase {

@@ -14,6 +14,9 @@ import { GeneralModule } from 'src/app/modules/general.module';
 import { IsGrantedDirective } from '@app/modules/auth/directives/isGranted.directive';
 import { ModuleWithProviders } from '@angular/compiler/src/core';
 import { AuthenticationService } from './services/authentication.service';
+import { AuthGuardService } from './guards/authGuard.service';
+import { AuthInterceptor } from './auth.interceptor';
+import { AuthErrorHandler } from './AuthError.handler';
 
 @NgModule({
   declarations: [
@@ -36,7 +39,12 @@ export class AuthModule {
   static forRoot(): ModuleWithProviders {
     return {
       ngModule: AuthModule,
-      providers: [AuthenticationService]
+      providers: [
+        AuthenticationService,
+        AuthGuardService,
+        AuthErrorHandler,
+        AuthInterceptor
+      ]
     };
   }
 }

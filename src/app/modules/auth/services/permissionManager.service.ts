@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 
 import { Roles } from '@app/modules/auth/models/roles.enum';
 import { PermissionType } from '@app/modules/auth/models/permissionType.enum';
-
 import { PermissionBase } from '@app/modules/auth/permissions/permission.base';
 import { PermissionsFactory } from '@modules/auth/permissions/permissions.factory';
 
