@@ -1,4 +1,4 @@
-import { Roles } from '@models/role.model';
+import { Roles } from '@app/modules/auth/models/roles.enum';
 import { OwnerPermission } from '@modules/auth/permissions/owner.permission';
 import { UserPermission } from '@modules/auth/permissions/user.permission';
 import { ExternalPermission } from '@modules/auth/permissions/external.permission';

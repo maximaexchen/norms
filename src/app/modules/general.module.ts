@@ -13,11 +13,10 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
-import { AuthComponent } from './auth/auth.component';
 import { CrudNavComponent } from '../components/crud-nav/crud-nav.component';
 
 @NgModule({
-  declarations: [AuthComponent, CrudNavComponent],
+  declarations: [CrudNavComponent],
   imports: [
     CommonModule,
     RouterModule,

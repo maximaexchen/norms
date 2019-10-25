@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 
 import { CouchDBService } from '@app/services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
-import { Role } from '@models/role.model';
+import { Role } from '@app/modules/auth/models/role.model';
 import { takeWhile } from 'rxjs/operators';
 
 @Component({

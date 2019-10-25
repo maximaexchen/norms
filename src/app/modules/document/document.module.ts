@@ -1,3 +1,4 @@
+import { AuthModule } from './../auth/auth.module';
 import { SearchModule } from './../search/search.module';
 import { UserModule } from './../user/user.module';
 import { NgModule } from '@angular/core';
@@ -17,15 +18,13 @@ import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 
 import { GeneralModule } from 'src/app/modules/general.module';
-import { IsGrantedDirective } from '@app/modules/auth/directives/isGranted.directive';
 
 @NgModule({
   declarations: [
     DocumentComponent,
     DocumentListComponent,
     DocumentEditComponent,
-    DocumentStartComponent,
-    IsGrantedDirective
+    DocumentStartComponent
   ],
   imports: [
     GeneralModule,
@@ -38,7 +37,8 @@ import { IsGrantedDirective } from '@app/modules/auth/directives/isGranted.direc
     DialogModule,
     GroupModule,
     UserModule,
-    SearchModule
+    SearchModule,
+    AuthModule
   ],
   exports: []
 })

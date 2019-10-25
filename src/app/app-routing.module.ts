@@ -34,6 +34,14 @@ const routes: Routes = [
   {
     path: 'role',
     loadChildren: './modules/role/role.module#RoleModule'
+  },
+  {
+    path: 'login',
+    loadChildren: './modules/auth/auth.module#AuthModule'
+  },
+  {
+    path: 'logout',
+    loadChildren: './modules/auth/auth.module#AuthModule'
   }
 ];
 

@@ -1,6 +1,6 @@
 import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 import { PermissionManagerService } from './../services/permissionManager.service';
-import { PermissionType } from '@models/index';
+import { PermissionType } from '@app/modules/auth/models/permissionType.enum';
 
 @Directive({ selector: '[appIsGranted]' })
 export class IsGrantedDirective {

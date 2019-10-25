@@ -10,7 +10,7 @@ import { ACP_Menu } from '@services/menu.service';
 import { ApiService } from '@services/api.service';
 import { PermissionManagerService } from '@modules/auth/services/permissionManager.service';
 
-import { Roles } from '@models/role.model';
+import { Roles } from '@app/modules/auth/models/roles.enum';
 import { Router } from '@angular/router';
 
 import { LogoutComponent } from '@modules/auth/logout/logout.component';

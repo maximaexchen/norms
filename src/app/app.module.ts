@@ -1,3 +1,5 @@
+import { LoginComponent } from './modules/auth/login/login.component';
+import { IsGrantedDirective } from './modules/auth/directives/isGranted.directive';
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -22,9 +24,8 @@ import { HeaderComponent } from './components/header/header.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './modules/auth/login/login.component';
-import { LogoutComponent } from './modules/auth/logout/logout.component';
 import { AuthInterceptor } from './modules/auth/auth.interceptor';
+import { AuthModule } from './modules/auth/auth.module';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
@@ -32,8 +33,6 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
   declarations: [
     AppComponent,
     HeaderComponent,
-    LoginComponent,
-    LogoutComponent,
     OrderByPipe,
     FileInputValueAccessor,
     NotificationsComponent
@@ -48,7 +47,8 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
     ButtonModule,
     DialogModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    AuthModule.forRoot()
   ],
   providers: [
     {
