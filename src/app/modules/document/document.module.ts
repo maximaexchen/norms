@@ -17,7 +17,7 @@ import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 
 import { GeneralModule } from 'src/app/modules/general.module';
-import { IsGrantedDirective } from '@app/directives/isGranted.directive';
+import { IsGrantedDirective } from '@app/modules/auth/directives/isGranted.directive';
 
 @NgModule({
   declarations: [

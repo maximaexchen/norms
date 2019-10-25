@@ -1,6 +1,6 @@
 import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { registerLocaleData } from '@angular/common';
@@ -22,9 +22,9 @@ import { HeaderComponent } from './components/header/header.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './components/login/login.component';
-import { LogoutComponent } from './components/logout/logout.component';
-import { IsGrantedDirective } from './directives/isGranted.directive';
+import { LoginComponent } from './modules/auth/login/login.component';
+import { LogoutComponent } from './modules/auth/logout/logout.component';
+import { AuthInterceptor } from './modules/auth/auth.interceptor';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
@@ -49,6 +49,13 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
     DialogModule,
     ToastModule,
     ConfirmDialogModule
+  ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

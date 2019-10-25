@@ -1,5 +1,6 @@
 import { PermissionType } from '@models/role.model';
-import { PermissionBase } from '@app/helpers/permissions/permission.base';
+import { PermissionBase } from '@modules/auth/permissions/permission.base';
+
 export class AdminPermission extends PermissionBase {
   constructor() {
     super();

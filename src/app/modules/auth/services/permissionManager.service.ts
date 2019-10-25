@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Roles, PermissionType } from './../models/role.model';
 
-import { PermissionBase } from '@app/helpers/permissions/permission.base';
-import { PermissionsFactory } from './../helpers/permissions/permissions.factory';
+import { Roles, PermissionType } from '@models/role.model';
+
+import { PermissionBase } from '@app/modules/auth/permissions/permission.base';
+import { PermissionsFactory } from '@modules/auth/permissions/permissions.factory';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionManagerService {

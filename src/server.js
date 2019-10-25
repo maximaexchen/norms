@@ -7,6 +7,7 @@ const express = require('express');
 const multer = require('multer');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const jwt = require('jsonwebtoken');
 const app = express();
 let fileName = '';
 
@@ -106,6 +107,54 @@ app.post('/api/upload', function(req, res) {
       });
     }
   });
+});
+
+app.post('/api/auth', function(req, res) {
+  const body = req.body;
+
+  console.log(req.body);
+  console.log(body);
+  console.log(body.username);
+  console.log(!body.username);
+
+  if (!body.username) res.sendStatus(401);
+
+  var privateKEY = fs.readFileSync(
+    path.dirname(__filename) + '/private.key',
+    'utf8'
+  );
+  var publicKEY = fs.readFileSync(
+    path.dirname(__filename) + '/public.key',
+    'utf8'
+  );
+
+  var i = 'Aircraft Philipp';
+  var s = body.username;
+  var a = 'https://www.aircraft-philipp.com';
+
+  var signOptions = {
+    issuer: i,
+    subject: s,
+    audience: a,
+    expiresIn: '8h',
+    algorithm: 'RS256' // RSASSA [ "RS256", "RS384", "RS512" ]
+  };
+
+  var token = jwt.sign({ userName: body.username }, privateKEY, signOptions);
+
+  /*
+ ====================   JWT Verify =====================
+*/
+  /*  var verifyOptions = {
+    issuer: i,
+    subject: s,
+    audience: a,
+    expiresIn: '8h',
+    algorithm: ['RS256']
+  };
+  var legit = jwt.verify(token, publicKEY, verifyOptions); */
+
+  res.send({ token });
 });
 
 const PORT = process.env.PORT || 4000;

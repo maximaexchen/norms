@@ -1,3 +1,4 @@
+import { AuthenticationService } from '@modules/auth/services/authentication.service';
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { from } from 'rxjs';
@@ -15,11 +16,38 @@ export class LoginComponent implements OnInit {
   public passWord = '';
   private user: any;
 
-  constructor(private backend: CouchDBService) {}
+  constructor(
+    private backend: CouchDBService,
+    private authService: AuthenticationService
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('LoginComponent ready');
+  }
 
   public login() {
+    console.log('LOGIN');
+    console.log(this.userName);
+    console.log(this.passWord);
+
+    const params = {
+      username: this.userName,
+      password: this.passWord
+    };
+
+    from(this.backend.login(params)).subscribe(res => {
+      console.log(res);
+    });
+    this.authService.login(this.userName, this.passWord).subscribe(
+      response => {
+        console.log(response);
+      },
+      error => {
+        console.log(error.message);
+      },
+      () => {}
+    );
+    /* console.log('LoginComponent login');
     this.headerMsg = '';
     const params = {
       username: this.userName,
@@ -27,9 +55,13 @@ export class LoginComponent implements OnInit {
     };
     from(this.backend.login(params)).subscribe(
       res => {
+        console.log('res');
+        console.log(res);
         this.display = !res['success'];
         this.headerMsg = res['msg'];
         from(this.backend.currentUser).subscribe(usr => {
+          console.log('usr');
+          console.log(usr);
           this.valueChange.emit({
             isValidUser: res['success'],
             ID: usr['ID'],
@@ -40,6 +72,6 @@ export class LoginComponent implements OnInit {
       err => {
         this.headerMsg = 'Fehler beim Login!';
       }
-    );
+    );*/
   }
 }

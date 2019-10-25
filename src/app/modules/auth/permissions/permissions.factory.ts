@@ -1,9 +1,8 @@
-import { Roles } from './../../models/role.model';
-import { AdminPermission } from './admin.permission';
-import { OwnerPermission } from './owner.permission';
-import { UserPermission } from './user.permission';
-import { ExternalPermission } from './external.permission';
-import { PermissionBase } from './permission.base';
+import { Roles } from '@models/role.model';
+import { OwnerPermission } from '@modules/auth/permissions/owner.permission';
+import { UserPermission } from '@modules/auth/permissions/user.permission';
+import { ExternalPermission } from '@modules/auth/permissions/external.permission';
+import { PermissionBase } from '@modules/auth/permissions/permission.base';
 
 export class PermissionsFactory {
   public static instance: PermissionBase;
@@ -17,9 +16,6 @@ export class PermissionsFactory {
       const role = localStorage.getItem('role');
 
       switch (role) {
-        case Roles.ADMIN:
-          this.instance = new AdminPermission();
-          break;
         case Roles.OWNER:
           this.instance = new OwnerPermission();
           break;

@@ -45,6 +45,7 @@
                 [(ngModel)]="name"
                 name="name"
                 #nameCheck="ngModel"
+                [readOnly]="!editable"
               />
               <small
                 class="form-text text-muted"
@@ -72,6 +73,7 @@
                 ]"
                 name="active"
                 [(ngModel)]="active"
+                [disabled]="!editable"
               ></p-selectButton>
             </div>
           </div>

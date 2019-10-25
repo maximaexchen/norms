@@ -7,7 +7,7 @@ import { takeWhile } from 'rxjs/operators';
 
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
-import { User } from '@models/index';
+import { User, Role, Roles } from '@models/index';
 
 @Component({
   selector: 'app-user-edit',
@@ -18,12 +18,17 @@ export class UserEditComponent implements OnInit, OnDestroy {
   @ViewChild('userForm', { static: false }) userForm: NgForm;
 
   alive = true;
+  editable = false;
 
   formTitle: string;
   isNew = true; // 1 = new - 2 = update
 
   writeItem: User;
   users: User[] = [];
+  role: string;
+  selectedRole: string;
+  roles = Roles;
+  roleValues: any;
 
   id: string;
   rev: string;
@@ -43,6 +48,10 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     console.log('UserEditComponent');
+    this.roleValues = Object.keys(this.roles).map(k => ({
+      key: k,
+      value: this.roles[k as any]
+    }));
     this.getUser();
   }
 
@@ -64,6 +73,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
             this.firstName = entry['firstName'];
             this.lastName = entry['lastName'];
             this.email = entry['email'];
+            this.role = entry['role'];
             this.active = entry['active'];
           });
       } else {
@@ -141,6 +151,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.writeItem['firstName'] = this.userForm.value.firstName || '';
     this.writeItem['lastName'] = this.userForm.value.lastName || '';
     this.writeItem['email'] = this.userForm.value.email || '';
+    this.writeItem['role'] = this.userForm.value.selectedRole || '';
     this.writeItem['active'] = this.userForm.value.active || false;
 
     if (this.userForm.value._id) {
@@ -168,5 +179,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  public onEdit() {
+    this.editable = true;
   }
 }

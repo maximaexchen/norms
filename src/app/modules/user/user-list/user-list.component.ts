@@ -49,8 +49,6 @@ export class UserListComponent implements OnInit, OnDestroy {
         res => {
           this.users = res;
           this.userCount = this.users.length;
-          console.log(this.users);
-          console.log(this.userCount);
         },
         err => {
           console.log('Error on loading users');

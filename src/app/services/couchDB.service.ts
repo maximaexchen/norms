@@ -105,15 +105,16 @@ export class CouchDBService {
     return this.updateSubject.asObservable();
   }
 
-  login(params: { username: string; password: string }): any {
+  public login(params: { username: string; password: string }): any {
     return new Promise(resolve => {
       resolve({
         success: true,
         msg: 'Login ok'
       });
-      /* this._client.directory
-        .login(params.username, params.password)
+
+      this.checkLoginUser(params.username, params.password)
         .then(result => {
+          console.log(result);
           resolve({
             success: true,
             msg: 'Login ok'
@@ -124,11 +125,34 @@ export class CouchDBService {
             success: false,
             msg: err.message
           });
-        }); */
+        });
     });
   }
 
-  logout(): any {
+  private checkLoginUser(username, password): Promise<any> {
+    const updateQuery = {
+      use_index: ['_design/check_user'],
+      selector: {
+        _id: { $gt: null },
+        $and: [
+          {
+            userName: {
+              $eq: username
+            }
+          },
+          {
+            password: {
+              $eq: password
+            }
+          }
+        ]
+      }
+    };
+
+    return this.http.post(this.dbRequest + '/_find', updateQuery).toPromise();
+  }
+
+  public logout(): any {
     return new Promise(resolve => {
       /* this._client.directory.logout().then(isLogedOut => {
         resolve(isLogedOut);
