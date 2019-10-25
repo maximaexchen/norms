@@ -108,7 +108,7 @@ export class CouchDBService {
   public getLoginUser(params: {
     username: string;
     password: string;
-  }): Promise<any> {
+  }): Observable<any> {
     const updateQuery = {
       use_index: ['_design/check_user'],
       selector: {
@@ -128,6 +128,6 @@ export class CouchDBService {
       }
     };
 
-    return this.http.post(this.dbRequest + '/_find', updateQuery).toPromise();
+    return this.http.post(this.dbRequest + '/_find', updateQuery);
   }
 }

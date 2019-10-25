@@ -2,6 +2,8 @@ import { AuthenticationService } from '@modules/auth/services/authentication.ser
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { from } from 'rxjs';
+import { Router } from '@angular/router';
+import { resolve } from 'q';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +20,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private backend: CouchDBService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -27,15 +30,20 @@ export class LoginComponent implements OnInit {
 
   public login() {
     console.log('LOGIN');
-    console.log(this.userName);
-    console.log(this.passWord);
 
     const params = {
       username: this.userName,
       password: this.passWord
     };
 
-    this.authService.login(this.userName, this.passWord);
+    /*  if (this.authService.login(this.userName, this.passWord)) {
+      this.router.navigate(['../document/']);
+    } */
+
+    this.authService.login(this.userName, this.passWord).subscribe(result => {
+      console.log('LoginComponent login');
+      console.log(result);
+    });
     /* console.log('LoginComponent login');
     this.headerMsg = '';
     const params = {

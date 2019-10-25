@@ -32,19 +32,40 @@ export class AuthenticationService {
     this.currentToken = this.currentTokenSubject.asObservable();
   }
 
-  public login(username: string, password: string): boolean {
+  public login(username: string, password: string): Observable<any> {
     const params = {
       username: username,
       password: password
     };
 
-    from(this.couchDBService.getLoginUser(params)).subscribe(
-      result => {
-        console.log('result');
+    return this.couchDBService.getLoginUser(params);
+
+    /*   .subscribe(result => {
+      console.log('res');
+      console.log(result);
+      const user = result['docs'][0];
+      console.log(user);
+      if (user) {
+        this.requestToken(username, password).subscribe(res => {
+          console.log('res');
+          console.log(res);
+
+          const role = user['role'];
+          if (role) {
+            this.userS.authAs(role as Roles);
+          } else {
+            this.userS.authAs('External' as Roles);
+          }
+        });
+      }
+    });
+ */
+    /* return new Promise(resolve => {
+      this.couchDBService.getLoginUser(params).subscribe(result => {
+        console.log('res');
         console.log(result);
-
         const user = result['docs'][0];
-
+        console.log(user);
         if (user) {
           this.requestToken(username, password).subscribe(res => {
             console.log('res');
@@ -56,16 +77,36 @@ export class AuthenticationService {
             } else {
               this.userS.authAs('External' as Roles);
             }
-            return true;
+          });
+        }
+      });
+    }); */
+
+    /*  return from(this.couchDBService.getLoginUser(params)).subscribe(
+      result => {
+        console.log('result');
+        console.log(result);
+
+        const user = result['docs'][0];
+
+        if (user) {
+          return this.requestToken(username, password).subscribe(res => {
+            console.log('res');
+            console.log(res);
+
+            const role = user['role'];
+            if (role) {
+              this.userS.authAs(role as Roles);
+            } else {
+              this.userS.authAs('External' as Roles);
+            }
           });
         }
       },
       error => {
         console.log(error.message);
       }
-    );
-
-    return false;
+    ); */
   }
 
   private requestToken(
@@ -137,6 +178,6 @@ export class AuthenticationService {
   }
 
   public get currentUserValue(): User {
-    return this.currentUserSubject.value;
+    return this.currentTokenSubject.value;
   }
 }
