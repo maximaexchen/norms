@@ -7,7 +7,9 @@ import { takeWhile } from 'rxjs/operators';
 
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
-import { User } from '../../../models/user.model';
+import { User } from '@models/index';
+import { Role } from '@app/modules/auth/models/role.model';
+import { Roles } from '@app/modules/auth/models/roles.enum';
 
 @Component({
   selector: 'app-user-edit',
@@ -18,12 +20,17 @@ export class UserEditComponent implements OnInit, OnDestroy {
   @ViewChild('userForm', { static: false }) userForm: NgForm;
 
   alive = true;
+  editable = false;
 
   formTitle: string;
-  formMode = false; // 0 = new - 1 = update
+  isNew = true; // 1 = new - 2 = update
 
   writeItem: User;
   users: User[] = [];
+  role: string;
+  selectedRole: string;
+  roles = Roles;
+  roleValues: any;
 
   id: string;
   rev: string;
@@ -43,6 +50,10 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     console.log('UserEditComponent');
+    this.roleValues = Object.keys(this.roles).map(k => ({
+      key: k,
+      value: this.roles[k as any]
+    }));
     this.getUser();
   }
 
@@ -51,7 +62,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
       // check if we are updating
       if (results['id']) {
         console.log('Edit mode');
-        this.formMode = true;
+        this.isNew = false;
         this.formTitle = 'User bearbeiten';
 
         this.couchDBService
@@ -64,6 +75,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
             this.firstName = entry['firstName'];
             this.lastName = entry['lastName'];
             this.email = entry['email'];
+            this.role = entry['role'];
             this.active = entry['active'];
           });
       } else {
@@ -75,12 +87,12 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   public onSubmit(): void {
-    if (this.userForm.value.formMode) {
-      console.log('Update a user');
-      this.onUpdateUser();
-    } else {
+    if (this.userForm.value.isNew) {
       console.log('Create a user');
       this.onCreateUser();
+    } else {
+      console.log('Update a user');
+      this.onUpdateUser();
     }
   }
 
@@ -141,6 +153,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.writeItem['firstName'] = this.userForm.value.firstName || '';
     this.writeItem['lastName'] = this.userForm.value.lastName || '';
     this.writeItem['email'] = this.userForm.value.email || '';
+    this.writeItem['role'] = this.userForm.value.selectedRole || '';
     this.writeItem['active'] = this.userForm.value.active || false;
 
     if (this.userForm.value._id) {
@@ -168,5 +181,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.alive = false;
+  }
+
+  public onEdit() {
+    this.editable = true;
   }
 }

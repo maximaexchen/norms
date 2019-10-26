@@ -61,7 +61,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tagClass',
+      classes: 'tag-multiselect',
       groupBy: 'tagType'
     };
 
@@ -191,31 +191,25 @@ export class SearchComponent implements OnInit, OnDestroy {
     console.log(this.tagIds.length > 0);
     console.log(!!this.publisherId || !!this.ownerId || this.tagIds.length > 0);
 
-    if (!!this.ownerId || this.tagIds.length > 0) {
+    if (!!this.ownerId) {
       Object.assign(searchObject['selector'], {
         $or: []
       });
     }
 
-    /* if (!!this.publisherId) {
-      Object.assign(
-        searchObject['selector']['$or'].push({
-          tags: {
-            $elemMatch: {
-              id: { $eq: this.publisherId }
-            }
-          }
-        })
-      );
-    } */
-
     if (this.tagIds.length > 0) {
+      Object.assign(searchObject['selector'], {
+        tags: {}
+      });
+      Object.assign(searchObject['selector']['tags'], {
+        $and: []
+      });
       this.tagIds.forEach(val => {
         Object.assign(
-          searchObject['selector']['$or'].push({
-            tags: {
-              $elemMatch: {
-                id: val
+          searchObject['selector']['tags']['$and'].push({
+            $elemMatch: {
+              id: {
+                $eq: val
               }
             }
           })

@@ -7,11 +7,14 @@
   </div>
   <div class="col-sm-8 text-right">
     <app-crud-nav
-      [formMode]="formMode"
+      [isNew]="isNew"
       [validForm]="userForm.valid"
+      [dirtyForm]="userForm.dirty"
       [routeNew]="'/user/new'"
+      [editable]="editable"
       (save)="onSubmit()"
       (add)="onSubmit()"
+      (edit)="onEdit()"
       (delete)="onDelete()"
     ></app-crud-nav>
   </div>
@@ -23,7 +26,7 @@
       (ngSubmit)="onSubmit()"
       #userForm="ngForm"
     >
-      <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+      <input type="hidden" [(ngModel)]="isNew" name="isNew" />
       <input type="hidden" [(ngModel)]="id" name="_id" />
       <input type="hidden" [(ngModel)]="rev" name="_rev" />
       <div class="row">
@@ -42,6 +45,7 @@
                 [(ngModel)]="firstName"
                 name="firstName"
                 #firstNameCheck="ngModel"
+                [readOnly]="!editable"
               />
               <small
                 class="form-text text-muted"
@@ -66,6 +70,7 @@
                 [(ngModel)]="lastName"
                 name="lastName"
                 #lastNameCheck="ngModel"
+                [readOnly]="!editable"
               />
               <small
                 class="form-text text-muted"
@@ -91,6 +96,7 @@
                 [(ngModel)]="email"
                 name="email"
                 #emailCheck="ngModel"
+                [readOnly]="!editable"
               />
               <small
                 class="form-text text-muted"
@@ -98,6 +104,31 @@
                 *ngIf="!emailCheck.valid && emailCheck.touched"
                 >Bitte geben Sie eine gültige E-Mail Adresse ein.</small
               >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-role-dataset"
+              >Rolle</label
+            >
+
+            <div class="col-sm-10">
+              <select
+                class="form-control"
+                [(ngModel)]="selectedRole"
+                name="selectedRole"
+                [disabled]="!editable"
+              >
+                <option [value]="undefined" selected="selected"
+                  >Rolle wählen</option
+                >
+                <option
+                  *ngFor="let role of roleValues"
+                  [value]="role['value']"
+                  [selected]="role['value'] == selectedRole"
+                >
+                  {{ role['value'] }}
+                </option>
+              </select>
             </div>
           </div>
         </div>
@@ -118,6 +149,7 @@
                 ]"
                 name="active"
                 [(ngModel)]="active"
+                [disabled]="!editable"
               ></p-selectButton>
             </div>
           </div>

@@ -1,7 +1,10 @@
 <div class="btn-expand-collapse">
   <span class="nav-label">Auswahl Artikel</span>
-  <span class="nav-button fa fa-chevron-left" (click)="toggleSidebar()"></span>
+  <span class="nav-button fas fa-chevron-left" (click)="toggleSidebar()"></span>
 </div>
+
+<div *appIsGranted="'OTHER'">Zugriff CREATE</div>
+
 <!-- (sortFunction)="tableSort($event)"
   [customSort]="true" -->
 <p-table
@@ -27,7 +30,7 @@
 >
   <ng-template pTemplate="caption">
     <div style="text-align: center;">
-      <i class="fa fa-search" style="margin:4px 6px 0 0;"></i>
+      <i class="fas fa-search" style="margin:4px 6px 0 0;"></i>
       <input
         type="text"
         pInputText
@@ -72,18 +75,47 @@
       <td>{{ document.normNumber }}</td>
       <td>{{ document.revision }}</td>
       <td>{{ document.publisher }}</td>
-      <td pTooltip="{{ document.description.de }}" tooltipPosition="top">
+      <td
+        *ngIf="document.normLanguage === 'de'"
+        pTooltip="{{ document.description.de }}"
+        tooltipPosition="top"
+      >
         {{
           document.description.de.length > 15
             ? (document.description.de | slice: 0:15) + '...'
             : document.description.de
         }}
       </td>
+      <td
+        *ngIf="document.normLanguage === 'en' || document.normLanguage === ''"
+        pTooltip="{{ document.description.en }}"
+        tooltipPosition="top"
+      >
+        {{
+          document.description.en.length > 15
+            ? (document.description.en | slice: 0:15) + '...'
+            : document.description.en
+        }}
+      </td>
+
+      <td
+        *ngIf="document.normLanguage === 'fr'"
+        pTooltip="{{ document.description.fr }}"
+        tooltipPosition="top"
+      >
+        {{
+          document.description.fr.length > 15
+            ? (document.description.fr | slice: 0:15) + '...'
+            : document.description.fr
+        }}
+      </td>
 
       <td>{{ document.revisionDate | date }}</td>
       <td>
-        {{ document.owner.lastName }},
-        {{ document.owner.firstName }}
+        <span *ngIf="document.owner.lastName || document.owner.firstName">
+          {{ document.owner.lastName }},
+          {{ document.owner.firstName }}
+        </span>
       </td>
       <td>
         <i
@@ -91,7 +123,7 @@
             'font-size': '16px',
             color: document.active ? 'green' : 'red '
           }"
-          [ngClass]="document.active ? 'fa fa-check-circle' : 'fa fa-ban'"
+          [ngClass]="document.active ? 'fas fa-check-circle' : 'fas fa-ban'"
           aria-hidden="true"
         ></i>
       </td>

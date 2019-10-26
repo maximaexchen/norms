@@ -14,7 +14,7 @@
   </div>
   <div class="col-sm-8 text-right">
     <app-crud-nav
-      [formMode]="formMode"
+      [isNew]="isNew"
       [validForm]="normForm.valid"
       [dirtyForm]="normForm.dirty"
       [routeNew]="'/document/new'"
@@ -28,7 +28,7 @@
 </div>
 
 <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
-  <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+  <input type="hidden" [(ngModel)]="isNew" name="isNew" />
   <input type="hidden" [(ngModel)]="id" name="_id" />
   <input type="hidden" [(ngModel)]="rev" name="_rev" />
   <p-tabView
@@ -53,10 +53,11 @@
                     class="form-control"
                     i18n-placeholder
                     placeholder="Nummer"
-                    [(ngModel)]="normNumber" 
-                    name="normNumber" 
+                    [(ngModel)]="normNumber"
+                    name="normNumber"
                     required
-                    [readOnly]="!editable" />
+                    [readOnly]="!editable"
+                  />
                 </div>
               </div>
             </div>
@@ -123,6 +124,7 @@
                 dateFormat="dd.mm.yy"
                 id="revisionDate"
                 name="revisionDate"
+                required
                 [disabled]="!editable"
               ></p-calendar>
             </div>
@@ -190,6 +192,7 @@
                 [(ngModel)]="descriptionEN"
                 name="descriptionEN"
                 [disabled]="!editable"
+                required
               ></textarea>
             </div>
           </div>
@@ -217,8 +220,15 @@
               >Scope</label
             >
             <div class="col-sm-8">
-              <textarea class="form-control" i18n-placeholder placeholder="Scope" [(ngModel)]="scope"
-                name="scope" [disabled]="!editable"></textarea>
+              <textarea
+                required
+                class="form-control"
+                i18n-placeholder
+                placeholder="Scope"
+                [(ngModel)]="scope"
+                name="scope"
+                [disabled]="!editable"
+              ></textarea>
             </div>
           </div>
 
@@ -229,7 +239,6 @@
             <div class="col-sm-8">
               <p i18n="@@string-tag-level1-dataset">Level 1 (Herausgeber)</p>
               <angular2-multiselect
-                required
                 name="tagsLevel1"
                 [data]="tagsLevel1"
                 [(ngModel)]="selectedTags1"
@@ -238,6 +247,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                required
                 [disabled]="!editable"
               >
                 <c-badge>
@@ -255,6 +265,7 @@
               </angular2-multiselect>
               <p i18n="@@string-tag-level2-dataset">Level 2</p>
               <angular2-multiselect
+                required
                 name="tagsLevel2"
                 [data]="tagsLevel2"
                 [(ngModel)]="selectedTags2"
@@ -263,6 +274,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -287,6 +299,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-badge>
                   <ng-template let-item="item">
@@ -343,6 +356,12 @@
             >
             <div class="col-sm-12">
               <p-fileUpload
+                [ngClass]="{
+                  'ng-invalid': !false,
+                  'ng-valid': true,
+                  required: false,
+                  'w-100': true
+                }"
                 #fileUploadInput
                 [disabled]="normForm.invalid || !editable"
                 name="files"
@@ -352,6 +371,7 @@
                 [showCancelButton]="true"
                 showButtons="true"
                 chooseLabel="Norm wählen (PDF)"
+                required="true"
               ></p-fileUpload>
               <p
                 *ngIf="!normForm.valid"
@@ -363,18 +383,16 @@
           </div>
 
           <hr />
-          
-          <p-button
+
+          <button
             type="button"
-            *ngIf="latestAttachmentName"
-            icon="fa fa-download "
-            iconPos="left"
-            title="{{ latestAttachmentName }}"
-            label="Download Norm"
-            class="attachmentDownload"
             (click)="getDownload(id, latestAttachmentName)"
-            [disabled]="!editable"
-          ></p-button>
+            *ngIf="latestAttachmentName"
+            title="{{ latestAttachmentName }}"
+            class="btn btn-acp attachmentDownload"
+          >
+            <i class="fas fa-file-download"></i> Download Norm
+          </button>
 
           <hr />
 
@@ -383,20 +401,14 @@
             [toggleable]="true"
             [transitionOptions]="'100ms'"
             [collapsed]="false"
-            
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
-              <a
-                class="dynamic-link"
-                (click)="getDownload(id, revDoc['name'])"
-                >{{
-                  revDoc['name'].length > 15
-                    ? (revDoc['name'] | slice: 0:15) + '...'
-                    : revDoc['name']
-                }}</a
-              ><br />
+              <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"
+                ><i class="fas fa-file-download"></i>
+                {{ revDoc['revisionID'] }}</a
+              >
 
-              Link to the server file
+              <!-- Link to the server file
               <a
                 *ngIf="revDoc['path']"
                 href="{{ revDoc['path'] }}{{ id }}/{{ revDoc['name'] }}"
@@ -409,11 +421,11 @@
                     ? (revDoc['name'] | slice: 0:15) + '...'
                     : revDoc['name']
                 }}</a
-              >
-              ({{ revDoc['revisionID'] }})
-              <div style="display: inline-block; float: right;">
-                {{ revDoc['date'] | date: 'dd.MM.y' }}
-              </div>
+              > -->
+
+              <span style="float: right;">
+                vom {{ revDoc['date'] | date: 'dd.MM.y' }}
+              </span>
               <hr *ngIf="i < revisionDocuments.length - 1" />
             </div>
           </p-fieldset>
@@ -441,11 +453,6 @@
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
               >
-                <c-badge>
-                  <ng-template let-item="item">
-                    <label class="badge">{{ item.normNumber }}</label>
-                  </ng-template>
-                </c-badge>
                 <c-item>
                   <ng-template let-item="item">
                     <label> {{ item.normNumber }}</label>
@@ -489,7 +496,7 @@
                       <a
                         class="dynamic-link"
                         (click)="getDownload(related.id, related.normNumber)"
-                        >Download <i class="fa fa-download"></i
+                        >Download <i class="fas fa-file-download"></i
                       ></a>
                     </td>
                   </tr>
@@ -509,7 +516,12 @@
               >Owner</label
             >
             <div class="col-sm-10">
-              <select class="form-control" [(ngModel)]="ownerId" name="ownerId" [disabled]="!editable">
+              <select
+                class="form-control"
+                [(ngModel)]="ownerId"
+                name="ownerId"
+                [disabled]="!editable"
+              >
                 <option value="" selected="selected">Owner wählen</option>
                 <option
                   *ngFor="let owner of owners"

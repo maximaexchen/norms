@@ -34,10 +34,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   alive = true;
   isLoading = false;
   editable = false;
+  deletable = false;
   uploadUrl = this.env.uploadUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
-  formMode = false; // 0 = new - 1 = update
+  isNew = true; // 1 = new / 0 = update
   selectedTab = 0;
 
   writeItem: NormDocument;
@@ -101,56 +102,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('DocumentEditComponent');
-
-    // Prepare the user multi select box
     this.setStartValues();
   }
 
   private setStartValues() {
-    this.restFields();
-    this.userDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Benutzer wählen',
-      textField: 'name',
-      labelKey: 'name',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'User Auswahl',
-      noDataLabel: 'Keinen Benutzer gefunden',
-      disabled: true
-    };
-
-    this.tagDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Tag wählen',
-      textField: 'name',
-      labelKey: 'name',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'Tag Auswahl',
-      noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tagClass',
-      disabled: true
-    };
-
-    this.relatedDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Referenz wählen',
-      textField: 'name',
-      labelKey: 'name',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'Referenz Auswahl',
-      noDataLabel: 'Keine Referenz gefunden',
-      classes: 'relatedClass',
-      disabled: true
-    };
+    console.log('setStartValues');
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // fetch data for select-boxes
@@ -168,19 +124,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private restFields() {
-    console.log('resetFields');
-    this.selectedRelatedNorms = [];
-    this.selectedUsers = [];
-    this.selectedTags1 = [];
-    this.selectedTags2 = [];
-    this.selectedTags3 = [];
-    this.selectedTab = 0;
-  }
-
   private newDocument() {
     console.log('New mode');
-    this.formMode = false;
+    this.resetComponent();
+    this.setMultiselects();
+    this.editable = true;
+    this.isNew = true;
     this.formTitle = 'Neue Norm anlegen';
     this.publisher = '';
     this.owner = '';
@@ -189,53 +138,74 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private editDocument(results) {
     console.log('Edit mode');
-    this.formMode = true;
+
+    this.isNew = false;
+    this.resetComponent();
+
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
     this.couchDBService
       .fetchEntry('/' + results['id'])
       .pipe(takeWhile(() => this.alive))
-      .subscribe(entry => {
-        this.getDocumentData(entry);
-      });
+      .subscribe(
+        entry => {
+          console.log('fetchEntry: entry');
+          console.log(entry);
+          this.getDocumentData(entry);
+        },
+        error => {
+          console.log(error.message);
+        },
+        () => {}
+      );
   }
 
   private saveDocument(): void {
     console.log('saveDocument: DocumentEditComponent');
     this.isLoading = true;
     this.processFormData();
+    this.normForm.form.markAsPristine();
 
     // First save to get a document id for the attachment path and name
     this.couchDBService
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        console.log('saveDocument:' + result);
+      .subscribe(
+        result => {
+          console.log('saveDocument:' + result);
 
-        if (this.fileUpload) {
-          this.uploadPDF()
-            .pipe(takeWhile(() => this.alive))
-            .subscribe(
-              res => {},
-              error => {
-                console.log(error);
-                this.showConfirmation('error', error.message);
-              },
-              () => {
-                this.router.navigate(['../document/' + this.id + '/edit']);
-                this.showConfirmation('sucess', 'Upload erfolgreich');
-              }
-            );
-        }
-        this.router.navigate(['../document/' + this.id + '/edit']);
-        this.isLoading = false;
-        this.sendStateUpdate();
-      });
+          if (this.fileUpload) {
+            this.uploadPDF()
+              .pipe(takeWhile(() => this.alive))
+              .subscribe(
+                res => {},
+                error => {
+                  console.log(error);
+                  this.showConfirmation('error', error.message);
+                },
+                () => {
+                  this.router.navigate(['../document/' + this.id + '/edit']);
+                  this.showConfirmation('success', 'Upload erfolgreich');
+                }
+              );
+          }
+          this.router.navigate(['../document/' + this.id + '/edit']);
+          this.isLoading = false;
+          this.sendStateUpdate();
+        },
+        error => {
+          console.log(error.message);
+          this.isLoading = false;
+        },
+        () => {}
+      );
   }
 
   private updateDocument(): void {
     console.log('onUpdateDocument: DocumentEditComponent');
+
     this.processFormData();
+
     if (this.fileUpload) {
       this.uploadPDF()
         .pipe(takeWhile(() => this.alive))
@@ -252,7 +222,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.writeUpdate();
     }
-    this.fileUploadInput.clear();
   }
 
   private writeUpdate() {
@@ -263,19 +232,83 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         results => {},
         error => {
-          console.log(error.message);
+          console.log(error);
           this.showConfirmation('error', error.message);
+          this.isLoading = false;
         },
         () => {
           // Inform about database change.
           this.sendStateUpdate();
           this.isLoading = false;
-          this.showConfirmation('sucess', 'Updated');
+          this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
           this.setStartValues();
           this.normForm.form.markAsPristine();
         }
       );
+  }
+
+  private resetComponent() {
+    console.log('??????????????????????????????????');
+    console.log('restComponent');
+
+    this.editable = false;
+    this.selectedRelatedNorms = [];
+    this.selectedUsers = [];
+    this.selectedTags1 = [];
+    this.selectedTags2 = [];
+    this.selectedTags3 = [];
+    this.selectedTab = 0;
+    if (this.normForm) {
+      this.normForm.form.markAsPristine();
+    }
+    this.assignMultiselectConfig();
+    this.fileUploadInput.clear();
+  }
+
+  private assignMultiselectConfig() {
+    console.log('assignMultiselectConfig');
+    this.userDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Benutzer wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'User Auswahl',
+      noDataLabel: 'Keinen Benutzer gefunden',
+      disabled: this.editable || !this.isNew
+    };
+    this.relatedDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Referenz wählen',
+      textField: 'normNumber',
+      labelKey: 'normNumber',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Referenz Auswahl',
+      noDataLabel: 'Keine Referenz gefunden',
+      classes: 'relatedClass',
+      disabled: this.editable || !this.isNew
+    };
+    this.tagDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Tag wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Tag Auswahl',
+      noDataLabel: 'Keinen Tag gefunden',
+      classes: 'tag-multiselect',
+      disabled: this.editable || !this.isNew
+    };
   }
 
   public checkUpload(event, uploadField) {
@@ -297,7 +330,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         accept: () => {
           this.processUpload(uploadField);
         },
-        reject: () => {}
+        reject: () => {
+          this.fileUploadInput.clear();
+        }
       });
     } else {
       this.processUpload(uploadField);
@@ -328,6 +363,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         error => {
           console.log('processUpload: error');
           console.log(error.message);
+          this.isLoading = false;
         },
         () => {
           console.log('processUpload: complete');
@@ -339,7 +375,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private checkForExistingAttachment(obj, searchKey): boolean {
     return Object.keys(obj).some(prop => {
-      return prop.includes(searchKey);
+      console.log('checkForExistingAttachment');
+      console.log('prop1: ' + prop);
+      const needle = /_([^.]+)./.exec(prop)[1];
+      console.log('searchKey: ' + searchKey);
+      console.log('needle extracted from filename (prop): ' + needle);
+      console.log('prop2: ' + prop);
+      return needle.includes(searchKey);
     });
   }
 
@@ -487,13 +529,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     this.isLoading = true;
-    if (this.normForm.value.formMode) {
-      this.updateDocument();
-    } else {
+    if (this.normForm.value.isNew) {
       this.saveDocument();
+    } else {
+      this.updateDocument();
     }
   }
-
   public deleteDocument(): void {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
@@ -517,7 +558,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
-    this.restFields();
+    console.log('getDocumentData');
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
@@ -550,11 +591,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (entry['relatedNorms']) {
       this.setRelatedNorms(entry['relatedNorms']);
     }
-
+    console.log('entry["tags"]');
+    console.log(entry['tags']);
     if (entry['tags']) {
       const ent = _.sortBy(entry['tags'], 'tagType');
-      // console.log(ent);
+      console.log('ent');
+      console.log(ent);
       ent.forEach(element => {
+        console.log('ent.forEach');
         switch (element['tagType']) {
           case 'level1':
             this.selectedTags1.push(element);
@@ -733,6 +777,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private showConfirmation(type: string, result: string) {
+    console.log('++++++++++++++++++++++++++');
+    console.log(type);
+    console.log('++++++++++++++++++++++++++');
     this.notificationsService.addSingle(type, result, type);
   }
 
@@ -762,9 +809,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public onEdit() {
-    console.log(this.editable);
+    this.setMultiselects();
     this.editable = true;
+  }
 
+  private setMultiselects() {
     this.tagDropdownSettings['disabled'] = false;
     this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
 
@@ -776,7 +825,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       {},
       this.relatedDropdownSettings
     );
-    console.log(this.editable);
+  }
+
+  private disableMultiselect() {
+    this.tagDropdownSettings['disabled'] = true;
+    this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
+
+    this.userDropdownSettings['disabled'] = true;
+    this.userDropdownSettings = Object.assign({}, this.userDropdownSettings);
+
+    this.relatedDropdownSettings['disabled'] = true;
+    this.relatedDropdownSettings = Object.assign(
+      {},
+      this.relatedDropdownSettings
+    );
   }
 
   public onItemSelect(item: any) {}

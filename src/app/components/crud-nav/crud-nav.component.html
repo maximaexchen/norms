@@ -1,32 +1,33 @@
 <div class="form-group">
   <button
     pButton
-    type="submit"
-    icon="fa fa-check"
-    iconPos="left"
-    label="{{ formMode ? 'Aktualisieren' : 'Erstellen' }}"
-    i18n-label="@@btn-new"
-    class="btn btn-default btn-sm btn-headline"
-    (click)="onSubmit()"
-    *ngIf="editable"
-    [disabled]="!validForm"
-    [ngClass]="{ 'ready-save-btn': dirtyForm }"
-  ></button>
-
-  <button
-    pButton
     type="button"
-    icon="fa fa-file-o"
+    icon="fas fa-file"
     iconPos="left"
     label="Neu"
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onCreate()"
+    *ngIf="!isNew"
   ></button>
   <button
     pButton
+    type="submit"
+    icon="fas fa-check"
+    iconPos="left"
+    label="{{ isNew ? 'Erstellen' : 'Aktualisieren' }}"
+    i18n-label="@@btn-new"
+    class="btn btn-default btn-sm btn-headline"
+    (click)="onSubmit()"
+    *ngIf="editable"
+    [disabled]="!validForm"
+    [ngClass]="{ 'ready-save-btn': dirtyForm && validForm }"
+  ></button>
+
+  <button
+    pButton
     type="button"
-    icon="fa fa-pencil"
+    icon="fas fa-pen"
     iconPos="left"
     i18n-label="@@btn-edit"
     class="btn btn-default btn-sm btn-headline"
@@ -37,11 +38,12 @@
   <button
     pButton
     type="button"
-    icon="fa fa-trash"
+    icon="fas fa-trash"
     iconPos="left"
-    i18n-label="@@btn-delete"
-    class="btn btn-default btn-sm btn-headline"
     label="Löschen"
     (click)="onDelete()"
+    class="btn btn-default btn-sm btn-headline"
+    i18n-label="@@btn-delete"
+    *ngIf="!isNew"
   ></button>
 </div>

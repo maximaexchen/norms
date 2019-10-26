@@ -1,3 +1,4 @@
+import { AuthModule } from './../auth/auth.module';
 import { SearchModule } from './../search/search.module';
 import { UserModule } from './../user/user.module';
 import { NgModule } from '@angular/core';
@@ -16,7 +17,6 @@ import { FieldsetModule } from 'primeng/fieldset';
 import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { GeneralModule } from 'src/app/modules/general.module';
 
 @NgModule({
@@ -33,12 +33,12 @@ import { GeneralModule } from 'src/app/modules/general.module';
     CalendarModule,
     ToastModule,
     FileUploadModule,
-    AngularMultiSelectModule,
     FieldsetModule,
     DialogModule,
     GroupModule,
     UserModule,
-    SearchModule
+    SearchModule,
+    AuthModule
   ],
   exports: []
 })

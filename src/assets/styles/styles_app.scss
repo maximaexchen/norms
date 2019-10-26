@@ -39,16 +39,17 @@
   text-align: center;
   padding: 12px 10px 8px 10px;
   text-decoration: none;
-}
-.btn-expand-collapse .nav-button {
-  display: block;
-  float: right;
-  width: 60px;
-  height: 34px;
-  padding: 3px 10px 3px 40px;
-  margin: 0 0 0 15px;
-  text-align: center;
-  cursor: pointer;
+
+  .nav-button {
+    display: block;
+    float: right;
+    width: 60px;
+    height: 34px;
+    padding: 3px 10px 3px 40px;
+    margin: 0 0 0 15px;
+    text-align: center;
+    cursor: pointer;
+  }
 }
 
 .collapsed .sidebar-content,
@@ -59,26 +60,26 @@
 .main-content {
   margin-left: 0;
   margin-left: 0;
-}
 
-.main-content.collapsed {
-  margin-left: 0;
-  padding-left: 80px;
+  &.collapsed {
+    margin-left: 0;
+    padding-left: 80px;
+  }
 }
 
 /* styles selectable rows */
 
 .selectable {
   cursor: pointer;
-}
 
-.selectable.active {
-  background-color: $selectable-active-bg-color;
-}
+  &.active {
+    background-color: $selectable-active-bg-color;
+  }
 
-.selectable:hover {
-  color: #fff;
-  background-color: $selectable-hover-bg-color;
+  &:hover {
+    color: #fff;
+    background-color: $selectable-hover-bg-color;
+  }
 }
 
 div.panel-table {
@@ -123,6 +124,10 @@ table.panel-table th {
 
 .col-icon {
   width: 32px;
+}
+
+body .ui-table .ui-sortable-column.ui-state-highlight {
+  background-color: theme-color('primary');
 }
 
 body .ui-table .ui-table-thead > tr > th {

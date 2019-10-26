@@ -63,34 +63,7 @@ body {
       background: $input-disabled-background;
     }
   }
-  .selected-list {
-    .c-list {
-      .c-token {
-        background: $token-background;
-        .c-label {
-          color: $token-text-color;
-        }
-        .c-remove {
-          svg {
-            fill: $token-remove-color;
-          }
-        }
-      }
-    }
-    .c-angle-down,
-    .c-angle-up {
-      svg {
-        fill: $btn-arrow;
-      }
-    }
-  }
-  .dropdown-list {
-    ul {
-      li:hover {
-        background: $list-hover-background;
-      }
-    }
-  }
+
   .arrow-up,
   .arrow-down {
     border-bottom: 15px solid #fff;

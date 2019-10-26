@@ -5,13 +5,17 @@
       Datensatz erstellen
     </h1>
   </div>
+
   <div class="col-sm-8 text-right">
     <app-crud-nav
-      [formMode]="formMode"
+      [isNew]="isNew"
       [validForm]="tagForm.valid"
+      [dirtyForm]="tagForm.dirty"
       [routeNew]="'/tag/new'"
+      [editable]="editable"
       (save)="onSubmit()"
       (add)="onSubmit()"
+      (edit)="onEdit()"
       (delete)="onDelete()"
     ></app-crud-nav>
   </div>
@@ -23,7 +27,7 @@
       (ngSubmit)="onSubmit()"
       #tagForm="ngForm"
     >
-      <input type="hidden" [(ngModel)]="formMode" name="formMode" />
+      <input type="hidden" [(ngModel)]="isNew" name="isNew" />
       <input type="hidden" [(ngModel)]="id" name="_id" />
       <input type="hidden" [(ngModel)]="rev" name="_rev" />
       <div class="row">
@@ -42,6 +46,7 @@
                 [(ngModel)]="name"
                 name="name"
                 #nameCheck="ngModel"
+                [disabled]="!editable"
               />
               <small
                 class="form-text text-muted"
@@ -64,6 +69,7 @@
                   label="Stufe 1"
                   [(ngModel)]="tagType"
                   inputId="level1"
+                  [disabled]="!editable"
                 ></p-radioButton>
               </div>
               <div class="ui-g-12">
@@ -73,6 +79,7 @@
                   label="Stufe 2"
                   [(ngModel)]="tagType"
                   inputId="level2"
+                  [disabled]="!editable"
                 ></p-radioButton>
               </div>
               <div class="ui-g-12">
@@ -82,6 +89,7 @@
                   label="Stufe 3"
                   [(ngModel)]="tagType"
                   inputId="level3"
+                  [disabled]="!editable"
                 ></p-radioButton>
               </div>
             </div>
@@ -104,6 +112,7 @@
                 ]"
                 name="active"
                 [(ngModel)]="active"
+                [disabled]="!editable"
               ></p-selectButton>
             </div>
           </div>

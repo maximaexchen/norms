@@ -12,12 +12,11 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
-
-import { AuthComponent } from '../components/auth/auth.component';
-import { CrudNavComponent } from '../components/shared/crud-nav/crud-nav.component';
+import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
+import { CrudNavComponent } from '../components/crud-nav/crud-nav.component';
 
 @NgModule({
-  declarations: [AuthComponent, CrudNavComponent],
+  declarations: [CrudNavComponent],
   imports: [
     CommonModule,
     RouterModule,
@@ -30,7 +29,8 @@ import { CrudNavComponent } from '../components/shared/crud-nav/crud-nav.compone
     SelectButtonModule,
     MultiSelectModule,
     CheckboxModule,
-    TooltipModule
+    TooltipModule,
+    AngularMultiSelectModule
   ],
   exports: [
     CommonModule,
@@ -45,7 +45,8 @@ import { CrudNavComponent } from '../components/shared/crud-nav/crud-nav.compone
     MultiSelectModule,
     CrudNavComponent,
     CheckboxModule,
-    TooltipModule
+    TooltipModule,
+    AngularMultiSelectModule
   ]
 })
 export class GeneralModule {}

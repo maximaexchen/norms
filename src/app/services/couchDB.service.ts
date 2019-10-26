@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
 import { EnvService } from './env.service';
-import { NormDocument } from '@models/index';
+import { NormDocument, Role } from '@models/index';
 
 // CouchDB Ubuntu Server
 /* $kP2ZernC */
@@ -59,10 +59,10 @@ export class CouchDBService {
 
   public findDocuments(searchObject?: any): Observable<any> {
     if (searchObject) {
-      console.log('search');
+      console.log('findDocuments');
       return this.http.post(this.dbRequest + '/_find', searchObject);
     } else {
-      console.log('alll');
+      console.log('findDocuments all');
       return this.fetchEntries(
         '/_design/norms/_view/all-norms?include_docs=true'
       );
@@ -91,6 +91,12 @@ export class CouchDBService {
     );
   }
 
+  public getRoles(): Observable<Role[]> {
+    return this.fetchEntries(
+      '/_design/norms/_view/all-roles?include_docs=true'
+    );
+  }
+
   public sendStateUpdate(message: string) {
     this.updateSubject.next({ text: message });
   }
@@ -99,51 +105,29 @@ export class CouchDBService {
     return this.updateSubject.asObservable();
   }
 
-  login(params: { username: string; password: string }): any {
-    return new Promise(resolve => {
-      resolve({
-        success: true,
-        msg: 'Login ok'
-      });
-      /* this._client.directory
-        .login(params.username, params.password)
-        .then(result => {
-          resolve({
-            success: true,
-            msg: 'Login ok'
-          });
-        })
-        .catch(err => {
-          resolve({
-            success: false,
-            msg: err.message
-          });
-        }); */
-    });
-  }
+  public getLoginUser(params: {
+    username: string;
+    password: string;
+  }): Observable<any> {
+    const updateQuery = {
+      use_index: ['_design/check_user'],
+      selector: {
+        _id: { $gt: null },
+        $and: [
+          {
+            userName: {
+              $eq: params.username
+            }
+          },
+          {
+            password: {
+              $eq: params.password
+            }
+          }
+        ]
+      }
+    };
 
-  logout(): any {
-    return new Promise(resolve => {
-      /* this._client.directory.logout().then(isLogedOut => {
-        resolve(isLogedOut);
-      }); */
-    });
-  }
-
-  get currentUser() {
-    return new Promise(resolve => {
-      /* this._client.directory
-        .getCurrentUser()
-        .then(result => {
-          result.success = true;
-          resolve(result);
-        })
-        .catch(err => {
-          resolve({
-            success: false,
-            msg: err.message
-          });
-        }); */
-    });
+    return this.http.post(this.dbRequest + '/_find', updateQuery);
   }
 }

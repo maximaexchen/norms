@@ -1,6 +1,6 @@
 import { FormsModule } from '@angular/forms';
-import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { NgModule, ErrorHandler } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { registerLocaleData } from '@angular/common';
@@ -14,16 +14,16 @@ import { DialogModule } from 'primeng/components/dialog/dialog';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { CoreModule } from './core.module';
-import { OrderByPipe } from './shared/pipes/orderBy.pipe';
-import { FileInputValueAccessor } from './/services/file-input-value.accessor';
+import { FileInputValueAccessor } from './services/file-input-value.accessor';
 import { NotificationsComponent } from './shared/notifications.component';
 
 import { HeaderComponent } from './components/header/header.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './components/login/login.component';
-import { LogoutComponent } from './components/logout/logout.component';
+import { AuthModule } from '@modules/auth/auth.module';
+import { AuthInterceptor } from '@modules/auth/auth.interceptor';
+import { AuthErrorHandler } from '@modules/auth/AuthError.handler';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
@@ -31,9 +31,6 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
   declarations: [
     AppComponent,
     HeaderComponent,
-    LoginComponent,
-    LogoutComponent,
-    OrderByPipe,
     FileInputValueAccessor,
     NotificationsComponent
   ],
@@ -47,7 +44,19 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
     ButtonModule,
     DialogModule,
     ToastModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    AuthModule.forRoot()
+  ],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    } /* ,
+    {
+      provide: ErrorHandler,
+      useClass: AuthErrorHandler
+    } */
   ],
   bootstrap: [AppComponent]
 })

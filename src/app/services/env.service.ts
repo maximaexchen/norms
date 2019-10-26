@@ -18,5 +18,7 @@ export class EnvService {
   public uploadDir = './dist/norms/assets/uploads/';
   public uploadRoot = './dist/norms/';
 
+  public apiUrl = 'http://localhost:4000';
+
   constructor() {}
 }

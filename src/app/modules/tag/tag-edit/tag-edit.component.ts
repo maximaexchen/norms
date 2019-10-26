@@ -20,9 +20,10 @@ export class TagEditComponent implements OnInit, OnDestroy {
   @ViewChild('tagForm', { static: false }) tagForm: NgForm;
 
   alive = true;
+  editable = false;
 
   formTitle: string;
-  formMode = false; // 0 = new - 1 = update
+  isNew = true; // 1 = new - 0 = update
 
   writeItem: Tag;
   tags: Tag[] = [];
@@ -44,11 +45,34 @@ export class TagEditComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     console.log('TagEditComponent');
-    this.getTag();
-    this.restFields();
+    this.setStartValues();
   }
 
-  private restFields() {
+  private setStartValues() {
+    this.resetComponent();
+
+    if (this.tagForm) {
+      this.tagForm.form.markAsPristine();
+    }
+
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+      results => {
+        // check if we are updating
+        if (results['id']) {
+          this.editTag(results);
+        } else {
+          this.newTag();
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+
+  private resetComponent() {
+    console.log('restComponent');
+    this.editable = false;
     this.id = '';
     this.rev = '';
     this.type = '';
@@ -57,43 +81,50 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.active = null;
   }
 
-  private getTag() {
-    this.restFields();
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      // check if we are updating
-      if (results['id']) {
-        console.log('Edit mode');
-        this.formMode = true;
-        this.formTitle = 'Tag bearbeiten';
+  private newTag() {
+    console.log('New mode');
+    this.isNew = true;
+    this.editable = true;
+    this.formTitle = 'Neuen Tag anlegen';
+    this.tags = [];
+  }
 
-        this.couchDBService
-          .fetchEntry('/' + results['id'])
-          .pipe(takeWhile(() => this.alive))
-          .subscribe(entry => {
-            this.id = entry['_id'];
-            this.rev = entry['_rev'];
-            this.type = 'tag';
-            this.name = entry['name'];
-            this.tagType = entry['tagType'];
-            this.active = entry['active'];
-          });
-      } else {
-        console.log('New mode');
-        this.formTitle = 'Neuen Tag anlegen';
-        this.tags = [];
-      }
-    });
+  private editTag(results) {
+    this.resetComponent();
+    this.isNew = false;
+    this.formTitle = 'Tag bearbeiten';
+
+    this.couchDBService
+      .fetchEntry('/' + results['id'])
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(entry => {
+        this.getTagData(entry);
+      });
+  }
+
+  private getTagData(entry: any) {
+    this.id = entry['_id'];
+    this.rev = entry['_rev'];
+    this.type = 'tag';
+    this.name = entry['name'];
+    this.tagType = entry['tagType'];
+    this.active = entry['active'];
   }
 
   public onSubmit(): void {
-    if (this.tagForm.value.formMode) {
+    if (this.tagForm.value.isNew) {
+      console.log('Create a tag');
+      this.resetComponent();
+      this.onCreateTag();
+    } else {
       console.log('Update a tag');
       this.onUpdateTag();
-    } else {
-      console.log('Create a tag');
-      this.restFields();
-      this.onCreateTag();
     }
+  }
+
+  public onEdit() {
+    console.log(this.editable);
+    this.editable = true;
   }
 
   private onUpdateTag(): void {
@@ -122,13 +153,19 @@ export class TagEditComponent implements OnInit, OnDestroy {
           this.couchDBService
             .search(updateQuery)
             .pipe(takeWhile(() => this.alive))
-            .subscribe(results => {
-              this.updateRelated(results);
-            });
+            .subscribe(
+              results => {
+                this.updateRelated(results);
 
-          // Inform about Database change.
-          this.getTag();
-          this.sendStateUpdate();
+                // Inform about Database change.
+                this.sendStateUpdate();
+                this.router.navigate(['../tag']);
+              },
+              error => {
+                console.log(error);
+              },
+              () => {}
+            );
         },
         err => {
           console.log(err);
@@ -138,15 +175,20 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private updateRelated(related: any) {
+    console.log('updateRelated');
+    console.log(related);
     const bulkUpdateObject = {};
     bulkUpdateObject['docs'] = [];
     related.docs.forEach(norm => {
       // reasing the new name to the found Norm with tag
       _.findWhere(norm['tags'], { id: this.id })['name'] = this.name;
+      console.log('norm');
+      console.log(norm);
       bulkUpdateObject['docs'].push(norm);
     });
 
     this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(res => {
+      console.log('bulkUpdate');
       console.log(res);
     });
   }
@@ -158,6 +200,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
       .subscribe(result => {
+        this.router.navigate(['../tag']);
         this.sendStateUpdate();
       });
   }
