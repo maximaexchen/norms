@@ -4,6 +4,7 @@ import { from } from 'rxjs';
 import { MenuItem } from 'primeng/components/common/api';
 import { MessageService } from 'primeng/components/common/messageservice';
 
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 @Component({
   selector: 'app-header',
@@ -16,7 +17,7 @@ export class HeaderComponent implements OnInit {
   public mainmenuItems: MenuItem[] = [];
 
   constructor(
-    private couchDBService: CouchDBService,
+    private authenticationService: AuthenticationService,
     private messageService: MessageService
   ) {}
 
@@ -61,7 +62,8 @@ export class HeaderComponent implements OnInit {
   }
 
   public logout(event: Event) {
-    from(this.couchDBService.logout()).subscribe(
+    this.authenticationService.logout();
+    /* from(this.authenticationService.logout()).subscribe(
       res => {
         console.log('Logout Subscription');
         console.log(res);
@@ -76,6 +78,6 @@ export class HeaderComponent implements OnInit {
       () => {
         console.log('Logout Callback');
       }
-    );
+    ); */
   }
 }

@@ -36,10 +36,6 @@ export class LoginComponent implements OnInit {
       password: this.passWord
     };
 
-    /*  if (this.authService.login(this.userName, this.passWord)) {
-      this.router.navigate(['../document/']);
-    } */
-
     this.authService.login(this.userName, this.passWord).subscribe(result => {
       console.log('LoginComponent login');
       console.log(result);

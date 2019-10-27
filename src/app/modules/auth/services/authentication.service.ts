@@ -1,8 +1,8 @@
 import { CouchDBService } from './../../../services/couchDB.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { switchMap, map, tap, catchError } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 import { User } from '@models/index';
@@ -34,79 +34,34 @@ export class AuthenticationService {
 
   public login(username: string, password: string): Observable<any> {
     const params = {
-      username: username,
-      password: password
+      username,
+      password
     };
 
-    return this.couchDBService.getLoginUser(params);
+    const loginUSerObs = this.couchDBService.getLoginUser(params);
 
-    /*   .subscribe(result => {
-      console.log('res');
-      console.log(result);
-      const user = result['docs'][0];
-      console.log(user);
-      if (user) {
-        this.requestToken(username, password).subscribe(res => {
-          console.log('res');
-          console.log(res);
+    return loginUSerObs.pipe(
+      switchMap(
+        (loginResult): Observable<boolean | any> => {
+          const user = loginResult['docs'][0];
+          if (user) {
+            this.requestToken(username, password).subscribe(res => {
+              console.log('res');
+              console.log(res);
 
-          const role = user['role'];
-          if (role) {
-            this.userS.authAs(role as Roles);
-          } else {
-            this.userS.authAs('External' as Roles);
+              const role = user['role'];
+              if (role) {
+                this.userS.authAs(role as Roles);
+                return of(true);
+              } else {
+                this.userS.authAs('External' as Roles);
+              }
+            });
           }
-        });
-      }
-    });
- */
-    /* return new Promise(resolve => {
-      this.couchDBService.getLoginUser(params).subscribe(result => {
-        console.log('res');
-        console.log(result);
-        const user = result['docs'][0];
-        console.log(user);
-        if (user) {
-          this.requestToken(username, password).subscribe(res => {
-            console.log('res');
-            console.log(res);
-
-            const role = user['role'];
-            if (role) {
-              this.userS.authAs(role as Roles);
-            } else {
-              this.userS.authAs('External' as Roles);
-            }
-          });
+          return of(false);
         }
-      });
-    }); */
-
-    /*  return from(this.couchDBService.getLoginUser(params)).subscribe(
-      result => {
-        console.log('result');
-        console.log(result);
-
-        const user = result['docs'][0];
-
-        if (user) {
-          return this.requestToken(username, password).subscribe(res => {
-            console.log('res');
-            console.log(res);
-
-            const role = user['role'];
-            if (role) {
-              this.userS.authAs(role as Roles);
-            } else {
-              this.userS.authAs('External' as Roles);
-            }
-          });
-        }
-      },
-      error => {
-        console.log(error.message);
-      }
-    ); */
+      )
+    );
   }
 
   private requestToken(
@@ -115,14 +70,15 @@ export class AuthenticationService {
   ): Observable<boolean> {
     return this.http
       .post<any>(this.env.apiUrl + '/api/auth', {
-        username: username,
-        password: password
+        username,
+        password
       })
       .pipe(
-        map(result => {
+        tap(result => {
           this.setToken(result.token);
-          return true;
-        })
+        }), // do side effects
+        map(data => true), // modify the data and return the value you care for
+        catchError(error => of(false)) // return an Observable with the value that should be returned on errors
       );
   }
 
