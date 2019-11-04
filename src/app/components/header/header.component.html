@@ -31,20 +31,20 @@
     </div>
   </div>
 
-  <div class="container-fluid">
+  <div class="container-fluid" *ngIf="authenticationService.isAuthenticated()">
     <!-- *ngIf="user && user.isValidUser == true" -->
     <p-menubar
       [model]="mainmenuItems"
       styleClass="main-menubar"
       [autoDisplay]="false"
     >
-      <!-- <div>
+      <div>
         <p-button
           (onClick)="logout($event)"
           label="Logout"
           icon="fas fa-sign-out-alt"
         ></p-button>
-      </div> -->
+      </div>
     </p-menubar>
   </div>
 </div>

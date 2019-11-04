@@ -10,21 +10,22 @@ export class PermissionManagerService {
   private permissions: PermissionBase;
   constructor() {}
 
-  isGranted(permission: PermissionType) {
-    console.log('permission');
-    console.log(permission);
+  public isGranted(permission: PermissionType) {
     const permissions = PermissionsFactory.getInstance().permissions;
     for (const perm of permissions) {
-      console.log(perm);
-      console.log(permissions);
       if (perm === permission) {
         return true;
       }
     }
     return false;
   }
-  authAs(role: Roles) {
+
+  public authAs(role: Roles) {
     localStorage.setItem('role', role === null ? Roles.EXTERNAL : role);
     this.permissions = PermissionsFactory.getInstance();
+  }
+
+  public removeAuth() {
+    localStorage.removeItem('role');
   }
 }

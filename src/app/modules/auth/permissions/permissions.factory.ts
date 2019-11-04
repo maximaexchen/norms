@@ -10,6 +10,8 @@ export class PermissionsFactory {
   private constructor() {}
 
   public static getInstance() {
+    console.log('getInstance');
+    console.log(this.instance);
     if (this.instance) {
       return this.instance;
     } else {

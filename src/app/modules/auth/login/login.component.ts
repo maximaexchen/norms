@@ -11,7 +11,7 @@ import { resolve } from 'q';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  @Output() valueChange = new EventEmitter();
+  @Output() loginEvent = new EventEmitter();
   public display = true;
   public headerMsg = '';
   public userName = '';
@@ -36,35 +36,24 @@ export class LoginComponent implements OnInit {
       password: this.passWord
     };
 
-    this.authService.login(this.userName, this.passWord).subscribe(result => {
-      console.log('LoginComponent login');
-      console.log(result);
-    });
-    /* console.log('LoginComponent login');
-    this.headerMsg = '';
-    const params = {
-      username: this.userName,
-      password: this.passWord
-    };
-    from(this.backend.login(params)).subscribe(
-      res => {
-        console.log('res');
-        console.log(res);
-        this.display = !res['success'];
-        this.headerMsg = res['msg'];
-        from(this.backend.currentUser).subscribe(usr => {
-          console.log('usr');
-          console.log(usr);
-          this.valueChange.emit({
-            isValidUser: res['success'],
-            ID: usr['ID'],
-            fullName: usr['fullName']
+    this.authService.login(this.userName, this.passWord).subscribe(
+      result => {
+        console.log('LoginComponent login');
+        console.log(result);
+
+        this.display = !result;
+
+        if (!result) {
+          this.headerMsg = 'Zugangsdaten nicht korrekt!';
+        } else {
+          this.loginEvent.emit({
+            isValidUser: result
           });
-        });
+        }
       },
       err => {
         this.headerMsg = 'Fehler beim Login!';
       }
-    );*/
+    );
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { from } from 'rxjs';
 
 import { MenuItem } from 'primeng/components/common/api';
@@ -12,12 +12,13 @@ import { CouchDBService } from 'src/app/services/couchDB.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
+  @Output() logoutEvent = new EventEmitter();
   isCollapsed = false;
   public title = 'Normenverwaltung';
   public mainmenuItems: MenuItem[] = [];
 
   constructor(
-    private authenticationService: AuthenticationService,
+    public authenticationService: AuthenticationService,
     private messageService: MessageService
   ) {}
 
@@ -62,22 +63,9 @@ export class HeaderComponent implements OnInit {
   }
 
   public logout(event: Event) {
+    this.logoutEvent.emit({
+      isValidUser: true
+    });
     this.authenticationService.logout();
-    /* from(this.authenticationService.logout()).subscribe(
-      res => {
-        console.log('Logout Subscription');
-        console.log(res);
-      },
-      err => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Logout-',
-          detail: 'Es ist ein Fehler aufgetreten!'
-        });
-      },
-      () => {
-        console.log('Logout Callback');
-      }
-    ); */
   }
 }

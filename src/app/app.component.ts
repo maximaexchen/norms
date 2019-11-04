@@ -35,7 +35,8 @@ export class AppComponent implements OnInit {
     private messageService: MessageService,
     private authService: AuthenticationService,
     private menu: ACP_Menu,
-    private api: ApiService
+    private api: ApiService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -55,72 +56,21 @@ export class AppComponent implements OnInit {
         this.mainmenuItems = [];
       }
     ); */
+
+    console.log();
   }
 
-  /* public setUserValidation(user) {
-    this.user = user;
-    this.initMainMenu();
-  } */
-
-  /**
-   * initialisiert das Haupt-Menü
-   */
-  private initMainMenu() {
-    /* from(
-      this.menu.initMainMenu({
-        injector: this.injector,
-        dataStore: this.dataStore
-      })
-    ).subscribe(
-      mainMenu => {
-        let mainmenuItems = [];
-        mainmenuItems = mainmenuItems.concat(mainMenu);
-        this.api.setUserMenuSubject(mainmenuItems);
-      },
-      error => {
-        console.log(error.message);
-      }
-    ); */
+  public login(event) {
+    this.router.navigate(['document']);
+    if (event.isValidUser) {
+      console.log('navigate: /document');
+      this.router.navigate(['/document']);
+    }
   }
 
   public logout() {
+    console.log('AppComponent: logout');
+    this.api.reloadApp();
     this.authService.logout();
-    /* from(this.couchDBService.logout()).subscribe(
-      res => {
-        this.menu.clearMainMenu({ injector: this.injector });
-        this.api.clearUserMenuSubject();
-        this.user = undefined;
-      },
-      err => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Logout-',
-          detail: 'Es ist ein Fehler aufgetreten!'
-        });
-      },
-      () => {
-        const router = this.injector.get(Router);
-        const userPermittedRoutes = [
-          { path: 'logout', component: LogoutComponent }
-        ];
-        router.resetConfig(userPermittedRoutes);
-        from(router.navigate(['logout'])).subscribe(
-          succ => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Logout-',
-              detail: 'erfolgreich!'
-            });
-          },
-          err => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Logout',
-              detail: 'Logout-Display konnte nicht geladen werden!'
-            });
-          }
-        );
-      }
-    ); */
   }
 }

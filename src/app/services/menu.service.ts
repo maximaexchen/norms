@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { MenuItem } from 'primeng/components/common/api';
 import { DocumentComponent } from '@app/modules/document/document.component';
+import { RoleComponent } from '@app/modules/role/role.component';
 
 @Injectable({ providedIn: 'root' })
 export class ACP_Menu {
@@ -19,7 +20,8 @@ export class ACP_Menu {
       { path: 'document', component: DocumentComponent },
       { path: 'tag', component: TagComponent },
       { path: 'group', component: GroupComponent },
-      { path: 'user', component: GroupComponent }
+      { path: 'user', component: GroupComponent },
+      { path: 'role', component: RoleComponent }
     ];
   }
 

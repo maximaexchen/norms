@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { CouchDBService } from './../../../services/couchDB.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -20,11 +21,13 @@ export class AuthenticationService {
   apiUrl = this.env.uploadUrl;
   permissions: Array<string>;
   jwtHelper = new JwtHelperService();
+  user: User;
 
   constructor(
     private env: EnvService,
     private http: HttpClient,
-    private couchDBService: CouchDBService
+    private couchDBService: CouchDBService,
+    private router: Router
   ) {
     this.currentTokenSubject = new BehaviorSubject<string>(
       localStorage.getItem('access_token')
@@ -38,30 +41,53 @@ export class AuthenticationService {
       password
     };
 
-    const loginUSerObs = this.couchDBService.getLoginUser(params);
+    const loginUserObs = this.couchDBService.getLoginUser(params);
 
-    return loginUSerObs.pipe(
+    return loginUserObs.pipe(
       switchMap(
         (loginResult): Observable<boolean | any> => {
-          const user = loginResult['docs'][0];
-          if (user) {
-            this.requestToken(username, password).subscribe(res => {
-              console.log('res');
-              console.log(res);
+          this.user = loginResult['docs'][0];
 
-              const role = user['role'];
+          if (!!this.user) {
+            this.requestToken(username, password).subscribe(res => {
+              const role = this.user['role'];
               if (role) {
                 this.userS.authAs(role as Roles);
-                return of(true);
               } else {
                 this.userS.authAs('External' as Roles);
               }
+              this.router.navigate(['/document']);
             });
+
+            return of(true);
           }
           return of(false);
         }
       )
     );
+
+    /* return loginUSerObs.pipe(
+      switchMap(
+        (loginResult): Observable<boolean | any> => {
+          this.user = loginResult['docs'][0];
+
+          console.log(this.user);
+
+          if (!!this.user) {
+            this.requestToken(username, password).subscribe(res => {
+              const role = this.user['role'];
+              if (role) {
+                this.userS.authAs(role as Roles);
+              } else {
+                this.userS.authAs('External' as Roles);
+              }
+            });
+            return of(true);
+          }
+          return of(false);
+        }
+      )
+    ); */
   }
 
   private requestToken(
@@ -83,6 +109,7 @@ export class AuthenticationService {
   }
 
   public logout() {
+    this.userS.removeAuth();
     this.removeToken();
     this.currentTokenSubject.next(null);
   }
@@ -111,26 +138,9 @@ export class AuthenticationService {
     return date;
   }
 
-  private isTokenExpired(token?: string): boolean {
-    if (!token) {
-      token = this.getToken();
-    }
-    if (!token) {
-      return true;
-    }
-
-    const date = this.getTokenExpirationDate(token);
-    if (date === undefined) {
-      return false;
-    }
-    return !(date.valueOf() > new Date().valueOf());
-  }
-
   public isAuthenticated(): boolean {
     const token = localStorage.getItem(TOKEN_NAME);
-    console.log('isAuthenticated');
-    console.log(!this.jwtHelper.isTokenExpired(token));
-    return this.jwtHelper.isTokenExpired(token);
+    return !this.jwtHelper.isTokenExpired(token);
   }
 
   public get currentUserValue(): User {
