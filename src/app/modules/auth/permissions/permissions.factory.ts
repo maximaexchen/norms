@@ -3,6 +3,7 @@ import { OwnerPermission } from '@modules/auth/permissions/owner.permission';
 import { UserPermission } from '@modules/auth/permissions/user.permission';
 import { ExternalPermission } from '@modules/auth/permissions/external.permission';
 import { PermissionBase } from '@modules/auth/permissions/permission.base';
+import { AdminPermission } from './admin.permission';
 
 export class PermissionsFactory {
   public static instance: PermissionBase;
@@ -12,12 +13,15 @@ export class PermissionsFactory {
   public static getInstance() {
     console.log('getInstance');
     console.log(this.instance);
-    if (this.instance) {
+    if (!!this.instance) {
       return this.instance;
     } else {
       const role = localStorage.getItem('role');
 
       switch (role) {
+        case Roles.ADMIN:
+          this.instance = new AdminPermission();
+          break;
         case Roles.OWNER:
           this.instance = new OwnerPermission();
           break;

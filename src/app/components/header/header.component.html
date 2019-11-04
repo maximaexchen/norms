@@ -30,7 +30,7 @@
       </div>
     </div>
   </div>
-
+  <div *appIsGranted="'CREATE'">ADMIN *******</div>
   <div class="container-fluid" *ngIf="authenticationService.isAuthenticated()">
     <!-- *ngIf="user && user.isValidUser == true" -->
     <p-menubar

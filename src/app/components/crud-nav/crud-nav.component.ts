@@ -6,8 +6,8 @@ import {
   Output,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 
 @Component({
   selector: 'app-crud-nav',
@@ -28,7 +28,10 @@ export class CrudNavComponent implements OnInit {
   @Output() edit = new EventEmitter();
   @Output() delete = new EventEmitter();
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    public authenticationService: AuthenticationService
+  ) {}
 
   ngOnInit() {}
 

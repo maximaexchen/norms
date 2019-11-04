@@ -1,15 +1,14 @@
-import { Tag } from './../../../models/tag.model';
 import { MessageService } from 'primeng/components/common/messageservice';
 import { DocumentModule } from './../../document/document.module';
 import { GroupModule } from './../../group/group.module';
 import { PublisherModule } from './../../publisher/publisher.module';
-import { RoleModule } from './../../role/role.module';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { RoleModule } from './../../role/role.module';
+import { Tag } from './../../../models/tag.model';
 import { TagEditComponent } from './tag-edit.component';
-import { CrudNavComponent } from '@app/components/shared/crud-nav/crud-nav.component';
 import { CouchDBService } from '@app/services/couchDB.service';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { NotificationsService } from '@app/services/notifications.service';
 import { ConfirmationService } from 'primeng/api';
 import { GeneralModule } from '@app/modules/general.module';

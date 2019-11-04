@@ -11,12 +11,15 @@ export class PermissionManagerService {
   constructor() {}
 
   public isGranted(permission: PermissionType) {
-    const permissions = PermissionsFactory.getInstance().permissions;
-    for (const perm of permissions) {
-      if (perm === permission) {
-        return true;
+    if (!!PermissionsFactory.getInstance()) {
+      const permissions = PermissionsFactory.getInstance().permissions;
+      for (const perm of permissions) {
+        if (perm === permission) {
+          return true;
+        }
       }
     }
+
     return false;
   }
 

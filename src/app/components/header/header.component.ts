@@ -1,11 +1,7 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { from } from 'rxjs';
-
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { MenuItem } from 'primeng/components/common/api';
-import { MessageService } from 'primeng/components/common/messageservice';
-
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
-import { CouchDBService } from 'src/app/services/couchDB.service';
+
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
@@ -17,19 +13,25 @@ export class HeaderComponent implements OnInit {
   public title = 'Normenverwaltung';
   public mainmenuItems: MenuItem[] = [];
 
-  constructor(
-    public authenticationService: AuthenticationService,
-    private messageService: MessageService
-  ) {}
+  constructor(public authenticationService: AuthenticationService) {}
 
   ngOnInit() {
-    this.initMainMenu();
+    // this.initMainMenu();
+
+    this.authenticationService.userIsLoggedIn$.subscribe(res => {
+      this.initMainMenu();
+    });
+
+    if (this.authenticationService.isAuthenticated) {
+      this.initMainMenu();
+    }
   }
 
   /**
    * initialisiert das Haupt-Menü
    */
-  private initMainMenu() {
+  public initMainMenu() {
+    this.mainmenuItems = [];
     this.mainmenuItems.push({
       icon: 'fas fa-check-square',
       label: 'Normen',
@@ -50,16 +52,18 @@ export class HeaderComponent implements OnInit {
       label: 'Gruppen',
       routerLink: 'group'
     });
-    this.mainmenuItems.push({
-      icon: 'fas fa-user',
-      label: 'Benutzer',
-      routerLink: 'user'
-    });
-    this.mainmenuItems.push({
-      icon: 'fas fa-link',
-      label: 'Rollen',
-      routerLink: 'role'
-    });
+    if (localStorage.getItem('role') === 'admin') {
+      this.mainmenuItems.push({
+        icon: 'fas fa-user',
+        label: 'Benutzer',
+        routerLink: 'user'
+      });
+      this.mainmenuItems.push({
+        icon: 'fas fa-link',
+        label: 'Rollen',
+        routerLink: 'role'
+      });
+    }
   }
 
   public logout(event: Event) {

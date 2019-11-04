@@ -23,7 +23,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from '@modules/auth/auth.module';
 import { AuthInterceptor } from '@modules/auth/auth.interceptor';
-import { AuthErrorHandler } from '@modules/auth/AuthError.handler';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 

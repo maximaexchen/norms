@@ -5,6 +5,7 @@ export class AdminPermission extends PermissionBase {
   constructor() {
     super();
     this.permissions = [
+      PermissionType.MAINTAIN,
       PermissionType.CREATE,
       PermissionType.READ,
       PermissionType.UPDATE,

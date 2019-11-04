@@ -9,33 +9,29 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'search',
-    loadChildren: './modules/search/search.module#SearchModule'
-  },
-  {
-    path: 'publisher',
-    loadChildren: './modules/publisher/publisher.module#PublisherModule'
-  },
-  {
     path: 'document',
     loadChildren: './modules/document/document.module#DocumentModule',
     canActivate: [AuthGuardService]
   },
   {
     path: 'tag',
-    loadChildren: './modules/tag/tag.module#TagModule'
+    loadChildren: './modules/tag/tag.module#TagModule',
+    canActivate: [AuthGuardService]
   },
   {
     path: 'group',
-    loadChildren: './modules/group/group.module#GroupModule'
+    loadChildren: './modules/group/group.module#GroupModule',
+    canActivate: [AuthGuardService]
   },
   {
     path: 'user',
-    loadChildren: './modules/user/user.module#UserModule'
+    loadChildren: './modules/user/user.module#UserModule',
+    canActivate: [AuthGuardService]
   },
   {
     path: 'role',
-    loadChildren: './modules/role/role.module#RoleModule'
+    loadChildren: './modules/role/role.module#RoleModule',
+    canActivate: [AuthGuardService]
   },
   {
     path: 'login',

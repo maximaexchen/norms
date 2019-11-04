@@ -2,7 +2,7 @@ import { Router } from '@angular/router';
 import { CouchDBService } from './../../../services/couchDB.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { switchMap, map, tap, catchError } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
@@ -22,6 +22,8 @@ export class AuthenticationService {
   permissions: Array<string>;
   jwtHelper = new JwtHelperService();
   user: User;
+  private userIsLoggedIn = new Subject<string>();
+  public userIsLoggedIn$ = this.userIsLoggedIn.asObservable();
 
   constructor(
     private env: EnvService,
@@ -56,7 +58,8 @@ export class AuthenticationService {
               } else {
                 this.userS.authAs('External' as Roles);
               }
-              this.router.navigate(['/document']);
+
+              this.userIsLoggedIn.next('userIsLoggedIn');
             });
 
             return of(true);

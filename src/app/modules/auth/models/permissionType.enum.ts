@@ -1,4 +1,5 @@
 export enum PermissionType {
+  MAINTAIN = 'MAINTAIN',
   CREATE = 'CREATE',
   READ = 'READ',
   UPDATE = 'UPDATE',
