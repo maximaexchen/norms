@@ -18,6 +18,7 @@ import { NotificationsService } from 'src/app/services/notifications.service';
 
 import { Group } from '../../../models/group.model';
 import { User } from '@app/models/user.model';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 
 @Component({
   selector: 'app-group-edit',
@@ -51,7 +52,8 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private notificationsService: NotificationsService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    public authService: AuthenticationService
   ) {}
 
   ngOnInit() {

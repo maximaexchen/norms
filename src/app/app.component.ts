@@ -1,8 +1,9 @@
-import { Component, OnInit, Injector, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { ApiService } from '@services/api.service';
 import { Router } from '@angular/router';
 
+import { MessagingService } from './services/messaging.service';
 import { AuthenticationService } from './modules/auth/services/authentication.service';
 
 @Component({
@@ -18,10 +19,21 @@ export class AppComponent implements OnInit {
   constructor(
     private authService: AuthenticationService,
     private api: ApiService,
-    private router: Router
+    private router: Router,
+    private messaging: MessagingService
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('send message');
+    this.messaging.sendMessage('HALLO: Ein Test').subscribe(
+      send => {
+        console.log(send);
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
 
   public login(event) {
     this.router.navigate(['document']);

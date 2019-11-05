@@ -2,7 +2,6 @@ import { Injectable, Injector } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
-import { CouchDBService } from '@services/couchDB.service';
 import { ACP_Menu } from '@services/menu.service';
 import { from } from 'rxjs';
 import { MessageService } from 'primeng/api';
@@ -35,8 +34,9 @@ export class ApiService {
     console.log(router);
     const userPermittedRoutes = [];
     router.resetConfig(userPermittedRoutes);
-    router.navigateByUrl('/');
-    /* from(router.navigateByUrl('/')).subscribe(
+    // router.navigateByUrl('/');
+
+    from(router.navigateByUrl('/')).subscribe(
       res => {
         setTimeout(() => {
           window.location.reload();
@@ -49,6 +49,6 @@ export class ApiService {
           detail: 'Fehler-Nr: ' + this.componentID + '_6!'
         });
       }
-    ); */
+    );
   }
 }

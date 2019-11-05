@@ -9,6 +9,8 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const jwt = require('jsonwebtoken');
 const app = express();
+const cors = require('cors');
+const nodemailer = require('nodemailer');
 let fileName = '';
 
 const DIR = './uploads';
@@ -22,7 +24,7 @@ var allowCrossDomain = function(req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, revision, createid'
+    'Content-Type, Authorization, revision, createid, body'
   );
 
   // intercept OPTIONS method
@@ -69,6 +71,10 @@ app.get('/api/findDirectory/:id', searchMiddleware, function(req, res) {
     });
 });
 
+/*
+==================== Fileupload =====================
+*/
+
 // Store file in temp directory
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
@@ -109,13 +115,12 @@ app.post('/api/upload', function(req, res) {
   });
 });
 
+/*
+==================== Authentication =====================
+*/
+
 app.post('/api/auth', function(req, res) {
   const body = req.body;
-
-  console.log(req.body);
-  console.log(body);
-  console.log(body.username);
-  console.log(!body.username);
 
   if (!body.username) res.sendStatus(401);
 
@@ -142,19 +147,53 @@ app.post('/api/auth', function(req, res) {
 
   var token = jwt.sign({ userName: body.username }, privateKEY, signOptions);
 
-  /*
- ====================   JWT Verify =====================
-*/
-  /*  var verifyOptions = {
-    issuer: i,
-    subject: s,
-    audience: a,
-    expiresIn: '8h',
-    algorithm: ['RS256']
-  };
-  var legit = jwt.verify(token, publicKEY, verifyOptions); */
-
   res.send({ token });
+});
+
+/*
+==================== Mail Sending =====================
+*/
+
+app.post('/api/sendmail', (req, res) => {
+  const body = req.body;
+
+  console.log(body.emails);
+  console.log(body.normId);
+
+  /* const transporter = nodemailer.createTransport({
+    host: 'smtp.mailtrap.io',
+    port: 2525,
+    auth: {
+      user: '659490e952aac2',
+      pass: 'e260af4d0f6b3d'
+    }
+  }); */
+
+  const transporter = nodemailer.createTransport({
+    host: 'sslout.df.eu',
+    port: 465,
+    auth: {
+      user: 'marcus.bieber@itspoon.com',
+      pass: 'eSjt1ymakb.H'
+    }
+  });
+
+  const mailOptions = {
+    from: `"ACP", "Normenverwaltung"`,
+    //to: `<${user.email}>`,
+    to: body.emails.join(),
+    subject: 'Update Normenverwaltung',
+    html: `<h1>Norm with ID: ${body.normId} changed!</h1>`
+  };
+
+  console.log(mailOptions);
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.log(error);
+    }
+    console.log('Message sent: %s', info.messageId);
+  });
 });
 
 const PORT = process.env.PORT || 4000;

@@ -10,6 +10,7 @@
       [isNew]="isNew"
       [validForm]="groupForm.valid"
       [routeNew]="'/group/new'"
+      [role]="authService.getUserRole()"
       (save)="onSubmit()"
       (add)="onSubmit()"
       (delete)="onDelete()"

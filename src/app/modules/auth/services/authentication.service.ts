@@ -29,8 +29,7 @@ export class AuthenticationService {
   constructor(
     private env: EnvService,
     private http: HttpClient,
-    private couchDBService: CouchDBService,
-    private router: Router
+    private couchDBService: CouchDBService
   ) {
     this.currentTokenSubject = new BehaviorSubject<string>(
       localStorage.getItem('access_token')

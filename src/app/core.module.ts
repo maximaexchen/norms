@@ -1,10 +1,9 @@
-import { PermissionManagerService } from './modules/auth/services/permissionManager.service';
-import { AuthenticationService } from './modules/auth/services/authentication.service';
 import { NgModule } from '@angular/core';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { APIResolver } from './shared/resolver/api.resolver';
 import { DocumentResolver } from './shared/resolver/document.resolver';
-import { EnvServiceProvider } from './/services/env.service.provider';
+import { EnvServiceProvider } from './services/env.service.provider';
+import { MessagingService } from './services/messaging.service';
 
 @NgModule({
   providers: [
@@ -13,7 +12,8 @@ import { EnvServiceProvider } from './/services/env.service.provider';
     DocumentResolver,
     MessageService,
     EnvServiceProvider,
-    ConfirmationService
+    ConfirmationService,
+    MessagingService
   ]
 })
 export class CoreModule {}
