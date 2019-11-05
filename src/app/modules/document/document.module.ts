@@ -1,4 +1,3 @@
-import { IsGrantedDirective } from '@app/modules/auth/directives/isGranted.directive';
 import { AuthModule } from './../auth/auth.module';
 import { SearchModule } from './../search/search.module';
 import { UserModule } from './../user/user.module';
@@ -41,6 +40,6 @@ import { GeneralModule } from 'src/app/modules/general.module';
     SearchModule,
     AuthModule
   ],
-  exports: [IsGrantedDirective]
+  exports: []
 })
 export class DocumentModule {}

@@ -53,10 +53,11 @@ export class AuthenticationService {
           if (!!this.user) {
             this.requestToken(username, password).subscribe(res => {
               const role = this.user['role'];
+
               if (role) {
                 this.userS.authAs(role as Roles);
               } else {
-                this.userS.authAs('External' as Roles);
+                this.userS.authAs('external' as Roles);
               }
 
               this.userIsLoggedIn.next('userIsLoggedIn');
@@ -68,29 +69,6 @@ export class AuthenticationService {
         }
       )
     );
-
-    /* return loginUSerObs.pipe(
-      switchMap(
-        (loginResult): Observable<boolean | any> => {
-          this.user = loginResult['docs'][0];
-
-          console.log(this.user);
-
-          if (!!this.user) {
-            this.requestToken(username, password).subscribe(res => {
-              const role = this.user['role'];
-              if (role) {
-                this.userS.authAs(role as Roles);
-              } else {
-                this.userS.authAs('External' as Roles);
-              }
-            });
-            return of(true);
-          }
-          return of(false);
-        }
-      )
-    ); */
   }
 
   private requestToken(

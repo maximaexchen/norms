@@ -5,6 +5,14 @@
     animationDuration=".8s"
   ></p-progressSpinner>
 </div>
+<hr>
+<div *appIsGranted="'MAINTAIN'">MAINTAIN *******</div>
+<div *appIsGranted="'CREATE'">CREATE *******</div>
+<div *appIsGranted="'DELETE'">DELETE *******</div>
+<div *appIsGranted="'READ'">READ *******</div>
+<div *appIsGranted="'UPDATE'">UPDATE *******</div>
+<div *appIsGranted="'OTHER'">OTHER *******</div>
+<hr>
 <div class="row detail-edit-header">
   <div class="col-sm-4">
     <h1 *ngIf="normNumber">{{ normNumber }}</h1>

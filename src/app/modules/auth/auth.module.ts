@@ -17,6 +17,7 @@ import { AuthenticationService } from './services/authentication.service';
 import { AuthGuardService } from './guards/authGuard.service';
 import { AuthInterceptor } from './auth.interceptor';
 import { AuthErrorHandler } from './AuthError.handler';
+import { PermissionManagerService } from './services/permissionManager.service';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,8 @@ export class AuthModule {
         AuthenticationService,
         AuthGuardService,
         AuthErrorHandler,
-        AuthInterceptor
+        AuthInterceptor,
+        PermissionManagerService
       ]
     };
   }

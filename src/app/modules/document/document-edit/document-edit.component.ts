@@ -106,8 +106,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setStartValues() {
-    console.log('setStartValues');
-
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       // fetch data for select-boxes
       this.getPublishers();
@@ -125,7 +123,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private newDocument() {
-    console.log('New mode');
     this.resetComponent();
     this.setMultiselects();
     this.editable = true;
@@ -137,8 +134,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private editDocument(results) {
-    console.log('Edit mode');
-
     this.isNew = false;
     this.resetComponent();
 
@@ -149,8 +144,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         entry => {
-          console.log('fetchEntry: entry');
-          console.log(entry);
           this.getDocumentData(entry);
         },
         error => {
@@ -161,7 +154,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private saveDocument(): void {
-    console.log('saveDocument: DocumentEditComponent');
     this.isLoading = true;
     this.processFormData();
     this.normForm.form.markAsPristine();
@@ -172,8 +164,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          console.log('saveDocument:' + result);
-
           if (this.fileUpload) {
             this.uploadPDF()
               .pipe(takeWhile(() => this.alive))
@@ -202,8 +192,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private updateDocument(): void {
-    console.log('onUpdateDocument: DocumentEditComponent');
-
     this.processFormData();
 
     if (this.fileUpload) {
@@ -249,9 +237,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private resetComponent() {
-    console.log('??????????????????????????????????');
-    console.log('restComponent');
-
     this.editable = false;
     this.selectedRelatedNorms = [];
     this.selectedUsers = [];
@@ -267,7 +252,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private assignMultiselectConfig() {
-    console.log('assignMultiselectConfig');
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',
@@ -312,8 +296,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public checkUpload(event, uploadField) {
-    console.log('checkUpload: start');
-
     for (const file of event.files) {
       this.fileUpload = file;
     }
@@ -340,13 +322,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public processUpload(uploadField) {
-    console.log('processUpload: start');
-
     this.convertToBase64(this.fileUpload)
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          console.log('processUpload: result');
           this.newAttachmentName =
             this.id +
             '_' +
@@ -361,12 +340,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           };
         },
         error => {
-          console.log('processUpload: error');
           console.log(error.message);
           this.isLoading = false;
         },
         () => {
-          console.log('processUpload: complete');
           this.isLoading = false;
           this.showConfirmation('success', 'Files added');
         }
@@ -375,18 +352,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private checkForExistingAttachment(obj, searchKey): boolean {
     return Object.keys(obj).some(prop => {
-      console.log('checkForExistingAttachment');
-      console.log('prop1: ' + prop);
       const needle = /_([^.]+)./.exec(prop)[1];
-      console.log('searchKey: ' + searchKey);
-      console.log('needle extracted from filename (prop): ' + needle);
-      console.log('prop2: ' + prop);
+
       return needle.includes(searchKey);
     });
   }
 
   private uploadPDF(): Observable<any> {
-    console.log('uploadPDF:' + this.id);
     return this.serverService.uploadFile(
       this.uploadUrl + '/',
       this.fileUpload,
@@ -558,7 +530,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
-    console.log('getDocumentData');
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
@@ -591,14 +562,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (entry['relatedNorms']) {
       this.setRelatedNorms(entry['relatedNorms']);
     }
-    console.log('entry["tags"]');
-    console.log(entry['tags']);
+
     if (entry['tags']) {
       const ent = _.sortBy(entry['tags'], 'tagType');
-      console.log('ent');
-      console.log(ent);
+
       ent.forEach(element => {
-        console.log('ent.forEach');
         switch (element['tagType']) {
           case 'level1':
             this.selectedTags1.push(element);
@@ -640,7 +608,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processFormData() {
-    console.log('processFormData');
     this.writeItem = {};
     this.writeItem['type'] = 'norm';
     this.writeItem['normNumber'] = this.normForm.value.normNumber || '';
@@ -777,9 +744,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private showConfirmation(type: string, result: string) {
-    console.log('++++++++++++++++++++++++++');
-    console.log(type);
-    console.log('++++++++++++++++++++++++++');
     this.notificationsService.addSingle(type, result, type);
   }
 
@@ -842,16 +806,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public onItemSelect(item: any) {}
-  public onItemDeSelect(item: any) {
-    console.log(item);
-    console.log(this.selectedUsers);
-  }
-  public onSelectAll(items: any) {
-    console.log(items);
-  }
-  public onDeSelectAll(items: any) {
-    console.log(items);
-  }
+  public onItemDeSelect(item: any) {}
+  public onSelectAll(items: any) {}
+  public onDeSelectAll(items: any) {}
 
   ngOnDestroy(): void {
     this.alive = false;

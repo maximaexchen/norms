@@ -12,8 +12,8 @@ export class PermissionManagerService {
 
   public isGranted(permission: PermissionType) {
     if (!!PermissionsFactory.getInstance()) {
-      const permissions = PermissionsFactory.getInstance().permissions;
-      for (const perm of permissions) {
+      const perms = PermissionsFactory.getInstance().permissions;
+      for (const perm of perms) {
         if (perm === permission) {
           return true;
         }
