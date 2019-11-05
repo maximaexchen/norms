@@ -26,6 +26,7 @@ export class PermissionManagerService {
   public authAs(role: Roles) {
     localStorage.setItem('role', role === null ? Roles.EXTERNAL : role);
     this.permissions = PermissionsFactory.getInstance();
+    console.log(this.permissions);
   }
 
   public removeAuth() {

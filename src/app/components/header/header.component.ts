@@ -42,17 +42,18 @@ export class HeaderComponent implements OnInit {
       label: 'Herausgeber',
       routerLink: 'publisher'
     }); */
-    this.mainmenuItems.push({
-      icon: 'fas fa-tags',
-      label: 'Tags',
-      routerLink: 'tag'
-    });
-    this.mainmenuItems.push({
-      icon: 'fas fa-users',
-      label: 'Gruppen',
-      routerLink: 'group'
-    });
     if (localStorage.getItem('role') === 'admin') {
+      this.mainmenuItems.push({
+        icon: 'fas fa-tags',
+        label: 'Tags',
+        routerLink: 'tag'
+      });
+      this.mainmenuItems.push({
+        icon: 'fas fa-users',
+        label: 'Gruppen',
+        routerLink: 'group'
+      });
+
       this.mainmenuItems.push({
         icon: 'fas fa-user',
         label: 'Benutzer',

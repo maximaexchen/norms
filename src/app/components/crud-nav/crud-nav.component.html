@@ -8,18 +8,32 @@
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onCreate()"
-    *ngIf="!isNew"
+    *ngIf="!isNew && role === 'admin'"
   ></button>
   <button
     pButton
     type="submit"
     icon="fas fa-check"
     iconPos="left"
-    label="{{ isNew ? 'Erstellen' : 'Aktualisieren' }}"
+    label="Erstellen"
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onSubmit()"
-    *ngIf="editable"
+    *ngIf="(isNew || editable) && role === 'admin'"
+    [disabled]="!validForm"
+    [ngClass]="{ 'ready-save-btn': dirtyForm && validForm }"
+  ></button>
+
+  <button
+    pButton
+    type="submit"
+    icon="fas fa-check"
+    iconPos="left"
+    label="Aktualisieren"
+    i18n-label="@@btn-new"
+    class="btn btn-default btn-sm btn-headline"
+    (click)="onSubmit()"
+    *ngIf="(!isNew || editable) && (role === 'admin' || role === 'owner')"
     [disabled]="!validForm"
     [ngClass]="{ 'ready-save-btn': dirtyForm && validForm }"
   ></button>
@@ -32,7 +46,7 @@
     i18n-label="@@btn-edit"
     class="btn btn-default btn-sm btn-headline"
     label="Bearbeiten"
-    *ngIf="!editable"
+    *ngIf="!editable && (role === 'admin' || role === 'owner')"
     (click)="onEdit()"
   ></button>
   <button
@@ -44,6 +58,6 @@
     (click)="onDelete()"
     class="btn btn-default btn-sm btn-headline"
     i18n-label="@@btn-delete"
-    *ngIf="!isNew"
+    *ngIf="!isNew && role === 'admin'"
   ></button>
 </div>

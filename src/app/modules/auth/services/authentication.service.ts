@@ -6,7 +6,7 @@ import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { switchMap, map, tap, catchError } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
-import { User } from '@models/index';
+import { User, Role } from '@models/index';
 import { EnvService } from '@app/services/env.service';
 import { PermissionManagerService } from './permissionManager.service';
 import { Roles } from '../models/roles.enum';
@@ -22,6 +22,7 @@ export class AuthenticationService {
   permissions: Array<string>;
   jwtHelper = new JwtHelperService();
   user: User;
+  role: Role;
   private userIsLoggedIn = new Subject<string>();
   public userIsLoggedIn$ = this.userIsLoggedIn.asObservable();
 
@@ -52,10 +53,12 @@ export class AuthenticationService {
 
           if (!!this.user) {
             this.requestToken(username, password).subscribe(res => {
-              const role = this.user['role'];
+              this.role = this.user['role'];
+              console.log('Set Role');
+              console.log(this.role);
 
-              if (role) {
-                this.userS.authAs(role as Roles);
+              if (this.role) {
+                this.userS.authAs(this.role as Roles);
               } else {
                 this.userS.authAs('external' as Roles);
               }
@@ -69,6 +72,10 @@ export class AuthenticationService {
         }
       )
     );
+  }
+
+  public getUserRole() {
+    return localStorage.getItem('role');
   }
 
   private requestToken(

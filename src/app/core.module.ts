@@ -1,3 +1,5 @@
+import { PermissionManagerService } from './modules/auth/services/permissionManager.service';
+import { AuthenticationService } from './modules/auth/services/authentication.service';
 import { NgModule } from '@angular/core';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { APIResolver } from './shared/resolver/api.resolver';

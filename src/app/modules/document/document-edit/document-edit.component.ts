@@ -1,3 +1,4 @@
+import { AuthenticationService } from './../../auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
@@ -30,7 +31,7 @@ import { FileUpload } from 'primeng/fileupload';
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
   @ViewChild('fileUploadInput', { static: true }) fileUploadInput: FileUpload;
-
+  role: User;
   alive = true;
   isLoading = false;
   editable = false;
@@ -97,7 +98,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private serverService: ServerService,
     private notificationsService: NotificationsService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private authService: AuthenticationService
   ) {}
 
   ngOnInit() {
@@ -107,6 +109,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private setStartValues() {
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
+      this.role = this.authService.getUserRole();
+      console.log('this.role');
+      console.log(this.role);
+
       // fetch data for select-boxes
       this.getPublishers();
       this.getUsers();
