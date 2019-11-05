@@ -35,11 +35,12 @@ export class ApiService {
     console.log(router);
     const userPermittedRoutes = [];
     router.resetConfig(userPermittedRoutes);
-    from(router.navigateByUrl('/')).subscribe(
+    router.navigateByUrl('/');
+    /* from(router.navigateByUrl('/')).subscribe(
       res => {
         setTimeout(() => {
           window.location.reload();
-        }, 1000);
+        }, 500);
       },
       err => {
         this.messageService.add({
@@ -48,6 +49,6 @@ export class ApiService {
           detail: 'Fehler-Nr: ' + this.componentID + '_6!'
         });
       }
-    );
+    ); */
   }
 }
