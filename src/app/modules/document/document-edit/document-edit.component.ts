@@ -210,13 +210,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.showConfirmation('error', error.message);
           },
           () => {
-            this.setNotification();
             this.writeUpdate();
           }
         );
     } else {
       this.writeUpdate();
-      this.setNotification();
     }
   }
 
@@ -244,29 +242,58 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       );
   }
 
-  private setNotification() {
-    console.log('setNotification');
-    console.log(this.selectedUsers);
-
+  private setNotification(revision: string) {
     this.selectedUsers.forEach(user => {
-      console.log(user['id']);
-
       this.couchDBService
         .fetchEntry('/' + user['id'])
         .pipe(takeWhile(() => this.alive))
         .subscribe(entry => {
+          let associatedNorms = [];
+
+          if (entry['associatedNorms']) {
+            associatedNorms = entry['associatedNorms'];
+          }
+
+          const now = new Date();
+          const isoString = now.toISOString();
+
+          const newAssociatedNorm = {
+            normId: this.id,
+            revisionId: revision,
+            date: isoString,
+            confirmed: false,
+            confirmedDate: ''
+          };
+
+          associatedNorms.push(newAssociatedNorm);
+
           const updateUser = {
             _id: entry['_id'],
             _rev: entry['_rev'],
             type: 'user',
+            userName: entry['userName'],
+            externalID: entry['externalID'],
             firstName: entry['firstName'],
             lastName: entry['lastName'],
             email: entry['email'],
             role: entry['role'],
-            active: entry['active']
+            password: entry['password'],
+            active: entry['active'],
+            associatedNorms
           };
 
-          console.log(updateUser);
+          this.couchDBService
+            .writeEntry(updateUser)
+            .pipe(takeWhile(() => this.alive))
+            .subscribe(
+              result => {
+                this.sendStateUpdate();
+                console.log(result);
+              },
+              error => {
+                console.log(error);
+              }
+            );
         });
     });
   }
@@ -547,6 +574,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.updateDocument();
     }
   }
+
   public deleteDocument(): void {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
@@ -717,6 +745,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.writeItem['_attachments'] = this.attachments || [];
     this.writeItem['revisions'] = this.revisionDocuments || [];
+
+    this.setNotification(this.normForm.value.revision);
     return this.writeItem;
   }
 

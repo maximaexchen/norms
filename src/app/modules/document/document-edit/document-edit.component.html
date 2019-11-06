@@ -19,7 +19,7 @@
       [dirtyForm]="normForm.dirty"
       [routeNew]="'/document/new'"
       [editable]="editable"
-      [role]="role"
+      [role]="currentUserRole"
       (save)="onSubmit()"
       (add)="onSubmit()"
       (edit)="onEdit()"

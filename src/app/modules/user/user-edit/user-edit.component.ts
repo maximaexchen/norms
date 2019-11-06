@@ -8,7 +8,6 @@ import { takeWhile } from 'rxjs/operators';
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
 import { User } from '@models/index';
-import { Role } from '@app/modules/auth/models/role.model';
 import { Roles } from '@app/modules/auth/models/roles.enum';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 
@@ -44,6 +43,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   lastName: string;
   email: string;
   password: string;
+  associatedNorms: [];
   active = 0;
 
   constructor(
@@ -88,7 +88,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
             this.email = entry['email'];
             this.password = entry['password'];
             this.role = entry['role'];
+            this.selectedRole = entry['role'];
             this.active = entry['active'];
+            this.associatedNorms = entry['associatedNorms'];
           });
       } else {
         console.log('New mode');
@@ -171,6 +173,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.writeItem['password'] = this.userForm.value.password || '';
     this.writeItem['role'] = this.userForm.value.selectedRole || '';
     this.writeItem['active'] = this.userForm.value.active || false;
+    this.writeItem['associatedNorms'] = this.associatedNorms || '';
 
     if (this.userForm.value._id) {
       this.writeItem['_id'] = this.userForm.value._id;
