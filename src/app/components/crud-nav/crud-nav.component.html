@@ -19,7 +19,7 @@
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onSubmit()"
-    *ngIf="(isNew || editable) && role === 'admin'"
+    *ngIf="isNew && role === 'admin'"
     [disabled]="!validForm"
     [ngClass]="{ 'ready-save-btn': dirtyForm && validForm }"
   ></button>
@@ -33,7 +33,7 @@
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onSubmit()"
-    *ngIf="(!isNew || editable) && (role === 'admin' || role === 'owner')"
+    *ngIf="!isNew && editable && (role === 'admin' || role === 'owner')"
     [disabled]="!validForm"
     [ngClass]="{ 'ready-save-btn': dirtyForm && validForm }"
   ></button>

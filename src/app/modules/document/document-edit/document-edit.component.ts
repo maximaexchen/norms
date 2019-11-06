@@ -108,10 +108,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setStartValues() {
+    console.log('setStartValues');
+
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
       this.role = this.authService.getUserRole();
-      console.log('this.role');
-      console.log(this.role);
 
       // fetch data for select-boxes
       this.getPublishers();
@@ -243,7 +243,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private resetComponent() {
+    console.log('resetComponent');
     this.editable = false;
+    this.users = [];
+    this.publishers = [];
+    this.owners = [];
+    this.relatedNorms = [];
     this.selectedRelatedNorms = [];
     this.selectedUsers = [];
     this.selectedTags1 = [];
@@ -258,6 +263,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private assignMultiselectConfig() {
+    console.log('assignMultiselectConfig');
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',
