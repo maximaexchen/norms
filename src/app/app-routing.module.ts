@@ -1,3 +1,4 @@
+import { StartComponent } from './components/start/start.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 import { AuthGuardService } from './modules/auth/guards/authGuard.service';
@@ -5,9 +6,11 @@ import { AuthGuardService } from './modules/auth/guards/authGuard.service';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'document',
-    pathMatch: 'full'
+    redirectTo: 'start',
+    pathMatch: 'full',
+    canActivate: [AuthGuardService]
   },
+  { path: 'start', component: StartComponent, canActivate: [AuthGuardService] },
   {
     path: 'document',
     loadChildren: './modules/document/document.module#DocumentModule',

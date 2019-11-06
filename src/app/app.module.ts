@@ -23,12 +23,15 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from '@modules/auth/auth.module';
 import { AuthInterceptor } from '@modules/auth/auth.interceptor';
+import { StartComponent } from './components/start/start.component';
+import { CheckboxModule } from 'primeng/checkbox';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
 @NgModule({
   declarations: [
     AppComponent,
+    StartComponent,
     HeaderComponent,
     FileInputValueAccessor,
     NotificationsComponent
@@ -42,6 +45,7 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
     MenubarModule,
     ButtonModule,
     DialogModule,
+    CheckboxModule,
     ToastModule,
     ConfirmDialogModule,
     AuthModule.forRoot()

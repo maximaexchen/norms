@@ -86,7 +86,7 @@ export class DocumentService {
     );
   }
 
-  public getDownload(id: string, documentName: string) {
+  public getDownload(id: string, documentName: string): Observable<any> {
     const url = '/' + id + '/' + documentName;
 
     return this.http.get(this.couchDBService.dbRequest + url, {

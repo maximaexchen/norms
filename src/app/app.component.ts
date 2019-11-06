@@ -36,10 +36,10 @@ export class AppComponent implements OnInit {
   }
 
   public login(event) {
-    this.router.navigate(['document']);
+    this.router.navigate(['start']);
     if (event.isValidUser) {
       this.authService.userIsLoggedIn$.subscribe(res => {
-        this.router.navigate(['/document']);
+        this.router.navigate(['/start']);
       });
     }
   }

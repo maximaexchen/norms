@@ -17,12 +17,12 @@ export const TOKEN_NAME = 'access_token';
 export class AuthenticationService {
   private userS: PermissionManagerService = new PermissionManagerService();
   private currentTokenSubject: BehaviorSubject<string>;
-  public currentToken: Observable<string>;
-  apiUrl = this.env.uploadUrl;
-  permissions: Array<string>;
-  jwtHelper = new JwtHelperService();
-  user: User;
-  role: Role;
+  private currentToken: Observable<string>;
+  private apiUrl = this.env.uploadUrl;
+  private permissions: Array<string>;
+  private jwtHelper = new JwtHelperService();
+  private user: User;
+  private role: Role;
   private userIsLoggedIn = new Subject<string>();
   public userIsLoggedIn$ = this.userIsLoggedIn.asObservable();
 
@@ -48,13 +48,12 @@ export class AuthenticationService {
     return loginUserObs.pipe(
       switchMap(
         (loginResult): Observable<boolean | any> => {
+          console.log(loginResult);
           this.user = loginResult['docs'][0];
 
           if (!!this.user) {
             this.requestToken(username, password).subscribe(res => {
               this.role = this.user['role'];
-              console.log('Set Role');
-              console.log(this.role);
 
               if (this.role) {
                 this.userS.authAs(this.role as Roles);
@@ -73,8 +72,12 @@ export class AuthenticationService {
     );
   }
 
-  public getUserRole() {
+  public getUserRole(): string {
     return localStorage.getItem('role');
+  }
+
+  public getCurrentUser(): User {
+    return this.user;
   }
 
   private requestToken(

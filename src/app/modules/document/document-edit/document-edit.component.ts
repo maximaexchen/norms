@@ -260,6 +260,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           const newAssociatedNorm = {
             normId: this.id,
             revisionId: revision,
+            normDocument: this.revisionDocuments[0]['name'],
+            normNumber: this.normNumber,
             date: isoString,
             confirmed: false,
             confirmedDate: ''
@@ -618,10 +620,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.descriptionFR = entry.description.fr;
     }
 
-    this.revisionDocuments = _.sortBy(
-      entry['revisions'],
-      'revisionID'
-    ).reverse();
+    this.revisionDocuments = _.sortBy(entry['revisions'], 'date').reverse();
 
     if (entry['users']) {
       this.setSelectedUsers(entry['users']);

@@ -1,0 +1,74 @@
+<div class="row">
+  <div class="col-md-6">
+    <div *ngIf="currentUser">
+      <h1>
+        Willkommen! {{ currentUser.firstName }} {{ currentUser.lastName }}
+      </h1>
+
+      <h2>Zu bestätigende Normen Updates</h2>
+      <form
+        class="form form-horizontal"
+        (ngSubmit)="onSubmit()"
+        #userForm="ngForm"
+      >
+        <input type="hidden" [(ngModel)]="userId" name="_id" />
+        <input type="hidden" [(ngModel)]="userRev" name="_rev" />
+        <table class="table table-striped">
+          <tr>
+            <th scope="col">
+              Nummer
+            </th>
+            <th scope="col">Revision</th>
+            <th scope="col">PDF</th>
+            <th scope="col">Revision date</th>
+            <th scope="col">Received</th>
+            <th scope="col">Confirm</th>
+          </tr>
+          <tr *ngFor="let associatedNorm of associatedNorms">
+            <td>
+              <a class="js-link" (click)="gotoNorm(associatedNorm.normId)">{{
+                associatedNorm.normNumber
+              }}</a>
+            </td>
+            <td>
+              <a class="js-link" (click)="gotoNorm(associatedNorm.normId)">{{
+                associatedNorm.revisionId
+              }}</a>
+            </td>
+            <td>
+              <a
+                class="js-link"
+                (click)="
+                  getDownload(
+                    associatedNorm.normId,
+                    associatedNorm.normDocument
+                  )
+                "
+                ><i class="fas fa-file-download"></i> Download PDF</a
+              >
+            </td>
+            <td>
+              {{ associatedNorm.date | date }}
+            </td>
+            <td>
+              {{ associatedNorm.date | date }}
+            </td>
+            <td>
+              <button class="btn btn-default" *ngIf="!associatedNorm.confirmed">
+                <i class="fas fa-clipboard-check"></i> confirm
+              </button>
+              <span *ngIf="associatedNorm.confirmed">{{
+                associatedNorm.confirmedDate | date
+              }}</span>
+            </td>
+          </tr>
+        </table>
+
+        <div class="form-check mb-2 mr-sm-2">
+          <br />
+        </div>
+      </form>
+      {{ currentUser | json }}
+    </div>
+  </div>
+</div>

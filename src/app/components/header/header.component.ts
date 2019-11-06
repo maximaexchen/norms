@@ -65,6 +65,12 @@ export class HeaderComponent implements OnInit {
         routerLink: 'role'
       });
     }
+
+    this.mainmenuItems.push({
+      icon: 'fas fa-id-card',
+      label: 'Profil',
+      routerLink: 'start'
+    });
   }
 
   public logout(event: Event) {
