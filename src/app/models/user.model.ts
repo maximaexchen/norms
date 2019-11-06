@@ -4,9 +4,11 @@ export interface UserProperties {
   _id?: string;
   _rev?: string;
   type?: string;
+  externalID?: number;
+  userName?: string;
   firstName?: string;
   lastName?: string;
-  username?: string;
+  password?: string;
   role?: Role;
   token?: string;
   active?: boolean;

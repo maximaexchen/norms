@@ -31,7 +31,7 @@ import { FileUpload } from 'primeng/fileupload';
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
   @ViewChild('fileUploadInput', { static: true }) fileUploadInput: FileUpload;
-  role: User;
+  currentUserRole: User;
   alive = true;
   isLoading = false;
   editable = false;
@@ -111,7 +111,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('setStartValues');
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      this.role = this.authService.getUserRole();
+      this.currentUserRole = this.authService.getUserRole();
 
       // fetch data for select-boxes
       this.getPublishers();
@@ -210,11 +210,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.showConfirmation('error', error.message);
           },
           () => {
+            this.setNotification();
             this.writeUpdate();
           }
         );
     } else {
       this.writeUpdate();
+      this.setNotification();
     }
   }
 
@@ -242,6 +244,33 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       );
   }
 
+  private setNotification() {
+    console.log('setNotification');
+    console.log(this.selectedUsers);
+
+    this.selectedUsers.forEach(user => {
+      console.log(user['id']);
+
+      this.couchDBService
+        .fetchEntry('/' + user['id'])
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(entry => {
+          const updateUser = {
+            _id: entry['_id'],
+            _rev: entry['_rev'],
+            type: 'user',
+            firstName: entry['firstName'],
+            lastName: entry['lastName'],
+            email: entry['email'],
+            role: entry['role'],
+            active: entry['active']
+          };
+
+          console.log(updateUser);
+        });
+    });
+  }
+
   private resetComponent() {
     console.log('resetComponent');
     this.editable = false;
@@ -263,7 +292,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private assignMultiselectConfig() {
-    console.log('assignMultiselectConfig');
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',

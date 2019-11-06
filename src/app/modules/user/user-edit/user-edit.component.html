@@ -12,6 +12,7 @@
       [dirtyForm]="userForm.dirty"
       [routeNew]="'/user/new'"
       [editable]="editable"
+      [role]="currentUserRole"
       (save)="onSubmit()"
       (add)="onSubmit()"
       (edit)="onEdit()"
@@ -32,6 +33,29 @@
       <div class="row">
         <div class="col-sm-8">
           <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-userName"
+              >Username</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="text"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Username"
+                [(ngModel)]="userName"
+                name="userName"
+                #userNameCheck="ngModel"
+                [readOnly]="!editable"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-userName-required"
+                *ngIf="!userNameCheck.valid && userNameCheck.touched"
+                >Bitte geben Sie einen Benutzernamen ein.</small
+              >
+            </div>
+          </div>
+          <div class="form-group row">
             <label class="col-sm-2 col-form-label" i18n="@@string-firstName"
               >Vorname</label
             >
@@ -42,6 +66,7 @@
                 i18n-placeholder
                 placeholder="Vorname"
                 required
+                firstName
                 [(ngModel)]="firstName"
                 name="firstName"
                 #firstNameCheck="ngModel"
@@ -103,6 +128,54 @@
                 i18n="@@string-email-required"
                 *ngIf="!emailCheck.valid && emailCheck.touched"
                 >Bitte geben Sie eine gültige E-Mail Adresse ein.</small
+              >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-password"
+              >Passwort</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="password"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Passwort"
+                [(ngModel)]="password"
+                name="password"
+                required
+                #passwordCheck="ngModel"
+                [readOnly]="!editable"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-password-required"
+                *ngIf="!passwordCheck.valid && passwordCheck.touched"
+                >Bitte geben Sie einen Passwort ein.</small
+              >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-externalID"
+              >Externe ID</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="externalID"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Passwort"
+                [(ngModel)]="externalID"
+                name="externalID"
+                required
+                #externalIDCheck="ngModel"
+                [readOnly]="!editable"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-externalID-required"
+                *ngIf="!externalIDCheck.valid && externalIDCheck.touched"
+                >Bitte geben Sie einen Externe ID ein.</small
               >
             </div>
           </div>

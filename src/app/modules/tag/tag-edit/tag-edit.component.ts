@@ -187,10 +187,15 @@ export class TagEditComponent implements OnInit, OnDestroy {
       bulkUpdateObject['docs'].push(norm);
     });
 
-    this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(res => {
-      console.log('bulkUpdate');
-      console.log(res);
-    });
+    this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(
+      res => {
+        console.log('bulkUpdate');
+        console.log(res);
+      },
+      error => {
+        console.log(error);
+      }
+    );
   }
 
   private onCreateTag(): void {

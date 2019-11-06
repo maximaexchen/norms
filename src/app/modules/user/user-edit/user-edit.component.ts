@@ -10,6 +10,7 @@ import { NotificationsService } from '@services/notifications.service';
 import { User } from '@models/index';
 import { Role } from '@app/modules/auth/models/role.model';
 import { Roles } from '@app/modules/auth/models/roles.enum';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -21,6 +22,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   alive = true;
   editable = false;
+
+  currentUserRole: User;
 
   formTitle: string;
   isNew = true; // 1 = new - 2 = update
@@ -35,9 +38,12 @@ export class UserEditComponent implements OnInit, OnDestroy {
   id: string;
   rev: string;
   type: string;
+  externalID: number;
+  userName: string;
   firstName: string;
   lastName: string;
   email: string;
+  password: string;
   active = 0;
 
   constructor(
@@ -45,11 +51,14 @@ export class UserEditComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private notificationsService: NotificationsService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private authService: AuthenticationService
   ) {}
 
   public ngOnInit() {
     console.log('UserEditComponent');
+    this.currentUserRole = this.authService.getUserRole();
+
     this.roleValues = Object.keys(this.roles).map(k => ({
       key: k,
       value: this.roles[k as any]
@@ -72,14 +81,18 @@ export class UserEditComponent implements OnInit, OnDestroy {
             this.id = entry['_id'];
             this.rev = entry['_rev'];
             this.type = 'user';
+            this.externalID = entry['externalID'];
+            this.userName = entry['userName'];
             this.firstName = entry['firstName'];
             this.lastName = entry['lastName'];
             this.email = entry['email'];
+            this.password = entry['password'];
             this.role = entry['role'];
             this.active = entry['active'];
           });
       } else {
         console.log('New mode');
+        this.editable = true;
         this.formTitle = 'Neuen User anlegen';
         this.users = [];
       }
@@ -150,9 +163,12 @@ export class UserEditComponent implements OnInit, OnDestroy {
   private createWriteItem() {
     this.writeItem = {};
     this.writeItem['type'] = 'user';
+    this.writeItem['externalID'] = this.userForm.value.externalID || '';
+    this.writeItem['userName'] = this.userForm.value.userName || '';
     this.writeItem['firstName'] = this.userForm.value.firstName || '';
     this.writeItem['lastName'] = this.userForm.value.lastName || '';
     this.writeItem['email'] = this.userForm.value.email || '';
+    this.writeItem['password'] = this.userForm.value.password || '';
     this.writeItem['role'] = this.userForm.value.selectedRole || '';
     this.writeItem['active'] = this.userForm.value.active || false;
 
