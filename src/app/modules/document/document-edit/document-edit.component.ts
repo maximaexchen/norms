@@ -614,6 +614,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.ownerId = entry['owner']._id;
     this.active = entry['active'];
 
+    console.log('Owner: ' + this.owner._id);
+
     if (entry.description) {
       this.descriptionDE = entry.description.de;
       this.descriptionEN = entry.description.en;
@@ -677,19 +679,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private processFormData() {
     this.writeItem = {};
     this.writeItem['type'] = 'norm';
-    this.writeItem['normNumber'] = this.normForm.value.normNumber || '';
-    this.writeItem['revision'] = this.normForm.value.revision || '';
-    this.writeItem['revisionDate'] = this.normForm.value.revisionDate || '';
-    this.writeItem['normLanguage'] = this.normForm.value.normLanguage || '';
+    this.writeItem['normNumber'] =
+      this.normForm.value.normNumber || this.normNumber;
+    this.writeItem['revision'] = this.normForm.value.revision || this.revision;
+    this.writeItem['revisionDate'] =
+      this.normForm.value.revisionDate || this.revisionDate;
+    this.writeItem['normLanguage'] =
+      this.normForm.value.normLanguage || this.normLanguage;
     this.writeItem['description'] = {};
     this.writeItem['description']['de'] =
-      this.normForm.value.descriptionDE || '';
+      this.normForm.value.descriptionDE || this.descriptionDE;
     this.writeItem['description']['en'] =
-      this.normForm.value.descriptionEN || '';
+      this.normForm.value.descriptionEN || this.descriptionEN;
     this.writeItem['description']['fr'] =
-      this.normForm.value.descriptionFR || '';
-    this.writeItem['scope'] = this.normForm.value.scope || '';
-    this.writeItem['active'] = this.normForm.value.active || false;
+      this.normForm.value.descriptionFR || this.descriptionFR;
+    this.writeItem['scope'] = this.normForm.value.scope || this.scope;
+    this.writeItem['active'] = this.normForm.value.active || this.active;
 
     if (this.normForm.value._id) {
       this.writeItem['_id'] = this.normForm.value._id;
@@ -709,7 +714,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         })
       )
     ];
-    this.writeItem['relatedNorms'] = selectedRelatedObjects || [];
+    this.writeItem['relatedNorms'] =
+      selectedRelatedObjects || this.selectedRelatedNorms;
 
     this.setSelectedUser();
 
@@ -718,12 +724,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     const selPublisher = this.publishers.find(
       pub => pub['_id'] === this.normForm.value.publisherId
     );
-    this.writeItem['publisher'] = selPublisher || '';
+    this.writeItem['publisher'] = selPublisher || this.publisher;
 
     const selOwner = this.owners.find(
       own => own['_id'] === this.normForm.value.ownerId
     );
-    this.writeItem['owner'] = selOwner || '';
+    this.writeItem['owner'] = selOwner || this.owner;
 
     // If there is a new PDF upload
     if (this.attachment) {
