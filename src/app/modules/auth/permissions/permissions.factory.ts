@@ -14,7 +14,7 @@ export class PermissionsFactory {
     if (!!this.instance) {
       return this.instance;
     } else {
-      const role = localStorage.getItem('role');
+      const role = sessionStorage.getItem('role');
 
       switch (role) {
         case Roles.ADMIN:

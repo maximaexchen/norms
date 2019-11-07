@@ -24,12 +24,19 @@ export class PermissionManagerService {
   }
 
   public authAs(role: Roles) {
-    localStorage.setItem('role', role === null ? Roles.EXTERNAL : role);
+    sessionStorage.setItem('role', role === null ? Roles.EXTERNAL : role);
     this.permissions = PermissionsFactory.getInstance();
     console.log(this.permissions);
   }
 
   public removeAuth() {
-    localStorage.removeItem('role');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('access_token');
+
+    sessionStorage.removeItem('userId', user._id);
+    sessionStorage.removeItem('userName', user.userName);
+    sessionStorage.removeItem('firstName', user.firstName);
+    sessionStorage.removeItem('lastName', user.lastName);
+    sessionStorage.removeItem('email', user.email);
   }
 }

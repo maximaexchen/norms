@@ -32,7 +32,7 @@ export class AuthenticationService {
     private couchDBService: CouchDBService
   ) {
     this.currentTokenSubject = new BehaviorSubject<string>(
-      localStorage.getItem('access_token')
+      sessionStorage.getItem('access_token')
     );
     this.currentToken = this.currentTokenSubject.asObservable();
   }
@@ -61,6 +61,7 @@ export class AuthenticationService {
                 this.userS.authAs('external' as Roles);
               }
 
+              this.persistUserData(this.user);
               this.userIsLoggedIn.next('userIsLoggedIn');
             });
 
@@ -72,12 +73,41 @@ export class AuthenticationService {
     );
   }
 
+  private persistUserData(user: User) {
+    console.log(user);
+    sessionStorage.setItem('userId', user._id);
+    sessionStorage.setItem('userName', user.userName);
+    sessionStorage.setItem('firstName', user.firstName);
+    sessionStorage.setItem('lastName', user.lastName);
+    sessionStorage.setItem('email', user.email);
+  }
+
   public getUserRole(): string {
-    return localStorage.getItem('role');
+    return sessionStorage.getItem('role');
   }
 
   public getCurrentUser(): User {
     return this.user;
+  }
+
+  public getCurrentUserName(): string {
+    return sessionStorage.getItem('userName');
+  }
+
+  public getCurrentUserID(): string {
+    return sessionStorage.getItem('userId');
+  }
+
+  public getCurrentUserFullName(): string {
+    return (
+      sessionStorage.getItem('firstName') +
+      ' ' +
+      sessionStorage.getItem('lastName')
+    );
+  }
+
+  public getCurrentUserEmail(): string {
+    return sessionStorage.getItem('email');
   }
 
   private requestToken(
@@ -105,15 +135,15 @@ export class AuthenticationService {
   }
 
   private getToken(): string {
-    return localStorage.getItem(TOKEN_NAME);
+    return sessionStorage.getItem(TOKEN_NAME);
   }
 
   private setToken(token: string): void {
-    localStorage.setItem(TOKEN_NAME, token);
+    sessionStorage.setItem(TOKEN_NAME, token);
   }
 
   private removeToken() {
-    localStorage.removeItem(TOKEN_NAME);
+    sessionStorage.removeItem(TOKEN_NAME);
   }
 
   public getTokenExpirationDate(token: string): Date {
@@ -129,7 +159,7 @@ export class AuthenticationService {
   }
 
   public isAuthenticated(): boolean {
-    const token = localStorage.getItem(TOKEN_NAME);
+    const token = sessionStorage.getItem(TOKEN_NAME);
     return !this.jwtHelper.isTokenExpired(token);
   }
 

@@ -42,7 +42,7 @@ export class HeaderComponent implements OnInit {
       label: 'Herausgeber',
       routerLink: 'publisher'
     }); */
-    if (localStorage.getItem('role') === 'admin') {
+    if (sessionStorage.getItem('role') === 'admin') {
       this.mainmenuItems.push({
         icon: 'fas fa-tags',
         label: 'Tags',

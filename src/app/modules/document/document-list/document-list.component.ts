@@ -1,3 +1,4 @@
+import { localeDe } from '@angular/common/locales/de';
 import {
   Component,
   OnInit,
@@ -15,6 +16,7 @@ import { EnvService } from 'src/app//services/env.service';
 import { Router } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
 import { SearchService } from '@app/services/search.service';
+import { AuthenticationService } from './../../auth/services/authentication.service';
 import _ = require('underscore');
 
 @Component({
@@ -47,11 +49,12 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
     private searchService: SearchService,
-    private router: Router
+    private router: Router,
+    private authService: AuthenticationService
   ) {
     this.searchService.searchResultData.subscribe(result => {
       this.documents = result;
-      this.setOwnerFromTags();
+      this.setPublisherFromTags();
       console.log('this.documents');
       console.log(this.documents);
     });
@@ -79,8 +82,28 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         result => {
           this.documents = result;
           this.documentCount = this.documents.length;
+          this.setPublisherFromTags();
+          let userId = this.authService.getCurrentUserID();
 
-          this.setOwnerFromTags();
+          switch (this.authService.getUserRole()) {
+            case 'owner':
+              this.documents = this.documents
+                .filter(function(obj) {
+                  return obj.owner._id === userId;
+                })
+                .map(function(obj) {
+                  return obj;
+                });
+              break;
+            case 'user':
+              this.documents = _.filter(this.documents, obj => {
+                return _.some(obj.users, {
+                  id: userId
+                });
+              });
+              break;
+          }
+          console.log(this.documents);
         },
         error => {
           console.log(error.message);
@@ -89,14 +112,16 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       );
   }
 
-  private setOwnerFromTags() {
-    this.documents.forEach(norm => {
-      norm['tags'].forEach(tag => {
-        if (tag.tagType === 'level1') {
-          norm['publisher'] = tag.name;
-        }
+  private setPublisherFromTags() {
+    if (this.documents.length > 1) {
+      this.documents.forEach(norm => {
+        norm['tags'].forEach(tag => {
+          if (tag.tagType === 'level1') {
+            norm['publisher'] = tag.name;
+          }
+        });
       });
-    });
+    }
   }
 
   public getDownload(id: string, attachments: any) {

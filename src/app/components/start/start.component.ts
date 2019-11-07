@@ -32,10 +32,9 @@ export class StartComponent implements OnInit {
     console.log(this.authService.getCurrentUser());
 
     if (this.currentUser) {
-      this.userId = this.currentUser['_id'];
+      this.userId = this.authService.getCurrentUserID();
       this.userRev = this.currentUser['_rev'];
-      this.userName =
-        this.currentUser['firstName'] + ' ' + this.currentUser['lastName'];
+      this.userName = this.authService.getCurrentUserFullName();
       this.associatedNorms = _.uniq(
         this.currentUser['associatedNorms'],
         'normId'
