@@ -85,15 +85,12 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.setPublisherFromTags();
           let userId = this.authService.getCurrentUserID();
 
+          // Filter the documents by given owner or user
           switch (this.authService.getUserRole()) {
             case 'owner':
-              this.documents = this.documents
-                .filter(function(obj) {
-                  return obj.owner._id === userId;
-                })
-                .map(function(obj) {
-                  return obj;
-                });
+              this.documents = this.documents.filter(function(obj) {
+                return obj.owner._id === userId;
+              });
               break;
             case 'user':
               this.documents = _.filter(this.documents, obj => {
@@ -103,7 +100,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
               });
               break;
           }
-          console.log(this.documents);
         },
         error => {
           console.log(error.message);
