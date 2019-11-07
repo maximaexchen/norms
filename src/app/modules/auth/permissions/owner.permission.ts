@@ -5,6 +5,7 @@ export class OwnerPermission extends PermissionBase {
   constructor() {
     super();
     this.permissions = [
+      PermissionType.INFORM,
       PermissionType.CREATE,
       PermissionType.READ,
       PermissionType.UPDATE,

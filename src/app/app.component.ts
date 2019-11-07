@@ -36,10 +36,13 @@ export class AppComponent implements OnInit {
   }
 
   public login(event) {
-    this.router.navigate(['start']);
     if (event.isValidUser) {
       this.authService.userIsLoggedIn$.subscribe(res => {
-        this.router.navigate(['/start']);
+        if (sessionStorage.getItem('role') === 'user') {
+          this.router.navigate(['/start']);
+        } else {
+          this.router.navigate(['/document']);
+        }
       });
     }
   }

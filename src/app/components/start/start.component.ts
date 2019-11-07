@@ -1,18 +1,23 @@
 import { DocumentService } from './../../services/document.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import * as _ from 'underscore';
 
+import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from './../../modules/auth/services/authentication.service';
 import { User } from '@app/models';
+import { takeWhile } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-start',
   templateUrl: './start.component.html',
   styleUrls: ['./start.component.scss']
 })
-export class StartComponent implements OnInit {
+export class StartComponent implements OnInit, OnDestroy {
+  alive = true;
   currentUser: User;
+  currentUserId: string;
   userName: string;
   userId: string;
   userRev: string;
@@ -20,30 +25,83 @@ export class StartComponent implements OnInit {
   confirmedDate: Date;
   associatedNorms: Array<any>;
   selectedAssocNorms: Array<any>;
+  currentUserEmitter$ = new BehaviorSubject<User>(this.associatedNorms);
 
   constructor(
     private documentService: DocumentService,
     private authService: AuthenticationService,
-    private router: Router
+    private couchDBService: CouchDBService,
+    private router: Router,
+    private changeDetection: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    this.currentUser = this.authService.getCurrentUser();
+    this.currentUserId = this.authService.getCurrentUserID();
     console.log(this.authService.getCurrentUser());
+    this.getUser(this.currentUserId);
+  }
 
-    if (this.currentUser) {
-      this.userId = this.authService.getCurrentUserID();
-      this.userRev = this.currentUser['_rev'];
-      this.userName = this.authService.getCurrentUserFullName();
-      this.associatedNorms = _.uniq(
-        this.currentUser['associatedNorms'],
-        'normId'
-      );
-    }
+  public getUser(id: string) {
+    this.couchDBService.fetchEntry('/' + id).subscribe(
+      user => {
+        this.currentUser = user;
+
+        this.userId = this.authService.getCurrentUserID();
+        this.userRev = this.currentUser['_rev'];
+        this.userName = this.authService.getCurrentUserFullName();
+        this.associatedNorms = _.uniq(
+          this.currentUser['associatedNorms'],
+          'normId'
+        );
+
+        // this.associatedNorms = [...this.associatedNorms];
+
+        // this.currentUserEmitter$.next(this.currentUser);
+
+        this.changeDetection.detectChanges();
+      },
+      error => {
+        console.log(error);
+      },
+      () => {}
+    );
   }
 
   public gotoNorm(id: string) {
     this.router.navigate(['../document/' + id + '/edit']);
+  }
+
+  public confirm(id: string) {
+    this.getUser(this.currentUserId);
+
+    const now = new Date();
+    const isoString = now.toISOString();
+    console.log(this.currentUser);
+
+    _.filter(this.currentUser.associatedNorms, obj => {
+      if (obj.normId === id) {
+        console.log(obj);
+        obj.confirmed = true;
+        obj.confirmedDate = isoString;
+      }
+      return obj;
+    });
+
+    /*  _.findWhere(this.currentUser['associatedNorms'], { normId: id })[
+      'confirmed'
+    ] = true;
+    _.findWhere(this.currentUser['associatedNorms'], { normId: id })[
+      'confirmedDate'
+    ] = isoString; */
+
+    console.log(this.currentUser);
+
+    this.couchDBService
+      .writeEntry(this.currentUser)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(result => {
+        console.log(result);
+      });
   }
 
   public getDownload(id: string, name: string) {
@@ -90,5 +148,9 @@ export class StartComponent implements OnInit {
         console.log('Completed file download.');
       }
     );
+  }
+
+  public ngOnDestroy(): void {
+    this.alive = false;
   }
 }
