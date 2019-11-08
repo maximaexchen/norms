@@ -5,6 +5,8 @@
         Willkommen! {{ currentUser.firstName }} {{ currentUser.lastName }}
       </h1>
 
+      <hr />
+
       <h2>Zu bestätigende Normen Updates</h2>
 
       <table class="table table-striped">
@@ -41,7 +43,6 @@
             {{ associatedNorm.date | date: 'dd.MM.yyyy' }}
           </td>
           <td>
-            {{ associatedNorm.confirmed | json }}
             <button
               (click)="confirm(associatedNorm.normId)"
               class="btn btn-default"
@@ -59,8 +60,6 @@
       <div class="form-check mb-2 mr-sm-2">
         <br />
       </div>
-
-      {{ currentUser | json }}
     </div>
   </div>
 </div>
