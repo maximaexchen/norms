@@ -13,6 +13,7 @@
       [dirtyForm]="tagForm.dirty"
       [routeNew]="'/tag/new'"
       [editable]="editable"
+      [role]="authService.getUserRole()"
       (save)="onSubmit()"
       (add)="onSubmit()"
       (edit)="onEdit()"

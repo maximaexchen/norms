@@ -12,11 +12,14 @@ export class HeaderComponent implements OnInit {
   isCollapsed = false;
   public title = 'Normenverwaltung';
   public mainmenuItems: MenuItem[] = [];
+  public userName: string;
 
   constructor(public authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     // this.initMainMenu();
+
+    this.userName = this.authenticationService.getCurrentUserFullName();
 
     this.authenticationService.userIsLoggedIn$.subscribe(res => {
       this.initMainMenu();

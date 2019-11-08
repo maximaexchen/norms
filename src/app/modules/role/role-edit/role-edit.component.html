@@ -12,6 +12,7 @@
       [dirtyForm]="roleForm.dirty"
       [routeNew]="'/role/new'"
       [editable]="editable"
+      [role]="authService.getUserRole()"
       (save)="onSubmit()"
       (add)="onSubmit()"
       (edit)="onEdit()"

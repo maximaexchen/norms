@@ -1,3 +1,4 @@
+import { AuthenticationService } from '@app/services/authentication.service';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -38,7 +39,8 @@ export class RoleEditComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private notificationsService: NotificationsService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    public authService: AuthenticationService
   ) {}
 
   ngOnInit() {

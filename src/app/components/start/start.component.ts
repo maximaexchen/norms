@@ -21,6 +21,7 @@ export class StartComponent implements OnInit, OnDestroy {
   userName: string;
   userId: string;
   userRev: string;
+  userRole: string;
   date: Date;
   confirmedDate: Date;
   associatedNorms: Array<any>;
@@ -36,10 +37,12 @@ export class StartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentUserId = this.authService.getCurrentUserID();
-    this.getUser(this.currentUserId);
+    this.getUserData(this.currentUserId);
   }
 
-  public getUser(id: string) {
+  public getOwnerData() {}
+
+  public getUserData(id: string) {
     this.couchDBService.fetchEntry('/' + id).subscribe(
       user => {
         this.currentUser = user;
@@ -47,6 +50,7 @@ export class StartComponent implements OnInit, OnDestroy {
         this.userId = this.authService.getCurrentUserID();
         this.userRev = this.currentUser['_rev'];
         this.userName = this.authService.getCurrentUserFullName();
+        this.userRole = this.authService.getUserRole();
         this.associatedNorms = _.uniq(
           this.currentUser['associatedNorms'],
           'normId'
@@ -68,7 +72,7 @@ export class StartComponent implements OnInit, OnDestroy {
   }
 
   public confirm(id: string) {
-    this.getUser(this.currentUserId);
+    this.getUserData(this.currentUserId);
 
     const now = new Date();
     const isoString = now.toISOString();
@@ -88,7 +92,7 @@ export class StartComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          this.getUser(this.currentUserId);
+          this.getUserData(this.currentUserId);
         },
         error => {
           console.log(error);

@@ -1,12 +1,15 @@
 <div class="row">
   <div class="col-md-6">
-    <div *ngIf="currentUser">
-      <h1>
-        Willkommen! {{ currentUser['firstName'] }} {{ currentUser['lastName'] }}
-      </h1>
+    <h1>
+      Willkommen! {{ currentUser['firstName'] }}
+      {{ currentUser['lastName'] }}
+    </h1>
 
-      <hr />
+    <div *ngIf="userRole === 'owner'; else UserContent">
+      Owner Content
+    </div>
 
+    <ng-template #UserContent>
       <h2>Zu bestätigende Normen Updates</h2>
 
       <table class="table table-striped">
@@ -21,14 +24,15 @@
         </tr>
         <tr *ngFor="let associatedNorm of associatedNorms">
           <td>
-            <a class="js-link" (click)="gotoNorm(associatedNorm.normId)">{{
-              associatedNorm.normNumber
-            }}</a>
+            <a class="js-link" (click)="gotoNorm(associatedNorm.normId)"
+              ><i class="fas fa-link"></i> {{ associatedNorm.normNumber }}
+            </a>
           </td>
           <td>
-            <a class="js-link" (click)="gotoNorm(associatedNorm.normId)">{{
-              associatedNorm.revisionId
-            }}</a>
+            <a class="js-link" (click)="gotoNorm(associatedNorm.normId)"
+              ><i class="fas fa-exchange-alt"></i>
+              {{ associatedNorm.revisionId }}</a
+            >
           </td>
           <td>
             <a
@@ -40,6 +44,7 @@
             >
           </td>
           <td>
+            <i class="far fa-calendar"></i>
             {{ associatedNorm.date | date: 'dd.MM.yyyy' }}
           </td>
           <td>
@@ -48,11 +53,12 @@
               class="btn btn-default"
               *ngIf="!associatedNorm.confirmed"
             >
-              <i class="fas fa-clipboard-check"></i> confirm
+              <i class="fas fa-clipboard-check"></i> Bestätigen
             </button>
-            <span *ngIf="associatedNorm.confirmed">{{
-              associatedNorm.confirmedDate | date: 'dd.MM.yyyy'
-            }}</span>
+            <span *ngIf="associatedNorm.confirmed"
+              ><i class="far fa-calendar-check"></i>
+              {{ associatedNorm.confirmedDate | date: 'dd.MM.yyyy' }}</span
+            >
           </td>
         </tr>
       </table>
@@ -60,6 +66,6 @@
       <div class="form-check mb-2 mr-sm-2">
         <br />
       </div>
-    </div>
+    </ng-template>
   </div>
 </div>

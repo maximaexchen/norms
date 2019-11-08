@@ -10,6 +10,7 @@ import { Tag } from '@app/models/tag.model';
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
 import _ = require('underscore');
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 
 @Component({
   selector: 'app-tag-edit',
@@ -40,7 +41,8 @@ export class TagEditComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private notificationsService: NotificationsService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    public authService: AuthenticationService
   ) {}
 
   public ngOnInit() {
