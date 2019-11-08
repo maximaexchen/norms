@@ -1,4 +1,3 @@
-import { AuthenticationService } from '@app/services/authentication.service';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -8,6 +7,7 @@ import { takeWhile } from 'rxjs/operators';
 
 import { CouchDBService } from '@app/services/couchDB.service';
 import { NotificationsService } from '@app/services/notifications.service';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Role } from '@models/index';
 
 @Component({
