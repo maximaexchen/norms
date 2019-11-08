@@ -14,4 +14,6 @@
 
   window.__env.uploadDir = './assets/uploads/';
   window.__env.uploadRoot = './';
+
+  window.__env.apiUrl = 'http://192.9.155.184:4000';
 })(this);
