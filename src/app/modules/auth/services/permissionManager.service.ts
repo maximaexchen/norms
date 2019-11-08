@@ -33,10 +33,10 @@ export class PermissionManagerService {
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('access_token');
 
-    sessionStorage.removeItem('userId', user._id);
-    sessionStorage.removeItem('userName', user.userName);
-    sessionStorage.removeItem('firstName', user.firstName);
-    sessionStorage.removeItem('lastName', user.lastName);
-    sessionStorage.removeItem('email', user.email);
+    sessionStorage.removeItem('userId');
+    sessionStorage.removeItem('userName');
+    sessionStorage.removeItem('firstName');
+    sessionStorage.removeItem('lastName');
+    sessionStorage.removeItem('email');
   }
 }

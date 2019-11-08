@@ -1,13 +1,13 @@
-import { Router } from '@angular/router';
-import { CouchDBService } from './../../../services/couchDB.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { switchMap, map, tap, catchError } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { Md5 } from 'ts-md5/dist/md5';
 
 import { User, Role } from '@models/index';
 import { EnvService } from '@app/services/env.service';
+import { CouchDBService } from './../../../services/couchDB.service';
 import { PermissionManagerService } from './permissionManager.service';
 import { Roles } from '../models/roles.enum';
 
@@ -38,9 +38,10 @@ export class AuthenticationService {
   }
 
   public login(username: string, password: string): Observable<any> {
+    const passw = Md5.hashStr(password);
     const params = {
       username,
-      password
+      passw
     };
 
     const loginUserObs = this.couchDBService.getLoginUser(params);
@@ -75,11 +76,11 @@ export class AuthenticationService {
 
   private persistUserData(user: User) {
     console.log(user);
-    sessionStorage.setItem('userId', user._id);
-    sessionStorage.setItem('userName', user.userName);
-    sessionStorage.setItem('firstName', user.firstName);
-    sessionStorage.setItem('lastName', user.lastName);
-    sessionStorage.setItem('email', user.email);
+    sessionStorage.setItem('userId', user['_id']);
+    sessionStorage.setItem('userName', user['userName']);
+    sessionStorage.setItem('firstName', user['firstName']);
+    sessionStorage.setItem('lastName', user['lastName']);
+    sessionStorage.setItem('email', user['email']);
   }
 
   public getUserRole(): string {

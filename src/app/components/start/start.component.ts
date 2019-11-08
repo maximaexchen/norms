@@ -73,23 +73,15 @@ export class StartComponent implements OnInit, OnDestroy {
     const now = new Date();
     const isoString = now.toISOString();
 
-    _.filter(this.currentUser.associatedNorms, obj => {
-      if (obj.normId === id) {
-        console.log(obj);
-        obj.confirmed = true;
-        obj.confirmedDate = isoString;
+    console.log(this.currentUser['associatedNorms']);
+
+    this.currentUser['associatedNorms'].map(asocN => {
+      if (asocN['normId'] === id) {
+        asocN['confirmed'] = true;
+        asocN['confirmedDate'] = isoString;
       }
-      return obj;
+      return asocN;
     });
-
-    /*  _.findWhere(this.currentUser['associatedNorms'], { normId: id })[
-      'confirmed'
-    ] = true;
-    _.findWhere(this.currentUser['associatedNorms'], { normId: id })[
-      'confirmedDate'
-    ] = isoString; */
-
-    console.log(this.currentUser);
 
     this.couchDBService
       .writeEntry(this.currentUser)

@@ -614,7 +614,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.ownerId = entry['owner']._id;
     this.active = entry['active'];
 
-    console.log('Owner: ' + this.owner._id);
+    console.log('Owner: ' + this.owner['_id']);
 
     if (entry.description) {
       this.descriptionDE = entry.description.de;

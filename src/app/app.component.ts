@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
   public user: any;
 
   constructor(
-    private authService: AuthenticationService,
+    public authService: AuthenticationService,
     private api: ApiService,
     private router: Router,
     private messaging: MessagingService
@@ -47,7 +47,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public logout() {
+  public logout(event: Event) {
     console.log('AppComponent: logout');
     this.api.reloadApp();
     this.authService.logout();

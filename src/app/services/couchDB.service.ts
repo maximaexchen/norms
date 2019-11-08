@@ -106,10 +106,7 @@ export class CouchDBService {
     return this.updateSubject.asObservable();
   }
 
-  public getLoginUser(params: {
-    username: string;
-    password: string;
-  }): Observable<any> {
+  public getLoginUser(params: { username: any; passw: any }): Observable<any> {
     const updateQuery = {
       use_index: ['_design/check_user'],
       selector: {
@@ -122,7 +119,7 @@ export class CouchDBService {
           },
           {
             password: {
-              $eq: params.password
+              $eq: params.passw
             }
           }
         ]

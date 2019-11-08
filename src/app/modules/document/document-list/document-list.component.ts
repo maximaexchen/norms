@@ -1,4 +1,3 @@
-import { localeDe } from '@angular/common/locales/de';
 import {
   Component,
   OnInit,
@@ -83,21 +82,20 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.documents = result;
           this.documentCount = this.documents.length;
           this.setPublisherFromTags();
-          let userId = this.authService.getCurrentUserID();
+          const userId = this.authService.getCurrentUserID();
 
           // Filter the documents by given owner or user
           switch (this.authService.getUserRole()) {
             case 'owner':
-              this.documents = this.documents.filter(function(obj) {
-                return obj.owner._id === userId;
+              this.documents = this.documents.filter(obj => {
+                return obj['owner']._id === userId;
               });
               break;
             case 'user':
               this.documents = _.filter(this.documents, obj => {
-                return _.some(obj.users, {
-                  id: userId
-                });
+                return _.find(obj['users'], { id: userId });
               });
+
               break;
           }
         },
