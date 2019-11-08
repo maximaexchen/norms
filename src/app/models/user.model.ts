@@ -9,6 +9,7 @@ export interface UserProperties {
   firstName?: string;
   lastName?: string;
   password?: string;
+  associatedNorms?: Array<any>;
   role?: Role;
   token?: string;
   active?: boolean;

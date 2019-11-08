@@ -7,7 +7,7 @@ import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from './../../modules/auth/services/authentication.service';
 import { User } from '@app/models';
 import { takeWhile } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-start',
@@ -25,14 +25,13 @@ export class StartComponent implements OnInit, OnDestroy {
   confirmedDate: Date;
   associatedNorms: Array<any>;
   selectedAssocNorms: Array<any>;
-  currentUserEmitter$ = new BehaviorSubject<User>(this.associatedNorms);
+  currentUser$: Subject<any> = new BehaviorSubject<User>(this.currentUser);
 
   constructor(
     private documentService: DocumentService,
     private authService: AuthenticationService,
     private couchDBService: CouchDBService,
-    private router: Router,
-    private changeDetection: ChangeDetectorRef
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -54,11 +53,7 @@ export class StartComponent implements OnInit, OnDestroy {
           'normId'
         );
 
-        // this.associatedNorms = [...this.associatedNorms];
-
-        // this.currentUserEmitter$.next(this.currentUser);
-
-        this.changeDetection.detectChanges();
+        this.currentUser$.next(this.currentUser);
       },
       error => {
         console.log(error);
