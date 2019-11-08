@@ -25,7 +25,7 @@ export class StartComponent implements OnInit, OnDestroy {
   confirmedDate: Date;
   associatedNorms: Array<any>;
   selectedAssocNorms: Array<any>;
-  currentUser$: Subject<any> = new BehaviorSubject<User>(this.currentUser);
+  // currentUser$: Subject<any> = new BehaviorSubject<User>(this.currentUser);
 
   constructor(
     private documentService: DocumentService,
@@ -36,7 +36,6 @@ export class StartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.currentUserId = this.authService.getCurrentUserID();
-    console.log(this.authService.getCurrentUser());
     this.getUser(this.currentUserId);
   }
 
@@ -52,8 +51,10 @@ export class StartComponent implements OnInit, OnDestroy {
           this.currentUser['associatedNorms'],
           'normId'
         );
+        console.log(this.currentUser['associatedNorms']);
+        console.log(this.associatedNorms);
 
-        this.currentUser$.next(this.currentUser);
+        // this.currentUser$.next(this.currentUser);
       },
       error => {
         console.log(error);
@@ -71,7 +72,6 @@ export class StartComponent implements OnInit, OnDestroy {
 
     const now = new Date();
     const isoString = now.toISOString();
-    console.log(this.currentUser);
 
     _.filter(this.currentUser.associatedNorms, obj => {
       if (obj.normId === id) {
@@ -94,9 +94,14 @@ export class StartComponent implements OnInit, OnDestroy {
     this.couchDBService
       .writeEntry(this.currentUser)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        console.log(result);
-      });
+      .subscribe(
+        result => {
+          this.getUser(this.currentUserId);
+        },
+        error => {
+          console.log(error);
+        }
+      );
   }
 
   public getDownload(id: string, name: string) {

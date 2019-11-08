@@ -17,9 +17,7 @@
           <th scope="col">Received</th>
           <th scope="col">Confirm</th>
         </tr>
-        <tr
-          *ngFor="let associatedNorm of (currentUser$ | async).associatedNorms"
-        >
+        <tr *ngFor="let associatedNorm of associatedNorms">
           <td>
             <a class="js-link" (click)="gotoNorm(associatedNorm.normId)">{{
               associatedNorm.normNumber
