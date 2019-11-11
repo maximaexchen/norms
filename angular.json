@@ -30,7 +30,9 @@
               "src/env.acpu.js",
               "src/server.js",
               "src/server-service.js",
-              "src/server-service.bat"
+              "src/server-service.bat",
+              "src/private.key",
+              "src/public.key"
             ],
             "styles": ["src/styles.scss"],
             "scripts": []
