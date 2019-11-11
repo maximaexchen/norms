@@ -19,7 +19,11 @@ export class HeaderComponent implements OnInit {
   ngOnInit() {
     // this.initMainMenu();
 
-    this.userName = this.authenticationService.getCurrentUserFullName();
+    this.authenticationService.userName$.subscribe(res => {
+      console.log(this.authenticationService);
+      console.log(res);
+      this.userName = res;
+    });
 
     this.authenticationService.userIsLoggedIn$.subscribe(res => {
       this.initMainMenu();

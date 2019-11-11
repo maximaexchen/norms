@@ -17,7 +17,7 @@ export const TOKEN_NAME = 'access_token';
 export class AuthenticationService {
   private userS: PermissionManagerService = new PermissionManagerService();
   private currentTokenSubject: BehaviorSubject<string>;
-  private currentToken: Observable<string>;
+  public currentToken: Observable<string>;
   private apiUrl = this.env.uploadUrl;
   private permissions: Array<string>;
   private jwtHelper = new JwtHelperService();
@@ -25,6 +25,9 @@ export class AuthenticationService {
   private role: Role;
   private userIsLoggedIn = new Subject<string>();
   public userIsLoggedIn$ = this.userIsLoggedIn.asObservable();
+
+  private userNameSubject = new Subject<string>();
+  public userName$ = this.userNameSubject.asObservable();
 
   constructor(
     private env: EnvService,
@@ -64,6 +67,7 @@ export class AuthenticationService {
 
               this.persistUserData(this.user);
               this.userIsLoggedIn.next('userIsLoggedIn');
+              this.userNameSubject.next(this.getCurrentUserFullName());
             });
 
             return of(true);

@@ -25,6 +25,8 @@ export class StartComponent implements OnInit, OnDestroy {
   confirmedDate: Date;
   associatedNorms: Array<any>;
   selectedAssocNorms: Array<any>;
+  firstName: string;
+  lastName: string;
 
   constructor(
     private documentService: DocumentService,
@@ -49,6 +51,9 @@ export class StartComponent implements OnInit, OnDestroy {
       user => {
         this.currentUser = user;
 
+        this.firstName = this.currentUser['firstName'];
+        this.lastName = this.currentUser['lastName'];
+
         this.userId = this.authService.getCurrentUserID();
         this.userRev = this.currentUser['_rev'];
         this.userName = this.authService.getCurrentUserFullName();
@@ -57,10 +62,6 @@ export class StartComponent implements OnInit, OnDestroy {
           this.currentUser['associatedNorms'],
           'normId'
         );
-        console.log(this.currentUser['associatedNorms']);
-        console.log(this.associatedNorms);
-
-        // this.currentUser$.next(this.currentUser);
       },
       error => {
         console.log(error);
@@ -78,8 +79,6 @@ export class StartComponent implements OnInit, OnDestroy {
 
     const now = new Date();
     const isoString = now.toISOString();
-
-    console.log(this.currentUser['associatedNorms']);
 
     this.currentUser['associatedNorms'].map(asocN => {
       if (asocN['normId'] === id) {
