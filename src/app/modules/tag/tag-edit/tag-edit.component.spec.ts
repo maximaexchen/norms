@@ -54,16 +54,4 @@ describe('TagEditComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  it('Entering email and password emits loggedIn event', () => {
-    let tag: Tag;
-    name.nativeElement.value = 'Tag Name';
-
-    passwordEl.nativeElement.value = '123456';
-    component.loggedIn.subscribe(value => (tag = value));
-    submitEl.triggerEventHandler('click', null);
-
-    expect(tag.name).toBe('test@example.com');
-    expect(tag.tagType).toBe('Level 1');
-  });
 });

@@ -7,7 +7,6 @@ import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from './../../modules/auth/services/authentication.service';
 import { User } from '@app/models';
 import { takeWhile } from 'rxjs/operators';
-import { BehaviorSubject, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-start',
@@ -26,7 +25,6 @@ export class StartComponent implements OnInit, OnDestroy {
   confirmedDate: Date;
   associatedNorms: Array<any>;
   selectedAssocNorms: Array<any>;
-  // currentUser$: Subject<any> = new BehaviorSubject<User>(this.currentUser);
 
   constructor(
     private documentService: DocumentService,
@@ -36,6 +34,10 @@ export class StartComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.initComponent();
+  }
+
+  private initComponent() {
     this.currentUserId = this.authService.getCurrentUserID();
     this.getUserData(this.currentUserId);
   }

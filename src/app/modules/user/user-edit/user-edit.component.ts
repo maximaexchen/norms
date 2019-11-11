@@ -1,3 +1,4 @@
+import { NormDocument } from './../../../models/document.model';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
@@ -10,6 +11,7 @@ import { NotificationsService } from '@services/notifications.service';
 import { User } from '@models/index';
 import { Roles } from '@app/modules/auth/models/roles.enum';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
+import _ = require('underscore');
 
 @Component({
   selector: 'app-user-edit',
@@ -122,12 +124,103 @@ export class UserEditComponent implements OnInit, OnDestroy {
           // Inform about Database change.
           this.getUser();
           this.sendStateUpdate();
+          this.searchRelatedUser(result);
         },
         err => {
           console.log(err);
           this.showConfirm('error', err.message);
         }
       );
+  }
+
+  private searchRelatedUser(result: any) {
+    // Query for NormDocuments having the changed user
+    console.log('searchRelatedUser');
+    console.log(this.role);
+
+    const updateQuery = {
+      use_index: ['_design/search_norm'],
+      selector: {
+        _id: { $gt: null },
+        type: { $eq: 'norm' }
+      }
+    };
+
+    if (this.role === 'owner') {
+      updateQuery['selector']['owner'] = {
+        _id: { $eq: result.id }
+      };
+    } else {
+      updateQuery['selector']['users'] = {
+        $elemMatch: {
+          id: { $eq: result.id }
+        }
+      };
+    }
+
+    // Update all NormDocuments with the changed user
+    this.couchDBService
+      .search(updateQuery)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        results => {
+          this.updateRelated(results);
+
+          // Inform about Database change.
+          this.sendStateUpdate();
+          this.router.navigate(['../user']);
+        },
+        error => {
+          console.log(error);
+        },
+        () => {}
+      );
+  }
+
+  private updateRelated(related: any) {
+    console.log('updateRelated in user');
+    const bulkUpdateObject = {};
+    bulkUpdateObject['docs'] = [];
+    related.docs.forEach(norm => {
+      if (this.role === 'owner') {
+        this.updateRelatedOwner(norm);
+      } else {
+        this.updateRelatedUser(norm);
+      }
+      bulkUpdateObject['docs'].push(norm);
+    });
+
+    console.log(bulkUpdateObject);
+
+    this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(
+      res => {
+        console.log('bulkUpdate');
+        console.log(res);
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+
+  private updateRelatedUser(norm: NormDocument): NormDocument {
+    const foundUser = _.findWhere(norm['users'], { id: this.id });
+    foundUser['firstName'] = this.firstName;
+    foundUser['lastName'] = this.lastName;
+    foundUser['email'] = this.email;
+    foundUser['active'] = this.active;
+
+    return norm;
+  }
+
+  private updateRelatedOwner(norm: NormDocument): NormDocument {
+    norm['owner']['firstName'] = this.firstName;
+    norm['owner']['lastName'] = this.lastName;
+    norm['owner']['email'] = this.email;
+    norm['owner']['externalID'] = this.externalID;
+    norm['owner']['active'] = this.active;
+
+    return norm;
   }
 
   private onCreateUser(): void {
