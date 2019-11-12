@@ -1,3 +1,4 @@
+import { MessagingService } from './../../services/messaging.service';
 import { DocumentService } from './../../services/document.service';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
@@ -35,7 +36,8 @@ export class StartComponent implements OnInit, OnDestroy {
     private documentService: DocumentService,
     private authService: AuthenticationService,
     private couchDBService: CouchDBService,
-    private router: Router
+    private router: Router,
+    private messagingService: MessagingService
   ) {}
 
   ngOnInit() {
@@ -166,6 +168,21 @@ export class StartComponent implements OnInit, OnDestroy {
         }
         return asocN;
       });
+
+      console.log(informUser);
+
+      const messageParams = {};
+      messageParams['userMail'] = informUser['email'];
+      messageParams['normId'] = normId;
+
+      this.messagingService.sendMessage(messageParams).subscribe(
+        send => {
+          console.log(send);
+        },
+        error => {
+          console.log(error);
+        }
+      );
 
       this.couchDBService
         .writeEntry(informUser)

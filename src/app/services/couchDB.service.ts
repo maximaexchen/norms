@@ -71,9 +71,9 @@ export class CouchDBService {
   }
 
   public search(object: any): Observable<any> {
-    console.log('search');
+    /* console.log('search');
     console.log(JSON.stringify(object));
-    console.log(this.dbRequest + '/_find', object);
+    console.log(this.dbRequest + '/_find', object); */
     return this.http.post(this.dbRequest + '/_find', object);
   }
 

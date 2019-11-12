@@ -25,14 +25,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     console.log('send message');
-    /* this.messaging.sendMessage('HALLO: Ein Test').subscribe(
-      send => {
-        console.log(send);
-      },
-      error => {
-        console.log(error);
-      }
-    ); */
   }
 
   public login(event) {

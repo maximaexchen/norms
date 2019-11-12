@@ -1,5 +1,5 @@
 import { FormsModule } from '@angular/forms';
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -55,7 +55,9 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    } /* ,
+    },
+    { provide: LOCALE_ID, useValue: 'de-DE' } // replace "de-at" with your locale
+    /* ,
     {
       provide: ErrorHandler,
       useClass: AuthErrorHandler

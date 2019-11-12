@@ -65,16 +65,14 @@
             <td width="10%">
               {{
                 user.value.associatedNorms &&
-                  user.value.associatedNorms[0]?.confirmedDate
-                  | date: 'dd.MM.yyyy'
+                  user.value.associatedNorms[0]?.confirmedDate | date
               }}
               <br />
             </td>
             <td width="10%">
               {{
                 user.value.associatedNorms &&
-                  user.value.associatedNorms[0]?.informedDate
-                  | date: 'dd.MM.yyyy'
+                  user.value.associatedNorms[0]?.informedDate | date
               }}
               <br />
             </td>
@@ -82,10 +80,17 @@
               <div
                 *ngIf="
                   user.value.associatedNorms &&
-                    !user.value.associatedNorms[0]?.informed;
+                    user.value.associatedNorms[0]?.hasOwnProperty('informed');
                   else confirmButton
                 "
               >
+                <i
+                  aria-hidden="true"
+                  class="fas fa-check-circle"
+                  style="font-size: 16px; color: green;"
+                ></i>
+              </div>
+              <ng-template #confirmButton>
                 <button
                   (click)="
                     inform(user.value.associatedNorms[0]?.normId, user.key)
@@ -98,13 +103,6 @@
                 >
                   Benachrichtigen
                 </button>
-              </div>
-              <ng-template #confirmButton>
-                <i
-                  aria-hidden="true"
-                  class="fas fa-check-circle"
-                  style="font-size: 16px; color: green;"
-                ></i>
               </ng-template>
             </td>
           </tr>

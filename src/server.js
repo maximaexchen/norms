@@ -183,7 +183,7 @@ app.post('/api/sendmail', (req, res) => {
     //to: `<${user.email}>`,
     to: body.emails.join(),
     subject: 'Update Normenverwaltung',
-    html: `<h1>Norm with ID: ${body.normId} changed!</h1>`
+    html: `<p><strong>Norm with ID: ${body.normId} changed!</strong></p><p>Bitte loggen Sie sich ein und bestätigen die Änderung.</p>`
   };
 
   console.log(mailOptions);

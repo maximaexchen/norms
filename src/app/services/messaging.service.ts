@@ -12,22 +12,18 @@ import { EnvService } from './env.service';
 export class MessagingService {
   constructor(private http: HttpClient, private env: EnvService) {}
 
-  sendMessage(body): Observable<any> {
+  sendMessage(messageParams): Observable<any> {
     console.log('send message');
-    console.log(body);
+    console.log(messageParams);
     const url = this.env.apiUrl + '/api/sendmail/';
 
     const params = new HttpParams()
       .append('test1', 'JAJA')
       .append('test2', 'TATA');
 
-    const emails = [
-      'kontakt@marcus-bieber.de',
-      'maximaexchen@gmx.de',
-      'mb@moon-media.biz'
-    ];
+    const emails = ['marcus.bieber@itspoon.com'];
 
-    const normId = '80-T-34-9600';
+    const normId = messageParams.normId;
 
     return this.http.post(this.env.apiUrl + '/api/sendmail/', {
       normId,
