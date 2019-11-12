@@ -74,7 +74,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   revision: string;
   revisionDate: Date;
   scope: string;
-  normLanguage: string;
+  normLanguage = 'en';
   descriptionDE: string;
   descriptionEN: string;
   descriptionFR: string;
@@ -260,12 +260,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           const newAssociatedNorm = {
             normId: this.id,
             revisionId: revision,
-            normDocument: this.revisionDocuments[0]['name'],
             normNumber: this.normNumber,
             date: isoString,
             confirmed: false,
             confirmedDate: ''
           };
+
+          if (!!this.revisionDocuments[0]) {
+            newAssociatedNorm['normDocument'] =
+              this.revisionDocuments[0]['name'] || '';
+          }
 
           associatedNorms.push(newAssociatedNorm);
 
