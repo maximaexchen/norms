@@ -28,6 +28,8 @@ export class StartComponent implements OnInit, OnDestroy {
   firstName: string;
   lastName: string;
 
+  ownerData = {};
+
   constructor(
     private documentService: DocumentService,
     private authService: AuthenticationService,
@@ -41,10 +43,126 @@ export class StartComponent implements OnInit, OnDestroy {
 
   private initComponent() {
     this.currentUserId = this.authService.getCurrentUserID();
-    this.getUserData(this.currentUserId);
+    this.userName = this.authService.getCurrentUserFullName();
+    this.userRole = this.authService.getUserRole();
+
+    if (this.userRole === 'owner') {
+      this.getOwnerData();
+    } else {
+      this.getUserData(this.currentUserId);
+    }
   }
 
-  public getOwnerData() {}
+  public getOwnerData() {
+    // get all Norms for the owner
+
+    const ownerQuery = {
+      use_index: ['_design/search_norm'],
+      selector: {
+        _id: {
+          $gt: null
+        },
+        type: {
+          $eq: 'norm'
+        },
+        owner: {
+          _id: {
+            $eq: this.currentUserId
+          }
+        }
+      }
+    };
+
+    // select all users in the norms
+
+    this.couchDBService.search(ownerQuery).subscribe(result => {
+      this.ownerData['norms'] = {};
+
+      result.docs.forEach(norm => {
+        this.ownerData['norms'][norm.normNumber] = {};
+        this.ownerData['norms'][norm.normNumber]['id'] = norm._id;
+        this.ownerData['norms'][norm.normNumber]['users'] = {};
+
+        norm.users.forEach(users => {
+          this.ownerData['norms'][norm.normNumber]['users'][users.id] = {};
+          this.ownerData['norms'][norm.normNumber]['users'][users.id]['name'] =
+            users.firstName + ' ' + users.lastName;
+
+          const userQuery = {
+            use_index: ['_design/search_norm'],
+            selector: {
+              _id: {
+                $eq: users.id
+              },
+              type: {
+                $eq: 'user'
+              },
+              $and: [
+                {
+                  associatedNorms: {
+                    $elemMatch: {
+                      normNumber: {
+                        $eq: norm.normNumber
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          };
+
+          this.couchDBService.search(userQuery).subscribe(user => {
+            this.ownerData['norms'][norm.normNumber]['users'][users.id][
+              'associatedNorms'
+            ] = {};
+            console.log(user);
+            if (user.docs.length > 0) {
+              user.docs.forEach(userData => {
+                this.ownerData['norms'][norm.normNumber]['users'][users.id][
+                  'associatedNorms'
+                ] = _.uniq(userData.associatedNorms, 'normId').filter(obj => {
+                  return obj['normId'] === norm._id;
+                });
+              });
+            }
+
+            console.log(this.ownerData);
+          });
+        });
+      });
+    });
+
+    // show confirmation information for each user and Norm
+  }
+
+  public inform(normId: string, userId: string) {
+    console.log(normId, userId);
+
+    /* const informUser = this.getUserData(userId);
+
+    const now = new Date();
+    const isoString = now.toISOString();
+
+    informUser['associatedNorms'].map(asocN => {
+      if (asocN['normId'] === normId) {
+        asocN['informed'] = true;
+        asocN['informedDate'] = isoString;
+      }
+      return asocN;
+    });
+
+    this.couchDBService
+      .writeEntry(informUser)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        result => {
+          this.getUserData(userId);
+        },
+        error => {
+          console.log(error);
+        }
+      ); */
+  }
 
   public getUserData(id: string) {
     this.couchDBService.fetchEntry('/' + id).subscribe(
@@ -53,11 +171,8 @@ export class StartComponent implements OnInit, OnDestroy {
 
         this.firstName = this.currentUser['firstName'];
         this.lastName = this.currentUser['lastName'];
-
-        this.userId = this.authService.getCurrentUserID();
         this.userRev = this.currentUser['_rev'];
-        this.userName = this.authService.getCurrentUserFullName();
-        this.userRole = this.authService.getUserRole();
+
         this.associatedNorms = _.uniq(
           this.currentUser['associatedNorms'],
           'normId'

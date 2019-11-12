@@ -7,8 +7,52 @@
 
     <div *ngIf="userRole === 'owner'; else UserContent">
       Owner Content
-    </div>
 
+      <div *ngFor="let norm of ownerData['norms'] | keyvalue">
+        <table
+          class="table table-striped"
+          *ngIf="(norm.value.users | json) != '{}'"
+        >
+          <tr>
+            <th scope="col" width="10%">User</th>
+            <th scope="col" width="10%">NormNumber</th>
+            <th scope="col" width="10%">Bestätigt</th>
+            <th scope="col" width="10%">Datum</th>
+            <th width="10%"></th>
+          </tr>
+
+          <tr *ngFor="let user of norm.value.users | keyvalue">
+            <td>{{ user.value.name }}</td>
+            <td>
+              <div *ngFor="let associatedNorm of user.value.associatedNorms">
+                {{ associatedNorm.normNumber }} <br />
+              </div>
+            </td>
+            <td>
+              <div *ngFor="let associatedNorm of user.value.associatedNorms">
+                {{ associatedNorm.confirmed }} <br />
+              </div>
+            </td>
+            <td>
+              <div *ngFor="let associatedNorm of user.value.associatedNorms">
+                {{ associatedNorm.confirmedDate | date }} <br />
+              </div>
+            </td>
+            <td>
+              <div *ngFor="let associatedNorm of user.value.associatedNorms">
+                <button
+                  (click)="inform(associatedNorm.normId, user.key)"
+                  class="btn btn-default"
+                  *ngIf="!associatedNorm.confirmed"
+                >
+                  Benachrichtigen
+                </button>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
     <ng-template #UserContent>
       <h2>Zu bestätigende Normen Updates</h2>
 
