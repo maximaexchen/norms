@@ -21,11 +21,11 @@ export class CouchDBService {
 
   constructor(private env: EnvService, private http: HttpClient) {}
 
-  public writeEntry(document: NormDocument): Observable<any> {
+  public writeEntry(document: any): Observable<any> {
     return this.http.post(this.dbRequest, document);
   }
 
-  public updateEntry(document: NormDocument, id: string): Observable<any> {
+  public updateEntry(document: any, id: string): Observable<any> {
     return this.http.put(this.dbRequest + '/' + id, document);
   }
 

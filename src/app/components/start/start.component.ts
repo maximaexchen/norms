@@ -7,6 +7,7 @@ import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from './../../modules/auth/services/authentication.service';
 import { User } from '@app/models';
 import { takeWhile } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-start',
@@ -47,15 +48,34 @@ export class StartComponent implements OnInit, OnDestroy {
     this.userRole = this.authService.getUserRole();
 
     if (this.userRole === 'owner') {
-      this.getOwnerData();
+      this.setOwnerData();
     } else {
-      this.getUserData(this.currentUserId);
+      this.setUserData(this.currentUserId);
     }
   }
 
-  public getOwnerData() {
-    // get all Norms for the owner
+  public setUserData(id: string) {
+    this.couchDBService.fetchEntry('/' + id).subscribe(
+      user => {
+        this.currentUser = user;
 
+        this.userId = this.authService.getCurrentUserID();
+        this.userRev = this.currentUser['_rev'];
+        this.userName = this.authService.getCurrentUserFullName();
+        this.userRole = this.authService.getUserRole();
+        this.associatedNorms = _.uniq(
+          this.currentUser['associatedNorms'],
+          'normId'
+        );
+      },
+      error => {
+        console.log(error);
+      },
+      () => {}
+    );
+  }
+
+  public setOwnerData() {
     const ownerQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -72,8 +92,6 @@ export class StartComponent implements OnInit, OnDestroy {
         }
       }
     };
-
-    // select all users in the norms
 
     this.couchDBService.search(ownerQuery).subscribe(result => {
       this.ownerData['norms'] = {};
@@ -115,7 +133,6 @@ export class StartComponent implements OnInit, OnDestroy {
             this.ownerData['norms'][norm.normNumber]['users'][users.id][
               'associatedNorms'
             ] = {};
-            console.log(user);
             if (user.docs.length > 0) {
               user.docs.forEach(userData => {
                 this.ownerData['norms'][norm.normNumber]['users'][users.id][
@@ -125,64 +142,43 @@ export class StartComponent implements OnInit, OnDestroy {
                 });
               });
             }
-
-            console.log(this.ownerData);
           });
         });
       });
     });
+  }
 
-    // show confirmation information for each user and Norm
+  public getUpdateNormUser(id: string): Observable<User> {
+    return this.couchDBService.fetchEntry('/' + id);
   }
 
   public inform(normId: string, userId: string) {
-    console.log(normId, userId);
+    this.getUpdateNormUser(userId).subscribe(user => {
+      const informUser = user;
 
-    /* const informUser = this.getUserData(userId);
+      const now = new Date();
+      const isoString = now.toISOString();
 
-    const now = new Date();
-    const isoString = now.toISOString();
-
-    informUser['associatedNorms'].map(asocN => {
-      if (asocN['normId'] === normId) {
-        asocN['informed'] = true;
-        asocN['informedDate'] = isoString;
-      }
-      return asocN;
-    });
-
-    this.couchDBService
-      .writeEntry(informUser)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          this.getUserData(userId);
-        },
-        error => {
-          console.log(error);
+      informUser['associatedNorms'].map(asocN => {
+        if (asocN['normId'] === normId) {
+          asocN['informed'] = true;
+          asocN['informedDate'] = isoString;
         }
-      ); */
-  }
+        return asocN;
+      });
 
-  public getUserData(id: string) {
-    this.couchDBService.fetchEntry('/' + id).subscribe(
-      user => {
-        this.currentUser = user;
-
-        this.firstName = this.currentUser['firstName'];
-        this.lastName = this.currentUser['lastName'];
-        this.userRev = this.currentUser['_rev'];
-
-        this.associatedNorms = _.uniq(
-          this.currentUser['associatedNorms'],
-          'normId'
+      this.couchDBService
+        .writeEntry(informUser)
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          result => {
+            this.setOwnerData();
+          },
+          error => {
+            console.log(error);
+          }
         );
-      },
-      error => {
-        console.log(error);
-      },
-      () => {}
-    );
+    });
   }
 
   public gotoNorm(id: string) {
@@ -190,7 +186,7 @@ export class StartComponent implements OnInit, OnDestroy {
   }
 
   public confirm(id: string) {
-    this.getUserData(this.currentUserId);
+    this.setUserData(this.currentUserId);
 
     const now = new Date();
     const isoString = now.toISOString();
@@ -208,7 +204,7 @@ export class StartComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          this.getUserData(this.currentUserId);
+          this.setUserData(this.currentUserId);
         },
         error => {
           console.log(error);

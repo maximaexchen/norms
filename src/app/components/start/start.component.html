@@ -1,9 +1,30 @@
 <div class="row">
   <div class="col-md-6">
-    <h1>Willkommen! {{ firstName }} {{ lastName }}</h1>
-    <hr />
-
+    <h1 style="margin-bottom: 30px;">
+      Willkommen! {{ firstName }} {{ lastName }}
+    </h1>
     <div *ngIf="userRole === 'owner'; else UserContent">
+      <table
+        class="table table-striped"
+        style=" border-bottom: 1px solid #dee2e6"
+      >
+        <tr>
+          <th scope="col" width="10%">User</th>
+          <th scope="col" width="10%">
+            Bestätigt
+          </th>
+          <th scope="col" width="10%">
+            Bestätigt am:
+          </th>
+          <th scope="col" width="10%">
+            Benachrichtigt am:
+          </th>
+          <th width="10%" style="text-align: center;">
+            Benachrichtigung
+          </th>
+        </tr>
+      </table>
+
       <div *ngFor="let norm of ownerData['norms'] | keyvalue">
         <h2 *ngIf="(norm.value.users | json) != '{}'">
           <strong>Norm: {{ norm.key }}</strong>
@@ -12,16 +33,16 @@
           class="table table-striped"
           *ngIf="(norm.value.users | json) != '{}'"
         >
-          <tr>
+          <!-- <tr>
             <th scope="col" width="10%">User</th>
             <th scope="col" width="10%">Bestätigt</th>
             <th scope="col" width="10%">Datum</th>
-            <th width="10%"></th>
-          </tr>
+            <th width="10%" style="text-align: center;">Benachrichtigung</th>
+          </tr> -->
 
           <tr *ngFor="let user of norm.value.users | keyvalue">
-            <td>{{ user.value.name }}</td>
-            <td>
+            <td width="10%">{{ user.value.name }}</td>
+            <td width="10%">
               <i
                 aria-hidden="true"
                 class="fas fa-ban"
@@ -41,24 +62,50 @@
                 "
               ></i>
             </td>
-            <td>
+            <td width="10%">
               {{
                 user.value.associatedNorms &&
-                  user.value.associatedNorms[0]?.confirmedDate | date
+                  user.value.associatedNorms[0]?.confirmedDate
+                  | date: 'dd.MM.yyyy'
               }}
               <br />
             </td>
-            <td>
-              <button
-                (click)="inform(user.value.associatedNorms.normId, user.key)"
-                class="btn btn-default"
+            <td width="10%">
+              {{
+                user.value.associatedNorms &&
+                  user.value.associatedNorms[0]?.informedDate
+                  | date: 'dd.MM.yyyy'
+              }}
+              <br />
+            </td>
+            <td style="text-align: center;" width="10%">
+              <div
                 *ngIf="
                   user.value.associatedNorms &&
-                  !user.value.associatedNorms[0]?.confirmed
+                    !user.value.associatedNorms[0]?.informed;
+                  else confirmButton
                 "
               >
-                Benachrichtigen
-              </button>
+                <button
+                  (click)="
+                    inform(user.value.associatedNorms[0]?.normId, user.key)
+                  "
+                  class="btn btn-default"
+                  *ngIf="
+                    user.value.associatedNorms &&
+                    !user.value.associatedNorms[0]?.confirmed
+                  "
+                >
+                  Benachrichtigen
+                </button>
+              </div>
+              <ng-template #confirmButton>
+                <i
+                  aria-hidden="true"
+                  class="fas fa-check-circle"
+                  style="font-size: 16px; color: green;"
+                ></i>
+              </ng-template>
             </td>
           </tr>
         </table>
