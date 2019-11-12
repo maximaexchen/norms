@@ -582,6 +582,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public deleteDocument(): void {
+    this.deleteRelatedDatabaseEntries(this.id);
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
       accept: () => {
@@ -589,7 +590,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .deleteEntry(this.id, this.rev)
           .pipe(takeWhile(() => this.alive))
           .subscribe(
-            res => {},
+            res => {
+              this.deleteRelatedDatabaseEntries(this.id);
+            },
             err => {
               this.showConfirmation('error', err.message);
             },
@@ -600,6 +603,52 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           );
       },
       reject: () => {}
+    });
+  }
+
+  private deleteRelatedDatabaseEntries(id: string) {
+    const deleteQuery = {
+      use_index: ['_design/search_norm'],
+      selector: {
+        _id: {
+          $gt: null
+        },
+        type: {
+          $eq: 'user'
+        },
+        $and: [
+          {
+            associatedNorms: {
+              $elemMatch: {
+                normId: {
+                  $eq: id
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    this.couchDBService.search(deleteQuery).subscribe(user => {
+      user.docs.forEach(foundUser => {
+        // filter out the deleted associatedNorms for given id
+        foundUser.associatedNorms = foundUser.associatedNorms.filter(
+          norm => norm.normId !== id
+        );
+
+        this.couchDBService
+          .updateEntry(foundUser, foundUser._id)
+          .pipe(takeWhile(() => this.alive))
+          .subscribe(
+            result => {
+              console.log(user);
+            },
+            err => {
+              console.log(err);
+            }
+          );
+      });
     });
   }
 
