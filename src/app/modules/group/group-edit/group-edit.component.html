@@ -9,10 +9,13 @@
     <app-crud-nav
       [isNew]="isNew"
       [validForm]="groupForm.valid"
+      [dirtyForm]="groupForm.dirty"
       [routeNew]="'/group/new'"
+      [editable]="editable"
       [role]="authService.getUserRole()"
       (save)="onSubmit()"
       (add)="onSubmit()"
+      (edit)="onEdit()"
       (delete)="onDelete()"
     ></app-crud-nav>
   </div>
@@ -43,6 +46,7 @@
                 [(ngModel)]="name"
                 name="name"
                 #nameCheck="ngModel"
+                [disabled]="!editable"
               />
               <small
                 class="form-text text-muted"
@@ -101,6 +105,7 @@
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
                 (onDeSelectAll)="onDeSelectAll($event)"
+                [disabled]="!editable"
               >
                 <c-item>
                   <ng-template let-item="item">
@@ -138,6 +143,7 @@
                 ]"
                 name="active"
                 [(ngModel)]="active"
+                [disabled]="!editable"
               ></p-selectButton>
             </div>
           </div>

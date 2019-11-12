@@ -12,6 +12,7 @@ import { User } from '@models/index';
 import { Roles } from '@app/modules/auth/models/roles.enum';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import _ = require('underscore');
+import { Md5 } from 'ts-md5/dist/md5';
 
 @Component({
   selector: 'app-user-edit',
@@ -59,13 +60,87 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     console.log('UserEditComponent');
+    this.setStartValues();
+  }
+
+  private setStartValues() {
+    this.resetComponent();
+
+    if (this.userForm) {
+      this.userForm.form.markAsPristine();
+    }
+
     this.currentUserRole = this.authService.getUserRole();
 
     this.roleValues = Object.keys(this.roles).map(k => ({
       key: k,
       value: this.roles[k as any]
     }));
+
     this.getUser();
+
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+      results => {
+        // check if we are updating
+        if (results['id']) {
+          this.editUser(results);
+        } else {
+          this.newUser();
+        }
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
+
+  private resetComponent() {
+    console.log('restComponent');
+    this.editable = false;
+    this.id = '';
+    this.rev = '';
+    this.type = '';
+    this.externalID = null;
+    this.userName = '';
+    this.firstName = '';
+    this.lastName = '';
+    this.email = '';
+    this.password = '';
+    this.associatedNorms = null;
+    this.active = null;
+  }
+
+  private newUser() {
+    console.log('New mode');
+    this.isNew = true;
+    this.editable = true;
+    this.formTitle = 'Neuen User anlegen';
+    this.users = [];
+  }
+
+  private editUser(results) {
+    this.resetComponent();
+    this.isNew = false;
+    this.formTitle = 'User bearbeiten';
+
+    this.couchDBService
+      .fetchEntry('/' + results['id'])
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(entry => {
+        this.id = entry['_id'];
+        this.rev = entry['_rev'];
+        this.type = 'user';
+        this.externalID = entry['externalID'];
+        this.userName = entry['userName'];
+        this.firstName = entry['firstName'];
+        this.lastName = entry['lastName'];
+        this.email = entry['email'];
+        this.password = entry['password'];
+        this.role = entry['role'];
+        this.selectedRole = entry['role'];
+        this.active = entry['active'];
+        this.associatedNorms = entry['associatedNorms'];
+      });
   }
 
   private getUser() {
@@ -125,6 +200,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
           this.getUser();
           this.sendStateUpdate();
           this.searchRelatedUser(result);
+          this.router.navigate(['../user']);
         },
         err => {
           console.log(err);
@@ -230,6 +306,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
       .subscribe(result => {
+        this.router.navigate(['../user']);
         this.sendStateUpdate();
       });
   }
@@ -263,7 +340,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.writeItem['firstName'] = this.userForm.value.firstName || '';
     this.writeItem['lastName'] = this.userForm.value.lastName || '';
     this.writeItem['email'] = this.userForm.value.email || '';
-    this.writeItem['password'] = this.userForm.value.password || '';
+    this.writeItem['password'] =
+      Md5.hashStr(this.userForm.value.password) || '';
     this.writeItem['role'] = this.userForm.value.selectedRole || '';
     this.writeItem['active'] = this.userForm.value.active || false;
     this.writeItem['associatedNorms'] = this.associatedNorms || '';

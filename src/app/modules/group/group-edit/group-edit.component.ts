@@ -30,6 +30,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   @ViewChild('groupForm', { static: false }) groupForm: NgForm;
 
   alive = true;
+  editable = false;
 
   formTitle: string;
   isNew = true; // 1 = new - 0 = update
@@ -58,7 +59,32 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('GruppeEditComponent');
+    this.setStartValues();
+  }
 
+  private setStartValues() {
+    this.resetComponent();
+
+    if (this.groupForm) {
+      this.groupForm.form.markAsPristine();
+    }
+
+    this.assignMultiselectConfig();
+    this.getUsers();
+
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
+      this.selectedtUsers = [];
+
+      // check if we are updating
+      if (results['id']) {
+        this.editGroup(results);
+      } else {
+        this.newGroup();
+      }
+    });
+  }
+
+  private assignMultiselectConfig() {
     // Prepare the user multi select box
     this.dropdownSettings = {
       singleSelection: false,
@@ -70,39 +96,51 @@ export class GroupEditComponent implements OnInit, OnDestroy {
       unSelectAllText: 'Auswahl aufheben',
       enableSearchFilter: true,
       searchPlaceholderText: 'User Auswahl',
-      noDataLabel: 'Keinen Benutzer gefunden'
+      noDataLabel: 'Keinen Benutzer gefunden',
+      disabled: this.editable || !this.isNew
     };
+  }
 
-    this.getUsers();
+  private resetComponent() {
+    console.log('restComponent');
+    this.editable = false;
+    this.id = '';
+    this.rev = '';
+    this.type = '';
+    this.name = '';
+    this.active = null;
+    this.assignMultiselectConfig();
+  }
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      this.selectedtUsers = [];
+  private newGroup() {
+    this.resetComponent();
+    this.setMultiselects();
+    this.isNew = true;
+    this.editable = true;
+    this.formTitle = 'Neue Gruppe anlegen';
+    this.groups = [];
+  }
 
-      // check if we are updating
-      if (results['id']) {
-        this.isNew = false;
-        this.formTitle = 'Gruppe bearbeiten';
+  private editGroup(results) {
+    this.isNew = false;
+    this.resetComponent();
+    this.formTitle = 'Gruppe bearbeiten';
 
-        this.couchDBService
-          .fetchEntry('/' + results['id'])
-          .pipe(takeWhile(() => this.alive))
-          .subscribe(
-            entry => {
-              this.id = entry['_id'];
-              this.rev = entry['_rev'];
-              this.name = entry['name'];
-              this.active = entry['active'];
+    this.couchDBService
+      .fetchEntry('/' + results['id'])
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        entry => {
+          this.id = entry['_id'];
+          this.rev = entry['_rev'];
+          this.name = entry['name'];
+          this.active = entry['active'];
 
-              this.getSelectedUsers(entry['users']);
-            },
-            error => console.log(error.message),
-            () => console.log('Group Observer got a complete notification')
-          );
-      } else {
-        this.formTitle = 'Neue Gruppe anlegen';
-        this.groups = [];
-      }
-    });
+          this.getSelectedUsers(entry['users']);
+        },
+        error => console.log(error.message),
+        () => console.log('Group Observer got a complete notification')
+      );
   }
 
   private getSelectedUsers(users: any[]) {
@@ -148,6 +186,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     if (this.groupForm.value.isNew) {
+      this.resetComponent();
       this.createGroup();
     } else {
       this.updateGroup();
@@ -162,6 +201,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           this.sendStateUpdate();
+          this.router.navigate(['../group']);
         },
         error => {
           console.log('Error updating groupe' + error.message);
@@ -185,6 +225,12 @@ export class GroupEditComponent implements OnInit, OnDestroy {
           console.log('Error crrating group: ' + error.message);
         }
       );
+  }
+
+  public onEdit() {
+    console.log(this.editable);
+    this.setMultiselects();
+    this.editable = true;
   }
 
   public onDelete(): void {
@@ -247,6 +293,16 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   private updateSelect() {
     console.log('updateSelect');
     this.selectedtUsers = [];
+  }
+
+  private setMultiselects() {
+    this.dropdownSettings['disabled'] = false;
+    this.dropdownSettings = Object.assign({}, this.dropdownSettings);
+  }
+
+  private disableMultiselect() {
+    this.dropdownSettings['disabled'] = true;
+    this.dropdownSettings = Object.assign({}, this.dropdownSettings);
   }
 
   public onItemSelect(item: any) {
