@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
 
 import { Publisher } from '../../../models/publisher.model';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { Router } from '@angular/router';
 import { takeWhile } from 'rxjs/operators';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-publisher-list',
@@ -21,7 +21,8 @@ export class PublisherListComponent implements OnInit, OnDestroy {
   constructor(
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
-    private router: Router
+    private router: Router,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -31,32 +32,36 @@ export class PublisherListComponent implements OnInit, OnDestroy {
     this.couchDBService
       .setStateUpdate()
       .pipe(takeWhile(() => this.alive))
-      .subscribe(message => {
-        if (message.text === 'publisher') {
-          this.documentService.getPublishers().subscribe(
-            res => {
-              this.publishers = res;
-            },
-            err => {
-              console.log(err);
-            }
-          );
-        }
-      });
+      .subscribe(
+        message => {
+          if (message.text === 'publisher') {
+            this.documentService.getPublishers().subscribe(
+              res => {
+                this.publishers = res;
+              },
+              err => {
+                console.log(err);
+              }
+            );
+          }
+        },
+        error => this.logger.error(error.message)
+      );
 
     this.getPublishers();
   }
 
   private getPublishers() {
-    this.documentService.getPublishers().subscribe(
-      res => {
-        this.publishers = res;
-        this.publisherCount = this.publishers.length;
-      },
-      err => {
-        console.log(err);
-      }
-    );
+    this.documentService
+      .getPublishers()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        res => {
+          this.publishers = res;
+          this.publisherCount = this.publishers.length;
+        },
+        error => this.logger.error(error.message)
+      );
   }
 
   public onFilter(event: any): void {

@@ -7,6 +7,7 @@ import { CouchDBService } from '@app/services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { Role } from '@app/modules/auth/models/role.model';
 import { takeWhile } from 'rxjs/operators';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-role-list',
@@ -20,17 +21,24 @@ export class RoleListComponent implements OnInit, OnDestroy {
   selectedRole: Role;
   roleCount = 0;
 
-  constructor(private couchDBService: CouchDBService, private router: Router) {}
+  constructor(
+    private couchDBService: CouchDBService,
+    private router: Router,
+    private logger: NGXLogger
+  ) {}
 
   ngOnInit() {
     this.couchDBService
       .setStateUpdate()
       .pipe(takeWhile(() => this.alive))
-      .subscribe(message => {
-        if (message.text === 'role') {
-          this.getRoles();
-        }
-      });
+      .subscribe(
+        message => {
+          if (message.text === 'role') {
+            this.getRoles();
+          }
+        },
+        error => this.logger.error(error.message)
+      );
 
     this.getRoles();
   }
@@ -44,9 +52,7 @@ export class RoleListComponent implements OnInit, OnDestroy {
           this.roles = res;
           this.roleCount = this.roles.length;
         },
-        err => {
-          console.log('Error on loading roles');
-        }
+        error => this.logger.error(error.message)
       );
   }
 

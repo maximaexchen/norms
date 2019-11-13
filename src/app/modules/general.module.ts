@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+
 import { TableModule } from 'primeng/table';
 import { PaginatorModule } from 'primeng/paginator';
 import { ButtonModule } from 'primeng/button';
@@ -30,7 +32,12 @@ import { CrudNavComponent } from '../components/crud-nav/crud-nav.component';
     MultiSelectModule,
     CheckboxModule,
     TooltipModule,
-    AngularMultiSelectModule
+    AngularMultiSelectModule,
+    LoggerModule.forRoot({
+      serverLoggingUrl: 'http://localhost:4000/api/logs',
+      level: NgxLoggerLevel.DEBUG,
+      serverLogLevel: NgxLoggerLevel.ERROR
+    })
   ],
   exports: [
     CommonModule,

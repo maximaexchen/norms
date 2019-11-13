@@ -14,6 +14,7 @@ const nodemailer = require('nodemailer');
 let fileName = '';
 
 const DIR = './uploads';
+const LOGS = './logs';
 
 app.use(methodOverride());
 app.use(bodyParser.json());
@@ -148,6 +149,21 @@ app.post('/api/auth', function(req, res) {
   var token = jwt.sign({ userName: body.username }, privateKEY, signOptions);
 
   res.send({ token });
+});
+
+/*
+==================== Logging =====================
+*/
+
+app.post('/api/logs', (req, res) => {
+  console.log(req.body.message);
+  const file = './logs/logs.log';
+  const options = { flag: 'a' };
+  fs.outputFile(
+    file,
+    `${req.body.timestamp} - ${req.body.fileName} - ${req.body.message}\n`,
+    options
+  );
 });
 
 /*

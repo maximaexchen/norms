@@ -11,6 +11,7 @@ import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
 import _ = require('underscore');
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-tag-edit',
@@ -42,7 +43,8 @@ export class TagEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private notificationsService: NotificationsService,
     private confirmationService: ConfirmationService,
-    public authService: AuthenticationService
+    public authService: AuthenticationService,
+    private logger: NGXLogger
   ) {}
 
   public ngOnInit() {
@@ -66,9 +68,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
           this.newTag();
         }
       },
-      error => {
-        console.log(error);
-      }
+      error => this.logger.error(error.message)
     );
   }
 
@@ -99,9 +99,12 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .fetchEntry('/' + results['id'])
       .pipe(takeWhile(() => this.alive))
-      .subscribe(entry => {
-        this.getTagData(entry);
-      });
+      .subscribe(
+        entry => {
+          this.getTagData(entry);
+        },
+        error => this.logger.error(error.message)
+      );
   }
 
   private getTagData(entry: any) {
@@ -163,15 +166,13 @@ export class TagEditComponent implements OnInit, OnDestroy {
                 this.sendStateUpdate();
                 this.router.navigate(['../tag']);
               },
-              error => {
-                console.log(error);
-              },
+              error => this.logger.error(error.message),
               () => {}
             );
         },
-        err => {
-          console.log(err);
-          this.showConfirm('error', err.message);
+        error => {
+          this.logger.error(error.message);
+          this.showConfirm('error', error.message);
         }
       );
   }
@@ -194,9 +195,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
         console.log('bulkUpdate');
         console.log(res);
       },
-      error => {
-        console.log(error);
-      }
+      error => this.logger.error(error.message)
     );
   }
 
@@ -206,10 +205,13 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        this.router.navigate(['../tag']);
-        this.sendStateUpdate();
-      });
+      .subscribe(
+        result => {
+          this.router.navigate(['../tag']);
+          this.sendStateUpdate();
+        },
+        error => this.logger.error(error.message)
+      );
   }
 
   public onDelete(): void {
@@ -224,8 +226,9 @@ export class TagEditComponent implements OnInit, OnDestroy {
               this.sendStateUpdate();
               this.router.navigate(['../tag']);
             },
-            err => {
-              this.showConfirm('error', err.message);
+            error => {
+              this.logger.error(error.message);
+              this.showConfirm('error', error.message);
             }
           );
       },

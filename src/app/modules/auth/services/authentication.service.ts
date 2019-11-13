@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { switchMap, map, tap, catchError } from 'rxjs/operators';
+import { switchMap, map, tap, catchError, takeWhile } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Md5 } from 'ts-md5/dist/md5';
 
@@ -10,6 +10,7 @@ import { EnvService } from '@app/services/env.service';
 import { CouchDBService } from './../../../services/couchDB.service';
 import { PermissionManagerService } from './permissionManager.service';
 import { Roles } from '../models/roles.enum';
+import { NGXLogger } from 'ngx-logger';
 
 export const TOKEN_NAME = 'access_token';
 
@@ -32,7 +33,8 @@ export class AuthenticationService {
   constructor(
     private env: EnvService,
     private http: HttpClient,
-    private couchDBService: CouchDBService
+    private couchDBService: CouchDBService,
+    private logger: NGXLogger
   ) {
     this.currentTokenSubject = new BehaviorSubject<string>(
       sessionStorage.getItem('access_token')
@@ -56,19 +58,22 @@ export class AuthenticationService {
           this.user = loginResult['docs'][0];
 
           if (!!this.user) {
-            this.requestToken(username, password).subscribe(res => {
-              this.role = this.user['role'];
+            this.requestToken(username, password).subscribe(
+              res => {
+                this.role = this.user['role'];
 
-              if (this.role) {
-                this.userS.authAs(this.role as Roles);
-              } else {
-                this.userS.authAs('external' as Roles);
-              }
+                if (this.role) {
+                  this.userS.authAs(this.role as Roles);
+                } else {
+                  this.userS.authAs('external' as Roles);
+                }
 
-              this.persistUserData(this.user);
-              this.userIsLoggedIn.next('userIsLoggedIn');
-              this.userNameSubject.next(this.getCurrentUserFullName());
-            });
+                this.persistUserData(this.user);
+                this.userIsLoggedIn.next('userIsLoggedIn');
+                this.userNameSubject.next(this.getCurrentUserFullName());
+              },
+              error => this.logger.error(error.message)
+            );
 
             return of(true);
           }

@@ -9,6 +9,7 @@ import { AuthenticationService } from './../../modules/auth/services/authenticat
 import { User } from '@app/models';
 import { takeWhile } from 'rxjs/operators';
 import { from, Observable } from 'rxjs';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-start',
@@ -37,7 +38,8 @@ export class StartComponent implements OnInit, OnDestroy {
     private authService: AuthenticationService,
     private couchDBService: CouchDBService,
     private router: Router,
-    private messagingService: MessagingService
+    private messagingService: MessagingService,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -70,9 +72,7 @@ export class StartComponent implements OnInit, OnDestroy {
           'normId'
         );
       },
-      error => {
-        console.log(error);
-      },
+      error => this.logger.error(error.message),
       () => {}
     );
   }
@@ -95,59 +95,68 @@ export class StartComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.couchDBService.search(ownerQuery).subscribe(result => {
-      this.ownerData['norms'] = {};
+    this.couchDBService.search(ownerQuery).subscribe(
+      result => {
+        this.ownerData['norms'] = {};
 
-      result.docs.forEach(norm => {
-        this.ownerData['norms'][norm.normNumber] = {};
-        this.ownerData['norms'][norm.normNumber]['id'] = norm._id;
-        this.ownerData['norms'][norm.normNumber]['users'] = {};
+        result.docs.forEach(norm => {
+          this.ownerData['norms'][norm.normNumber] = {};
+          this.ownerData['norms'][norm.normNumber]['id'] = norm._id;
+          this.ownerData['norms'][norm.normNumber]['users'] = {};
 
-        norm.users.forEach(users => {
-          this.ownerData['norms'][norm.normNumber]['users'][users.id] = {};
-          this.ownerData['norms'][norm.normNumber]['users'][users.id]['name'] =
-            users.firstName + ' ' + users.lastName;
+          norm.users.forEach(users => {
+            this.ownerData['norms'][norm.normNumber]['users'][users.id] = {};
+            this.ownerData['norms'][norm.normNumber]['users'][users.id][
+              'name'
+            ] = users.firstName + ' ' + users.lastName;
 
-          const userQuery = {
-            use_index: ['_design/search_norm'],
-            selector: {
-              _id: {
-                $eq: users.id
-              },
-              type: {
-                $eq: 'user'
-              },
-              $and: [
-                {
-                  associatedNorms: {
-                    $elemMatch: {
-                      normNumber: {
-                        $eq: norm.normNumber
+            const userQuery = {
+              use_index: ['_design/search_norm'],
+              selector: {
+                _id: {
+                  $eq: users.id
+                },
+                type: {
+                  $eq: 'user'
+                },
+                $and: [
+                  {
+                    associatedNorms: {
+                      $elemMatch: {
+                        normNumber: {
+                          $eq: norm.normNumber
+                        }
                       }
                     }
                   }
-                }
-              ]
-            }
-          };
+                ]
+              }
+            };
 
-          this.couchDBService.search(userQuery).subscribe(user => {
-            this.ownerData['norms'][norm.normNumber]['users'][users.id][
-              'associatedNorms'
-            ] = {};
-            if (user.docs.length > 0) {
-              user.docs.forEach(userData => {
+            this.couchDBService.search(userQuery).subscribe(
+              user => {
                 this.ownerData['norms'][norm.normNumber]['users'][users.id][
                   'associatedNorms'
-                ] = _.uniq(userData.associatedNorms, 'normId').filter(obj => {
-                  return obj['normId'] === norm._id;
-                });
-              });
-            }
+                ] = {};
+                if (user.docs.length > 0) {
+                  user.docs.forEach(userData => {
+                    this.ownerData['norms'][norm.normNumber]['users'][users.id][
+                      'associatedNorms'
+                    ] = _.uniq(userData.associatedNorms, 'normId').filter(
+                      obj => {
+                        return obj['normId'] === norm._id;
+                      }
+                    );
+                  });
+                }
+              },
+              error => this.logger.error(error.message)
+            );
           });
         });
-      });
-    });
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   public getUpdateNormUser(id: string): Observable<User> {
@@ -155,47 +164,51 @@ export class StartComponent implements OnInit, OnDestroy {
   }
 
   public inform(normId: string, userId: string) {
-    this.getUpdateNormUser(userId).subscribe(user => {
-      const informUser = user;
+    this.getUpdateNormUser(userId)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        user => {
+          const informUser = user;
 
-      const now = new Date();
-      const isoString = now.toISOString();
+          const now = new Date();
+          const isoString = now.toISOString();
 
-      informUser['associatedNorms'].map(asocN => {
-        if (asocN['normId'] === normId) {
-          asocN['informed'] = true;
-          asocN['informedDate'] = isoString;
-        }
-        return asocN;
-      });
+          informUser['associatedNorms'].map(asocN => {
+            if (asocN['normId'] === normId) {
+              asocN['informed'] = true;
+              asocN['informedDate'] = isoString;
+            }
+            return asocN;
+          });
 
-      console.log(informUser);
+          const messageParams = {};
+          messageParams['userMail'] = informUser['email'];
+          messageParams['normId'] = normId;
 
-      const messageParams = {};
-      messageParams['userMail'] = informUser['email'];
-      messageParams['normId'] = normId;
+          this.messagingService
+            .sendMessage(messageParams)
+            .pipe(takeWhile(() => this.alive))
+            .subscribe(
+              send => {
+                console.log(send);
+              },
+              error => {
+                this.logger.error(error.message);
+              }
+            );
 
-      this.messagingService.sendMessage(messageParams).subscribe(
-        send => {
-          console.log(send);
+          this.couchDBService
+            .writeEntry(informUser)
+            .pipe(takeWhile(() => this.alive))
+            .subscribe(
+              result => {
+                this.setOwnerData();
+              },
+              error => this.logger.error(error.message)
+            );
         },
-        error => {
-          console.log(error);
-        }
+        error => this.logger.error(error.message)
       );
-
-      this.couchDBService
-        .writeEntry(informUser)
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          result => {
-            this.setOwnerData();
-          },
-          error => {
-            console.log(error);
-          }
-        );
-    });
   }
 
   public gotoNorm(id: string) {
@@ -224,13 +237,12 @@ export class StartComponent implements OnInit, OnDestroy {
           this.setUserData(this.currentUserId);
         },
         error => {
-          console.log(error);
+          this.logger.error(error.message);
         }
       );
   }
 
   public getDownload(id: string, name: string) {
-    console.log('GET Download');
     this.documentService.getDownload(id, name);
   }
 

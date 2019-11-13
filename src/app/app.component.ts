@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { ApiService } from '@services/api.service';
 import { Router } from '@angular/router';
 
 import { MessagingService } from './services/messaging.service';
 import { AuthenticationService } from './modules/auth/services/authentication.service';
+import { NGXLogger } from 'ngx-logger';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  alive = true;
   title = 'Normenverwaltung';
 
   public user: any;
@@ -20,7 +23,8 @@ export class AppComponent implements OnInit {
     public authService: AuthenticationService,
     private api: ApiService,
     private router: Router,
-    private messaging: MessagingService
+    private messaging: MessagingService,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -29,19 +33,27 @@ export class AppComponent implements OnInit {
 
   public login(event) {
     if (event.isValidUser) {
-      this.authService.userIsLoggedIn$.subscribe(res => {
-        if (sessionStorage.getItem('role') === 'user') {
-          this.router.navigate(['/start']);
-        } else {
-          this.router.navigate(['/document']);
-        }
-      });
+      this.authService.userIsLoggedIn$
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          res => {
+            if (sessionStorage.getItem('role') === 'user') {
+              this.router.navigate(['/start']);
+            } else {
+              this.router.navigate(['/document']);
+            }
+          },
+          error => this.logger.error(error.message)
+        );
     }
   }
 
   public logout(event: Event) {
-    console.log('AppComponent: logout');
     this.api.reloadApp();
     this.authService.logout();
+  }
+
+  public ngOnDestroy(): void {
+    this.alive = false;
   }
 }

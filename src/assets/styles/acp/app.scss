@@ -88,6 +88,9 @@ body {
 
   angular2-multiselect {
     .cuppa-dropdown {
+      .selected-list .c-list {
+        width: calc(100% - 40px);
+      }
       .selected-list .c-list .c-token {
         padding: 10px 30px 10px 15px;
         font-weight: 700;

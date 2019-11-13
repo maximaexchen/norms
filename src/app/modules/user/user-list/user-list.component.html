@@ -12,7 +12,7 @@
   [(selection)]="selectedUser"
   (onRowSelect)="onRowSelect($event)"
   [globalFilterFields]="['firstName', 'lastName']"
-  (onFilter)="onFilter($event)"
+  (onFilter)="onFilter($event, dt)"
 >
   <ng-template pTemplate="caption">
     <div style="text-align: center;">

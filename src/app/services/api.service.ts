@@ -5,6 +5,7 @@ import { distinctUntilChanged } from 'rxjs/operators';
 import { ACP_Menu } from '@services/menu.service';
 import { from } from 'rxjs';
 import { MessageService } from 'primeng/api';
+import { NGXLogger } from 'ngx-logger';
 
 const userMenu = {};
 const userMenuSubject = new BehaviorSubject<any>(userMenu);
@@ -20,7 +21,8 @@ export class ApiService {
 
   constructor(
     private messageService: MessageService,
-    private injector: Injector
+    private injector: Injector,
+    private logger: NGXLogger
   ) {}
 
   public reloadApp() {
@@ -42,7 +44,8 @@ export class ApiService {
           window.location.reload();
         }, 500);
       },
-      err => {
+      error => {
+        this.logger.error(error.message);
         this.messageService.add({
           severity: 'error',
           summary: 'Reload failed',

@@ -6,7 +6,7 @@ import { takeWhile } from 'rxjs/operators';
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { Tag } from '@app/models/tag.model';
-import { TagRoutingModule } from '../tag-routing.module';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-tag-list',
@@ -25,7 +25,8 @@ export class TagListComponent implements OnInit, OnDestroy {
   constructor(
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
-    private router: Router
+    private router: Router,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -38,7 +39,7 @@ export class TagListComponent implements OnInit, OnDestroy {
             this.getTags();
           }
         },
-        err => console.log('Error', err),
+        error => this.logger.error(error.message),
         () => console.log('completed.')
       );
 
@@ -83,8 +84,8 @@ export class TagListComponent implements OnInit, OnDestroy {
             }
           }
         },
-        err => {
-          console.log('Error on loading users');
+        error => {
+          this.logger.error(error.message);
         }
       );
   }

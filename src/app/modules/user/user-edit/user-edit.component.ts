@@ -13,6 +13,7 @@ import { Roles } from '@app/modules/auth/models/roles.enum';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import _ = require('underscore');
 import { Md5 } from 'ts-md5/dist/md5';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-user-edit',
@@ -55,7 +56,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private notificationsService: NotificationsService,
     private confirmationService: ConfirmationService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private logger: NGXLogger
   ) {}
 
   public ngOnInit() {
@@ -88,9 +90,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
           this.newUser();
         }
       },
-      error => {
-        console.log(error);
-      }
+      error => this.logger.error(error.message)
     );
   }
 
@@ -126,56 +126,65 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .fetchEntry('/' + results['id'])
       .pipe(takeWhile(() => this.alive))
-      .subscribe(entry => {
-        this.id = entry['_id'];
-        this.rev = entry['_rev'];
-        this.type = 'user';
-        this.externalID = entry['externalID'];
-        this.userName = entry['userName'];
-        this.firstName = entry['firstName'];
-        this.lastName = entry['lastName'];
-        this.email = entry['email'];
-        this.password = entry['password'];
-        this.role = entry['role'];
-        this.selectedRole = entry['role'];
-        this.active = entry['active'];
-        this.associatedNorms = entry['associatedNorms'];
-      });
+      .subscribe(
+        entry => {
+          this.id = entry['_id'];
+          this.rev = entry['_rev'];
+          this.type = 'user';
+          this.externalID = entry['externalID'];
+          this.userName = entry['userName'];
+          this.firstName = entry['firstName'];
+          this.lastName = entry['lastName'];
+          this.email = entry['email'];
+          this.password = entry['password'];
+          this.role = entry['role'];
+          this.selectedRole = entry['role'];
+          this.active = entry['active'];
+          this.associatedNorms = entry['associatedNorms'];
+        },
+        error => this.logger.error(error.message)
+      );
   }
 
   private getUser() {
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      // check if we are updating
-      if (results['id']) {
-        console.log('Edit mode');
-        this.isNew = false;
-        this.formTitle = 'User bearbeiten';
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+      results => {
+        // check if we are updating
+        if (results['id']) {
+          console.log('Edit mode');
+          this.isNew = false;
+          this.formTitle = 'User bearbeiten';
 
-        this.couchDBService
-          .fetchEntry('/' + results['id'])
-          .pipe(takeWhile(() => this.alive))
-          .subscribe(entry => {
-            this.id = entry['_id'];
-            this.rev = entry['_rev'];
-            this.type = 'user';
-            this.externalID = entry['externalID'];
-            this.userName = entry['userName'];
-            this.firstName = entry['firstName'];
-            this.lastName = entry['lastName'];
-            this.email = entry['email'];
-            this.password = entry['password'];
-            this.role = entry['role'];
-            this.selectedRole = entry['role'];
-            this.active = entry['active'];
-            this.associatedNorms = entry['associatedNorms'];
-          });
-      } else {
-        console.log('New mode');
-        this.editable = true;
-        this.formTitle = 'Neuen User anlegen';
-        this.users = [];
-      }
-    });
+          this.couchDBService
+            .fetchEntry('/' + results['id'])
+            .pipe(takeWhile(() => this.alive))
+            .subscribe(
+              entry => {
+                this.id = entry['_id'];
+                this.rev = entry['_rev'];
+                this.type = 'user';
+                this.externalID = entry['externalID'];
+                this.userName = entry['userName'];
+                this.firstName = entry['firstName'];
+                this.lastName = entry['lastName'];
+                this.email = entry['email'];
+                this.password = entry['password'];
+                this.role = entry['role'];
+                this.selectedRole = entry['role'];
+                this.active = entry['active'];
+                this.associatedNorms = entry['associatedNorms'];
+              },
+              error => this.logger.error(error.message)
+            );
+        } else {
+          console.log('New mode');
+          this.editable = true;
+          this.formTitle = 'Neuen User anlegen';
+          this.users = [];
+        }
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   public onSubmit(): void {
@@ -202,9 +211,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
           this.searchRelatedUser(result);
           this.router.navigate(['../user']);
         },
-        err => {
-          console.log(err);
-          this.showConfirm('error', err.message);
+        error => {
+          this.logger.error(error.message);
+          this.showConfirm('error', error.message);
         }
       );
   }
@@ -246,9 +255,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
           this.sendStateUpdate();
           this.router.navigate(['../user']);
         },
-        error => {
-          console.log(error);
-        },
+        error => this.logger.error(error.message),
         () => {}
       );
   }
@@ -273,9 +280,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
         console.log('bulkUpdate');
         console.log(res);
       },
-      error => {
-        console.log(error);
-      }
+      error => this.logger.error(error.message)
     );
   }
 
@@ -305,10 +310,13 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        this.router.navigate(['../user']);
-        this.sendStateUpdate();
-      });
+      .subscribe(
+        result => {
+          this.router.navigate(['../user']);
+          this.sendStateUpdate();
+        },
+        error => this.logger.error(error.message)
+      );
   }
 
   public onDelete(): void {
@@ -323,8 +331,9 @@ export class UserEditComponent implements OnInit, OnDestroy {
               this.sendStateUpdate();
               this.router.navigate(['../user']);
             },
-            err => {
-              this.showConfirm('error', err.message);
+            error => {
+              this.logger.error(error.message);
+              this.showConfirm('error', error.message);
             }
           );
       },

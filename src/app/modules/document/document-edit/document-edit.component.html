@@ -247,7 +247,7 @@
                 (onSelect)="onItemSelect($event)"
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAllTag1($event)"
                 required
                 [disabled]="!editable"
               >
@@ -274,7 +274,7 @@
                 (onSelect)="onItemSelect($event)"
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAllTag2($event)"
                 [disabled]="!editable"
               >
                 <c-badge>
@@ -299,7 +299,7 @@
                 (onSelect)="onItemSelect($event)"
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAllTag3($event)"
                 [disabled]="!editable"
               >
                 <c-badge>
@@ -452,7 +452,7 @@
                 (onSelect)="onItemSelect($event)"
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAllRelatedNorms($event)"
               >
                 <c-item>
                   <ng-template let-item="item">
@@ -547,7 +547,7 @@
                 (onSelect)="onItemSelect($event)"
                 (onDeSelect)="onItemDeSelect($event)"
                 (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAllSelectedUsers($event)"
               >
                 <c-item>
                   <ng-template let-item="item">

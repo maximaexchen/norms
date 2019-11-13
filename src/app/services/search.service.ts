@@ -4,6 +4,7 @@ import { EnvService } from './env.service';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { CouchDBService } from './couchDB.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
@@ -14,7 +15,8 @@ export class SearchService {
   constructor(
     private env: EnvService,
     private http: HttpClient,
-    private couchDBService: CouchDBService
+    private couchDBService: CouchDBService,
+    private logger: NGXLogger
   ) {}
 
   private searchResult = new Subject<NormDocument[]>();
@@ -24,18 +26,22 @@ export class SearchService {
   public search(searchObject?: any) {
     if (searchObject) {
       console.log('search');
-      this.http
-        .post(this.dbRequest + '/_find', searchObject)
-        .subscribe(result => {
+      this.http.post(this.dbRequest + '/_find', searchObject).subscribe(
+        result => {
           this.searchResult.next(result['docs']);
-        });
+        },
+        error => this.logger.error(error.message)
+      );
     } else {
       console.log('all');
       this.couchDBService
         .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
-        .subscribe(result => {
-          this.searchResult.next(result);
-        });
+        .subscribe(
+          result => {
+            this.searchResult.next(result);
+          },
+          error => this.logger.error(error.message)
+        );
     }
   }
 }

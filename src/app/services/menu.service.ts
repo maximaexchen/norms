@@ -7,6 +7,7 @@ import { MessageService } from 'primeng/components/common/messageservice';
 import { MenuItem } from 'primeng/components/common/api';
 import { DocumentComponent } from '@app/modules/document/document.component';
 import { RoleComponent } from '@app/modules/role/role.component';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({ providedIn: 'root' })
 export class ACP_Menu {
@@ -15,7 +16,7 @@ export class ACP_Menu {
   private componentID = 900;
   private messageService: MessageService;
 
-  constructor() {
+  constructor(private logger: NGXLogger) {
     this.routes = [
       { path: 'document', component: DocumentComponent },
       { path: 'tag', component: TagComponent },
@@ -94,7 +95,8 @@ export class ACP_Menu {
           });
           router.resetConfig(userPermittedRoutes);
         },
-        err => {
+        error => {
+          this.logger.error(error.message);
           this.messageService.add({
             severity: 'error',
             summary: 'Menüerstellung failed!',

@@ -5,6 +5,7 @@ import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { User } from '../../../models/user.model';
 import { takeWhile } from 'rxjs/operators';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-user-list',
@@ -21,7 +22,8 @@ export class UserListComponent implements OnInit, OnDestroy {
   constructor(
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
-    private router: Router
+    private router: Router,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -34,7 +36,7 @@ export class UserListComponent implements OnInit, OnDestroy {
             this.getUsers();
           }
         },
-        err => console.log('Error', err),
+        error => this.logger.error(error.message),
         () => console.log('completed.')
       );
 
@@ -48,20 +50,18 @@ export class UserListComponent implements OnInit, OnDestroy {
       .subscribe(
         res => {
           this.users = res;
+          console.log(this.users);
           this.userCount = this.users.length;
         },
-        err => {
-          console.log('Error on loading users');
-        }
+        error => this.logger.error(error.message)
       );
   }
 
   public onRowSelect(event) {
-    console.log(event.data);
     this.router.navigate(['../user/' + event.data._id + '/edit']);
   }
 
-  public onFilter(event: any): void {
+  public onFilter(event: any, dt: any): void {
     this.userCount = event.filteredValue.length;
   }
 

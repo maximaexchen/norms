@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { MenuItem } from 'primeng/components/common/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-header',
@@ -14,20 +15,29 @@ export class HeaderComponent implements OnInit {
   public mainmenuItems: MenuItem[] = [];
   public userName: string;
 
-  constructor(public authenticationService: AuthenticationService) {}
+  constructor(
+    public authenticationService: AuthenticationService,
+    private logger: NGXLogger
+  ) {}
 
   ngOnInit() {
     // this.initMainMenu();
 
-    this.authenticationService.userName$.subscribe(res => {
-      console.log(this.authenticationService);
-      console.log(res);
-      this.userName = res;
-    });
+    this.authenticationService.userName$.subscribe(
+      res => {
+        console.log(this.authenticationService);
+        console.log(res);
+        this.userName = res;
+      },
+      error => this.logger.error(error.message)
+    );
 
-    this.authenticationService.userIsLoggedIn$.subscribe(res => {
-      this.initMainMenu();
-    });
+    this.authenticationService.userIsLoggedIn$.subscribe(
+      res => {
+        this.initMainMenu();
+      },
+      error => this.logger.error(error.message)
+    );
 
     if (this.authenticationService.isAuthenticated) {
       this.initMainMenu();

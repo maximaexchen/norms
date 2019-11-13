@@ -11,6 +11,7 @@ import { User } from '@app/models/user.model';
 import { Publisher } from '@app/models/publisher.model';
 import { takeWhile, groupBy } from 'rxjs/operators';
 import { Tag } from '@app/models/tag.model';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-document-search',
@@ -44,7 +45,8 @@ export class SearchComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private searchService: SearchService,
-    private documentService: DocumentService
+    private documentService: DocumentService,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -73,9 +75,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           res => {
             this.groups = res;
           },
-          err => {
-            console.log(err);
-          }
+          error => this.logger.error(error.message)
         );
       this.documentService
         .getUsers()
@@ -84,9 +84,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           res => {
             this.users = res;
           },
-          err => {
-            console.log(err);
-          }
+          error => this.logger.error(error.message)
         );
 
       this.documentService
@@ -96,9 +94,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           res => {
             this.publishers = res;
           },
-          err => {
-            console.log(err);
-          }
+          error => this.logger.error(error.message)
         );
 
       this.documentService
@@ -108,9 +104,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           res => {
             this.tags = res;
           },
-          err => {
-            console.log(err);
-          }
+          error => this.logger.error(error.message)
         );
       this.documentService
         .getUsers()
@@ -119,9 +113,7 @@ export class SearchComponent implements OnInit, OnDestroy {
           res => {
             this.owners = res;
           },
-          err => {
-            console.log(err);
-          }
+          error => this.logger.error(error.message)
         );
     });
   }

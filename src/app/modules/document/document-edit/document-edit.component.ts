@@ -22,6 +22,7 @@ import { EnvService } from 'src/app/services/env.service';
 import { takeWhile } from 'rxjs/operators';
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-document-edit',
@@ -99,7 +100,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private serverService: ServerService,
     private notificationsService: NotificationsService,
     private confirmationService: ConfirmationService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -110,22 +112,25 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private setStartValues() {
     console.log('setStartValues');
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      this.currentUserRole = this.authService.getUserRole();
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+      results => {
+        this.currentUserRole = this.authService.getUserRole();
 
-      // fetch data for select-boxes
-      this.getPublishers();
-      this.getUsers();
-      this.getTags();
-      this.getRelatedNorms();
+        // fetch data for select-boxes
+        this.getPublishers();
+        this.getUsers();
+        this.getTags();
+        this.getRelatedNorms();
 
-      // check if we are updating
-      if (results['id']) {
-        this.editDocument(results);
-      } else {
-        this.newDocument();
-      }
-    });
+        // check if we are updating
+        if (results['id']) {
+          this.editDocument(results);
+        } else {
+          this.newDocument();
+        }
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   private newDocument() {
@@ -153,7 +158,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.getDocumentData(entry);
         },
         error => {
-          console.log(error.message);
+          this.logger.error(error.message);
         },
         () => {}
       );
@@ -176,7 +181,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               .subscribe(
                 res => {},
                 error => {
-                  console.log(error);
+                  this.logger.error(error.message);
                   this.showConfirmation('error', error.message);
                 },
                 () => {
@@ -190,7 +195,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.sendStateUpdate();
         },
         error => {
-          console.log(error.message);
+          this.logger.error(error.message);
           this.isLoading = false;
         },
         () => {}
@@ -206,7 +211,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         .subscribe(
           result => {},
           error => {
-            console.log(error);
+            this.logger.error(error.message);
             this.showConfirmation('error', error.message);
           },
           () => {
@@ -226,7 +231,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         results => {},
         error => {
-          console.log(error);
+          this.logger.error(error.message);
           this.showConfirmation('error', error.message);
           this.isLoading = false;
         },
@@ -247,60 +252,64 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.couchDBService
         .fetchEntry('/' + user['id'])
         .pipe(takeWhile(() => this.alive))
-        .subscribe(entry => {
-          let associatedNorms = [];
+        .subscribe(
+          entry => {
+            let associatedNorms = [];
 
-          if (entry['associatedNorms']) {
-            associatedNorms = entry['associatedNorms'];
+            if (entry['associatedNorms']) {
+              associatedNorms = entry['associatedNorms'];
+            }
+
+            const now = new Date();
+            const isoString = now.toISOString();
+
+            const newAssociatedNorm = {
+              normId: this.id,
+              revisionId: revision,
+              normNumber: this.normNumber,
+              date: isoString,
+              confirmed: false,
+              confirmedDate: ''
+            };
+
+            if (!!this.revisionDocuments[0]) {
+              newAssociatedNorm['normDocument'] =
+                this.revisionDocuments[0]['name'] || '';
+            }
+
+            associatedNorms.push(newAssociatedNorm);
+
+            const updateUser = {
+              _id: entry['_id'],
+              _rev: entry['_rev'],
+              type: 'user',
+              userName: entry['userName'],
+              externalID: entry['externalID'],
+              firstName: entry['firstName'],
+              lastName: entry['lastName'],
+              email: entry['email'],
+              role: entry['role'],
+              password: entry['password'],
+              active: entry['active'],
+              associatedNorms
+            };
+
+            this.couchDBService
+              .writeEntry(updateUser)
+              .pipe(takeWhile(() => this.alive))
+              .subscribe(
+                result => {
+                  this.sendStateUpdate();
+                },
+                error => {
+                  this.logger.error(error.message);
+                }
+              );
+          },
+          error => {
+            this.logger.error(error.message);
           }
-
-          const now = new Date();
-          const isoString = now.toISOString();
-
-          const newAssociatedNorm = {
-            normId: this.id,
-            revisionId: revision,
-            normNumber: this.normNumber,
-            date: isoString,
-            confirmed: false,
-            confirmedDate: ''
-          };
-
-          if (!!this.revisionDocuments[0]) {
-            newAssociatedNorm['normDocument'] =
-              this.revisionDocuments[0]['name'] || '';
-          }
-
-          associatedNorms.push(newAssociatedNorm);
-
-          const updateUser = {
-            _id: entry['_id'],
-            _rev: entry['_rev'],
-            type: 'user',
-            userName: entry['userName'],
-            externalID: entry['externalID'],
-            firstName: entry['firstName'],
-            lastName: entry['lastName'],
-            email: entry['email'],
-            role: entry['role'],
-            password: entry['password'],
-            active: entry['active'],
-            associatedNorms
-          };
-
-          this.couchDBService
-            .writeEntry(updateUser)
-            .pipe(takeWhile(() => this.alive))
-            .subscribe(
-              result => {
-                this.sendStateUpdate();
-                console.log(result);
-              },
-              error => {
-                console.log(error);
-              }
-            );
-        });
+        );
     });
   }
 
@@ -413,7 +422,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           };
         },
         error => {
-          console.log(error.message);
+          this.logger.error(error.message);
           this.isLoading = false;
         },
         () => {
@@ -449,19 +458,24 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .pipe(takeWhile(() => this.alive))
-      .subscribe(results => {
-        // Add all users for the selectable owner dropdown
-        this.owners = results;
+      .subscribe(
+        results => {
+          // Add all users for the selectable owner dropdown
+          this.owners = results;
 
-        // Also add to the users
-        results.forEach(item => {
-          const userObject = {} as User;
-          userObject['id'] = item._id;
-          userObject['name'] = item.lastName + ', ' + item.firstName;
-          userObject['email'] = item.email;
-          this.users.push(userObject);
-        });
-      });
+          // Also add to the users
+          results.forEach(item => {
+            const userObject = {} as User;
+            userObject['id'] = item._id;
+            userObject['name'] = item.lastName + ', ' + item.firstName;
+            userObject['email'] = item.email;
+            this.users.push(userObject);
+          });
+        },
+        error => {
+          this.logger.error(error.message);
+        }
+      );
   }
 
   // f8848d43-e241-437b-96e7-5d67dd
@@ -483,7 +497,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.relatedNorms.push(relatedObject);
           });
         },
-        err => {}
+        error => {
+          this.logger.error(error.message);
+        }
       );
   }
 
@@ -495,7 +511,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         res => {
           this.publishers = res;
         },
-        err => {}
+        error => {
+          this.logger.error(error.message);
+        }
       );
   }
 
@@ -506,26 +524,31 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
       .pipe(takeWhile(() => this.alive))
-      .subscribe(results => {
-        results.forEach(tag => {
-          const tagObject = {} as Tag;
-          tagObject['id'] = tag._id;
-          tagObject['name'] = tag.name;
-          tagObject['tagType'] = tag.tagType;
-          tagObject['active'] = tag.active;
-          switch (tag.tagType) {
-            case 'level1':
-              this.tagsLevel1.push(tagObject);
-              break;
-            case 'level2':
-              this.tagsLevel2.push(tagObject);
-              break;
-            case 'level3':
-              this.tagsLevel3.push(tagObject);
-              break;
-          }
-        });
-      });
+      .subscribe(
+        results => {
+          results.forEach(tag => {
+            const tagObject = {} as Tag;
+            tagObject['id'] = tag._id;
+            tagObject['name'] = tag.name;
+            tagObject['tagType'] = tag.tagType;
+            tagObject['active'] = tag.active;
+            switch (tag.tagType) {
+              case 'level1':
+                this.tagsLevel1.push(tagObject);
+                break;
+              case 'level2':
+                this.tagsLevel2.push(tagObject);
+                break;
+              case 'level3':
+                this.tagsLevel3.push(tagObject);
+                break;
+            }
+          });
+        },
+        error => {
+          this.logger.error(error.message);
+        }
+      );
   }
 
   public onSubmit(): void {
@@ -549,8 +572,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             res => {
               this.deleteRelatedDatabaseEntries(this.id);
             },
-            err => {
-              this.showConfirmation('error', err.message);
+            error => {
+              this.logger.error(error.message);
+              this.showConfirmation('error', error.message);
             },
             () => {
               this.sendStateUpdate();
@@ -600,8 +624,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             result => {
               console.log(user);
             },
-            err => {
-              console.log(err);
+            error => {
+              this.logger.error(error.message);
             }
           );
       });
@@ -609,6 +633,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getDocumentData(entry: any) {
+    this.resetComponent();
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
@@ -622,8 +647,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.owner = entry['owner'];
     this.ownerId = entry['owner']._id;
     this.active = entry['active'];
-
-    console.log('Owner: ' + this.owner['_id']);
 
     if (entry.description) {
       this.descriptionDE = entry.description.de;
@@ -643,6 +666,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     if (entry['tags']) {
       const ent = _.sortBy(entry['tags'], 'tagType');
+
+      this.logger.log(ent);
 
       ent.forEach(element => {
         switch (element['tagType']) {
@@ -892,7 +917,31 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public onItemSelect(item: any) {}
   public onItemDeSelect(item: any) {}
   public onSelectAll(items: any) {}
-  public onDeSelectAll(items: any) {}
+  public onDeSelectAll(items: any) {
+    this.logger.info(items);
+    /* this.selectedTags1 = [];
+    this.selectedTags2 = [];
+    this.selectedTags3 = []; */
+  }
+  public onDeSelectAllTag1(items: any) {
+    this.selectedTags1 = [];
+  }
+
+  public onDeSelectAllTag2(items: any) {
+    this.selectedTags2 = [];
+  }
+
+  public onDeSelectAllTag3(items: any) {
+    this.selectedTags3 = [];
+  }
+
+  public onDeSelectAllRelatedNorms(items: any) {
+    this.selectedRelatedNorms = [];
+  }
+
+  public onDeSelectAllSelectedUsers(items: any) {
+    this.selectedUsers = [];
+  }
 
   ngOnDestroy(): void {
     this.alive = false;

@@ -19,6 +19,7 @@ import { NotificationsService } from 'src/app/services/notifications.service';
 import { Group } from '../../../models/group.model';
 import { User } from '@app/models/user.model';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-group-edit',
@@ -54,7 +55,8 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private notificationsService: NotificationsService,
     private confirmationService: ConfirmationService,
-    public authService: AuthenticationService
+    public authService: AuthenticationService,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -72,16 +74,19 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     this.assignMultiselectConfig();
     this.getUsers();
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      this.selectedtUsers = [];
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+      results => {
+        this.selectedtUsers = [];
 
-      // check if we are updating
-      if (results['id']) {
-        this.editGroup(results);
-      } else {
-        this.newGroup();
-      }
-    });
+        // check if we are updating
+        if (results['id']) {
+          this.editGroup(results);
+        } else {
+          this.newGroup();
+        }
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   private assignMultiselectConfig() {
@@ -138,7 +143,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
           this.getSelectedUsers(entry['users']);
         },
-        error => console.log(error.message),
+        error => this.logger.error(error.message),
         () => console.log('Group Observer got a complete notification')
       );
   }
@@ -154,9 +159,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
             result['lastName'] + ', ' + result['firstName'];
           this.selectedtUsers.push(selectedUserObject);
         },
-        error => {
-          this.showConfirm('error', 'Fehler beim Laden der Benutzer');
-        }
+        error => this.logger.error(error.message)
       );
     });
   }
@@ -174,9 +177,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
             this.users.push(userObject);
           });
         },
-        err => {
-          console.log('Error on loading users');
-        }
+        error => this.logger.error(error.message)
       );
   }
 
@@ -203,9 +204,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
           this.sendStateUpdate();
           this.router.navigate(['../group']);
         },
-        error => {
-          console.log('Error updating groupe' + error.message);
-        }
+        error => this.logger.error(error.message)
       );
   }
 
@@ -221,9 +220,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
         result => {
           this.sendStateUpdate();
         },
-        error => {
-          console.log('Error crrating group: ' + error.message);
-        }
+        error => this.logger.error(error.message)
       );
   }
 
@@ -246,9 +243,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
               this.sendStateUpdate();
               this.router.navigate(['../group']);
             },
-            err => {
-              this.showConfirm('error', err.message);
-            }
+            error => this.logger.error(error.message)
           );
       },
       reject: () => {}
@@ -305,19 +300,11 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     this.dropdownSettings = Object.assign({}, this.dropdownSettings);
   }
 
-  public onItemSelect(item: any) {
-    console.log(item);
-    console.log(this.selectedtUsers);
-  }
-  public onItemDeSelect(item: any) {
-    console.log(item);
-    console.log(this.selectedtUsers);
-  }
-  public onSelectAll(items: any) {
-    console.log(items);
-  }
+  public onItemSelect(item: any) {}
+  public onItemDeSelect(item: any) {}
+  public onSelectAll(items: any) {}
   public onDeSelectAll(items: any) {
-    console.log(items);
+    this.selectedtUsers = [];
   }
 
   ngOnDestroy(): void {

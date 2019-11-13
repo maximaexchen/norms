@@ -7,6 +7,7 @@ import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { Group } from '../../../models/group.model';
 import { takeWhile } from 'rxjs/operators';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-group-list',
@@ -23,18 +24,22 @@ export class GroupListComponent implements OnInit, OnDestroy {
   constructor(
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
-    private router: Router
+    private router: Router,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
     this.couchDBService
       .setStateUpdate()
       .pipe(takeWhile(() => this.alive))
-      .subscribe(message => {
-        if (message.text === 'group') {
-          this.getGroups();
-        }
-      });
+      .subscribe(
+        message => {
+          if (message.text === 'group') {
+            this.getGroups();
+          }
+        },
+        error => this.logger.error(error.message)
+      );
 
     this.getGroups();
   }
@@ -48,9 +53,7 @@ export class GroupListComponent implements OnInit, OnDestroy {
           this.groups = res;
           this.groupCount = this.groups.length;
         },
-        err => {
-          console.log('Error on loading groups');
-        }
+        error => this.logger.error(error.message)
       );
   }
 

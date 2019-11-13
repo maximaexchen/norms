@@ -9,6 +9,7 @@ import { CouchDBService } from '@app/services/couchDB.service';
 import { NotificationsService } from '@app/services/notifications.service';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Role } from '@models/index';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-role-edit',
@@ -40,7 +41,8 @@ export class RoleEditComponent implements OnInit, OnDestroy {
     private router: Router,
     private notificationsService: NotificationsService,
     private confirmationService: ConfirmationService,
-    public authService: AuthenticationService
+    public authService: AuthenticationService,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -55,14 +57,17 @@ export class RoleEditComponent implements OnInit, OnDestroy {
       this.roleForm.form.markAsPristine();
     }
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      // check if we are updating
-      if (results['id']) {
-        this.editRole(results['id']);
-      } else {
-        this.newRole();
-      }
-    });
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+      results => {
+        // check if we are updating
+        if (results['id']) {
+          this.editRole(results['id']);
+        } else {
+          this.newRole();
+        }
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   private newRole() {
@@ -82,7 +87,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
         entry => {
           this.getRoleData(entry);
         },
-        error => console.log(error.message),
+        error => this.logger.error(error.message),
         () => console.log('Rolle Observer got a complete notification')
       );
   }
@@ -122,13 +127,12 @@ export class RoleEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          // Inform about Database change.
           this.router.navigate(['../role']);
           this.sendStateUpdate();
         },
-        err => {
-          console.log(err);
-          this.showConfirm('error', err.message);
+        error => {
+          this.logger.error(error.message);
+          this.showConfirm('error', error.message);
         }
       );
   }
@@ -138,11 +142,13 @@ export class RoleEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        console.log(result);
-        this.router.navigate(['../role']);
-        this.sendStateUpdate();
-      });
+      .subscribe(
+        result => {
+          this.router.navigate(['../role']);
+          this.sendStateUpdate();
+        },
+        error => this.logger.error(error.message)
+      );
   }
 
   public onDelete() {
@@ -157,9 +163,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
               this.sendStateUpdate();
               this.router.navigate(['../user']);
             },
-            err => {
-              this.showConfirm('error', err.message);
-            }
+            error => this.logger.error(error.message)
           );
       },
       reject: () => {}

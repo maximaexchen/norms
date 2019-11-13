@@ -5,6 +5,7 @@ import { Subscription, Observable } from 'rxjs';
 import { User } from '@app/models/user.model';
 import { Group } from '@app/models/group.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { NGXLogger } from 'ngx-logger';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
@@ -23,7 +24,8 @@ export class DocumentService {
 
   constructor(
     private http: HttpClient,
-    private couchDBService: CouchDBService
+    private couchDBService: CouchDBService,
+    private logger: NGXLogger
   ) {}
 
   public getDocuments(): Observable<any> {
@@ -34,14 +36,18 @@ export class DocumentService {
 
   public getSelectedUsers(usersIds: string[]): User[] {
     usersIds.forEach(userId => {
-      this.getUserByID(userId).subscribe(result => {
-        // build the Object for the selectbox in right format
-        const selectedUserObject = {} as User;
-        selectedUserObject['id'] = result._id;
-        selectedUserObject['name'] = result.lastName + ', ' + result.firstName;
-        selectedUserObject['email'] = result.email;
-        this.selectedtUsers.push(selectedUserObject);
-      });
+      this.getUserByID(userId).subscribe(
+        result => {
+          // build the Object for the selectbox in right format
+          const selectedUserObject = {} as User;
+          selectedUserObject['id'] = result._id;
+          selectedUserObject['name'] =
+            result.lastName + ', ' + result.firstName;
+          selectedUserObject['email'] = result.email;
+          this.selectedtUsers.push(selectedUserObject);
+        },
+        error => this.logger.error(error.message)
+      );
     });
 
     return this.selectedtUsers;
@@ -133,7 +139,7 @@ export class DocumentService {
         }, 100);
       },
       error => {
-        console.log('download error:', JSON.stringify(error));
+        this.logger.error(error.message);
       },
       () => {
         console.log('Completed file download.');

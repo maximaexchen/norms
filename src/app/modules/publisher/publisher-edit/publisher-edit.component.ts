@@ -9,6 +9,7 @@ import { Publisher } from '../../../models/publisher.model';
 import { NotificationsService } from '@app/services/notifications.service';
 import { ConfirmationService } from 'primeng/api';
 import { takeWhile } from 'rxjs/operators';
+import { NGXLogger } from 'ngx-logger';
 @Component({
   selector: 'app-publisher-edit',
   templateUrl: './publisher-edit.component.html',
@@ -35,7 +36,8 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private notificationsService: NotificationsService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private logger: NGXLogger
   ) {}
 
   ngOnInit() {
@@ -45,24 +47,29 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
   }
 
   private getPublisher() {
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      // check if we are updating
-      if (results['id']) {
-        console.log('Edit mode');
-        this.isNew = false;
-        this.formTitle = 'Bereich bearbeiten';
-        this.couchDBService.fetchEntry('/' + results['id']).subscribe(entry => {
-          this.id = entry['_id'];
-          this.rev = entry['_rev'];
-          this.name = entry['name'];
-          this.active = entry['active'];
-        });
-      } else {
-        console.log('New mode');
-        this.formTitle = 'Neuen Bereich anlegen';
-        this.publishers = [];
-      }
-    });
+    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+      results => {
+        // check if we are updating
+        if (results['id']) {
+          console.log('Edit mode');
+          this.isNew = false;
+          this.formTitle = 'Bereich bearbeiten';
+          this.couchDBService
+            .fetchEntry('/' + results['id'])
+            .subscribe(entry => {
+              this.id = entry['_id'];
+              this.rev = entry['_rev'];
+              this.name = entry['name'];
+              this.active = entry['active'];
+            });
+        } else {
+          console.log('New mode');
+          this.formTitle = 'Neuen Bereich anlegen';
+          this.publishers = [];
+        }
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   onSubmit(): void {
@@ -87,9 +94,7 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
               this.sendStateUpdate();
               this.router.navigate(['../publisher']);
             },
-            err => {
-              this.showConfirm('error', err.message);
-            }
+            error => this.logger.error(error.message)
           );
       },
       reject: () => {}
@@ -103,30 +108,33 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .updateEntry(this.writeItem, this.normForm.value._id)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        // Query for NormDocuments having the changed publisher
-        const updateQuery = {
-          use_index: ['_design/search_norm'],
-          selector: {
-            _id: { $gt: null },
-            type: { $eq: 'norm' },
-            publisher: {
-              _id: { $eq: result.id }
+      .subscribe(
+        result => {
+          // Query for NormDocuments having the changed publisher
+          const updateQuery = {
+            use_index: ['_design/search_norm'],
+            selector: {
+              _id: { $gt: null },
+              type: { $eq: 'norm' },
+              publisher: {
+                _id: { $eq: result.id }
+              }
             }
-          }
-        };
+          };
 
-        // Update all NormDocuments with the changed publisher
-        this.couchDBService
-          .search(updateQuery)
-          .pipe(takeWhile(() => this.alive))
-          .subscribe(results => {
-            this.updateRelated(results);
-          });
+          // Update all NormDocuments with the changed publisher
+          this.couchDBService
+            .search(updateQuery)
+            .pipe(takeWhile(() => this.alive))
+            .subscribe(results => {
+              this.updateRelated(results);
+            });
 
-        // Inform about Database change.
-        this.sendStateUpdate();
-      });
+          // Inform about Database change.
+          this.sendStateUpdate();
+        },
+        error => this.logger.error(error.message)
+      );
   }
 
   private onCreatePublisher(): void {
@@ -137,9 +145,12 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .writeEntry(this.writeItem)
       .pipe(takeWhile(() => this.alive))
-      .subscribe(result => {
-        this.sendStateUpdate();
-      });
+      .subscribe(
+        result => {
+          this.sendStateUpdate();
+        },
+        error => this.logger.error(error.message)
+      );
   }
 
   private createWriteItem() {

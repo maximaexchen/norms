@@ -17,6 +17,7 @@ import { takeWhile } from 'rxjs/operators';
 import { SearchService } from '@app/services/search.service';
 import { AuthenticationService } from './../../auth/services/authentication.service';
 import _ = require('underscore');
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-document-list',
@@ -49,27 +50,33 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     private documentService: DocumentService,
     private searchService: SearchService,
     private router: Router,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private logger: NGXLogger
   ) {
-    this.searchService.searchResultData.subscribe(result => {
-      this.documents = result;
-      this.setPublisherFromTags();
-      console.log('this.documents');
-      console.log(this.documents);
-    });
+    this.searchService.searchResultData.subscribe(
+      result => {
+        this.documents = result;
+        this.setPublisherFromTags();
+        this.documentCount = this.documents.length;
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   ngOnInit() {
-    console.log('ngOnInit: DocumentListComponent');
+    this.logger.log('ngOnInit: DocumentListComponent');
 
     this.couchDBService
       .setStateUpdate()
       .pipe(takeWhile(() => this.alive))
-      .subscribe(message => {
-        if (message.text === 'document') {
-          this.getDocuments();
-        }
-      });
+      .subscribe(
+        message => {
+          if (message.text === 'document') {
+            this.getDocuments();
+          }
+        },
+        error => this.logger.error(error.message)
+      );
     this.getDocuments();
   }
 
@@ -100,7 +107,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           }
         },
         error => {
-          console.log(error.message);
+          this.logger.error(error.message);
         },
         () => {}
       );
@@ -123,13 +130,12 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   public onRowSelect(event: any) {
-    console.log(event.data);
-
-    //
     this.router.navigate(['../document/' + event.data._id + '/edit']);
   }
 
   public onFilter(event: any, dt: any): void {
+    this.logger.log(event);
+    this.logger.log(dt);
     // Check for simple ASCII Characters and give warning
     if (!_.isEmpty(event.filters.global)) {
       this.filterInputCheck = /^(?:(?!["';<=>\\])[\x20-\x7E])+$/u.test(
