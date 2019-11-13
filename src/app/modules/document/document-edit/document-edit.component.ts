@@ -487,13 +487,28 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          // Also add to the users
           result.forEach(item => {
             const relatedObject = {} as NormDocument;
             relatedObject['id'] = item._id;
             relatedObject['normNumber'] = item.normNumber;
             relatedObject['revision'] = item.revision;
             relatedObject['scope'] = item.scope;
+
+            if (!!item._attachments) {
+              const sortedByRevision = _.sortBy(
+                item._attachments,
+                (object, key) => {
+                  object['id'] = key;
+                  return object['revpos'];
+                }
+              ).reverse();
+
+              // take the first
+              const latest = _.first(sortedByRevision);
+              console.log(latest['id']);
+              relatedObject['normFileName'] = latest['id'];
+            }
+
             this.relatedNorms.push(relatedObject);
           });
         },
@@ -667,8 +682,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (entry['tags']) {
       const ent = _.sortBy(entry['tags'], 'tagType');
 
-      this.logger.log(ent);
-
       ent.forEach(element => {
         switch (element['tagType']) {
           case 'level1':
@@ -737,17 +750,21 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.normForm.value._rev) {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
-
+    console.log(this.selectedRelatedNorms);
     const selectedRelatedObjects = [
       ...new Set(
         this.selectedRelatedNorms.map(related => {
           const newRelated = {};
           newRelated['id'] = related['id'];
           newRelated['normNumber'] = related['normNumber'];
+          console.log(related['normFileName']);
+          newRelated['normFileName'] = related['normFileName'];
           return newRelated;
         })
       )
     ];
+    console.log(selectedRelatedObjects);
+    console.log(this.selectedRelatedNorms);
     this.writeItem['relatedNorms'] =
       selectedRelatedObjects || this.selectedRelatedNorms;
 
@@ -817,9 +834,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private setRelatedNorms(relatedNorms: any[]) {
     const relatedMap: NormDocument[] = relatedNorms.map(related => {
+      console.log(related);
       const selectedRelatedObject = {};
       selectedRelatedObject['id'] = related.id;
       selectedRelatedObject['normNumber'] = related.normNumber;
+      console.log(related.normFileName);
+      selectedRelatedObject['normFileName'] = related.normFileName;
       return selectedRelatedObject;
     });
     this.selectedRelatedNorms = relatedMap;
@@ -917,12 +937,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public onItemSelect(item: any) {}
   public onItemDeSelect(item: any) {}
   public onSelectAll(items: any) {}
-  public onDeSelectAll(items: any) {
-    this.logger.info(items);
-    /* this.selectedTags1 = [];
-    this.selectedTags2 = [];
-    this.selectedTags3 = []; */
-  }
+  public onDeSelectAll(items: any) {}
   public onDeSelectAllTag1(items: any) {
     this.selectedTags1 = [];
   }

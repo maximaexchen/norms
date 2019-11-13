@@ -161,7 +161,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
           .subscribe(
             res => {
               this.sendStateUpdate();
-              this.router.navigate(['../user']);
+              this.router.navigate(['../role']);
             },
             error => this.logger.error(error.message)
           );
@@ -201,7 +201,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
   }
 
   private sendStateUpdate(): void {
-    this.couchDBService.sendStateUpdate('user');
+    this.couchDBService.sendStateUpdate('role');
   }
 
   public ngOnDestroy(): void {
