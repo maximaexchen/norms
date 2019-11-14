@@ -44,7 +44,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   selectedTab = 0;
 
   writeItem: NormDocument;
-  publishers: Publisher[] = [];
   owners: User[] = [];
   users: User[] = [];
   selectedUsers: User[] = [];
@@ -117,10 +116,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.currentUserRole = this.authService.getUserRole();
 
         // fetch data for select-boxes
-        this.getPublishers();
-        this.getUsers();
-        this.getTags();
-        this.getRelatedNorms();
+        this.getUsersForSelect();
+        this.getTagsForSelect();
+        this.getNormsForRelatedSelect();
 
         // check if we are updating
         if (results['id']) {
@@ -317,9 +315,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('resetComponent');
     this.editable = false;
     this.users = [];
-    this.publishers = [];
     this.owners = [];
-    this.relatedNorms = [];
+    // this.relatedNorms = [];
     this.selectedRelatedNorms = [];
     this.selectedUsers = [];
     this.selectedTags1 = [];
@@ -454,7 +451,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.documentService.getDownload(id, name);
   }
 
-  private getUsers(): void {
+  private getUsersForSelect(): void {
     this.couchDBService
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .pipe(takeWhile(() => this.alive))
@@ -480,7 +477,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   // f8848d43-e241-437b-96e7-5d67dd
 
-  private getRelatedNorms() {
+  private getNormsForRelatedSelect() {
     this.relatedNorms = [];
     this.documentService
       .getDocuments()
@@ -492,8 +489,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             relatedObject['id'] = item._id;
             relatedObject['normNumber'] = item.normNumber;
             relatedObject['revision'] = item.revision;
-            relatedObject['scope'] = item.scope;
-
             if (!!item._attachments) {
               const sortedByRevision = _.sortBy(
                 item._attachments,
@@ -505,7 +500,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
               // take the first
               const latest = _.first(sortedByRevision);
-              console.log(latest['id']);
               relatedObject['normFileName'] = latest['id'];
             }
 
@@ -518,21 +512,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       );
   }
 
-  private getPublishers() {
-    this.documentService
-      .getPublishers()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        res => {
-          this.publishers = res;
-        },
-        error => {
-          this.logger.error(error.message);
-        }
-      );
-  }
-
-  private getTags(): void {
+  private getTagsForSelect(): void {
     this.tagsLevel1 = [];
     this.tagsLevel2 = [];
     this.tagsLevel3 = [];
@@ -750,32 +730,24 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.normForm.value._rev) {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
-    console.log(this.selectedRelatedNorms);
     const selectedRelatedObjects = [
       ...new Set(
         this.selectedRelatedNorms.map(related => {
           const newRelated = {};
           newRelated['id'] = related['id'];
           newRelated['normNumber'] = related['normNumber'];
-          console.log(related['normFileName']);
+          newRelated['revision'] = related['revision'];
           newRelated['normFileName'] = related['normFileName'];
           return newRelated;
         })
       )
     ];
-    console.log(selectedRelatedObjects);
-    console.log(this.selectedRelatedNorms);
     this.writeItem['relatedNorms'] =
       selectedRelatedObjects || this.selectedRelatedNorms;
 
     this.setSelectedUser();
 
     this.setSelectedTags();
-
-    const selPublisher = this.publishers.find(
-      pub => pub['_id'] === this.normForm.value.publisherId
-    );
-    this.writeItem['publisher'] = selPublisher || this.publisher;
 
     const selOwner = this.owners.find(
       own => own['_id'] === this.normForm.value.ownerId
@@ -838,10 +810,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       const selectedRelatedObject = {};
       selectedRelatedObject['id'] = related.id;
       selectedRelatedObject['normNumber'] = related.normNumber;
-      console.log(related.normFileName);
+      selectedRelatedObject['revision'] = related.revision;
       selectedRelatedObject['normFileName'] = related.normFileName;
       return selectedRelatedObject;
     });
+
     this.selectedRelatedNorms = relatedMap;
   }
 
@@ -856,20 +829,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedUsers = userMap;
   }
 
-  /* private setSelectedTags(tags: Tag[]): Tag {
-    return tags.map(tag => {
-      const selectedTagObject: Tag = {};
-      selectedTagObject['id'] = tag['id'];
-      selectedTagObject['name'] = tag['name'];
-      selectedTagObject['tagType'] = tag['tagType'];
-      selectedTagObject['active'] = tag['active'];
-      return selectedTagObject;
-    });
-    // this.selectedTags = tagMap;
-  } */
-
   public showRelated(id: string) {
     this.router.navigate(['../document/' + id + '/edit']);
+  }
+
+  public deleteRelated(id: string) {
+    console.log(id);
+    this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
+      item => item['id'] !== id
+    );
   }
 
   private showConfirmation(type: string, result: string) {

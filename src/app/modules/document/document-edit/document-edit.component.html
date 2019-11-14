@@ -85,31 +85,6 @@
             </div>
           </div>
 
-          <!-- <div class="col-sm-8">
-              <div class="form-group row">
-                <label
-                  class="col-sm-6 col-form-label"
-                  i18n="@@string-distributor-dataset"
-                  >Herausgeber</label
-                >
-                <div class="col-sm-6">
-                  <select
-                    class="form-control"
-                    [(ngModel)]="publisherId"
-                    name="publisherId"
-                  >
-                    <option value="">Herausgeber wählen</option>
-                    <option
-                      *ngFor="let item of publishers"
-                      [value]="item['_id']"
-                      [selected]="item['_id'] == publisherId"
-                    >
-                      {{ item['name'] }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-            </div> -->
           <div class="form-group row">
             <label
               class="col-sm-4 col-form-label"
@@ -436,7 +411,7 @@
 
     <p-tabPanel header="Referenzen" i18n="@@string-references-dataset">
       <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-8">
           <div class="form-group row">
             <label
               class="col-sm-2 col-form-label"
@@ -465,7 +440,7 @@
         </div>
       </div>
       <div class="row" *ngIf="selectedRelatedNorms.length > 0">
-        <div class="col-sm-6">
+        <div class="col-sm-8">
           <div class="row">
             <label
               class="col-sm-2 col-form-label"
@@ -476,20 +451,19 @@
               <table class="table table-striped">
                 <thead>
                   <tr>
-                    <th scope="col">Nummer</th>
-                    <th scope="col">Revison</th>
-                    <th scope="col">Scope</th>
-                    <th scope="col">Download</th>
+                    <th scope="col" i18n="@@string-number">Nummer</th>
+                    <th scope="col" i18n="@@string-revision">Revison</th>
+                    <th scope="col" i18n="@@string-relation">Bez</th>
+                    <th scope="col" i18n="@@string-download">Download</th>
+                    <th scope="col" i18n="@@string-delete">Löschen</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    class="clickable"
-                    *ngFor="let related of selectedRelatedNorms"
-                    (click)="showRelated(related.id)"
-                  >
+                  <tr *ngFor="let related of selectedRelatedNorms">
                     <td>
-                      {{ related.normNumber }}
+                      <a class="dynamic-link" (click)="showRelated(related.id)"
+                        ><i class="fas fa-link"></i> {{ related.normNumber }}</a
+                      >
                     </td>
                     <td>{{ related.revision }}</td>
                     <td>{{ related.scope }}</td>
@@ -497,8 +471,19 @@
                       <a
                         class="dynamic-link"
                         (click)="getDownload(related.id, related.normFileName)"
-                        >Download <i class="fas fa-file-download"></i>
+                        ><i class="fas fa-file-download"></i> Download
                       </a>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        [disabled]="normForm.invalid || !editable"
+                        class="btn dynamic-link "
+                        (click)="deleteRelated(related.id)"
+                      >
+                        <i class="fas fa-trash"></i>
+                        <span i18n="@@string-delete"> Löschen</span>
+                      </button>
                     </td>
                   </tr>
                 </tbody>

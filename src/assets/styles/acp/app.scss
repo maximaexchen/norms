@@ -26,6 +26,13 @@ body {
     color: theme-color('primary') !important;
   }
 
+  .btn.dynamic-link {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: theme-color('primary') !important;
+  }
+
   .info-panel {
     padding: 20px;
     text-align: center;
