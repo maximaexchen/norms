@@ -48,7 +48,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   users: User[] = [];
   selectedUsers: User[] = [];
 
-  relatedNorms: NormDocument[] = [];
+  relatedNormsSelectList: NormDocument[] = [];
   selectedRelatedNorms: NormDocument[] = [];
 
   revisionDocuments: RevisionDocument[] = [];
@@ -441,50 +441,36 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   // f8848d43-e241-437b-96e7-5d67dd
 
   private getNormsForRelatedSelect() {
-    this.relatedNorms = [];
+    console.log('getNormsForRelatedSelect');
+    this.relatedNormsSelectList = [];
     this.documentService
       .getDocuments()
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
+          console.log(result);
           result.forEach(item => {
-            const relatedObject = {} as NormDocument;
-            relatedObject['id'] = item._id;
-            relatedObject['normNumber'] = item.normNumber;
-            relatedObject['revision'] = item.revision;
-            switch (item.normLanguage) {
-              case 'de':
-                relatedObject['description'] = item.descriptionDE;
-                break;
-              case 'en':
-                relatedObject['description'] = item.descriptionDE;
-                break;
-              case 'fr':
-                relatedObject['description'] = item.descriptionDE;
-                break;
-            }
-
-            if (!!item._attachments) {
-              const sortedByRevision = _.sortBy(
-                item._attachments,
-                (object, key) => {
-                  object['id'] = key;
-                  return object['revpos'];
-                }
-              ).reverse();
-
-              // take the first
-              const latest = _.first(sortedByRevision);
-              relatedObject['normFileName'] = latest['id'];
-            }
-
-            this.relatedNorms.push(relatedObject);
+            const relatedNormSelectItem = {} as NormDocument;
+            relatedNormSelectItem['id'] = item._id;
+            relatedNormSelectItem['normNumber'] = item.normNumber;
+            this.relatedNormsSelectList.push(relatedNormSelectItem);
           });
         },
         error => {
           this.logger.error(error.message);
         }
       );
+  }
+
+  private getLatestAttchmentFileName(attachemnts: any): string {
+    const sortedByRevision = _.sortBy(attachemnts, (object, key) => {
+      object['id'] = key;
+      return object['revpos'];
+    }).reverse();
+
+    // take the first
+    const latest = _.first(sortedByRevision);
+    return latest['id'];
   }
 
   private getTagsForSelect(): void {
@@ -644,28 +630,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
 
     if (entry['_attachments']) {
-      // Sort by revision => revpos
-      const sortedByRevision = _.sortBy(
-        entry['_attachments'],
-        (object, key) => {
-          object['id'] = key;
-          return object['revpos'];
-        }
-      ).reverse();
-
-      // take the first
-      const latest = _.first(sortedByRevision);
-      const latestAttachment = {
-        [latest['id']]: {
-          content_type: latest['content_type'],
-          digest: latest['digest'],
-          length: latest['length'],
-          revpos: latest['revpos'],
-          stub: latest['stub']
-        }
-      };
       this.attachments = entry['_attachments'];
-      this.latestAttachmentName = latest['id'];
+      this.latestAttachmentName = this.getLatestAttchmentFileName(
+        this.attachments
+      );
     }
   }
 
@@ -699,7 +667,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
 
     const selectedRelatedObjects = [
-      ...new Set(
+      /* ...new Set(
         this.selectedRelatedNorms.map(related => {
           const newRelated = {};
           newRelated['id'] = related['id'];
@@ -709,8 +677,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           newRelated['description'] = related['description'];
           return newRelated;
         })
-      )
+      ) */
     ];
+
+    console.log(this.selectedRelatedNorms);
+
+    this.selectedRelatedNorms.forEach(element => {
+      selectedRelatedObjects.push(element['id']);
+    });
 
     this.setRelatedNormsFrom(selectedRelatedObjects);
 
@@ -750,107 +724,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     return this.writeItem;
   }
 
-  private setRelatedNormsFrom(relatedNorms: any[]) {
-    relatedNorms.forEach(relatedNorm => {
-      console.log(relatedNorm);
-
-      // get the linked Norm
-      this.couchDBService
-        .fetchEntry('/' + relatedNorm['id'])
-        .pipe(
-          switchMap(linkedNorm => {
-            console.log(linkedNorm);
-
-            const newLinkedNorm = {
-              id: this.id,
-              normNumber: this.normNumber,
-              revision: this.revision
-            };
-
-            if (!linkedNorm['relatedFrom']) {
-              linkedNorm.relatedFrom = [];
-            }
-
-            linkedNorm.relatedFrom.push(newLinkedNorm);
-
-            return this.couchDBService
-              .updateEntry(linkedNorm, linkedNorm['_id'])
-              .pipe(
-                tap(r => {
-                  // DO whaterver you want to do with the response of the observable
-                  console.log(r);
-                })
-              );
-          })
-        )
-        .subscribe(result => {
-          console.log('RESULT');
-          console.log(result);
-        });
-
-      /* this.getRouteParams$ = this.route.params.pipe(
-        switchMap(params => {
-          console.log(params);
-          // How to check params here and then subscribe to other observables conditionally
-          //here you can check the params and return the another observable like this:
-
-          //BELOW code is just to show how to return another observable conditionally
-          //Change it as per your logic
-          const p = params['id']; //i am assuming that your param name is `id`;
-          if (p === 100) {
-            return this.anotherObservable()
-              .pipe(
-                tap(r => {
-                  //DO whaterver you want to do with the response of the observable
-                  console.log(r);
-                })
-              );
-          } else {
-            return of(someThingAsPerYourLogic);
-          }
-        })
-      ).subscribe(); */
-
-      /* const one$ = this.couchDBService
-        .fetchEntry('/' + relatedNorm['id'])
-        .pipe(take(1));
-
-      const two$ = this.couchDBService
-        .updateEntry(this.writeItem, relatedNorm['id'])
-        .pipe(
-          take(1),
-          switchMap(value2 => {
-            return one$.pipe(
-              map(res => {
-                console.log('value2 00');
-                console.log(res);
-                console.log('value2 00');
-                console.log(value2);
-                return value2;
-              })
-            );
-          })
-        );
-      two$.subscribe(value2 => {
-        console.log('value2 01');
-        console.log(value2);
-      }); */
-
-      /* this.couchDBService
-        .fetchEntry('/' + relatedNorm['id'])
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          entry => {
-            console.log(entry);
-          },
-          error => {
-            this.logger.error(error.message);
-          },
-          () => {}
-        ); */
-    });
-  }
-
   private setSelectedTags() {
     const selectedTags = [
       ...this.selectedTags1,
@@ -878,17 +751,96 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setRelatedNorms(relatedNorms: any[]) {
-    const relatedMap: NormDocument[] = relatedNorms.map(related => {
-      const selectedRelatedObject = {};
-      selectedRelatedObject['id'] = related.id;
-      selectedRelatedObject['normNumber'] = related.normNumber;
-      selectedRelatedObject['revision'] = related.revision;
-      selectedRelatedObject['normFileName'] = related.normFileName;
-      selectedRelatedObject['description'] = related.description;
-      return selectedRelatedObject;
-    });
+    const relatedArray: NormDocument[] = [];
 
-    this.selectedRelatedNorms = relatedMap;
+    relatedNorms.forEach(relNorm => {
+      this.couchDBService
+        .fetchEntry('/' + relNorm)
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          entry => {
+            let revDescription: string;
+            switch (entry.normLanguage) {
+              case 'de':
+                revDescription = entry.description.de;
+                break;
+              case 'en':
+                revDescription = entry.description.en;
+                break;
+              case 'fr':
+                revDescription = entry.description.en;
+                break;
+            }
+
+            const relatedItem = {
+              id: entry['_id'],
+              normNumber: entry['normNumber'],
+              revision: entry['revision'],
+              description: revDescription
+            };
+
+            if (entry['_attachments']) {
+              relatedItem['normFileName'] = this.getLatestAttchmentFileName(
+                entry['_attachments']
+              );
+            }
+
+            relatedArray.push(relatedItem);
+          },
+          error => {
+            this.logger.error(error.message);
+          },
+          () => {}
+        );
+    });
+    /* console.log(relatedNorms);
+        const relatedMap: NormDocument[] = relatedNorms.map(related => {
+          const selectedRelatedObject = {};
+          selectedRelatedObject['id'] = related.id;
+          selectedRelatedObject['normNumber'] = related.normNumber;
+          selectedRelatedObject['revision'] = related.revision;
+          selectedRelatedObject['normFileName'] = related.normFileName;
+          selectedRelatedObject['description'] = related.description;
+          return selectedRelatedObject;
+        });
+    */
+    this.selectedRelatedNorms = relatedArray;
+  }
+
+  private setRelatedNormsFrom(relatedNorms: any[]) {
+    relatedNorms.forEach(relatedNorm => {
+      console.log(relatedNorm);
+
+      // get the linked Norm
+      this.couchDBService
+        .fetchEntry('/' + relatedNorm)
+        .pipe(
+          switchMap(linkedNorm => {
+            console.log(linkedNorm);
+
+            const newLinkedNorm = this.id;
+
+            if (!linkedNorm['relatedFrom']) {
+              linkedNorm.relatedFrom = [];
+            }
+
+            linkedNorm.relatedFrom.push(newLinkedNorm);
+
+            return this.couchDBService
+              .updateEntry(linkedNorm, linkedNorm['_id'])
+              .pipe(
+                tap(r => {
+                  // DO whaterver you want to do with the response of the observable
+                  console.log(r);
+                })
+              );
+          })
+        )
+        .subscribe(result => {
+          console.log('RESULT');
+          console.log(result);
+        });
+    });
   }
 
   private setSelectedUsers(users: any[]) {
@@ -907,7 +859,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public deleteRelated(id: string) {
-    console.log(id);
     this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
       item => item['id'] !== id
     );

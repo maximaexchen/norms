@@ -420,8 +420,8 @@
             >
             <div class="col-sm-10">
               <angular2-multiselect
-                name="relatedNorms"
-                [data]="relatedNorms"
+                name="relatedNormsSelectList"
+                [data]="relatedNormsSelectList"
                 [(ngModel)]="selectedRelatedNorms"
                 [settings]="relatedDropdownSettings"
                 (onSelect)="onItemSelect($event)"
@@ -468,9 +468,9 @@
                       >
                     </td>
                     <td>{{ related.revision }}</td>
-                    <td>{{ related | json }}{{ related.description }}</td>
+                    <td>{{ related.description }}</td>
                     <td>
-                      <a
+                      <a *ngIf="related.normFileName"
                         class="dynamic-link"
                         (click)="getDownload(related.id, related.normFileName)"
                         ><i class="fas fa-file-download"></i> Download
