@@ -1,28 +1,28 @@
-import { AuthenticationService } from './../../auth/services/authentication.service';
-import { Tag } from '@app/models/tag.model';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, of } from 'rxjs';
+import { takeWhile, switchMap, take, map, tap } from 'rxjs/operators';
+
+import { ConfirmationService } from 'primeng/api';
+import { FileUpload } from 'primeng/fileupload';
 
 import uuidv4 from '@bundled-es-modules/uuid/v4.js';
+import * as _ from 'underscore';
+import { NGXLogger } from 'ngx-logger';
 
+import { AuthenticationService } from './../../auth/services/authentication.service';
 import { CouchDBService } from 'src/app/services/couchDB.service';
+import { NotificationsService } from 'src/app/services/notifications.service';
 import { NormDocument } from '../../../models/document.model';
+import { Tag } from '@app/models/tag.model';
 import { RevisionDocument } from './../revision-document.model';
-import { Publisher } from '../../../models/publisher.model';
 import { User } from '@app/models/user.model';
 import { DocumentService } from 'src/app/services/document.service';
 import { ServerService } from 'src/app/services/server.service';
-import { NotificationsService } from 'src/app/services/notifications.service';
 
-import * as _ from 'underscore';
 import { EnvService } from 'src/app/services/env.service';
-import { takeWhile } from 'rxjs/operators';
-import { ConfirmationService } from 'primeng/api';
-import { FileUpload } from 'primeng/fileupload';
-import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-document-edit',
@@ -66,7 +66,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   id: string;
   rev: string;
   type: string;
-  publisher: Publisher;
   publisherId: string;
   normNumber: string;
 
@@ -137,29 +136,17 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.editable = true;
     this.isNew = true;
     this.formTitle = 'Neue Norm anlegen';
-    this.publisher = '';
     this.owner = '';
     this.id = uuidv4();
   }
 
-  private editDocument(results) {
-    this.isNew = false;
-    this.resetComponent();
-
-    this.formTitle = 'Norm bearbeiten';
-    // fetch document which should be upated
-    this.couchDBService
-      .fetchEntry('/' + results['id'])
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        entry => {
-          this.getDocumentData(entry);
-        },
-        error => {
-          this.logger.error(error.message);
-        },
-        () => {}
-      );
+  public onSubmit(): void {
+    this.isLoading = true;
+    if (this.normForm.value.isNew) {
+      this.saveDocument();
+    } else {
+      this.updateDocument();
+    }
   }
 
   private saveDocument(): void {
@@ -219,6 +206,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.writeUpdate();
     }
+  }
+
+  private editDocument(results) {
+    this.isNew = false;
+    this.resetComponent();
+
+    this.formTitle = 'Norm bearbeiten';
+    // fetch document which should be upated
+    this.couchDBService
+      .fetchEntry('/' + results['id'])
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        entry => {
+          this.getDocumentData(entry);
+        },
+        error => {
+          this.logger.error(error.message);
+        },
+        () => {}
+      );
   }
 
   private writeUpdate() {
@@ -328,50 +335,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
     this.assignMultiselectConfig();
     this.fileUploadInput.clear();
-  }
-
-  private assignMultiselectConfig() {
-    this.userDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Benutzer wählen',
-      textField: 'name',
-      labelKey: 'name',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'User Auswahl',
-      noDataLabel: 'Keinen Benutzer gefunden',
-      disabled: this.editable || !this.isNew
-    };
-    this.relatedDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Referenz wählen',
-      textField: 'normNumber',
-      labelKey: 'normNumber',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'Referenz Auswahl',
-      noDataLabel: 'Keine Referenz gefunden',
-      classes: 'relatedClass',
-      disabled: this.editable || !this.isNew
-    };
-    this.tagDropdownSettings = {
-      singleSelection: false,
-      idField: 'id',
-      text: 'Tag wählen',
-      textField: 'name',
-      labelKey: 'name',
-      selectAllText: 'Alle auswählen',
-      unSelectAllText: 'Auswahl aufheben',
-      enableSearchFilter: true,
-      searchPlaceholderText: 'Tag Auswahl',
-      noDataLabel: 'Keinen Tag gefunden',
-      classes: 'tag-multiselect',
-      disabled: this.editable || !this.isNew
-    };
   }
 
   public checkUpload(event, uploadField) {
@@ -489,6 +452,18 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             relatedObject['id'] = item._id;
             relatedObject['normNumber'] = item.normNumber;
             relatedObject['revision'] = item.revision;
+            switch (item.normLanguage) {
+              case 'de':
+                relatedObject['description'] = item.descriptionDE;
+                break;
+              case 'en':
+                relatedObject['description'] = item.descriptionDE;
+                break;
+              case 'fr':
+                relatedObject['description'] = item.descriptionDE;
+                break;
+            }
+
             if (!!item._attachments) {
               const sortedByRevision = _.sortBy(
                 item._attachments,
@@ -544,15 +519,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.logger.error(error.message);
         }
       );
-  }
-
-  public onSubmit(): void {
-    this.isLoading = true;
-    if (this.normForm.value.isNew) {
-      this.saveDocument();
-    } else {
-      this.updateDocument();
-    }
   }
 
   public deleteDocument(): void {
@@ -629,13 +595,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private getDocumentData(entry: any) {
     this.resetComponent();
+
     this.id = entry['_id'];
     this.rev = entry['_rev'];
     this.type = 'norm';
     this.normNumber = entry['normNumber'];
     this.revision = entry['revision'];
     this.revisionDate = new Date(entry['revisionDate']);
-    this.publisher = entry['publisher'];
     this.scope = entry['scope'];
     this.normLanguage = entry['normLanguage'];
     this.name = entry['name'];
@@ -704,6 +670,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processFormData() {
+    console.log('processFormdata');
     this.writeItem = {};
     this.writeItem['type'] = 'norm';
     this.writeItem['normNumber'] =
@@ -730,6 +697,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.normForm.value._rev) {
       this.writeItem['_rev'] = this.normForm.value._rev;
     }
+
     const selectedRelatedObjects = [
       ...new Set(
         this.selectedRelatedNorms.map(related => {
@@ -738,10 +706,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           newRelated['normNumber'] = related['normNumber'];
           newRelated['revision'] = related['revision'];
           newRelated['normFileName'] = related['normFileName'];
+          newRelated['description'] = related['description'];
           return newRelated;
         })
       )
     ];
+
+    this.setRelatedNormsFrom(selectedRelatedObjects);
+
     this.writeItem['relatedNorms'] =
       selectedRelatedObjects || this.selectedRelatedNorms;
 
@@ -778,6 +750,107 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     return this.writeItem;
   }
 
+  private setRelatedNormsFrom(relatedNorms: any[]) {
+    relatedNorms.forEach(relatedNorm => {
+      console.log(relatedNorm);
+
+      // get the linked Norm
+      this.couchDBService
+        .fetchEntry('/' + relatedNorm['id'])
+        .pipe(
+          switchMap(linkedNorm => {
+            console.log(linkedNorm);
+
+            const newLinkedNorm = {
+              id: this.id,
+              normNumber: this.normNumber,
+              revision: this.revision
+            };
+
+            if (!linkedNorm['relatedFrom']) {
+              linkedNorm.relatedFrom = [];
+            }
+
+            linkedNorm.relatedFrom.push(newLinkedNorm);
+
+            return this.couchDBService
+              .updateEntry(linkedNorm, linkedNorm['_id'])
+              .pipe(
+                tap(r => {
+                  // DO whaterver you want to do with the response of the observable
+                  console.log(r);
+                })
+              );
+          })
+        )
+        .subscribe(result => {
+          console.log('RESULT');
+          console.log(result);
+        });
+
+      /* this.getRouteParams$ = this.route.params.pipe(
+        switchMap(params => {
+          console.log(params);
+          // How to check params here and then subscribe to other observables conditionally
+          //here you can check the params and return the another observable like this:
+
+          //BELOW code is just to show how to return another observable conditionally
+          //Change it as per your logic
+          const p = params['id']; //i am assuming that your param name is `id`;
+          if (p === 100) {
+            return this.anotherObservable()
+              .pipe(
+                tap(r => {
+                  //DO whaterver you want to do with the response of the observable
+                  console.log(r);
+                })
+              );
+          } else {
+            return of(someThingAsPerYourLogic);
+          }
+        })
+      ).subscribe(); */
+
+      /* const one$ = this.couchDBService
+        .fetchEntry('/' + relatedNorm['id'])
+        .pipe(take(1));
+
+      const two$ = this.couchDBService
+        .updateEntry(this.writeItem, relatedNorm['id'])
+        .pipe(
+          take(1),
+          switchMap(value2 => {
+            return one$.pipe(
+              map(res => {
+                console.log('value2 00');
+                console.log(res);
+                console.log('value2 00');
+                console.log(value2);
+                return value2;
+              })
+            );
+          })
+        );
+      two$.subscribe(value2 => {
+        console.log('value2 01');
+        console.log(value2);
+      }); */
+
+      /* this.couchDBService
+        .fetchEntry('/' + relatedNorm['id'])
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          entry => {
+            console.log(entry);
+          },
+          error => {
+            this.logger.error(error.message);
+          },
+          () => {}
+        ); */
+    });
+  }
+
   private setSelectedTags() {
     const selectedTags = [
       ...this.selectedTags1,
@@ -806,12 +879,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private setRelatedNorms(relatedNorms: any[]) {
     const relatedMap: NormDocument[] = relatedNorms.map(related => {
-      console.log(related);
       const selectedRelatedObject = {};
       selectedRelatedObject['id'] = related.id;
       selectedRelatedObject['normNumber'] = related.normNumber;
       selectedRelatedObject['revision'] = related.revision;
       selectedRelatedObject['normFileName'] = related.normFileName;
+      selectedRelatedObject['description'] = related.description;
       return selectedRelatedObject;
     });
 
@@ -872,6 +945,52 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public onEdit() {
     this.setMultiselects();
     this.editable = true;
+  }
+
+  private assignMultiselectConfig() {
+    this.userDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Benutzer wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'User Auswahl',
+      noDataLabel: 'Keinen Benutzer gefunden',
+      disabled: this.editable || !this.isNew
+    };
+
+    this.relatedDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Referenz wählen',
+      textField: 'normNumber',
+      labelKey: 'normNumber',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Referenz Auswahl',
+      noDataLabel: 'Keine Referenz gefunden',
+      classes: 'relatedClass',
+      disabled: this.editable || !this.isNew
+    };
+
+    this.tagDropdownSettings = {
+      singleSelection: false,
+      idField: 'id',
+      text: 'Tag wählen',
+      textField: 'name',
+      labelKey: 'name',
+      selectAllText: 'Alle auswählen',
+      unSelectAllText: 'Auswahl aufheben',
+      enableSearchFilter: true,
+      searchPlaceholderText: 'Tag Auswahl',
+      noDataLabel: 'Keinen Tag gefunden',
+      classes: 'tag-multiselect',
+      disabled: this.editable || !this.isNew
+    };
   }
 
   private setMultiselects() {

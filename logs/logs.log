@@ -5,3 +5,5 @@
 2019-11-13T14:55:13.128Z - main.js - Http failure response for http://127.0.0.1:5984/norm_documents/f27c4943-da72-482e-8590-f066d534106f/AIMS03-02-009: 404 Object Not Found
 2019-11-13T14:55:37.242Z - main.js - Http failure response for http://127.0.0.1:5984/norm_documents/0efab36d-1a9a-4400-a255-8b71d060c859/80-T-35-0100%20BBL%2001: 404 Object Not Found
 2019-11-13T14:56:16.251Z - main.js - Http failure response for http://127.0.0.1:5984/norm_documents/96d8f652-08ef-486f-9c50-3aa6b3297fc5/undefined: 404 Object Not Found
+2019-11-14T12:21:41.677Z - main.js - Http failure response for http://127.0.0.1:5984/norm_documents/37ac21f7-7fef-4eb4-a24f-b093d97d0c9e/undefined: 404 Object Not Found
+2019-11-14T12:21:41.677Z - main.js - Http failure response for http://127.0.0.1:5984/norm_documents/37ac21f7-7fef-4eb4-a24f-b093d97d0c9e/undefined: 404 Object Not Found

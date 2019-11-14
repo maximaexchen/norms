@@ -50,6 +50,8 @@ export class CouchDBService {
   }
 
   public fetchEntry(param: string): Observable<any> {
+    console.log('fetchEntry');
+    console.log(param);
     return this.http.get(this.dbRequest + param);
   }
 

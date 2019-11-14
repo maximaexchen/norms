@@ -453,7 +453,9 @@
                   <tr>
                     <th scope="col" i18n="@@string-number">Nummer</th>
                     <th scope="col" i18n="@@string-revision">Revison</th>
-                    <th scope="col" i18n="@@string-relation">Bez</th>
+                    <th scope="col" i18n="@@string-description">
+                      Beschreibung
+                    </th>
                     <th scope="col" i18n="@@string-download">Download</th>
                     <th scope="col" i18n="@@string-delete">Löschen</th>
                   </tr>
@@ -466,7 +468,7 @@
                       >
                     </td>
                     <td>{{ related.revision }}</td>
-                    <td>{{ related.scope }}</td>
+                    <td>{{ related | json }}{{ related.description }}</td>
                     <td>
                       <a
                         class="dynamic-link"
