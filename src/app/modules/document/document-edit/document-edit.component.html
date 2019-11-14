@@ -416,7 +416,7 @@
             <label
               class="col-sm-2 col-form-label"
               i18n="@@string-related-dataset"
-              >Referenzen</label
+              >Referenzen wählen</label
             >
             <div class="col-sm-10">
               <angular2-multiselect
@@ -470,7 +470,8 @@
                     <td>{{ related.revision }}</td>
                     <td>{{ related.description }}</td>
                     <td>
-                      <a *ngIf="related.normFileName"
+                      <a
+                        *ngIf="related.normFileName"
                         class="dynamic-link"
                         (click)="getDownload(related.id, related.normFileName)"
                         ><i class="fas fa-file-download"></i> Download
@@ -486,6 +487,58 @@
                         <i class="fas fa-trash"></i>
                         <span i18n="@@string-delete"> Löschen</span>
                       </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row" *ngIf="relatedNormsFrom.length > 0">
+        <div class="col-sm-8">
+          <div class="row">
+            <label
+              class="col-sm-2 col-form-label"
+              i18n="@@string-relatedFrom-dataset"
+              >Referenziert von</label
+            >
+            <div class="col-sm-10">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th scope="col" i18n="@@string-number">Nummer</th>
+                    <th scope="col" i18n="@@string-revision">Revison</th>
+                    <th scope="col" i18n="@@string-description">
+                      Beschreibung
+                    </th>
+                    <th scope="col" i18n="@@string-download">Download</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let relatedFrom of relatedNormsFrom">
+                    <td>
+                      <a
+                        class="dynamic-link"
+                        (click)="showRelated(relatedFrom.id)"
+                        ><i class="fas fa-link"></i>
+                        {{ relatedFrom.normNumber }}</a
+                      >
+                    </td>
+                    <td>{{ relatedFrom.revision }}</td>
+                    <td>{{ relatedFrom.description }}</td>
+                    <td>
+                      <a
+                        *ngIf="relatedFrom.normFileName"
+                        class="dynamic-link"
+                        (click)="
+                          getDownload(relatedFrom.id, relatedFrom.normFileName)
+                        "
+                        ><i class="fas fa-file-download"></i> Download
+                      </a>
                     </td>
                   </tr>
                 </tbody>

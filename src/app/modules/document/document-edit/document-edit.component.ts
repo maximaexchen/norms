@@ -50,6 +50,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   relatedNormsSelectList: NormDocument[] = [];
   selectedRelatedNorms: NormDocument[] = [];
+  relatedNormsFrom: NormDocument[] = [];
 
   revisionDocuments: RevisionDocument[] = [];
   attachments: any = {};
@@ -325,6 +326,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.owners = [];
     // this.relatedNorms = [];
     this.selectedRelatedNorms = [];
+    this.relatedNormsFrom = [];
     this.selectedUsers = [];
     this.selectedTags1 = [];
     this.selectedTags2 = [];
@@ -611,6 +613,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.setRelatedNorms(entry['relatedNorms']);
     }
 
+    if (entry['relatedFrom']) {
+      this.setRelatedNormsFrom(entry['relatedFrom']);
+    }
+
     if (entry['tags']) {
       const ent = _.sortBy(entry['tags'], 'tagType');
 
@@ -640,6 +646,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private processFormData() {
     console.log('processFormdata');
     this.writeItem = {};
+
+    // Condition if we have a new norm or an update
+    if (this.normForm.value._id) {
+      this.writeItem['_id'] = this.normForm.value._id;
+    }
+
+    if (this.normForm.value._rev) {
+      this.writeItem['_rev'] = this.normForm.value._rev;
+    }
+
     this.writeItem['type'] = 'norm';
     this.writeItem['normNumber'] =
       this.normForm.value.normNumber || this.normNumber;
@@ -658,41 +674,23 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem['scope'] = this.normForm.value.scope || this.scope;
     this.writeItem['active'] = this.normForm.value.active || this.active;
 
-    if (this.normForm.value._id) {
-      this.writeItem['_id'] = this.normForm.value._id;
-    }
-
-    if (this.normForm.value._rev) {
-      this.writeItem['_rev'] = this.normForm.value._rev;
-    }
-
-    const selectedRelatedObjects = [
-      /* ...new Set(
-        this.selectedRelatedNorms.map(related => {
-          const newRelated = {};
-          newRelated['id'] = related['id'];
-          newRelated['normNumber'] = related['normNumber'];
-          newRelated['revision'] = related['revision'];
-          newRelated['normFileName'] = related['normFileName'];
-          newRelated['description'] = related['description'];
-          return newRelated;
-        })
-      ) */
-    ];
-
-    console.log(this.selectedRelatedNorms);
-
+    const selectedRelatedObjects = [];
     this.selectedRelatedNorms.forEach(element => {
       selectedRelatedObjects.push(element['id']);
     });
-
-    this.setRelatedNormsFrom(selectedRelatedObjects);
-
     this.writeItem['relatedNorms'] =
       selectedRelatedObjects || this.selectedRelatedNorms;
 
-    this.setSelectedUser();
+    const selectedRelatedFromObjects = [];
+    this.relatedNormsFrom.forEach(element => {
+      selectedRelatedFromObjects.push(element['id']);
+    });
+    this.writeItem['relatedFrom'] =
+      selectedRelatedFromObjects || this.relatedNormsFrom;
 
+    // write current norm to related norms for "reletedFrom"
+    this.writeRelatedNormsFrom(selectedRelatedObjects);
+    this.setSelectedUser();
     this.setSelectedTags();
 
     const selOwner = this.owners.find(
@@ -700,7 +698,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
     this.writeItem['owner'] = selOwner || this.owner;
 
-    // If there is a new PDF upload
+    // If there is a new PDF upload add to revisions and attachment Array
     if (this.attachment) {
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
@@ -716,10 +714,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       const tempAttachmentObject = this.attachments;
       this.attachments = { ...tempAttachmentObject, ...this.attachment };
     }
-
-    this.writeItem['_attachments'] = this.attachments || [];
     this.writeItem['revisions'] = this.revisionDocuments || [];
+    this.writeItem['_attachments'] = this.attachments || [];
 
+    // add update status to users to be notified
     this.setNotification(this.normForm.value.revision);
     return this.writeItem;
   }
@@ -793,21 +791,56 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           () => {}
         );
     });
-    /* console.log(relatedNorms);
-        const relatedMap: NormDocument[] = relatedNorms.map(related => {
-          const selectedRelatedObject = {};
-          selectedRelatedObject['id'] = related.id;
-          selectedRelatedObject['normNumber'] = related.normNumber;
-          selectedRelatedObject['revision'] = related.revision;
-          selectedRelatedObject['normFileName'] = related.normFileName;
-          selectedRelatedObject['description'] = related.description;
-          return selectedRelatedObject;
-        });
-    */
     this.selectedRelatedNorms = relatedArray;
   }
 
-  private setRelatedNormsFrom(relatedNorms: any[]) {
+  private setRelatedNormsFrom(relatedNormsFrom: any[]) {
+    const relatedFromArray: NormDocument[] = [];
+
+    relatedNormsFrom.forEach(relNormFrom => {
+      this.couchDBService
+        .fetchEntry('/' + relNormFrom)
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          entry => {
+            let revDescription: string;
+            switch (entry.normLanguage) {
+              case 'de':
+                revDescription = entry.description.de;
+                break;
+              case 'en':
+                revDescription = entry.description.en;
+                break;
+              case 'fr':
+                revDescription = entry.description.en;
+                break;
+            }
+
+            const relatedItemFrom = {
+              id: entry['_id'],
+              normNumber: entry['normNumber'],
+              revision: entry['revision'],
+              description: revDescription
+            };
+
+            if (entry['_attachments']) {
+              relatedItemFrom['normFileName'] = this.getLatestAttchmentFileName(
+                entry['_attachments']
+              );
+            }
+
+            relatedFromArray.push(relatedItemFrom);
+          },
+          error => {
+            this.logger.error(error.message);
+          },
+          () => {}
+        );
+    });
+    this.relatedNormsFrom = relatedFromArray;
+  }
+
+  private writeRelatedNormsFrom(relatedNorms: any[]) {
     relatedNorms.forEach(relatedNorm => {
       console.log(relatedNorm);
 
