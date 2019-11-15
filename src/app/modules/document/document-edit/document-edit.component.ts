@@ -430,9 +430,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public deleteDocument(): void {
-    this.deleteRelatedDatabaseEntriesForUser(this.id);
+    this.deleteRelatedDBEntriesForUser(this.id);
 
-    this.deleteRelatedDatabaseEntriesForRelatedFrom(this.id);
+    this.deleteRelatedDBEntriesForRelatedFrom(this.id);
 
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
@@ -442,7 +442,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
-              this.deleteRelatedDatabaseEntriesForUser(this.id);
+              this.deleteRelatedDBEntriesForUser(this.id);
             },
             error => {
               this.logger.error(error.message);
@@ -715,7 +715,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     return latest['id'];
   }
 
-  private deleteRelatedDatabaseEntriesForUser(id: string) {
+  private deleteRelatedDBEntriesForUser(id: string) {
     const deleteQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -761,7 +761,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deleteRelatedDatabaseEntriesForRelatedFrom(id: string) {
+  private deleteRelatedDBEntriesForRelatedFrom(id: string) {
     const deleteQuery = {
       use_index: ['_design/search_norm'],
       selector: {
