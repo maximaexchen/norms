@@ -430,8 +430,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public deleteDocument(): void {
-    this.deleteRelatedDatabaseEntries(this.id);
-    this.confirmationService.confirm({
+    this.deleteRelatedDatabaseEntriesForUser(this.id);
+
+    this.deleteRelatedDatabaseEntriesForRelatedFrom(this.id);
+
+    /* this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
       accept: () => {
         this.couchDBService
@@ -439,7 +442,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
-              this.deleteRelatedDatabaseEntries(this.id);
+              this.deleteRelatedDatabaseEntriesForUser(this.id);
             },
             error => {
               this.logger.error(error.message);
@@ -452,7 +455,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           );
       },
       reject: () => {}
-    });
+    }); */
   }
 
   /**
@@ -712,7 +715,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     return latest['id'];
   }
 
-  private deleteRelatedDatabaseEntries(id: string) {
+  private deleteRelatedDatabaseEntriesForUser(id: string) {
     const deleteQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -750,6 +753,47 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             result => {
               console.log(user);
             },
+            error => {
+              this.logger.error(error.message);
+            }
+          );
+      });
+    });
+  }
+
+  private deleteRelatedDatabaseEntriesForRelatedFrom(id: string) {
+    const deleteQuery = {
+      use_index: ['_design/search_norm'],
+      selector: {
+        _id: {
+          $gt: null
+        },
+        type: {
+          $eq: 'norm'
+        },
+        $and: [
+          {
+            relatedFrom: {
+              $elemMatch: {
+                $eq: id
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    this.couchDBService.search(deleteQuery).subscribe(norm => {
+      norm.docs.forEach(foundNorm => {
+        foundNorm.relatedFrom = foundNorm.relatedFrom.filter(
+          normId => normId !== id
+        );
+
+        this.couchDBService
+          .updateEntry(foundNorm, foundNorm._id)
+          .pipe(takeWhile(() => this.alive))
+          .subscribe(
+            result => {},
             error => {
               this.logger.error(error.message);
             }
@@ -899,16 +943,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               .updateEntry(linkedNorm, linkedNorm['_id'])
               .pipe(
                 tap(r => {
-                  // DO whaterver you want to do with the response of the observable
                   console.log(r);
                 })
               );
           })
         )
-        .subscribe(result => {
-          console.log('RESULT');
-          console.log(result);
-        });
+        .subscribe(result => {});
     });
   }
 
