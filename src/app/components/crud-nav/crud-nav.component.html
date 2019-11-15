@@ -35,7 +35,7 @@
     (click)="onSubmit()"
     *ngIf="!isNew && editable && (role === 'admin' || role === 'owner')"
     [disabled]="!validForm"
-    [ngClass]="{ 'ready-save-btn': dirtyForm && validForm }"
+    [ngClass]="{ 'ready-save-btn': (dirtyForm && validForm) || readyToSave }"
   ></button>
 
   <button

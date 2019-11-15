@@ -37,6 +37,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   isLoading = false;
   editable = false;
   deletable = false;
+  readyToSave = false;
   uploadUrl = this.env.uploadUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
@@ -108,6 +109,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.setStartValues();
   }
 
+  /**
+   * Setup
+   *
+   */
+
   private setStartValues() {
     console.log('setStartValues');
 
@@ -131,6 +137,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
   }
 
+  private resetComponent() {
+    console.log('resetComponent');
+    this.editable = false;
+    this.users = [];
+    this.owners = [];
+    // this.relatedNorms = [];
+    this.selectedRelatedNorms = [];
+    this.relatedNormsFrom = [];
+    this.selectedUsers = [];
+    this.selectedTags1 = [];
+    this.selectedTags2 = [];
+    this.selectedTags3 = [];
+    this.selectedTab = 0;
+    if (this.normForm) {
+      this.normForm.form.markAsPristine();
+    }
+    this.assignMultiselectConfig();
+    this.fileUploadInput.clear();
+  }
+
   private newDocument() {
     this.resetComponent();
     this.setMultiselects();
@@ -141,6 +167,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.id = uuidv4();
   }
 
+  /**
+   * CRUD methods
+   *
+   */
   public onSubmit(): void {
     this.isLoading = true;
     if (this.normForm.value.isNew) {
@@ -148,6 +178,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.updateDocument();
     }
+  }
+
+  public onEdit() {
+    this.setMultiselects();
+    this.editable = true;
   }
 
   private saveDocument(): void {
@@ -251,334 +286,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.normForm.form.markAsPristine();
         }
       );
-  }
-
-  private setNotification(revision: string) {
-    this.selectedUsers.forEach(user => {
-      this.couchDBService
-        .fetchEntry('/' + user['id'])
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          entry => {
-            let associatedNorms = [];
-
-            if (entry['associatedNorms']) {
-              associatedNorms = entry['associatedNorms'];
-            }
-
-            const now = new Date();
-            const isoString = now.toISOString();
-
-            const newAssociatedNorm = {
-              normId: this.id,
-              revisionId: revision,
-              normNumber: this.normNumber,
-              date: isoString,
-              confirmed: false,
-              confirmedDate: ''
-            };
-
-            if (!!this.revisionDocuments[0]) {
-              newAssociatedNorm['normDocument'] =
-                this.revisionDocuments[0]['name'] || '';
-            }
-
-            associatedNorms.push(newAssociatedNorm);
-
-            const updateUser = {
-              _id: entry['_id'],
-              _rev: entry['_rev'],
-              type: 'user',
-              userName: entry['userName'],
-              externalID: entry['externalID'],
-              firstName: entry['firstName'],
-              lastName: entry['lastName'],
-              email: entry['email'],
-              role: entry['role'],
-              password: entry['password'],
-              active: entry['active'],
-              associatedNorms
-            };
-
-            this.couchDBService
-              .writeEntry(updateUser)
-              .pipe(takeWhile(() => this.alive))
-              .subscribe(
-                result => {
-                  this.sendStateUpdate();
-                },
-                error => {
-                  this.logger.error(error.message);
-                }
-              );
-          },
-          error => {
-            this.logger.error(error.message);
-          }
-        );
-    });
-  }
-
-  private resetComponent() {
-    console.log('resetComponent');
-    this.editable = false;
-    this.users = [];
-    this.owners = [];
-    // this.relatedNorms = [];
-    this.selectedRelatedNorms = [];
-    this.relatedNormsFrom = [];
-    this.selectedUsers = [];
-    this.selectedTags1 = [];
-    this.selectedTags2 = [];
-    this.selectedTags3 = [];
-    this.selectedTab = 0;
-    if (this.normForm) {
-      this.normForm.form.markAsPristine();
-    }
-    this.assignMultiselectConfig();
-    this.fileUploadInput.clear();
-  }
-
-  public checkUpload(event, uploadField) {
-    for (const file of event.files) {
-      this.fileUpload = file;
-    }
-
-    const isIn = this.checkForExistingAttachment(
-      this.attachments,
-      this.revision.replace(/\s/g, '').toLowerCase()
-    );
-
-    if (isIn) {
-      this.confirmationService.confirm({
-        message:
-          'Es gibt bereits eine Datei zur Revision: ' + this.revision + '?',
-        accept: () => {
-          this.processUpload(uploadField);
-        },
-        reject: () => {
-          this.fileUploadInput.clear();
-        }
-      });
-    } else {
-      this.processUpload(uploadField);
-    }
-  }
-
-  public processUpload(uploadField) {
-    this.convertToBase64(this.fileUpload)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          this.newAttachmentName =
-            this.id +
-            '_' +
-            this.revision.replace(/\s/g, '').toLowerCase() +
-            '.' +
-            this.fileUpload.name.split('.').pop();
-          this.attachment = {
-            [this.newAttachmentName]: {
-              data: result,
-              content_type: 'application/pdf'
-            }
-          };
-        },
-        error => {
-          this.logger.error(error.message);
-          this.isLoading = false;
-        },
-        () => {
-          this.isLoading = false;
-          this.showConfirmation('success', 'Files added');
-        }
-      );
-  }
-
-  private checkForExistingAttachment(obj, searchKey): boolean {
-    return Object.keys(obj).some(prop => {
-      const needle = /_([^.]+)./.exec(prop)[1];
-
-      return needle.includes(searchKey);
-    });
-  }
-
-  private uploadPDF(): Observable<any> {
-    return this.serverService.uploadFile(
-      this.uploadUrl + '/',
-      this.fileUpload,
-      this.id,
-      this.env.uploadDir,
-      this.revision
-    );
-  }
-
-  public getDownload(id: string, name: any) {
-    this.documentService.getDownload(id, name);
-  }
-
-  private getUsersForSelect(): void {
-    this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        results => {
-          // Add all users for the selectable owner dropdown
-          this.owners = results;
-
-          // Also add to the users
-          results.forEach(item => {
-            const userObject = {} as User;
-            userObject['id'] = item._id;
-            userObject['name'] = item.lastName + ', ' + item.firstName;
-            userObject['email'] = item.email;
-            this.users.push(userObject);
-          });
-        },
-        error => {
-          this.logger.error(error.message);
-        }
-      );
-  }
-
-  // f8848d43-e241-437b-96e7-5d67dd
-
-  private getNormsForRelatedSelect() {
-    console.log('getNormsForRelatedSelect');
-    this.relatedNormsSelectList = [];
-    this.documentService
-      .getDocuments()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          console.log(result);
-          result.forEach(item => {
-            const relatedNormSelectItem = {} as NormDocument;
-            relatedNormSelectItem['id'] = item._id;
-            relatedNormSelectItem['normNumber'] = item.normNumber;
-            this.relatedNormsSelectList.push(relatedNormSelectItem);
-          });
-        },
-        error => {
-          this.logger.error(error.message);
-        }
-      );
-  }
-
-  private getLatestAttchmentFileName(attachemnts: any): string {
-    const sortedByRevision = _.sortBy(attachemnts, (object, key) => {
-      object['id'] = key;
-      return object['revpos'];
-    }).reverse();
-
-    // take the first
-    const latest = _.first(sortedByRevision);
-    return latest['id'];
-  }
-
-  private getTagsForSelect(): void {
-    this.tagsLevel1 = [];
-    this.tagsLevel2 = [];
-    this.tagsLevel3 = [];
-    this.couchDBService
-      .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        results => {
-          results.forEach(tag => {
-            const tagObject = {} as Tag;
-            tagObject['id'] = tag._id;
-            tagObject['name'] = tag.name;
-            tagObject['tagType'] = tag.tagType;
-            tagObject['active'] = tag.active;
-            switch (tag.tagType) {
-              case 'level1':
-                this.tagsLevel1.push(tagObject);
-                break;
-              case 'level2':
-                this.tagsLevel2.push(tagObject);
-                break;
-              case 'level3':
-                this.tagsLevel3.push(tagObject);
-                break;
-            }
-          });
-        },
-        error => {
-          this.logger.error(error.message);
-        }
-      );
-  }
-
-  public deleteDocument(): void {
-    this.deleteRelatedDatabaseEntries(this.id);
-    this.confirmationService.confirm({
-      message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
-      accept: () => {
-        this.couchDBService
-          .deleteEntry(this.id, this.rev)
-          .pipe(takeWhile(() => this.alive))
-          .subscribe(
-            res => {
-              this.deleteRelatedDatabaseEntries(this.id);
-            },
-            error => {
-              this.logger.error(error.message);
-              this.showConfirmation('error', error.message);
-            },
-            () => {
-              this.sendStateUpdate();
-              this.router.navigate(['../document']);
-            }
-          );
-      },
-      reject: () => {}
-    });
-  }
-
-  private deleteRelatedDatabaseEntries(id: string) {
-    const deleteQuery = {
-      use_index: ['_design/search_norm'],
-      selector: {
-        _id: {
-          $gt: null
-        },
-        type: {
-          $eq: 'user'
-        },
-        $and: [
-          {
-            associatedNorms: {
-              $elemMatch: {
-                normId: {
-                  $eq: id
-                }
-              }
-            }
-          }
-        ]
-      }
-    };
-
-    this.couchDBService.search(deleteQuery).subscribe(user => {
-      user.docs.forEach(foundUser => {
-        // filter out the deleted associatedNorms for given id
-        foundUser.associatedNorms = foundUser.associatedNorms.filter(
-          norm => norm.normId !== id
-        );
-
-        this.couchDBService
-          .updateEntry(foundUser, foundUser._id)
-          .pipe(takeWhile(() => this.alive))
-          .subscribe(
-            result => {
-              console.log(user);
-            },
-            error => {
-              this.logger.error(error.message);
-            }
-          );
-      });
-    });
   }
 
   private getDocumentData(entry: any) {
@@ -718,8 +425,337 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem['_attachments'] = this.attachments || [];
 
     // add update status to users to be notified
-    this.setNotification(this.normForm.value.revision);
+    this.setUserNotification(this.normForm.value.revision);
     return this.writeItem;
+  }
+
+  public deleteDocument(): void {
+    this.deleteRelatedDatabaseEntries(this.id);
+    this.confirmationService.confirm({
+      message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
+      accept: () => {
+        this.couchDBService
+          .deleteEntry(this.id, this.rev)
+          .pipe(takeWhile(() => this.alive))
+          .subscribe(
+            res => {
+              this.deleteRelatedDatabaseEntries(this.id);
+            },
+            error => {
+              this.logger.error(error.message);
+              this.showConfirmation('error', error.message);
+            },
+            () => {
+              this.sendStateUpdate();
+              this.router.navigate(['../document']);
+            }
+          );
+      },
+      reject: () => {}
+    });
+  }
+
+  /**
+   * Upload methods
+   *
+   */
+  public checkUpload(event, uploadField) {
+    for (const file of event.files) {
+      this.fileUpload = file;
+    }
+
+    const isIn = this.checkForExistingAttachment(
+      this.attachments,
+      this.revision.replace(/\s/g, '').toLowerCase()
+    );
+
+    if (isIn) {
+      this.confirmationService.confirm({
+        message:
+          'Es gibt bereits eine Datei zur Revision: ' + this.revision + '?',
+        accept: () => {
+          this.processUpload(uploadField);
+        },
+        reject: () => {
+          this.fileUploadInput.clear();
+        }
+      });
+    } else {
+      this.processUpload(uploadField);
+    }
+  }
+
+  public processUpload(uploadField) {
+    this.convertToBase64(this.fileUpload)
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        result => {
+          this.newAttachmentName =
+            this.id +
+            '_' +
+            this.revision.replace(/\s/g, '').toLowerCase() +
+            '.' +
+            this.fileUpload.name.split('.').pop();
+          this.attachment = {
+            [this.newAttachmentName]: {
+              data: result,
+              content_type: 'application/pdf'
+            }
+          };
+        },
+        error => {
+          this.logger.error(error.message);
+          this.isLoading = false;
+        },
+        () => {
+          this.isLoading = false;
+          this.showConfirmation('success', 'Files added');
+        }
+      );
+  }
+
+  private checkForExistingAttachment(obj, searchKey): boolean {
+    return Object.keys(obj).some(prop => {
+      const needle = /_([^.]+)./.exec(prop)[1];
+
+      return needle.includes(searchKey);
+    });
+  }
+
+  private uploadPDF(): Observable<any> {
+    return this.serverService.uploadFile(
+      this.uploadUrl + '/',
+      this.fileUpload,
+      this.id,
+      this.env.uploadDir,
+      this.revision
+    );
+  }
+
+  public getDownload(id: string, name: any) {
+    this.documentService.getDownload(id, name);
+  }
+
+  /**
+   * Data for selectboxes
+   *
+   */
+  private getUsersForSelect(): void {
+    this.couchDBService
+      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        results => {
+          // Add all users for the selectable owner dropdown
+          this.owners = results;
+
+          // Also add to the users
+          results.forEach(item => {
+            const userObject = {} as User;
+            userObject['id'] = item._id;
+            userObject['name'] = item.lastName + ', ' + item.firstName;
+            userObject['email'] = item.email;
+            this.users.push(userObject);
+          });
+        },
+        error => {
+          this.logger.error(error.message);
+        }
+      );
+  }
+
+  private setSelectedUsers(users: any[]) {
+    const userMap: User[] = users.map(user => {
+      const selectedUserObject = {};
+      selectedUserObject['id'] = user.id;
+      selectedUserObject['name'] = user.lastName + ', ' + user.firstName;
+      selectedUserObject['email'] = user.email;
+      return selectedUserObject;
+    });
+    this.selectedUsers = userMap;
+  }
+
+  private getNormsForRelatedSelect() {
+    console.log('getNormsForRelatedSelect');
+    this.relatedNormsSelectList = [];
+    this.documentService
+      .getDocuments()
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        result => {
+          console.log(result);
+          result.forEach(item => {
+            const relatedNormSelectItem = {} as NormDocument;
+            relatedNormSelectItem['id'] = item._id;
+            relatedNormSelectItem['normNumber'] = item.normNumber;
+            this.relatedNormsSelectList.push(relatedNormSelectItem);
+          });
+        },
+        error => {
+          this.logger.error(error.message);
+        }
+      );
+  }
+
+  private getTagsForSelect(): void {
+    this.tagsLevel1 = [];
+    this.tagsLevel2 = [];
+    this.tagsLevel3 = [];
+    this.couchDBService
+      .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(
+        results => {
+          results.forEach(tag => {
+            const tagObject = {} as Tag;
+            tagObject['id'] = tag._id;
+            tagObject['name'] = tag.name;
+            tagObject['tagType'] = tag.tagType;
+            tagObject['active'] = tag.active;
+            switch (tag.tagType) {
+              case 'level1':
+                this.tagsLevel1.push(tagObject);
+                break;
+              case 'level2':
+                this.tagsLevel2.push(tagObject);
+                break;
+              case 'level3':
+                this.tagsLevel3.push(tagObject);
+                break;
+            }
+          });
+        },
+        error => {
+          this.logger.error(error.message);
+        }
+      );
+  }
+
+  /**
+   * Helper methods
+   *
+   */
+  private setUserNotification(revision: string) {
+    this.selectedUsers.forEach(user => {
+      this.couchDBService
+        .fetchEntry('/' + user['id'])
+        .pipe(takeWhile(() => this.alive))
+        .subscribe(
+          entry => {
+            let associatedNorms = [];
+
+            if (entry['associatedNorms']) {
+              associatedNorms = entry['associatedNorms'];
+            }
+
+            const now = new Date();
+            const isoString = now.toISOString();
+
+            const newAssociatedNorm = {
+              normId: this.id,
+              revisionId: revision,
+              normNumber: this.normNumber,
+              date: isoString,
+              confirmed: false,
+              confirmedDate: ''
+            };
+
+            if (!!this.revisionDocuments[0]) {
+              newAssociatedNorm['normDocument'] =
+                this.revisionDocuments[0]['name'] || '';
+            }
+
+            associatedNorms.push(newAssociatedNorm);
+
+            const updateUser = {
+              _id: entry['_id'],
+              _rev: entry['_rev'],
+              type: 'user',
+              userName: entry['userName'],
+              externalID: entry['externalID'],
+              firstName: entry['firstName'],
+              lastName: entry['lastName'],
+              email: entry['email'],
+              role: entry['role'],
+              password: entry['password'],
+              active: entry['active'],
+              associatedNorms
+            };
+
+            this.couchDBService
+              .writeEntry(updateUser)
+              .pipe(takeWhile(() => this.alive))
+              .subscribe(
+                result => {
+                  this.sendStateUpdate();
+                },
+                error => {
+                  this.logger.error(error.message);
+                }
+              );
+          },
+          error => {
+            this.logger.error(error.message);
+          }
+        );
+    });
+  }
+
+  private getLatestAttchmentFileName(attachemnts: any): string {
+    const sortedByRevision = _.sortBy(attachemnts, (object, key) => {
+      object['id'] = key;
+      return object['revpos'];
+    }).reverse();
+
+    // take the first
+    const latest = _.first(sortedByRevision);
+    return latest['id'];
+  }
+
+  private deleteRelatedDatabaseEntries(id: string) {
+    const deleteQuery = {
+      use_index: ['_design/search_norm'],
+      selector: {
+        _id: {
+          $gt: null
+        },
+        type: {
+          $eq: 'user'
+        },
+        $and: [
+          {
+            associatedNorms: {
+              $elemMatch: {
+                normId: {
+                  $eq: id
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    this.couchDBService.search(deleteQuery).subscribe(user => {
+      user.docs.forEach(foundUser => {
+        // filter out the deleted associatedNorms for given id
+        foundUser.associatedNorms = foundUser.associatedNorms.filter(
+          norm => norm.normId !== id
+        );
+
+        this.couchDBService
+          .updateEntry(foundUser, foundUser._id)
+          .pipe(takeWhile(() => this.alive))
+          .subscribe(
+            result => {
+              console.log(user);
+            },
+            error => {
+              this.logger.error(error.message);
+            }
+          );
+      });
+    });
   }
 
   private setSelectedTags() {
@@ -876,25 +912,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setSelectedUsers(users: any[]) {
-    const userMap: User[] = users.map(user => {
-      const selectedUserObject = {};
-      selectedUserObject['id'] = user.id;
-      selectedUserObject['name'] = user.lastName + ', ' + user.firstName;
-      selectedUserObject['email'] = user.email;
-      return selectedUserObject;
-    });
-    this.selectedUsers = userMap;
-  }
-
   public showRelated(id: string) {
     this.router.navigate(['../document/' + id + '/edit']);
   }
 
   public deleteRelated(id: string) {
-    this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
-      item => item['id'] !== id
-    );
+    this.confirmationService.confirm({
+      message:
+        'Sie wollen die Referenz wirklich entfernen?<br><strong><span class="text-warning">Bitte Norm speichern nicht vergessen!!</span></strong>',
+      accept: () => {
+        this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
+          item => item['id'] !== id
+        );
+        this.readyToSave = true;
+      },
+      reject: () => {}
+    });
   }
 
   private showConfirmation(type: string, result: string) {
@@ -926,11 +959,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  public onEdit() {
-    this.setMultiselects();
-    this.editable = true;
-  }
-
+  /**
+   * Multiselect configuration and actions
+   */
   private assignMultiselectConfig() {
     this.userDropdownSettings = {
       singleSelection: false,
