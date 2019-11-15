@@ -113,7 +113,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    * Setup
    *
    */
-
   private setStartValues() {
     console.log('setStartValues');
 
@@ -126,7 +125,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.getTagsForSelect();
         this.getNormsForRelatedSelect();
 
-        // check if we are updating
+        // check if we have new document or we are updating
         if (results['id']) {
           this.editDocument(results);
         } else {
@@ -153,8 +152,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.normForm) {
       this.normForm.form.markAsPristine();
     }
-    this.assignMultiselectConfig();
     this.fileUploadInput.clear();
+    // reset the multiselects also
+    this.assignMultiselectConfig();
   }
 
   private newDocument() {
@@ -272,14 +272,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         results => {},
         error => {
+          this.isLoading = false;
           this.logger.error(error.message);
           this.showConfirmation('error', error.message);
-          this.isLoading = false;
         },
         () => {
           // Inform about database change.
-          this.sendStateUpdate();
           this.isLoading = false;
+          this.sendStateUpdate();
           this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
           this.setStartValues();
@@ -434,7 +434,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.deleteRelatedDatabaseEntriesForRelatedFrom(this.id);
 
-    /* this.confirmationService.confirm({
+    this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
       accept: () => {
         this.couchDBService
@@ -455,7 +455,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           );
       },
       reject: () => {}
-    }); */
+    });
   }
 
   /**

@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
 import { EnvService } from './env.service';
-import { NormDocument, Role } from '@models/index';
+import { Role } from '@models/index';
 
 // CouchDB Ubuntu Server
 /* $kP2ZernC */
@@ -50,22 +50,17 @@ export class CouchDBService {
   }
 
   public fetchEntry(param: string): Observable<any> {
-    console.log('fetchEntry');
-    console.log(param);
     return this.http.get(this.dbRequest + param);
   }
 
   public bulkUpdate(bulkObject: any): Observable<any> {
-    console.log(bulkObject);
     return this.http.post(this.dbRequest + '/_bulk_docs', bulkObject);
   }
 
   public findDocuments(searchObject?: any): Observable<any> {
     if (searchObject) {
-      console.log('findDocuments');
       return this.http.post(this.dbRequest + '/_find', searchObject);
     } else {
-      console.log('findDocuments all');
       return this.fetchEntries(
         '/_design/norms/_view/all-norms?include_docs=true'
       );
@@ -73,9 +68,6 @@ export class CouchDBService {
   }
 
   public search(object: any): Observable<any> {
-    /* console.log('search');
-    console.log(JSON.stringify(object));
-    console.log(this.dbRequest + '/_find', object); */
     return this.http.post(this.dbRequest + '/_find', object);
   }
 
