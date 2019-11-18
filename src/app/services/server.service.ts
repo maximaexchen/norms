@@ -6,7 +6,7 @@ import {
   HttpEvent,
   HttpHeaders
 } from '@angular/common/http';
-import { Subscription, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ServerService {

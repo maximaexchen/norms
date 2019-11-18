@@ -5,7 +5,6 @@ import { PublisherModule } from './../../publisher/publisher.module';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RoleModule } from './../../role/role.module';
-import { Tag } from './../../../models/tag.model';
 import { TagEditComponent } from './tag-edit.component';
 import { CouchDBService } from '@app/services/couchDB.service';
 import { RouterModule } from '@angular/router';
