@@ -992,7 +992,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
                   tap(r => {
                     console.log(r);
 
-                    this.onSubmit();
+                    // this.onSubmit();
                   })
                 );
             })
