@@ -67,7 +67,6 @@ export class UserListComponent implements OnInit, OnDestroy {
       .subscribe(
         res => {
           this.users = res;
-          console.log(this.users);
           this.userCount = this.users.length;
         },
         error => this.logger.error(error.message)

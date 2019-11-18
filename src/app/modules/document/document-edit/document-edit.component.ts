@@ -49,6 +49,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   users: User[] = [];
   selectedUsers: User[] = [];
 
+  processType: any;
+  processTypes: any[] = [];
+  processTypeId: string;
+
   relatedNormsSelectList: NormDocument[] = [];
   selectedRelatedNorms: NormDocument[] = [];
   relatedNormsFrom: NormDocument[] = [];
@@ -125,6 +129,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.getTagsForSelect();
         this.getNormsForRelatedSelect();
 
+        this.processTypes = [
+          { id: 1, name: 'Spezialprozess' },
+          { id: 2, name: 'kein Spezialprozess' },
+          { id: 3, name: 'Normschrift' }
+        ];
+
         // check if we have new document or we are updating
         if (results['id']) {
           this.editDocument(results);
@@ -141,7 +151,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.editable = false;
     this.users = [];
     this.owners = [];
-    // this.relatedNorms = [];
     this.selectedRelatedNorms = [];
     this.relatedNormsFrom = [];
     this.latestAttachmentName = '';
@@ -150,6 +159,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedTags2 = [];
     this.selectedTags3 = [];
     this.selectedTab = 0;
+
+    this.processTypeId = '';
+
     if (this.normForm) {
       this.normForm.form.markAsPristine();
     }
@@ -165,6 +177,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.isNew = true;
     this.formTitle = 'Neue Norm anlegen';
     this.owner = '';
+    this.processType = '';
     this.id = uuidv4();
   }
 
@@ -303,7 +316,18 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.name = entry['name'];
     this.owner = entry['owner'];
     this.ownerId = entry['owner']._id;
+
     this.active = entry['active'];
+
+    console.log('entry.processType');
+    console.log(entry.processType);
+    this.processType = entry['processType'];
+    if (entry.processType) {
+      this.processTypeId = entry['processType'].id;
+    }
+
+    console.log(this.processType);
+    console.log(this.processTypeId);
 
     if (entry.description) {
       this.descriptionDE = entry.description.de;
@@ -405,6 +429,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       own => own['_id'] === this.normForm.value.ownerId
     );
     this.writeItem['owner'] = selOwner || this.owner;
+
+    const selProcessType = this.processTypes.find(type => {
+      return type['id'] === parseInt(this.normForm.value.processTypeId, 0);
+    });
+    this.writeItem['processType'] = selProcessType || this.processType;
 
     // If there is a new PDF upload add to revisions and attachment Array
     if (this.attachment) {
@@ -544,6 +573,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    * Data for selectboxes
    *
    */
+
   private getUsersForSelect(): void {
     this.couchDBService
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
