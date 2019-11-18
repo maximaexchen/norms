@@ -201,7 +201,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
   }
 
   private sendStateUpdate(): void {
-    this.couchDBService.sendStateUpdate('role');
+    this.couchDBService.sendStateUpdate('role', this.id);
   }
 
   public ngOnDestroy(): void {

@@ -71,6 +71,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         message => {
+          console.log(message);
           if (message.text === 'document') {
             this.getDocuments();
           }

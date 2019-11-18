@@ -51,3 +51,13 @@
 2019-11-18T07:20:05.940Z - main.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f/ee2432fc-4afd-4c21-b8ee-4d8e06152084_issue3.pdf: 404 Object Not Found
 2019-11-18T07:20:08.040Z - main.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f/ee2432fc-4afd-4c21-b8ee-4d8e06152084_issue3.pdf: 404 Object Not Found
 2019-11-18T07:20:08.229Z - main.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f/ee2432fc-4afd-4c21-b8ee-4d8e06152084_issue3.pdf: 404 Object Not Found
+2019-11-18T07:56:48.785Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T07:56:48.785Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T07:59:33.886Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T08:01:24.919Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T07:59:33.886Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T08:01:24.919Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T08:10:28.781Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T08:10:28.781Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T08:16:11.980Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T08:16:11.980Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed

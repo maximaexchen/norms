@@ -587,7 +587,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          console.log(result);
           result.forEach(item => {
             const relatedNormSelectItem = {} as NormDocument;
             relatedNormSelectItem['id'] = item._id;
@@ -930,15 +929,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         .fetchEntry('/' + relatedNorm)
         .pipe(
           switchMap(linkedNorm => {
-            console.log(linkedNorm);
-
             const newLinkedNorm = this.id;
 
             if (!linkedNorm['relatedFrom']) {
               linkedNorm.relatedFrom = [];
             }
 
-            linkedNorm.relatedFrom.push(newLinkedNorm);
+            if (linkedNorm.relatedFrom.indexOf(this.id) === -1) {
+              linkedNorm.relatedFrom.push(newLinkedNorm);
+            }
 
             return this.couchDBService
               .updateEntry(linkedNorm, linkedNorm['_id'])
@@ -977,7 +976,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private sendStateUpdate(): void {
     // send message to subscribers via observable subject
-    this.couchDBService.sendStateUpdate('document');
+    this.couchDBService.sendStateUpdate('document', this.id);
   }
 
   private convertToBase64(file: File): Observable<string> {

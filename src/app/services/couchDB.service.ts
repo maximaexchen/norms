@@ -34,10 +34,8 @@ export class CouchDBService {
   }
 
   public fetchEntries(param: string): Observable<any> {
-    console.log(this.dbRequest + param);
     return this.http.get(this.dbRequest + param).pipe(
       map(responseData => {
-        console.log(JSON.stringify(responseData));
         const entriesArray = [];
 
         for (const key in responseData['rows']) {
@@ -94,8 +92,8 @@ export class CouchDBService {
     );
   }
 
-  public sendStateUpdate(message: string) {
-    this.updateSubject.next({ text: message });
+  public sendStateUpdate(message: string, id: string) {
+    this.updateSubject.next({ text: message, id });
   }
 
   public setStateUpdate(): Observable<any> {

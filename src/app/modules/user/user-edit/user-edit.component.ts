@@ -375,7 +375,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   private sendStateUpdate(): void {
-    this.couchDBService.sendStateUpdate('user');
+    this.couchDBService.sendStateUpdate('user', this.id);
   }
 
   public ngOnDestroy(): void {
