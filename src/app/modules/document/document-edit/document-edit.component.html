@@ -359,7 +359,7 @@
             </div>
           </div>
 
-          <hr />
+          <hr *ngIf="latestAttachmentName" />
 
           <button
             type="button"
@@ -371,13 +371,14 @@
             <i class="fas fa-file-download"></i> Download Norm
           </button>
 
-          <hr />
+          <hr *ngIf="latestAttachmentName" />
 
           <p-fieldset
             legend="Dokumenten Historie"
             [toggleable]="true"
             [transitionOptions]="'100ms'"
             [collapsed]="false"
+            *ngIf="revisionDocuments.length > 0"
           >
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
               <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"
@@ -497,7 +498,7 @@
         </div>
       </div>
 
-      <hr>
+      <hr />
 
       <div class="row" *ngIf="relatedNormsFrom.length > 0">
         <div class="col-sm-12">

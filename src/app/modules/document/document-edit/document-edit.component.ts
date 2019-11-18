@@ -144,6 +144,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // this.relatedNorms = [];
     this.selectedRelatedNorms = [];
     this.relatedNormsFrom = [];
+    this.latestAttachmentName = '';
     this.selectedUsers = [];
     this.selectedTags1 = [];
     this.selectedTags2 = [];
