@@ -92,8 +92,8 @@ export class CouchDBService {
     );
   }
 
-  public sendStateUpdate(message: string, id: string) {
-    this.updateSubject.next({ text: message, id });
+  public sendStateUpdate(message: string, item: any) {
+    this.updateSubject.next({ text: message, item });
   }
 
   public setStateUpdate(): Observable<any> {

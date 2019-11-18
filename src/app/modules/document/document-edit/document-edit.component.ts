@@ -1,4 +1,3 @@
-import { NormDocument } from './../../../models/document.model';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,10 +12,10 @@ import uuidv4 from '@bundled-es-modules/uuid/v4.js';
 import * as _ from 'underscore';
 import { NGXLogger } from 'ngx-logger';
 
+import { NormDocument } from './../../../models/document.model';
 import { AuthenticationService } from './../../auth/services/authentication.service';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { NotificationsService } from 'src/app/services/notifications.service';
-import { NormDocument } from '../../../models/document.model';
 import { Tag } from '@app/models/tag.model';
 import { RevisionDocument } from './../revision-document.model';
 import { User } from '@app/models/user.model';
@@ -1011,7 +1010,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private sendStateUpdate(): void {
     // send message to subscribers via observable subject
-    this.couchDBService.sendStateUpdate('document', this.id);
+    this.couchDBService.sendStateUpdate('document', this.writeItem);
   }
 
   private convertToBase64(file: File): Observable<string> {

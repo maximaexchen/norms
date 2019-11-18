@@ -282,7 +282,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
 
   private sendStateUpdate(): void {
     // send message to subscribers via observable subject
-    this.couchDBService.sendStateUpdate('group', this.id);
+    this.couchDBService.sendStateUpdate('group', this.writeItem);
   }
 
   private updateSelect() {

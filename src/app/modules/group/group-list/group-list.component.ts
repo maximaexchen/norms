@@ -1,7 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-
-import { Subscription } from 'rxjs';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
@@ -15,6 +13,7 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./group-list.component.scss']
 })
 export class GroupListComponent implements OnInit, OnDestroy {
+  @ViewChild('dataTable', { static: false }) dataTable: any;
   alive = true;
 
   groups: Group[] = [];
@@ -35,13 +34,31 @@ export class GroupListComponent implements OnInit, OnDestroy {
       .subscribe(
         message => {
           if (message.text === 'group') {
-            this.getGroups();
+            this.updateList(message.item);
           }
         },
         error => this.logger.error(error.message)
       );
 
     this.getGroups();
+  }
+
+  private updateList(changedItem: any) {
+    const updateItem = this.groups.find(
+      item => item['_id'] === changedItem._id
+    );
+
+    const index = this.groups.indexOf(updateItem);
+    this.groups[index] = changedItem;
+
+    // If the list is filtered, we have to reset the filter to reflect teh updated list values
+    this.resetFilter();
+  }
+
+  private resetFilter(): void {
+    if (this.dataTable.hasFilter()) {
+      this.dataTable.filter();
+    }
   }
 
   private getGroups() {
@@ -63,6 +80,7 @@ export class GroupListComponent implements OnInit, OnDestroy {
   }
 
   public onFilter(event): void {
+    console.log(event);
     this.groupCount = event.filteredValue.length;
   }
 

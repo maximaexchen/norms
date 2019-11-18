@@ -2,7 +2,7 @@
   <h1 i18n="@@string-group-selection">Auswahl Gruppe</h1>
 </div>
 <p-table
-  #dt
+  #dataTable
   [value]="groups"
   [paginator]="true"
   [rows]="13"
@@ -22,7 +22,7 @@
         size="50"
         i18n-placeholder
         placeholder="Globale Suche"
-        (input)="dt.filterGlobal($event.target.value, 'contains')"
+        (input)="dataTable.filterGlobal($event.target.value, 'contains')"
         style="width:auto"
       />
     </div>

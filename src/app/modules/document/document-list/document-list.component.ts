@@ -3,7 +3,8 @@ import {
   OnInit,
   OnDestroy,
   Output,
-  EventEmitter
+  EventEmitter,
+  ViewChild
 } from '@angular/core';
 
 import { Subscription, Observable } from 'rxjs';
@@ -25,6 +26,7 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./document-list.component.scss']
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
+  @ViewChild('dataTable', { static: false }) dataTable: any;
   @Output() openSideBar: EventEmitter<any> = new EventEmitter();
   @Output() closeSideBar: EventEmitter<any> = new EventEmitter();
   alive = true;
@@ -73,12 +75,30 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         message => {
           console.log(message);
           if (message.text === 'document') {
-            this.getDocuments();
+            this.updateList(message.item);
           }
         },
         error => this.logger.error(error.message)
       );
     this.getDocuments();
+  }
+
+  private updateList(changedItem: any) {
+    const updateItem = this.documents.find(
+      item => item['_id'] === changedItem._id
+    );
+
+    const index = this.documents.indexOf(updateItem);
+    this.documents[index] = changedItem;
+
+    // If the list is filtered, we have to reset the filter to reflect teh updated list values
+    this.resetFilter();
+  }
+
+  private resetFilter(): void {
+    if (this.dataTable.hasFilter()) {
+      this.dataTable.filter();
+    }
   }
 
   private getDocuments() {

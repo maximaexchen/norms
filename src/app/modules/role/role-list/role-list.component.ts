@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
@@ -15,6 +15,7 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./role-list.component.scss']
 })
 export class RoleListComponent implements OnInit, OnDestroy {
+  @ViewChild('dataTable', { static: false }) dataTable: any;
   alive = true;
 
   roles: Role[] = [];
@@ -34,13 +35,29 @@ export class RoleListComponent implements OnInit, OnDestroy {
       .subscribe(
         message => {
           if (message.text === 'role') {
-            this.getRoles();
+            this.updateList(message.item);
           }
         },
         error => this.logger.error(error.message)
       );
 
     this.getRoles();
+  }
+
+  private updateList(changedItem: any) {
+    const updateItem = this.roles.find(item => item['_id'] === changedItem._id);
+
+    const index = this.roles.indexOf(updateItem);
+    this.roles[index] = changedItem;
+
+    // If the list is filtered, we have to reset the filter to reflect teh updated list values
+    this.resetFilter();
+  }
+
+  private resetFilter(): void {
+    if (this.dataTable.hasFilter()) {
+      this.dataTable.filter();
+    }
   }
 
   private getRoles() {

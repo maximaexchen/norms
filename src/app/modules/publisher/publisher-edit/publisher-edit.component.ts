@@ -194,7 +194,7 @@ export class PublisherEditComponent implements OnInit, OnDestroy {
 
   sendStateUpdate(): void {
     // send message to subscribers via observable subject
-    this.couchDBService.sendStateUpdate('publisher', this.id);
+    this.couchDBService.sendStateUpdate('publisher', this.writeItem);
   }
 
   ngOnDestroy(): void {

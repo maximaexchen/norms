@@ -3,7 +3,7 @@
 </div>
 
 <p-table
-  #dt
+  #dataTable
   [value]="users"
   [paginator]="true"
   [rows]="13"
@@ -12,7 +12,7 @@
   [(selection)]="selectedUser"
   (onRowSelect)="onRowSelect($event)"
   [globalFilterFields]="['firstName', 'lastName']"
-  (onFilter)="onFilter($event, dt)"
+  (onFilter)="onFilter($event, dataTable)"
 >
   <ng-template pTemplate="caption">
     <div style="text-align: center;">
@@ -23,7 +23,7 @@
         size="50"
         i18n-placeholder
         placeholder="Globale Suche"
-        (input)="dt.filterGlobal($event.target.value, 'contains')"
+        (input)="dataTable.filterGlobal($event.target.value, 'contains')"
         style="width:auto"
       />
     </div>

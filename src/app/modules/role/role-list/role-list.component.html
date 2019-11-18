@@ -2,7 +2,7 @@
   <h1 i18n="@@string-role-selection">Auswahl Rolle</h1>
 </div>
 <p-table
-  #dt
+  #dataTable
   [value]="roles"
   [paginator]="true"
   [rows]="13"
@@ -23,7 +23,7 @@
         size="50"
         i18n-placeholder
         placeholder="Globale Suche"
-        (input)="dt.filterGlobal($event.target.value, 'contains')"
+        (input)="dataTable.filterGlobal($event.target.value, 'contains')"
         style="width:auto"
       />
     </div>
