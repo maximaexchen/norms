@@ -1,3 +1,4 @@
+import { NormDocument } from './../../../models/document.model';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -580,19 +581,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getNormsForRelatedSelect() {
-    console.log('getNormsForRelatedSelect');
     this.relatedNormsSelectList = [];
     this.documentService
       .getDocuments()
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          result.forEach(item => {
-            const relatedNormSelectItem = {} as NormDocument;
-            relatedNormSelectItem['id'] = item._id;
-            relatedNormSelectItem['normNumber'] = item.normNumber;
-            this.relatedNormsSelectList.push(relatedNormSelectItem);
+          const normMap: NormDocument[] = result.map(norm => {
+            const selectedNormObject = {};
+            selectedNormObject['id'] = norm['_id'];
+            selectedNormObject['normNumber'] = norm['normNumber'];
+            return selectedNormObject;
           });
+
+          this.relatedNormsSelectList = normMap;
         },
         error => {
           this.logger.error(error.message);
@@ -964,6 +966,39 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
           item => item['id'] !== id
         );
+
+        // TODO: Delete entry in the related DBEntry
+
+        // get the linked Norm
+        this.couchDBService
+          .fetchEntry('/' + id)
+          .pipe(
+            switchMap(linkedNorm => {
+              /* if (linkedNorm.relatedFrom.indexOf(this.id) === -1) {
+                linkedNorm.relatedFrom.pop(linkedNorm);
+              } */
+
+              console.log(linkedNorm);
+
+              const filtered = linkedNorm.relatedFrom.filter(relNorm => {
+                return relNorm !== this.id;
+              });
+
+              linkedNorm.relatedFrom = filtered;
+
+              return this.couchDBService
+                .updateEntry(linkedNorm, linkedNorm['_id'])
+                .pipe(
+                  tap(r => {
+                    console.log(r);
+
+                    this.onSubmit();
+                  })
+                );
+            })
+          )
+          .subscribe(result => {});
+
         this.readyToSave = true;
       },
       reject: () => {}

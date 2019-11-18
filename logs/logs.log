@@ -61,3 +61,5 @@
 2019-11-18T08:10:28.781Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
 2019-11-18T08:16:11.980Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
 2019-11-18T08:16:11.980Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T10:16:37.366Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-18T10:17:58.781Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
