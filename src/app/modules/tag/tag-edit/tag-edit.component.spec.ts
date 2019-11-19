@@ -1,7 +1,6 @@
 import { MessageService } from 'primeng/components/common/messageservice';
 import { DocumentModule } from './../../document/document.module';
 import { GroupModule } from './../../group/group.module';
-import { PublisherModule } from './../../publisher/publisher.module';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RoleModule } from './../../role/role.module';
@@ -30,7 +29,6 @@ describe('TagEditComponent', () => {
         SearchModule,
         UserModule,
         RoleModule,
-        PublisherModule,
         GroupModule,
         DocumentModule,
         RoleRoutingModule

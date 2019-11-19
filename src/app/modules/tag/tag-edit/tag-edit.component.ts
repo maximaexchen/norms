@@ -163,7 +163,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
                 this.updateRelated(results);
 
                 // Inform about Database change.
-                this.sendStateUpdate();
+                this.sendStateUpdate('update');
                 this.router.navigate(['../tag']);
               },
               error => this.logger.error(error.message),
@@ -208,7 +208,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           this.router.navigate(['../tag']);
-          this.sendStateUpdate();
+          this.sendStateUpdate('save');
         },
         error => this.logger.error(error.message)
       );
@@ -223,7 +223,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
           .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
-              this.sendStateUpdate();
+              this.sendStateUpdate('delete');
               this.router.navigate(['../tag']);
             },
             error => {
@@ -262,8 +262,8 @@ export class TagEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private sendStateUpdate(): void {
-    this.couchDBService.sendStateUpdate('tag', this.writeItem);
+  private sendStateUpdate(action: string): void {
+    this.couchDBService.sendStateUpdate('tag', this.writeItem, action);
   }
 
   public ngOnDestroy(): void {

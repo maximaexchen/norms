@@ -207,7 +207,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
         result => {
           // Inform about Database change.
           this.getUser();
-          this.sendStateUpdate();
+          this.sendStateUpdate('update');
           this.searchRelatedUser(result);
           this.router.navigate(['../user']);
         },
@@ -252,7 +252,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
           this.updateRelated(results);
 
           // Inform about Database change.
-          this.sendStateUpdate();
+          // this.sendStateUpdate();
           this.router.navigate(['../user']);
         },
         error => this.logger.error(error.message),
@@ -313,7 +313,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           this.router.navigate(['../user']);
-          this.sendStateUpdate();
+          this.sendStateUpdate('save');
         },
         error => this.logger.error(error.message)
       );
@@ -328,7 +328,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
           .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
-              this.sendStateUpdate();
+              this.sendStateUpdate('delete');
               this.router.navigate(['../user']);
             },
             error => {
@@ -374,8 +374,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private sendStateUpdate(): void {
-    this.couchDBService.sendStateUpdate('user', this.writeItem);
+  private sendStateUpdate(action: string): void {
+    this.couchDBService.sendStateUpdate('user', this.writeItem, action);
   }
 
   public ngOnDestroy(): void {

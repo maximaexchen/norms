@@ -63,3 +63,102 @@
 2019-11-18T08:16:11.980Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
 2019-11-18T10:16:37.366Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
 2019-11-18T10:17:58.781Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/8daca570-90dd-424f-92a9-5ac43b58cf7f: 412 Precondition Failed
+2019-11-19T13:16:53.771Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:17:47.775Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:18:20.138Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:20:00.133Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:20:35.374Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:20:53.467Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:21:07.122Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:21:26.929Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:21:48.821Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:21:57.525Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:22:06.314Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:22:12.159Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:22:12.159Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:24:47.481Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:25:09.794Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:25:38.784Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:25:51.822Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:25:58.955Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:26:09.750Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:26:26.826Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:26:44.023Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:27:31.553Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:27:43.450Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:27:43.450Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:47:58.063Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:48:10.844Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:48:30.323Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:49:21.460Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:50:33.417Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/44b48429-c689-426b-8c0c-00101365c3fb: 404 Object Not Found
+2019-11-19T13:49:21.460Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T13:50:33.417Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/44b48429-c689-426b-8c0c-00101365c3fb: 404 Object Not Found
+2019-11-19T13:57:22.831Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/44b48429-c689-426b-8c0c-00101365c3fb: 404 Object Not Found
+2019-11-19T13:57:22.831Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/44b48429-c689-426b-8c0c-00101365c3fb: 404 Object Not Found
+2019-11-19T14:04:18.814Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/44b48429-c689-426b-8c0c-00101365c3fb: 404 Object Not Found
+2019-11-19T14:07:38.720Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/12c9476a-94e6-42b5-86e0-e70762c5c4b5: 404 Object Not Found
+2019-11-19T14:07:38.766Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/12c9476a-94e6-42b5-86e0-e70762c5c4b5: 404 Object Not Found
+2019-11-19T14:08:23.159Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T14:10:58.001Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/b5cdd9a0-7092-48d2-9517-9af9d20c01c9: 404 Object Not Found
+2019-11-19T14:10:58.001Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/b5cdd9a0-7092-48d2-9517-9af9d20c01c9: 404 Object Not Found
+2019-11-19T14:15:18.624Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T14:15:43.042Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/1e6d174e-01c4-40d7-8d2e-c8b5393cc619: 404 Object Not Found
+2019-11-19T14:17:04.021Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/1e6d174e-01c4-40d7-8d2e-c8b5393cc619: 404 Object Not Found
+2019-11-19T14:17:40.977Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/1e6d174e-01c4-40d7-8d2e-c8b5393cc619: 404 Object Not Found
+2019-11-19T14:18:16.358Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T14:18:25.449Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ae64a0ab-b9de-4cb5-8ccb-8b9f51fee47b: 404 Object Not Found
+2019-11-19T14:18:43.154Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ae64a0ab-b9de-4cb5-8ccb-8b9f51fee47b: 404 Object Not Found
+2019-11-19T14:17:04.021Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/1e6d174e-01c4-40d7-8d2e-c8b5393cc619: 404 Object Not Found
+2019-11-19T14:19:13.394Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ae64a0ab-b9de-4cb5-8ccb-8b9f51fee47b: 404 Object Not Found
+2019-11-19T14:17:40.977Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/1e6d174e-01c4-40d7-8d2e-c8b5393cc619: 404 Object Not Found
+2019-11-19T14:18:16.358Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T14:18:25.449Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ae64a0ab-b9de-4cb5-8ccb-8b9f51fee47b: 404 Object Not Found
+2019-11-19T14:18:43.154Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ae64a0ab-b9de-4cb5-8ccb-8b9f51fee47b: 404 Object Not Found
+2019-11-19T14:19:13.394Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ae64a0ab-b9de-4cb5-8ccb-8b9f51fee47b: 404 Object Not Found
+2019-11-19T14:22:28.656Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:22:37.040Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:22:40.435Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T14:22:40.493Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T14:22:49.809Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:22:28.656Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:22:37.040Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:22:40.435Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T14:22:40.493Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T14:22:49.809Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:27:10.667Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:28:20.019Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:30:23.438Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:30:52.049Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:31:02.174Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T14:31:02.238Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T14:31:20.271Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:32:08.507Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:30:23.438Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:30:52.049Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:31:02.174Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T14:31:02.238Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/ee2432fc-4afd-4c21-b8ee-4d8e06152084: 404 Object Not Found
+2019-11-19T14:31:20.271Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:32:08.507Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:34:10.851Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:34:10.851Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:37:46.839Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T14:37:46.839Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/d8bc735c-c4a0-4f9b-8151-bad221eabb4a: 412 Precondition Failed
+2019-11-19T15:13:43.553Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T15:13:48.068Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/afb0d448-a436-4d5b-acdd-397001b445a5: 404 Object Not Found
+2019-11-19T15:13:43.553Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T15:13:48.068Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/afb0d448-a436-4d5b-acdd-397001b445a5: 404 Object Not Found
+2019-11-19T15:16:56.078Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/afb0d448-a436-4d5b-acdd-397001b445a5: 404 Object Not Found
+2019-11-19T15:17:55.044Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/afb0d448-a436-4d5b-acdd-397001b445a5: 404 Object Not Found
+2019-11-19T15:16:56.078Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/afb0d448-a436-4d5b-acdd-397001b445a5: 404 Object Not Found
+2019-11-19T15:19:54.782Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T15:17:55.044Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/afb0d448-a436-4d5b-acdd-397001b445a5: 404 Object Not Found
+2019-11-19T15:21:55.425Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/4d8c3a7c-33f2-461a-a446-5a6695707b7b: 412 Precondition Failed
+2019-11-19T15:23:15.647Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T15:23:18.457Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/4d8c3a7c-33f2-461a-a446-5a6695707b7b: 404 Object Not Found
+2019-11-19T15:21:55.425Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/4d8c3a7c-33f2-461a-a446-5a6695707b7b: 412 Precondition Failed
+2019-11-19T15:23:15.647Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
+2019-11-19T15:23:18.457Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/4d8c3a7c-33f2-461a-a446-5a6695707b7b: 404 Object Not Found
+2019-11-19T15:25:34.729Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/4d8c3a7c-33f2-461a-a446-5a6695707b7b: 404 Object Not Found
+2019-11-19T15:51:47.863Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/dc85f5c3-6110-4f70-b8e4-c47fb3cb3e68: 404 Object Not Found
+2019-11-19T15:51:47.863Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/dc85f5c3-6110-4f70-b8e4-c47fb3cb3e68: 404 Object Not Found

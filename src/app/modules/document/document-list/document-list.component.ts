@@ -84,12 +84,15 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private updateList(changedItem: any) {
-    const updateItem = this.documents.find(
-      item => item['_id'] === changedItem._id
-    );
+    const updateItem = this.documents.find(item => item['_id'] === changedItem);
 
     const index = this.documents.indexOf(updateItem);
-    this.documents[index] = changedItem;
+
+    if (index === -1) {
+      this.documents.push(changedItem);
+    } else {
+      this.documents[index] = changedItem;
+    }
 
     // If the list is filtered, we have to reset the filter to reflect teh updated list values
     this.resetFilter();
