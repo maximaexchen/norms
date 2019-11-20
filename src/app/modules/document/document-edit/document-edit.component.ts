@@ -292,6 +292,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         },
         () => {
           // Inform about database change.
+          console.log('writeUpdate');
+          console.log(this.writeItem);
           this.isLoading = false;
           this.sendStateUpdate(this.id, 'update');
           this.showConfirmation('success', 'Updated');
@@ -841,7 +843,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deleteRelatedDBEntriesForRelated(id: string) {
+  /* private deleteRelatedDBEntriesForRelated(id: string) {
     const deleteQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -880,9 +882,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           );
       });
     });
-  }
+  } */
 
-  private deleteRelatedDBEntriesForRelatedFrom(id: string) {
+  /* private deleteRelatedDBEntriesForRelatedFrom(id: string) {
     const deleteQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -921,7 +923,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           );
       });
     });
-  }
+  } */
 
   private setSelectedTags() {
     const selectedTags = [
@@ -1130,7 +1132,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private sendStateUpdate(id: string, action: string): void {
     // send message to subscribers via observable subject
-    this.couchDBService.sendStateUpdate('document', id, action);
+    this.couchDBService.sendStateUpdate('document', id, action, this.writeItem);
   }
 
   private convertToBase64(file: File): Observable<string> {

@@ -74,8 +74,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .subscribe(
         message => {
           console.log(message);
-          if (message.text === 'document') {
-            this.updateList(message.item);
+          if (message.model === 'document') {
+            this.updateList(message);
           }
         },
         error => this.logger.error(error.message)
@@ -83,15 +83,29 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.getDocuments();
   }
 
-  private updateList(changedItem: any) {
-    const updateItem = this.documents.find(item => item['_id'] === changedItem);
+  private updateList(changedInfo: any) {
+    console.log('updateList');
+
+    const updateItem = this.documents.find(
+      item => item['_id'] === changedInfo.id
+    );
 
     const index = this.documents.indexOf(updateItem);
 
-    if (index === -1) {
-      this.documents.push(changedItem);
+    if (changedInfo.action !== 'delete') {
+      console.log('00 updateList');
+
+      if (index === -1) {
+        console.log('01 updateList');
+        this.documents.push(changedInfo.object);
+      } else {
+        console.log('02 updateList');
+        this.documents[index] = changedInfo.object;
+      }
     } else {
-      this.documents[index] = changedItem;
+      console.log('03 updateList');
+
+      this.documents.splice(index, 1);
     }
 
     // If the list is filtered, we have to reset the filter to reflect teh updated list values

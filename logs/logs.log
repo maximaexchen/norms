@@ -162,3 +162,17 @@
 2019-11-19T15:25:34.729Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/4d8c3a7c-33f2-461a-a446-5a6695707b7b: 404 Object Not Found
 2019-11-19T15:51:47.863Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/dc85f5c3-6110-4f70-b8e4-c47fb3cb3e68: 404 Object Not Found
 2019-11-19T15:51:47.863Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/dc85f5c3-6110-4f70-b8e4-c47fb3cb3e68: 404 Object Not Found
+2019-11-20T06:35:14.741Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/68590f7d-8a75-45f6-b974-c49f24388a38: 412 Precondition Failed
+2019-11-20T06:35:37.340Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/68590f7d-8a75-45f6-b974-c49f24388a38: 412 Precondition Failed
+2019-11-20T06:35:46.706Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/68590f7d-8a75-45f6-b974-c49f24388a38: 412 Precondition Failed
+2019-11-20T06:35:14.741Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/68590f7d-8a75-45f6-b974-c49f24388a38: 412 Precondition Failed
+2019-11-20T06:35:37.340Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/68590f7d-8a75-45f6-b974-c49f24388a38: 412 Precondition Failed
+2019-11-20T06:35:46.706Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/68590f7d-8a75-45f6-b974-c49f24388a38: 412 Precondition Failed
+2019-11-20T07:53:09.968Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/eb374918-7761-49ca-bf8b-8ec26add26a9: 412 Precondition Failed
+2019-11-20T07:53:27.390Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/eb374918-7761-49ca-bf8b-8ec26add26a9: 412 Precondition Failed
+2019-11-20T07:53:35.755Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e0f72629-9080-48d2-9060-f498057641b5: 412 Precondition Failed
+2019-11-20T07:54:08.863Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/eb374918-7761-49ca-bf8b-8ec26add26a9: 412 Precondition Failed
+2019-11-20T07:53:09.968Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/eb374918-7761-49ca-bf8b-8ec26add26a9: 412 Precondition Failed
+2019-11-20T07:53:27.390Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/eb374918-7761-49ca-bf8b-8ec26add26a9: 412 Precondition Failed
+2019-11-20T07:53:35.755Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/e0f72629-9080-48d2-9060-f498057641b5: 412 Precondition Failed
+2019-11-20T07:54:08.863Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_documents/eb374918-7761-49ca-bf8b-8ec26add26a9: 412 Precondition Failed
