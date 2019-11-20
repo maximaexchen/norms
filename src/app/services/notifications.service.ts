@@ -8,9 +8,6 @@ export class NotificationsService {
   constructor(private messageService: MessageService) {}
 
   addSingle(severity: string, summary: string, detail: string) {
-    console.log(severity);
-    console.log(summary);
-    console.log(detail);
     this.messageService.add({
       severity,
       summary,
