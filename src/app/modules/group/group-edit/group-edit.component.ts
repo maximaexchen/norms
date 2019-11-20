@@ -201,7 +201,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          this.sendStateUpdate('update');
+          this.sendStateUpdate(this.id, 'update');
           this.router.navigate(['../group']);
         },
         error => this.logger.error(error.message)
@@ -218,7 +218,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
-          this.sendStateUpdate('save');
+          this.sendStateUpdate(this.id, 'save');
         },
         error => this.logger.error(error.message)
       );
@@ -240,7 +240,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
           .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
-              this.sendStateUpdate('delete');
+              this.sendStateUpdate(this.id, 'delete');
               this.router.navigate(['../group']);
             },
             error => this.logger.error(error.message)
@@ -280,9 +280,9 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private sendStateUpdate(action: string): void {
+  private sendStateUpdate(id: string, action: string): void {
     // send message to subscribers via observable subject
-    this.couchDBService.sendStateUpdate('group', this.writeItem, action);
+    this.couchDBService.sendStateUpdate('group', id, action, this.writeItem);
   }
 
   private updateSelect() {

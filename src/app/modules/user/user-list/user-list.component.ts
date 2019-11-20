@@ -33,8 +33,9 @@ export class UserListComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         message => {
-          if (message.text === 'user') {
-            this.updateList(message.item);
+          console.log(message);
+          if (message.model === 'user') {
+            this.updateList(message);
           }
         },
         error => this.logger.error(error.message),
@@ -44,11 +45,28 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.getUsers();
   }
 
-  private updateList(changedItem: any) {
-    const updateItem = this.users.find(item => item['_id'] === changedItem._id);
+  private updateList(changedInfo: any) {
+    console.log(changedInfo);
+    const updateItem = this.users.find(item => item['_id'] === changedInfo.id);
 
     const index = this.users.indexOf(updateItem);
-    this.users[index] = changedItem;
+    console.log('03');
+    if (changedInfo.action !== 'delete') {
+      if (index === -1) {
+        // Add to list
+        console.log('02');
+        this.users.push(changedInfo.object);
+      } else {
+        // Update object in list
+        console.log('01');
+        this.users[index] = changedInfo.object;
+      }
+    } else {
+      // Remove from list
+      console.log('00');
+      console.log(index);
+      this.users.splice(index, 1);
+    }
 
     // If the list is filtered, we have to reset the filter to reflect teh updated list values
     this.resetFilter();

@@ -292,8 +292,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         },
         () => {
           // Inform about database change.
-          console.log('writeUpdate');
-          console.log(this.writeItem);
           this.isLoading = false;
           this.sendStateUpdate(this.id, 'update');
           this.showConfirmation('success', 'Updated');

@@ -84,8 +84,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private updateList(changedInfo: any) {
-    console.log('updateList');
-
     const updateItem = this.documents.find(
       item => item['_id'] === changedInfo.id
     );
@@ -93,18 +91,15 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     const index = this.documents.indexOf(updateItem);
 
     if (changedInfo.action !== 'delete') {
-      console.log('00 updateList');
-
       if (index === -1) {
-        console.log('01 updateList');
+        // Add to list
         this.documents.push(changedInfo.object);
       } else {
-        console.log('02 updateList');
+        // Update object in list
         this.documents[index] = changedInfo.object;
       }
     } else {
-      console.log('03 updateList');
-
+      // Remove from list
       this.documents.splice(index, 1);
     }
 

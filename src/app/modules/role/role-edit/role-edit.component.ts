@@ -5,11 +5,13 @@ import { NgForm } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
 import { takeWhile } from 'rxjs/operators';
 
+import { NGXLogger } from 'ngx-logger';
+import uuidv4 from '@bundled-es-modules/uuid/v4.js';
+
 import { CouchDBService } from '@app/services/couchDB.service';
 import { NotificationsService } from '@app/services/notifications.service';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Role } from '@models/index';
-import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-role-edit',
@@ -71,6 +73,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
   }
 
   private newRole() {
+    this.id = uuidv4();
     this.isNew = true;
     this.editable = true;
     this.formTitle = 'Neue Rolle anlegen';
@@ -128,7 +131,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           this.router.navigate(['../role']);
-          this.sendStateUpdate('update');
+          this.sendStateUpdate(this.id, 'update');
         },
         error => {
           this.logger.error(error.message);
@@ -145,7 +148,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           this.router.navigate(['../role']);
-          this.sendStateUpdate('save');
+          this.sendStateUpdate(this.id, 'save');
         },
         error => this.logger.error(error.message)
       );
@@ -160,7 +163,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
           .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
-              this.sendStateUpdate('delete');
+              this.sendStateUpdate(this.id, 'delete');
               this.router.navigate(['../role']);
             },
             error => this.logger.error(error.message)
@@ -180,7 +183,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
       this.writeItem['_id'] = this.roleForm.value._id;
     }
 
-    if (this.roleForm.value._id) {
+    if (this.roleForm.value._rev) {
       this.writeItem['_rev'] = this.roleForm.value._rev;
     }
 
@@ -200,8 +203,9 @@ export class RoleEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private sendStateUpdate(action: string): void {
-    this.couchDBService.sendStateUpdate('role', this.writeItem, action);
+  private sendStateUpdate(id: string, action: string): void {
+    // send message to subscribers via observable subject
+    this.couchDBService.sendStateUpdate('role', id, action, this.writeItem);
   }
 
   public ngOnDestroy(): void {

@@ -33,8 +33,9 @@ export class GroupListComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         message => {
-          if (message.text === 'group') {
-            this.updateList(message.item);
+          console.log(message);
+          if (message.model === 'group') {
+            this.updateList(message);
           }
         },
         error => this.logger.error(error.message)
@@ -43,13 +44,23 @@ export class GroupListComponent implements OnInit, OnDestroy {
     this.getGroups();
   }
 
-  private updateList(changedItem: any) {
-    const updateItem = this.groups.find(
-      item => item['_id'] === changedItem._id
-    );
+  private updateList(changedInfo: any) {
+    const updateItem = this.groups.find(item => item['_id'] === changedInfo.id);
 
     const index = this.groups.indexOf(updateItem);
-    this.groups[index] = changedItem;
+
+    if (changedInfo.action !== 'delete') {
+      if (index === -1) {
+        // Add to list
+        this.groups.push(changedInfo.object);
+      } else {
+        // Update object in list
+        this.groups[index] = changedInfo.object;
+      }
+    } else {
+      // Remove from list
+      this.groups.splice(index, 1);
+    }
 
     // If the list is filtered, we have to reset the filter to reflect teh updated list values
     this.resetFilter();
