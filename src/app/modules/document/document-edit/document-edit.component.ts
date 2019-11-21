@@ -109,7 +109,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    console.log('DocumentEditComponent');
     this.setStartValues();
   }
 
@@ -151,9 +150,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.editable = false;
     this.users = [];
     this.owners = [];
-    this.attachments = [];
+    this.attachments = {};
+    this.attachment = {};
     this.selectedRelatedNorms = [];
     this.relatedNormsFrom = [];
+    this.revisionDocuments = [];
     this.latestAttachmentName = '';
     this.selectedUsers = [];
     this.selectedTags1 = [];
@@ -312,8 +313,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.id = entry['_id'];
     this.rev = entry['_rev'];
-    console.log('this.rev');
-    console.log(this.rev);
     this.type = 'norm';
     this.normNumber = entry['normNumber'];
     this.revision = entry['revision'];
@@ -438,7 +437,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.writeItem['processType'] = selProcessType || this.processType;
 
     // If there is a new PDF upload add to revisions and attachment Array
-    if (this.attachment) {
+    if (!_.isEmpty(this.attachment)) {
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
       this.revisionDocument['name'] = this.newAttachmentName;
@@ -458,8 +457,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     // add update status to users to be notified
     this.setUserNotification(this.normForm.value.revision);
-    console.log('this.writeItem');
-    console.log(this.writeItem);
     return this.writeItem;
   }
 
@@ -494,12 +491,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    *
    */
   public checkUpload(event, uploadField) {
-    console.log('checkUpload');
-    console.log(this.attachments);
     for (const file of event.files) {
       this.fileUpload = file;
     }
-    console.log(this.attachments);
 
     const isIn = this.checkForExistingAttachment(
       this.attachments,

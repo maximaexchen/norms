@@ -66,8 +66,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.logger.log('ngOnInit: DocumentListComponent');
-
     this.couchDBService
       .setStateUpdate()
       .pipe(takeWhile(() => this.alive))

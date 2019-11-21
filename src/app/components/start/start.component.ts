@@ -104,6 +104,9 @@ export class StartComponent implements OnInit, OnDestroy {
           this.ownerData['norms'][norm.normNumber] = {};
           this.ownerData['norms'][norm.normNumber]['id'] = norm._id;
 
+          console.log();
+          this.ownerData['norms'][norm.normNumber]['users'] = {};
+
           norm.users.forEach(userId => {
             const userQuery = {
               use_index: ['_design/search_norm'],
@@ -131,8 +134,6 @@ export class StartComponent implements OnInit, OnDestroy {
             this.couchDBService.search(userQuery).subscribe(
               user => {
                 if (user.docs.length > 0) {
-                  this.ownerData['norms'][norm.normNumber]['users'] = {};
-
                   user.docs.forEach(userData => {
                     this.ownerData['norms'][norm.normNumber]['users'][
                       userData['_id']
