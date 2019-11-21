@@ -78,6 +78,7 @@ export class StartComponent implements OnInit, OnDestroy {
   }
 
   public setOwnerData() {
+    console.log('setOwnerData');
     const ownerQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -102,19 +103,13 @@ export class StartComponent implements OnInit, OnDestroy {
         result.docs.forEach(norm => {
           this.ownerData['norms'][norm.normNumber] = {};
           this.ownerData['norms'][norm.normNumber]['id'] = norm._id;
-          this.ownerData['norms'][norm.normNumber]['users'] = {};
 
-          norm.users.forEach(users => {
-            this.ownerData['norms'][norm.normNumber]['users'][users.id] = {};
-            this.ownerData['norms'][norm.normNumber]['users'][users.id][
-              'name'
-            ] = users.firstName + ' ' + users.lastName;
-
+          norm.users.forEach(userId => {
             const userQuery = {
               use_index: ['_design/search_norm'],
               selector: {
                 _id: {
-                  $eq: users.id
+                  $eq: userId
                 },
                 type: {
                   $eq: 'user'
@@ -135,18 +130,37 @@ export class StartComponent implements OnInit, OnDestroy {
 
             this.couchDBService.search(userQuery).subscribe(
               user => {
-                this.ownerData['norms'][norm.normNumber]['users'][users.id][
-                  'associatedNorms'
-                ] = {};
                 if (user.docs.length > 0) {
+                  this.ownerData['norms'][norm.normNumber]['users'] = {};
+
                   user.docs.forEach(userData => {
-                    this.ownerData['norms'][norm.normNumber]['users'][users.id][
-                      'associatedNorms'
-                    ] = _.uniq(userData.associatedNorms, 'normId').filter(
-                      obj => {
-                        return obj['normId'] === norm._id;
-                      }
-                    );
+                    this.ownerData['norms'][norm.normNumber]['users'][
+                      userData['_id']
+                    ] = {};
+
+                    this.ownerData['norms'][norm.normNumber]['users'][
+                      userData['_id']
+                    ]['name'] =
+                      userData['firstName'] + ' ' + userData['lastName'];
+
+                    this.ownerData['norms'][norm.normNumber]['users'][
+                      userData['_id']
+                    ]['name'] =
+                      userData['firstName'] + ' ' + userData['lastName'];
+
+                    this.ownerData['norms'][norm.normNumber]['users'][
+                      userData['_id']
+                    ]['associatedNorms'] = {};
+
+                    // this.ownerData['norms'][norm.normNumber]['id']['name'] = users.firstName + ' ' + users.lastName;
+                    this.ownerData['norms'][norm.normNumber]['users'][
+                      userData['_id']
+                    ]['associatedNorms'] = _.uniq(
+                      userData.associatedNorms,
+                      'normId'
+                    ).filter(obj => {
+                      return obj['normId'] === norm._id;
+                    });
                   });
                 }
               },

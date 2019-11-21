@@ -151,6 +151,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.editable = false;
     this.users = [];
     this.owners = [];
+    this.attachments = [];
     this.selectedRelatedNorms = [];
     this.relatedNormsFrom = [];
     this.latestAttachmentName = '';
@@ -493,9 +494,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    *
    */
   public checkUpload(event, uploadField) {
+    console.log('checkUpload');
+    console.log(this.attachments);
     for (const file of event.files) {
       this.fileUpload = file;
     }
+    console.log(this.attachments);
 
     const isIn = this.checkForExistingAttachment(
       this.attachments,

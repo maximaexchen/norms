@@ -233,3 +233,23 @@
 2019-11-20T15:27:48.098Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_local/e194f2be-d0a9-47a7-8130-a1ac8f4471fe: 409 Conflict
 2019-11-20T15:35:43.802Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_local/60186c3c-d377-40f8-bc2c-c23a2c3079b8: 412 Precondition Failed
 2019-11-20T15:35:43.802Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_local/60186c3c-d377-40f8-bc2c-c23a2c3079b8: 412 Precondition Failed
+2019-11-21T08:46:03.710Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:46:03.720Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:46:03.732Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:46:03.741Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:46:03.746Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:46:03.752Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:47:27.499Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:47:27.725Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:47:27.732Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:47:27.747Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:47:27.740Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:47:27.754Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:49:03.984Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:49:03.968Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:49:03.996Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:49:04.004Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:49:04.015Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T08:49:04.023Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/_find: 500 Internal Server Error
+2019-11-21T09:42:00.024Z - main.js - Http failure response for http://localhost:4000/api/sendmail/: 0 Unknown Error
+2019-11-21T09:42:00.024Z - main.js - Http failure response for http://localhost:4000/api/sendmail/: 0 Unknown Error
