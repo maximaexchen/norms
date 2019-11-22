@@ -687,6 +687,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
                 this.revisionDocuments[0]['name'] || '';
             }
 
+            // filter the norms by new norm and add the new one
+            associatedNorms = _.filter(
+              associatedNorms,
+              num => num.normNumber !== newAssociatedNorm.normNumber
+            );
+
             associatedNorms.push(newAssociatedNorm);
 
             const updateUser = {
@@ -724,7 +730,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private deleteRelatedDBEntries(id: string) {
-    this.deleteRelatedDBEntriesForUser(this.id);
+    this.deleteAssociatedNormEntriesInUser(this.id);
 
     const deleteQuery = {
       use_index: ['_design/search_norm'],
@@ -777,7 +783,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deleteRelatedDBEntriesForUser(id: string) {
+  private deleteAssociatedNormEntriesInUser(id: string) {
     const deleteQuery = {
       use_index: ['_design/search_norm'],
       selector: {
