@@ -9,6 +9,8 @@
   [rows]="13"
   class="table"
   selectionMode="single"
+  [resizableColumns]="true"
+  columnResizeMode="fit"
   [(selection)]="selectedUser"
   (onRowSelect)="onRowSelect($event)"
   [globalFilterFields]="['firstName', 'lastName']"

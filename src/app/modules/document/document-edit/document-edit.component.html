@@ -1,9 +1,6 @@
 <div class="loading-indicator" *ngIf="isLoading">
-  <p-progressSpinner
-    [style]="{ width: '80px', height: '80px' }"
-    strokeWidth="5"
-    animationDuration=".8s"
-  ></p-progressSpinner>
+  <p-progressSpinner [style]="{ width: '80px', height: '80px' }" strokeWidth="5" animationDuration=".8s">
+  </p-progressSpinner>
 </div>
 <div class="row detail-edit-header">
   <div class="col-sm-4">
@@ -13,19 +10,9 @@
     </h1>
   </div>
   <div class="col-sm-8 text-right">
-    <app-crud-nav
-      [isNew]="isNew"
-      [validForm]="normForm.valid"
-      [dirtyForm]="normForm.dirty"
-      [routeNew]="'/document/new'"
-      [editable]="editable"
-      [role]="currentUserRole"
-      (save)="onSubmit()"
-      (add)="onSubmit()"
-      (edit)="onEdit()"
-      (delete)="deleteDocument()"
-      [readyToSave]="readyToSave"
-    ></app-crud-nav>
+    <app-crud-nav [isNew]="isNew" [validForm]="normForm.valid" [dirtyForm]="normForm.dirty" [routeNew]="'/document/new'"
+      [editable]="editable" [role]="currentUserRole" (save)="onSubmit()" (add)="onSubmit()" (edit)="onEdit()"
+      (delete)="deleteDocument()" [readyToSave]="readyToSave"></app-crud-nav>
   </div>
 </div>
 
@@ -33,89 +20,43 @@
   <input type="hidden" [(ngModel)]="isNew" name="isNew" />
   <input type="hidden" [(ngModel)]="id" name="_id" />
   <input type="hidden" [(ngModel)]="rev" name="_rev" />
-  <p-tabView
-    [(activeIndex)]="selectedTab"
-    (onChange)="selectedTab = $event.index"
-  >
+  <p-tabView [(activeIndex)]="selectedTab" (onChange)="selectedTab = $event.index">
     <p-tabPanel header="Stammdaten">
       <div class="row">
         <div class="col-sm-6">
           <div class="row">
             <div class="col-sm-8">
               <div class="form-group row">
-                <label
-                  for="normNumber"
-                  class="col-sm-6 col-form-label"
-                  i18n="@@string-number-dataset"
-                  >Nummer</label
-                >
+                <label for="normNumber" class="col-sm-6 col-form-label" i18n="@@string-number-dataset">Nummer</label>
                 <div class="col-sm-6">
-                  <input
-                    type="text"
-                    class="form-control"
-                    i18n-placeholder
-                    placeholder="Nummer"
-                    [(ngModel)]="normNumber"
-                    name="normNumber"
-                    required
-                    [readOnly]="!editable"
-                  />
+                  <input type="text" class="form-control" i18n-placeholder placeholder="Nummer" [(ngModel)]="normNumber"
+                    name="normNumber" required [readOnly]="!editable" />
                 </div>
               </div>
             </div>
             <div class="col-sm-4">
               <div class="form-group row">
-                <label
-                  class="col-sm-4 col-form-label"
-                  i18n="@@string-revision-dataset"
-                  >Revision</label
-                >
+                <label class="col-sm-4 col-form-label" i18n="@@string-revision-dataset">Revision</label>
                 <div class="col-sm-8">
-                  <input
-                    type="text"
-                    class="form-control"
-                    i18n-placeholder
-                    placeholder="Revision"
-                    [(ngModel)]="revision"
-                    name="revision"
-                    required
-                    [readOnly]="!editable"
-                  />
+                  <input type="text" class="form-control" i18n-placeholder placeholder="Revision" [(ngModel)]="revision"
+                    name="revision" required [readOnly]="!editable" />
                 </div>
               </div>
             </div>
           </div>
 
           <div class="form-group row">
-            <label
-              class="col-sm-4 col-form-label"
-              for="revisionDate"
-              i18n="@@string-date-dataset"
-              >Datum</label
-            >
+            <label class="col-sm-4 col-form-label" for="revisionDate" i18n="@@string-date-dataset">Datum</label>
             <div class="col-sm-4">
-              <p-calendar
-                [(ngModel)]="revisionDate"
-                [showIcon]="false"
-                [inline]="false"
-                dateFormat="dd.mm.yy"
-                id="revisionDate"
-                name="revisionDate"
-                required
-                [disabled]="!editable"
-              ></p-calendar>
+              <p-calendar [(ngModel)]="revisionDate" [showIcon]="false" [inline]="false" dateFormat="dd.mm.yy"
+                id="revisionDate" name="revisionDate" required [disabled]="!editable"></p-calendar>
             </div>
           </div>
 
           <div class="form-group row">
-            <label
-              class="col-sm-4 col-form-label"
-              i18n="@@string-language-dataset"
-              >Sprache</label
-            >
+            <label class="col-sm-4 col-form-label" i18n="@@string-language-dataset">Sprache</label>
             <div class="col-sm-8">
-              <p-selectButton
-                [options]="[
+              <p-selectButton [options]="[
                   {
                     label: 'de',
                     value: 'de'
@@ -128,105 +69,50 @@
                     label: 'fr',
                     value: 'fr'
                   }
-                ]"
-                name="normLanguage"
-                [(ngModel)]="normLanguage"
-                [disabled]="!editable"
-              ></p-selectButton>
+                ]" name="normLanguage" [(ngModel)]="normLanguage" [disabled]="!editable"></p-selectButton>
             </div>
           </div>
 
           <div class="form-group row">
-            <label
-              class="col-sm-4 col-form-label"
-              i18n="@@string-descriptionDE-dataset"
-              >Beschreibung de</label
-            >
+            <label class="col-sm-4 col-form-label" i18n="@@string-descriptionDE-dataset">Beschreibung de</label>
             <div class="col-sm-8">
-              <textarea
-                class="form-control"
-                i18n-placeholder
-                placeholder="Beschreibung de"
-                required
-                [(ngModel)]="descriptionDE"
-                name="descriptionDE"
-                [disabled]="!editable"
-              ></textarea>
+              <textarea class="form-control" i18n-placeholder placeholder="Beschreibung de" [required]="normLanguage === 'en' || normLanguage === 'de'  || normLanguage === 'fr'"
+                [(ngModel)]="descriptionDE" name="descriptionDE" [disabled]="!editable"></textarea>
             </div>
           </div>
 
           <div class="form-group row">
-            <label
-              class="col-sm-4 col-form-label"
-              i18n="@@string-descriptionEN-dataset"
-              >Beschreibung en</label
-            >
+            <label class="col-sm-4 col-form-label" i18n="@@string-descriptionEN-dataset">Beschreibung en</label>
             <div class="col-sm-8">
-              <textarea
-                class="form-control"
-                i18n-placeholder
-                placeholder="Beschreibung en"
-                [(ngModel)]="descriptionEN"
-                name="descriptionEN"
-                [disabled]="!editable"
-                required
-              ></textarea>
+              <textarea class="form-control" i18n-placeholder placeholder="Beschreibung en" [(ngModel)]="descriptionEN"
+                name="descriptionEN" [disabled]="!editable" [required]="normLanguage === 'en' || normLanguage === 'de' || normLanguage === 'fr'"></textarea>
             </div>
           </div>
 
           <div class="form-group row">
-            <label
-              class="col-sm-4 col-form-label"
-              i18n="@@string-descriptionFR-dataset"
-              >Beschreibung fr</label
-            >
+            <label class="col-sm-4 col-form-label" i18n="@@string-descriptionFR-dataset">Beschreibung fr</label>
             <div class="col-sm-8">
-              <textarea
-                class="form-control"
-                i18n-placeholder
-                placeholder="Beschreibung fr"
-                [(ngModel)]="descriptionFR"
-                name="descriptionFR"
-                [disabled]="!editable"
-              ></textarea>
+              <textarea class="form-control" i18n-placeholder placeholder="Beschreibung fr" [(ngModel)]="descriptionFR"
+                name="descriptionFR" [disabled]="!editable" [required]="normLanguage === 'fr'" ></textarea>
             </div>
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label" i18n="@@string-scope-dataset"
-              >Scope</label
-            >
+            <label class="col-sm-4 col-form-label" i18n="@@string-scope-dataset">Scope</label>
             <div class="col-sm-8">
-              <textarea
-                required
-                class="form-control"
-                i18n-placeholder
-                placeholder="Scope"
-                [(ngModel)]="scope"
-                name="scope"
-                [disabled]="!editable"
-              ></textarea>
+              <textarea required class="form-control" i18n-placeholder placeholder="Scope" [(ngModel)]="scope"
+                name="scope" [disabled]="!editable"></textarea>
             </div>
           </div>
 
           <div class="form-group row document-tags">
-            <label class="col-sm-4 col-form-label" i18n="@@string-tags-dataset"
-              >Tags</label
-            >
+            <label class="col-sm-4 col-form-label" i18n="@@string-tags-dataset">Tags</label>
             <div class="col-sm-8">
               <p i18n="@@string-tag-level1-dataset">Level 1 (Herausgeber)</p>
-              <angular2-multiselect
-                name="tagsLevel1"
-                [data]="tagsLevel1"
-                [(ngModel)]="selectedTags1"
-                [settings]="tagDropdownSettings"
-                (onSelect)="onItemSelect($event)"
-                (onDeSelect)="onItemDeSelect($event)"
-                (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAllTag1($event)"
-                required
-                [disabled]="!editable"
-              >
+              <angular2-multiselect name="tagsLevel1" [data]="tagsLevel1" [(ngModel)]="selectedTags1"
+                [settings]="tagDropdownSettings" (onSelect)="onItemSelect($event)" (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAllTag1($event)" required
+                [disabled]="!editable">
                 <c-badge>
                   <ng-template let-item="item">
                     <label class="badge {{ item.tagType }}">{{
@@ -241,18 +127,9 @@
                 </c-item>
               </angular2-multiselect>
               <p i18n="@@string-tag-level2-dataset">Level 2</p>
-              <angular2-multiselect
-                required
-                name="tagsLevel2"
-                [data]="tagsLevel2"
-                [(ngModel)]="selectedTags2"
-                [settings]="tagDropdownSettings"
-                (onSelect)="onItemSelect($event)"
-                (onDeSelect)="onItemDeSelect($event)"
-                (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAllTag2($event)"
-                [disabled]="!editable"
-              >
+              <angular2-multiselect required name="tagsLevel2" [data]="tagsLevel2" [(ngModel)]="selectedTags2"
+                [settings]="tagDropdownSettings" (onSelect)="onItemSelect($event)" (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAllTag2($event)" [disabled]="!editable">
                 <c-badge>
                   <ng-template let-item="item">
                     <label class="badge {{ item.tagType }}">{{
@@ -267,17 +144,9 @@
                 </c-item>
               </angular2-multiselect>
               <p i18n="@@string-tag-level3-dataset">Level 3</p>
-              <angular2-multiselect
-                name="tagsLevel3"
-                [data]="tagsLevel3"
-                [(ngModel)]="selectedTags3"
-                [settings]="tagDropdownSettings"
-                (onSelect)="onItemSelect($event)"
-                (onDeSelect)="onItemDeSelect($event)"
-                (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAllTag3($event)"
-                [disabled]="!editable"
-              >
+              <angular2-multiselect name="tagsLevel3" [data]="tagsLevel3" [(ngModel)]="selectedTags3"
+                [settings]="tagDropdownSettings" (onSelect)="onItemSelect($event)" (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAllTag3($event)" [disabled]="!editable">
                 <c-badge>
                   <ng-template let-item="item">
                     <label class="badge {{ item.tagType }}">{{
@@ -295,24 +164,12 @@
           </div>
 
           <div class="form-group row">
-            <label
-              class="col-sm-4 col-form-label"
-              i18n="@@string-processType-dataset"
-              >Einteilung als</label
-            >
+            <label class="col-sm-4 col-form-label" i18n="@@string-processType-dataset">Einteilung als</label>
             <div class="col-sm-8">
-              <select
-                class="form-control"
-                [(ngModel)]="processTypeId"
-                name="processTypeId"
-                [disabled]="!editable"
-              >
+              <select class="form-control" [(ngModel)]="processTypeId" name="processTypeId" [disabled]="!editable">
                 <option value="" selected="selected">Einteilung wählen</option>
-                <option
-                  *ngFor="let processType of processTypes"
-                  [value]="processType['id']"
-                  [selected]="processType['id'] === processTypeId"
-                >
+                <option *ngFor="let processType of processTypes" [value]="processType['id']"
+                  [selected]="processType['id'] === processTypeId">
                   {{ processType['name'] }}
                 </option>
               </select>
@@ -323,14 +180,9 @@
         <div class="col-sm-6">
           <div class="col-sm-12">
             <div class="form-group row">
-              <label
-                class="col-sm-4 col-form-label"
-                i18n="@@string-status-dataset"
-                >Status</label
-              >
+              <label class="col-sm-4 col-form-label" i18n="@@string-status-dataset">Status</label>
               <div class="col-sm-8">
-                <p-selectButton
-                  [options]="[
+                <p-selectButton [options]="[
                     {
                       label: 'aktiv',
                       value: true
@@ -339,11 +191,7 @@
                       label: 'gesperrt',
                       value: false
                     }
-                  ]"
-                  name="active"
-                  [(ngModel)]="active"
-                  [disabled]="!editable"
-                ></p-selectButton>
+                  ]" name="active" [(ngModel)]="active" [disabled]="!editable"></p-selectButton>
               </div>
             </div>
           </div>
@@ -351,34 +199,19 @@
           <hr />
 
           <div class="form-group row">
-            <label
-              class="col-sm-12 col-form-label text-left"
-              i18n="@@string-normfileUpload-dataset"
-              >Normdatei (PDF upload)</label
-            >
+            <label class="col-sm-12 col-form-label text-left" i18n="@@string-normfileUpload-dataset">Normdatei (PDF
+              upload)</label>
             <div class="col-sm-12">
-              <p-fileUpload
-                [ngClass]="{
+              <p-fileUpload [ngClass]="{
                   'ng-invalid': !false,
                   'ng-valid': true,
                   required: false,
                   'w-100': true
-                }"
-                #fileUploadInput
-                [disabled]="normForm.invalid || !editable"
-                name="files"
-                (onSelect)="checkUpload($event, fileUploadInput)"
-                accept="application/pdf"
-                [showUploadButton]="false"
-                [showCancelButton]="true"
-                showButtons="true"
-                chooseLabel="Norm wählen (PDF)"
-                required="true"
-              ></p-fileUpload>
-              <p
-                *ngIf="!normForm.valid"
-                i18n="@@string-fillRecomendedFields-dataset"
-              >
+                }" #fileUploadInput [disabled]="normForm.invalid || !editable" name="files"
+                (onSelect)="checkUpload($event, fileUploadInput)" accept="application/pdf" [showUploadButton]="false"
+                [showCancelButton]="true" showButtons="true" chooseLabel="Norm wählen (PDF)" required="true">
+              </p-fileUpload>
+              <p *ngIf="!normForm.valid" i18n="@@string-fillRecomendedFields-dataset">
                 Bitte erst die Pflichtfelder ausfüllen
               </p>
             </div>
@@ -386,30 +219,18 @@
 
           <hr *ngIf="latestAttachmentName" />
 
-          <button
-            type="button"
-            (click)="getDownload(id, latestAttachmentName)"
-            *ngIf="latestAttachmentName"
-            title="{{ latestAttachmentName }}"
-            class="btn btn-acp attachmentDownload"
-          >
+          <button type="button" (click)="getDownload(id, latestAttachmentName)" *ngIf="latestAttachmentName"
+            title="{{ latestAttachmentName }}" class="btn btn-acp attachmentDownload">
             <i class="fas fa-file-download"></i> Download Norm
           </button>
 
           <hr *ngIf="latestAttachmentName" />
 
-          <p-fieldset
-            legend="Dokumenten Historie"
-            [toggleable]="true"
-            [transitionOptions]="'100ms'"
-            [collapsed]="false"
-            *ngIf="revisionDocuments.length > 0"
-          >
+          <p-fieldset legend="Dokumenten Historie" [toggleable]="true" [transitionOptions]="'100ms'" [collapsed]="false"
+            *ngIf="revisionDocuments.length > 0">
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
-              <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"
-                ><i class="fas fa-file-download"></i>
-                {{ revDoc['revisionID'] }}</a
-              >
+              <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"><i class="fas fa-file-download"></i>
+                {{ revDoc['revisionID'] }}</a>
 
               <!-- Link to the server file
               <a
@@ -440,22 +261,12 @@
       <div class="row">
         <div class="col-sm-12">
           <div class="form-group row">
-            <label
-              class="col-sm-2 col-form-label"
-              i18n="@@string-related-dataset"
-              >Referenzen wählen</label
-            >
+            <label class="col-sm-2 col-form-label" i18n="@@string-related-dataset">Referenzen wählen</label>
             <div class="col-sm-10">
-              <angular2-multiselect
-                name="relatedNormsSelectList"
-                [data]="relatedNormsSelectList"
-                [(ngModel)]="selectedRelatedNorms"
-                [settings]="relatedDropdownSettings"
-                (onSelect)="onItemSelect($event)"
-                (onDeSelect)="onItemDeSelect($event)"
-                (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAllRelatedNorms($event)"
-              >
+              <angular2-multiselect name="relatedNormsSelectList" [data]="relatedNormsSelectList"
+                [(ngModel)]="selectedRelatedNorms" [settings]="relatedDropdownSettings"
+                (onSelect)="onItemSelect($event)" (onDeSelect)="onItemDeSelect($event)"
+                (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAllRelatedNorms($event)">
                 <c-item>
                   <ng-template let-item="item">
                     <label> {{ item.normNumber }}</label>
@@ -469,11 +280,7 @@
       <div class="row" *ngIf="selectedRelatedNorms.length > 0">
         <div class="col-sm-12">
           <div class="row">
-            <label
-              class="col-sm-2 col-form-label"
-              i18n="@@string-related-dataset"
-              >Referenzen</label
-            >
+            <label class="col-sm-2 col-form-label" i18n="@@string-related-dataset">Referenzen</label>
             <div class="col-sm-10">
               <table class="table table-striped">
                 <thead>
@@ -490,27 +297,20 @@
                 <tbody>
                   <tr *ngFor="let related of selectedRelatedNorms">
                     <td>
-                      <a class="dynamic-link" (click)="showRelated(related.id)"
-                        ><i class="fas fa-link"></i> {{ related.normNumber }}</a
-                      >
+                      <a class="dynamic-link" (click)="showRelated(related.id)"><i class="fas fa-link"></i>
+                        {{ related.normNumber }}</a>
                     </td>
                     <td>{{ related.revision }}</td>
                     <td>{{ related.description }}</td>
                     <td>
-                      <a
-                        *ngIf="related.normFileName"
-                        class="dynamic-link"
-                        (click)="getDownload(related.id, related.normFileName)"
-                        ><i class="fas fa-file-download"></i> Download
+                      <a *ngIf="related.normFileName" class="dynamic-link"
+                        (click)="getDownload(related.id, related.normFileName)"><i class="fas fa-file-download"></i>
+                        Download
                       </a>
                     </td>
                     <td>
-                      <button
-                        type="button"
-                        [disabled]="normForm.invalid || !editable"
-                        class="btn dynamic-link "
-                        (click)="deleteRelated(related.id)"
-                      >
+                      <button type="button" [disabled]="normForm.invalid || !editable" class="btn dynamic-link "
+                        (click)="deleteRelated(related.id)">
                         <i class="fas fa-trash"></i>
                         <span i18n="@@string-delete"> Löschen</span>
                       </button>
@@ -528,11 +328,7 @@
       <div class="row" *ngIf="relatedNormsFrom.length > 0">
         <div class="col-sm-12">
           <div class="row">
-            <label
-              class="col-sm-2 col-form-label"
-              i18n="@@string-relatedFrom-dataset"
-              >Referenziert von</label
-            >
+            <label class="col-sm-2 col-form-label" i18n="@@string-relatedFrom-dataset">Referenziert von</label>
             <div class="col-sm-10">
               <table class="table table-striped">
                 <thead>
@@ -548,23 +344,15 @@
                 <tbody>
                   <tr *ngFor="let relatedFrom of relatedNormsFrom">
                     <td>
-                      <a
-                        class="dynamic-link"
-                        (click)="showRelated(relatedFrom.id)"
-                        ><i class="fas fa-link"></i>
-                        {{ relatedFrom.normNumber }}</a
-                      >
+                      <a class="dynamic-link" (click)="showRelated(relatedFrom.id)"><i class="fas fa-link"></i>
+                        {{ relatedFrom.normNumber }}</a>
                     </td>
                     <td>{{ relatedFrom.revision }}</td>
                     <td>{{ relatedFrom.description }}</td>
                     <td>
-                      <a
-                        *ngIf="relatedFrom.normFileName"
-                        class="dynamic-link"
-                        (click)="
+                      <a *ngIf="relatedFrom.normFileName" class="dynamic-link" (click)="
                           getDownload(relatedFrom.id, relatedFrom.normFileName)
-                        "
-                        ><i class="fas fa-file-download"></i> Download
+                        "><i class="fas fa-file-download"></i> Download
                       </a>
                     </td>
                   </tr>
@@ -580,42 +368,23 @@
       <div class="row">
         <div class="col-sm-6">
           <div *appIsGranted="'MAINTAIN'" class="form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-owner-dataset"
-              >Owner</label
-            >
+            <label class="col-sm-2 col-form-label" i18n="@@string-owner-dataset">Owner</label>
             <div class="col-sm-10">
-              <select
-                class="form-control"
-                [(ngModel)]="ownerId"
-                name="ownerId"
-                [disabled]="!editable"
-              >
+              <select class="form-control" [(ngModel)]="ownerId" name="ownerId" [disabled]="!editable">
                 <option value="" selected="selected">Owner wählen</option>
-                <option
-                  *ngFor="let owner of owners"
-                  [value]="owner['_id']"
-                  [selected]="owner['_id'] == ownerId"
-                >
+                <option *ngFor="let owner of owners" [value]="owner['_id']" [selected]="owner['_id'] == ownerId">
                   {{ owner['lastName'] }}, {{ owner['firstName'] }}
                 </option>
               </select>
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-user-dataset"
-              >Benutzer</label
-            >
+            <label class="col-sm-2 col-form-label" i18n="@@string-user-dataset">Benutzer</label>
             <div class="col-sm-10">
-              <angular2-multiselect
-                name="users"
-                [data]="users"
-                [(ngModel)]="selectedUsers"
-                [settings]="userDropdownSettings"
-                (onSelect)="onItemSelect($event)"
-                (onDeSelect)="onItemDeSelect($event)"
-                (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAllSelectedUsers($event)"
-              >
+              <angular2-multiselect name="users" [data]="users" [(ngModel)]="selectedUsers"
+                [settings]="userDropdownSettings" (onSelect)="onItemSelect($event)"
+                (onDeSelect)="onItemDeSelect($event)" (onSelectAll)="onSelectAll($event)"
+                (onDeSelectAll)="onDeSelectAllSelectedUsers($event)">
                 <c-item>
                   <ng-template let-item="item">
                     <label> {{ item.name }}</label>

@@ -78,17 +78,11 @@ export class UserListComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getUsers() {
-    this.documentService
-      .getUsers()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        res => {
-          this.users = res;
-          this.userCount = this.users.length;
-        },
-        error => this.logger.error(error.message)
-      );
+  private getUsers(): void {
+    this.documentService.getUsers().then(users => {
+      this.users = users;
+      this.userCount = this.users.length;
+    });
   }
 
   public onRowSelect(event) {

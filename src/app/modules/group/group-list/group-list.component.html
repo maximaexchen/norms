@@ -8,6 +8,8 @@
   [rows]="13"
   class="table"
   selectionMode="single"
+  [resizableColumns]="true"
+  columnResizeMode="fit"
   [(selection)]="selectedGroup"
   (onRowSelect)="onRowSelect($event)"
   [globalFilterFields]="['name']"

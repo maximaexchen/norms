@@ -3,6 +3,7 @@
     <h1 style="margin-bottom: 30px;">
       Willkommen! {{ firstName }} {{ lastName }}
     </h1>
+
     <div *ngIf="userRole === 'owner'; else UserContent">
       <table
         class="table table-striped"

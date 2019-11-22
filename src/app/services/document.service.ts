@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Publisher } from '../models/publisher.model';
-import { CouchDBService } from 'src/app//services/couchDB.service';
-import { Subscription, Observable } from 'rxjs';
-import { User } from '@app/models/user.model';
-import { Group } from '@app/models/group.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Subscription, Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
+import * as _ from 'underscore';
+
+import { CouchDBService } from 'src/app/services/couchDB.service';
+import { Publisher } from '../models/publisher.model';
+import { User } from '@app/models/user.model';
+import { NormDocument } from './../models/document.model';
+import { Group } from '@app/models/group.model';
+import { filter } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
@@ -28,50 +32,99 @@ export class DocumentService {
     private logger: NGXLogger
   ) {}
 
-  public getDocuments(): Observable<any> {
+  /* public getDocuments(): Observable<any> {
     return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-norms?include_docs=true'
     );
+  } */
+
+  public getDocuments(): any {
+    return this.couchDBService
+      .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
+      .toPromise()
+      .then(response => response as NormDocument)
+      .catch(this.handleError);
   }
 
-  public getSelectedUsers(usersIds: string[]): User[] {
-    usersIds.forEach(userId => {
-      this.getUserByID(userId).subscribe(
-        result => {
-          // build the Object for the selectbox in right format
-          const selectedUserObject = {} as User;
-          selectedUserObject['id'] = result._id;
-          selectedUserObject['name'] =
-            result.lastName + ', ' + result.firstName;
-          selectedUserObject['email'] = result.email;
-          this.selectedtUsers.push(selectedUserObject);
-        },
-        error => this.logger.error(error.message)
-      );
+  public getSelectedOwner(ownerId: string[]): Promise<User[]> {
+    return this.getUsers().then(users => {
+      return users.filter(owner => ownerId.indexOf(owner._id) > -1);
     });
+  }
 
-    return this.selectedtUsers;
+  public getSelectedUsers(usersIds: string[]): Promise<User[]> {
+    return this.getUsers().then(users => {
+      return users.filter(user => usersIds.indexOf(user._id) > -1);
+    });
+  }
+
+  public getUsers(): any {
+    return this.couchDBService
+      .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
+      .toPromise()
+      .then(response => response as User)
+      .catch(this.handleError);
   }
 
   public getUserByID(id: string): Observable<any> {
-    // http://127.0.0.1:5984/norm_documents/_design/norms/_view/norm-users?startkey=
-    // ["2a350192903b8d08259b69d22700c2d4",1]&endkey=["2a350192903b8d08259b69d22700c2d4",10]&include_docs=true
     return this.couchDBService.fetchEntry('/' + id);
   }
 
   public getPublishers(): Observable<any> {
-    /*  return this.couchDBService.fetchEntries(
-      '/_design/norms/_view/all-publishers?include_docs=true'
-    ); */
     return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-level1-tags?include_docs=true'
     );
   }
 
-  public getUsers(): Observable<User[]> {
-    return this.couchDBService.fetchEntries(
-      '/_design/norms/_view/all-users?include_docs=true'
-    );
+  public setRelated(related: any[]): any {
+    return this.getDocuments().then(norms => {
+      const filtered = norms.filter(norm => related.indexOf(norm._id) > -1);
+
+      return filtered.map(mapped => {
+        let revDescription: string;
+        switch (mapped.normLanguage) {
+          case 'de':
+            revDescription = mapped.description.de;
+            break;
+          case 'en':
+            revDescription = mapped.description.en;
+            break;
+          case 'fr':
+            revDescription = mapped.description.en;
+            break;
+        }
+
+        const relatedItem = {
+          id: mapped['_id'],
+          normNumber: mapped['normNumber'],
+          revision: mapped['revision'],
+          description: revDescription
+        };
+
+        if (mapped['_attachments']) {
+          relatedItem['normFileName'] = this.getLatestAttchmentFileName(
+            mapped['_attachments']
+          );
+        }
+        return relatedItem;
+      });
+    });
+  }
+
+  public getLatestAttchmentFileName(attachemnts: any): string {
+    const sortedByRevision = _.sortBy(attachemnts, (object, key) => {
+      object['id'] = key;
+      return object['revpos'];
+    }).reverse();
+
+    // take the first
+    const latest = _.first(sortedByRevision);
+    return latest['id'];
+  }
+
+  private handleError(error: any): Promise<any> {
+    console.error('Ein fehler ist aufgetreten', error);
+    return Promise.reject(error.message || error);
   }
 
   public getTags(): Observable<User[]> {

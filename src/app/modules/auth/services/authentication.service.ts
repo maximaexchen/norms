@@ -54,7 +54,6 @@ export class AuthenticationService {
     return loginUserObs.pipe(
       switchMap(
         (loginResult): Observable<boolean | any> => {
-          console.log(loginResult);
           this.user = loginResult['docs'][0];
 
           if (!!this.user) {
@@ -84,7 +83,6 @@ export class AuthenticationService {
   }
 
   private persistUserData(user: User) {
-    console.log(user);
     sessionStorage.setItem('userId', user['_id']);
     sessionStorage.setItem('userName', user['userName']);
     sessionStorage.setItem('firstName', user['firstName']);

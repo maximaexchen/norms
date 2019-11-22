@@ -165,20 +165,14 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   }
 
   private getUsers(): void {
-    this.documentService
-      .getUsers()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        results => {
-          results.forEach(item => {
-            const userObject = {} as User;
-            userObject['id'] = item['_id'];
-            userObject['name'] = item['lastName'] + ', ' + item['firstName'];
-            this.users.push(userObject);
-          });
-        },
-        error => this.logger.error(error.message)
-      );
+    this.documentService.getUsers().then(users => {
+      users.forEach(user => {
+        const userObject = {} as User;
+        userObject['id'] = user['_id'];
+        userObject['name'] = user['lastName'] + ', ' + user['firstName'];
+        this.users.push(userObject);
+      });
+    });
   }
 
   private getUserByID(id: string): Observable<any[]> {

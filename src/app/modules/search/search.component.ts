@@ -77,15 +77,6 @@ export class SearchComponent implements OnInit, OnDestroy {
           },
           error => this.logger.error(error.message)
         );
-      this.documentService
-        .getUsers()
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          res => {
-            this.users = res;
-          },
-          error => this.logger.error(error.message)
-        );
 
       this.documentService
         .getPublishers()
@@ -106,15 +97,11 @@ export class SearchComponent implements OnInit, OnDestroy {
           },
           error => this.logger.error(error.message)
         );
-      this.documentService
-        .getUsers()
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          res => {
-            this.owners = res;
-          },
-          error => this.logger.error(error.message)
-        );
+
+      this.documentService.getUsers().then(users => {
+        this.owners = users;
+        this.users = users;
+      });
     });
   }
 

@@ -66,8 +66,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.logger.log('ngOnInit: DocumentListComponent');
-
     this.couchDBService
       .setStateUpdate()
       .pipe(takeWhile(() => this.alive))
@@ -133,7 +131,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
               break;
             case 'user':
               this.documents = _.filter(this.documents, obj => {
-                return _.find(obj['users'], { id: userId });
+                return _.find(obj['users'], id => {
+                  return String(id) === userId;
+                });
               });
 
               break;
@@ -167,8 +167,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   public onFilter(event: any, dt: any): void {
-    this.logger.log(event);
-    this.logger.log(dt);
     // Check for simple ASCII Characters and give warning
     if (!_.isEmpty(event.filters.global)) {
       this.filterInputCheck = /^(?:(?!["';<=>\\])[\x20-\x7E])+$/u.test(
