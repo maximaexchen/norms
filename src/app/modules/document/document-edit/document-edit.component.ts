@@ -641,6 +641,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
                 this.tagsLevel3.push(tagObject);
                 break;
             }
+
+            this.tagsLevel1 = _.sortBy(this.tagsLevel1, 'name');
+            this.tagsLevel2 = _.sortBy(this.tagsLevel2, 'name');
+            this.tagsLevel3 = _.sortBy(this.tagsLevel3, 'name');
           });
         },
         error => {

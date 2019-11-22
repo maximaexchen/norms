@@ -131,7 +131,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
               break;
             case 'user':
               this.documents = _.filter(this.documents, obj => {
-                return _.find(obj['users'], { id: userId });
+                return _.find(obj['users'], id => {
+                  return String(id) === userId;
+                });
               });
 
               break;
