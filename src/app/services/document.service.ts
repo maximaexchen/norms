@@ -111,8 +111,10 @@ export class DocumentService {
     });
   }
 
-  public getLatestAttchmentFileName(attachemnts: any): string {
-    const sortedByRevision = _.sortBy(attachemnts, (object, key) => {
+  public getLatestAttchmentFileName(attachements: any): string {
+    console.log('getLatestAttchmentFileName');
+    console.log(JSON.stringify(attachements));
+    const sortedByRevision = _.sortBy(attachements, (object, key) => {
       object['id'] = key;
       return object['revpos'];
     }).reverse();
