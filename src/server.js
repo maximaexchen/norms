@@ -212,6 +212,15 @@ app.post('/api/sendmail', (req, res) => {
   });
 });
 
+/*
+==================== Status message =====================
+*/
+
+app.get('/api/healthCheck', (req, res) => {
+  res.sendStatus(200);
+  // res.writeHead(200, { 'Content-Type': 'text/html' });
+});
+
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, function() {
