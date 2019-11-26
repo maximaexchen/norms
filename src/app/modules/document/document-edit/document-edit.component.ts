@@ -155,6 +155,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       normLanguage: 'en',
       description: {}
     };
+    this.ownerId = '';
     this.editable = false;
     this.users = [];
     this.owners = [];
@@ -854,12 +855,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setRelatedNorms(relatedNorms: any[]) {
+    console.log('setRelatedNorms');
+    console.log(relatedNorms);
     this.documentService.setRelated(relatedNorms).then(res => {
       this.selectedRelatedNorms = res;
     });
   }
 
   private setRelatedNormsFrom(relatedNormsFrom: any[]) {
+    console.log('setRelatedNormsFrom');
+    console.log(relatedNormsFrom);
     this.documentService.setRelated(relatedNormsFrom).then(res => {
       this.relatedNormsFrom = res;
     });
