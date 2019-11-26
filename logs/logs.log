@@ -256,3 +256,17 @@
 2019-11-21T10:09:00.112Z - modules-document-document-module.js - Http failure response for http://127.0.0.1:5984/norm_local/379b0928-498d-47c6-827b-6eb69b5f7570: 409 Conflict
 2019-11-21T10:42:03.801Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/c3eafe9a-1c4f-4d0d-bcef-b067aca02af0/undefined: 404 Object Not Found
 2019-11-21T10:42:03.801Z - main.js - Http failure response for http://127.0.0.1:5984/norm_local/c3eafe9a-1c4f-4d0d-bcef-b067aca02af0/undefined: 404 Object Not Found
+2019-11-26T10:58:21.698Z - modules-tag-tag-module.js - Http failure response for http://127.0.0.1:5984/norm_local: 400 Bad Request
+2019-11-26T10:58:21.698Z - modules-tag-tag-module.js - Http failure response for http://127.0.0.1:5984/norm_local: 400 Bad Request
+2019-11-26T11:11:54.931Z - modules-tag-tag-module.js - Http failure response for http://127.0.0.1:5984/norm_local: 400 Bad Request
+2019-11-26T11:11:54.931Z - modules-tag-tag-module.js - Http failure response for http://127.0.0.1:5984/norm_local: 400 Bad Request
+2019-11-26T11:18:48.915Z - modules-tag-tag-module.js - Http failure response for http://127.0.0.1:5984/norm_local: 400 Bad Request
+2019-11-26T11:19:31.693Z - modules-tag-tag-module.js - Http failure response for http://127.0.0.1:5984/norm_local: 400 Bad Request
+2019-11-26T11:20:10.043Z - modules-tag-tag-module.js - Http failure response for http://127.0.0.1:5984/norm_local: 400 Bad Request
+2019-11-26T12:49:35.204Z - modules-document-document-module.js - Cannot read property 'length' of undefined
+2019-11-26T12:49:35.204Z - modules-document-document-module.js - Cannot read property 'length' of undefined
+2019-11-26T12:54:14.930Z - modules-document-document-module.js - Cannot read property 'length' of undefined
+2019-11-26T12:55:40.879Z - modules-document-document-module.js - Cannot read property 'length' of undefined
+2019-11-26T12:55:40.879Z - modules-document-document-module.js - Cannot read property 'length' of undefined
+2019-11-26T12:58:37.245Z - modules-document-document-module.js - Cannot read property 'length' of undefined
+2019-11-26T13:00:49.176Z - modules-document-document-module.js - Cannot read property 'length' of undefined

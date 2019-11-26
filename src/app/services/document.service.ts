@@ -10,6 +10,7 @@ import { User } from '@app/models/user.model';
 import { NormDocument } from './../models/document.model';
 import { Group } from '@app/models/group.model';
 import { filter } from 'rxjs/operators';
+import { Tag } from '@app/models/tag.model';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
@@ -129,7 +130,7 @@ export class DocumentService {
     return Promise.reject(error.message || error);
   }
 
-  public getTags(): Observable<User[]> {
+  public getTags(): Observable<Tag[]> {
     return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-tags?include_docs=true'
     );
