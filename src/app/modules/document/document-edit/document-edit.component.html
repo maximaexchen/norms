@@ -4,8 +4,8 @@
 </div>
 <div class="row detail-edit-header">
   <div class="col-sm-4">
-    <h1 *ngIf="normNumber">{{ normNumber }}</h1>
-    <h1 *ngIf="!normNumber" i18n="@@string-new-dataset">
+    <h1 *ngIf="normDoc.normNumber">{{ normDoc.normNumber }}</h1>
+    <h1 *ngIf="!normDoc.normNumber" i18n="@@string-new-dataset">
       Datensatz erstellen
     </h1>
   </div>
@@ -367,6 +367,7 @@
     <p-tabPanel header="User">
       <div class="row">
         <div class="col-sm-6">
+          {{ ownerId | json}}
           <div *appIsGranted="'MAINTAIN'" class="form-group row">
             <label class="col-sm-2 col-form-label" i18n="@@string-owner-dataset">Owner</label>
             <div class="col-sm-10">

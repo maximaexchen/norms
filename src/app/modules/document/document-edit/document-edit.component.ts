@@ -58,7 +58,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   relatedNormsFrom: NormDocument[] = [];
 
   revisionDocuments: RevisionDocument[] = [];
-  attachments: any = {};
   attachment: any;
   newAttachmentName: string;
   latestAttachmentName: string;
@@ -159,7 +158,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.editable = false;
     this.users = [];
     this.owners = [];
-    this.attachments = {};
     this.attachment = {};
     this.selectedRelatedNorms = [];
     this.relatedNormsFrom = [];
@@ -365,9 +363,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
 
     if (this.normDoc._attachments) {
-      this.attachments = this.normDoc._attachments;
       this.latestAttachmentName = this.documentService.getLatestAttchmentFileName(
-        this.attachments
+        this.normDoc._attachments
       );
     }
   }
@@ -442,11 +439,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.revisionDocuments.push(this.revisionDocument);
 
       // Add new attachment by merge
-      const tempAttachmentObject = this.attachments;
-      this.attachments = { ...tempAttachmentObject, ...this.attachment };
+      const tempAttachmentObject = this.normDoc._attachments;
+      this.normDoc._attachments = {
+        ...tempAttachmentObject,
+        ...this.attachment
+      };
     }
     this.normDoc.revisions = this.revisionDocuments || [];
-    this.normDoc._attachments = this.attachments || [];
 
     // add update status to users to be notified
     this.setUserNotification(this.normForm.value.revision);
