@@ -38,7 +38,7 @@ export class DocumentService {
     );
   } */
 
-  public getDocuments(): any {
+  public getDocuments(): Promise<NormDocument[]> {
     return this.couchDBService
       .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
       .toPromise()
@@ -77,20 +77,22 @@ export class DocumentService {
   }
 
   public setRelated(related: any[]): any {
+    console.log('setRelated');
+    console.log(related);
     return this.getDocuments().then(norms => {
-      const filtered = norms.filter(norm => related.indexOf(norm._id) > -1);
+      const filtered = norms.filter(norm => related.indexOf(norm['_id']) > -1);
 
       return filtered.map(mapped => {
         let revDescription: string;
-        switch (mapped.normLanguage) {
+        switch (mapped['normLanguage']) {
           case 'de':
-            revDescription = mapped.description.de;
+            revDescription = mapped['description.de'];
             break;
           case 'en':
-            revDescription = mapped.description.en;
+            revDescription = mapped['description.en'];
             break;
           case 'fr':
-            revDescription = mapped.description.en;
+            revDescription = mapped['description.en'];
             break;
         }
 
@@ -112,8 +114,6 @@ export class DocumentService {
   }
 
   public getLatestAttchmentFileName(attachements: any): string {
-    console.log('getLatestAttchmentFileName');
-    console.log(JSON.stringify(attachements));
     const sortedByRevision = _.sortBy(attachements, (object, key) => {
       object['id'] = key;
       return object['revpos'];

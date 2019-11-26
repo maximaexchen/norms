@@ -1,11 +1,6 @@
 import { Tag } from './../models/tag.model';
 import { DocumentService } from 'src/app/services/document.service';
-import {
-  TestBed,
-  fakeAsync,
-  flushMicrotasks,
-  tick
-} from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { HttpClient } from '@angular/common/http';
@@ -43,7 +38,7 @@ describe('DocumentService test', () => {
     actualResult = undefined;
   });
 
-  describe('METHOD: getTags', () => {
+  describe('METHOD: getTags()', () => {
     Given(() => {
       fakeTags = [
         {
@@ -57,6 +52,7 @@ describe('DocumentService test', () => {
     });
 
     When(() => {
+      console.log('When: METHOD: getTags');
       serviceUnderTest.getTags().subscribe(result => (actualResult = result));
     });
 

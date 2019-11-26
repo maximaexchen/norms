@@ -43,7 +43,6 @@ export class CouchDBService {
             entriesArray.push({ ...responseData['rows'][key]['doc'] });
           }
         }
-
         return entriesArray;
       })
     );
@@ -86,7 +85,7 @@ export class CouchDBService {
     );
   }
 
-  public getRoles(): Observable<Role[]> {
+  public getRoles(): Observable<any[]> {
     return this.fetchEntries(
       '/_design/norms/_view/all-roles?include_docs=true'
     );
