@@ -9,7 +9,6 @@ import { Publisher } from '../models/publisher.model';
 import { User } from '@app/models/user.model';
 import { NormDocument } from './../models/document.model';
 import { Group } from '@app/models/group.model';
-import { filter } from 'rxjs/operators';
 import { Tag } from '@app/models/tag.model';
 
 @Injectable({ providedIn: 'root' })
@@ -78,8 +77,6 @@ export class DocumentService {
   }
 
   public setRelated(related: any[]): any {
-    console.log('setRelated');
-    console.log(related);
     return this.getDocuments().then(norms => {
       const filtered = norms.filter(norm => related.indexOf(norm['_id']) > -1);
 
