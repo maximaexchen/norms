@@ -36,6 +36,8 @@ export class CouchDBService {
   public fetchEntries(param: string): Observable<any> {
     return this.http.get(this.dbRequest + param).pipe(
       map(responseData => {
+        // console.log('fetchEntries Observable');
+        // console.log(responseData);
         const entriesArray = [];
 
         for (const key in responseData['rows']) {

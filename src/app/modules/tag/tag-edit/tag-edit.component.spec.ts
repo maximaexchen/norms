@@ -1,54 +1,77 @@
-import { MessageService } from 'primeng/components/common/messageservice';
-import { DocumentModule } from './../../document/document.module';
-import { GroupModule } from './../../group/group.module';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { RoleModule } from './../../role/role.module';
+/* import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { GeneralModule } from './../../general.module';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { TagEditComponent } from './tag-edit.component';
+import { CrudNavComponent } from '@app/components/crud-nav/crud-nav.component';
+import { TabViewModule } from 'primeng/tabview';
+import { TableModule } from 'primeng/table';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { FormsModule } from '@angular/forms';
+import { DocumentService } from '@app/services/document.service';
+import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
+import { LoggerTestingModule } from 'ngx-logger/testing';
 import { CouchDBService } from '@app/services/couchDB.service';
-import { RouterModule } from '@angular/router';
-import { NotificationsService } from '@app/services/notifications.service';
-import { ConfirmationService } from 'primeng/api';
-import { GeneralModule } from '@app/modules/general.module';
-import { RoleRoutingModule } from '@app/modules/role/role-routing.module';
-import { UserModule } from '@app/modules/user/user.module';
-import { TagModule } from '../tag.module';
-import { SearchModule } from '@app/modules/search/search.module';
 
 describe('TagEditComponent', () => {
-  let component: TagEditComponent;
+  let documentServiceSpy: Spy<DocumentService>;
+  let componentUnderTest: TagEditComponent;
   let fixture: ComponentFixture<TagEditComponent>;
 
-  beforeEach(async(() => {
+  Given(() => {
     TestBed.configureTestingModule({
-      declarations: [],
-      imports: [
-        RouterModule.forRoot([]),
-        GeneralModule,
-        TagModule,
-        SearchModule,
-        UserModule,
-        RoleModule,
-        GroupModule,
-        DocumentModule,
-        RoleRoutingModule
-      ],
       providers: [
-        CouchDBService,
-        NotificationsService,
-        ConfirmationService,
-        MessageService
+        GeneralModule,
+        {
+          provide: CouchDBService,
+          useValue: createSpyFromClass(CouchDBService)
+        },
+        {
+          provide: DocumentService,
+          useValue: createSpyFromClass(DocumentService)
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: createSpyFromClass(ActivatedRoute)
+        },
+        {
+          provide: Router,
+          useValue: createSpyFromClass(Router)
+        },
+        {
+          provide: AuthenticationService,
+          useValue: createSpyFromClass(AuthenticationService)
+        },
+        HttpClientTestingModule,
+        MessageService,
+        ConfirmationService
+      ],
+      declarations: [TagEditComponent, CrudNavComponent],
+      imports: [
+        FormsModule,
+        RadioButtonModule,
+        SelectButtonModule,
+        TabViewModule,
+        TableModule,
+        LoggerTestingModule
       ]
     }).compileComponents();
-  }));
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(TagEditComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('should createt', () => {
+    When(() => {
+      fixture = TestBed.createComponent(TagEditComponent);
+      componentUnderTest = fixture.componentInstance;
+      fixture.detectChanges();
+    });
+
+    Then(() => {
+      expect(componentUnderTest).toBeTruthy();
+    });
   });
 });
+ */

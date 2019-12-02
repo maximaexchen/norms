@@ -44,7 +44,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   isNew = true; // 1 = new / 0 = update
   selectedTab = 0;
 
-  writeItem: NormDocument;
+  normDoc: NormDocument;
   owners: User[] = [];
   users: User[] = [];
   selectedUsers: User[] = [];
@@ -58,7 +58,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   relatedNormsFrom: NormDocument[] = [];
 
   revisionDocuments: RevisionDocument[] = [];
-  attachments: any = {};
   attachment: any;
   newAttachmentName: string;
   latestAttachmentName: string;
@@ -70,24 +69,25 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   selectedTags3: Tag[] = [];
 
   id: string;
-  rev: string;
-  type: string;
+  /*   rev: string;
+  type: string; */
   publisherId: string;
-  normNumber: string;
-
-  name: string;
-  revision: string;
   revisionDate: Date;
+  /*   normNumber: string; */
+
+  /*   name: string;
+  revision: string;
+
   scope: string;
   normLanguage = 'en';
   descriptionDE: string;
   descriptionEN: string;
   descriptionFR: string;
+    active: boolean;*/
   revisionDocument: RevisionDocument;
   uploadPath: string;
   owner: User;
   ownerId: string;
-  active: boolean;
 
   userDropdownSettings = {};
   tagDropdownSettings = {};
@@ -120,7 +120,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('setStartValues');
 
     this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
-      results => {
+      selectedNorm => {
         this.currentUserRole = this.authService.getUserRole();
 
         // fetch data for select-boxes
@@ -135,8 +135,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         ];
 
         // check if we have new document or we are updating
-        if (results['id']) {
-          this.editDocument(results);
+        if (selectedNorm['id']) {
+          this.editDocument(selectedNorm);
         } else {
           this.newDocument();
         }
@@ -147,10 +147,18 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private resetComponent() {
     console.log('resetComponent');
+
+    this.normDoc = {
+      _id: this.id,
+      type: 'norm',
+      normNumber: '',
+      normLanguage: 'en',
+      description: {}
+    };
+    this.ownerId = '';
     this.editable = false;
     this.users = [];
     this.owners = [];
-    this.attachments = {};
     this.attachment = {};
     this.selectedRelatedNorms = [];
     this.relatedNormsFrom = [];
@@ -209,7 +217,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     // First save to get a document id for the attachment path and name
     this.couchDBService
-      .writeEntry(this.writeItem)
+      .writeEntry(this.normDoc)
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
@@ -261,18 +269,21 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
   }
 
-  private editDocument(results) {
+  private editDocument(selectedNorm) {
     this.isNew = false;
     this.resetComponent();
 
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
     this.couchDBService
-      .fetchEntry('/' + results['id'])
+      .fetchEntry('/' + selectedNorm['id'])
       .pipe(takeWhile(() => this.alive))
       .subscribe(
-        entry => {
-          this.getDocumentData(entry);
+        normDoc => {
+          console.log(normDoc);
+          this.normDoc = normDoc;
+
+          this.setAdditionalNormDocData();
         },
         error => {
           this.logger.error(error.message);
@@ -285,7 +296,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('writeUpdate');
     this.isLoading = true;
     this.couchDBService
-      .updateEntry(this.writeItem, this.normForm.value._id)
+      .updateEntry(this.normDoc, this.normForm.value._id)
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         results => {
@@ -308,117 +319,95 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       );
   }
 
-  private getDocumentData(entry: any) {
-    this.resetComponent();
+  private setAdditionalNormDocData() {
+    this.revisionDate = new Date(this.normDoc.revisionDate);
 
-    this.id = entry['_id'];
-    this.rev = entry['_rev'];
-    this.type = 'norm';
-    this.normNumber = entry['normNumber'];
-    this.revision = entry['revision'];
-    this.revisionDate = new Date(entry['revisionDate']);
-    this.scope = entry['scope'];
-    this.normLanguage = entry['normLanguage'];
-    this.name = entry['name'];
-    this.owner = entry['owner'];
-    this.ownerId = entry['owner']._id;
-
-    this.active = entry['active'];
-
-    this.processType = entry['processType'];
-    if (entry.processType) {
-      this.processTypeId = entry['processType'].id;
+    if (this.normDoc.owner) {
+      this.ownerId = this.normDoc.owner['_id'];
     }
 
-    if (entry.description) {
-      this.descriptionDE = entry.description.de;
-      this.descriptionEN = entry.description.en;
-      this.descriptionFR = entry.description.fr;
+    this.processType = this.normDoc.processType;
+    if (this.normDoc.processType) {
+      this.processTypeId = this.normDoc.processType['id'];
     }
 
-    this.revisionDocuments = _.sortBy(entry['revisions'], 'date').reverse();
+    this.revisionDocuments = _.sortBy(this.normDoc.revisions, 'date').reverse();
 
-    if (entry['users']) {
-      this.setSelectedUsers(entry['users']);
+    if (this.normDoc.users) {
+      this.setSelectedUsers(this.normDoc.users);
     }
 
-    if (entry['relatedNorms']) {
-      this.setRelatedNorms(entry['relatedNorms']);
+    if (this.normDoc.relatedNorms) {
+      this.setRelatedNorms(this.normDoc.relatedNorms);
     }
 
-    if (entry['relatedFrom']) {
-      this.setRelatedNormsFrom(entry['relatedFrom']);
+    if (this.normDoc.relatedFrom) {
+      this.setRelatedNormsFrom(this.normDoc.relatedFrom);
     }
 
-    if (entry['tags']) {
-      const ent = _.sortBy(entry['tags'], 'tagType');
+    if (this.normDoc.tags) {
+      const sortedTags: Tag[] = _.sortBy(this.normDoc.tags, 'tagType');
 
-      ent.forEach(element => {
-        switch (element['tagType']) {
+      sortedTags.forEach(tag => {
+        switch (tag.tagType) {
           case 'level1':
-            this.selectedTags1.push(element);
+            this.selectedTags1.push(tag);
             break;
           case 'level2':
-            this.selectedTags2.push(element);
+            this.selectedTags2.push(tag);
             break;
           case 'level3':
-            this.selectedTags3.push(element);
+            this.selectedTags3.push(tag);
             break;
         }
       });
     }
 
-    if (entry['_attachments']) {
-      this.attachments = entry['_attachments'];
+    if (this.normDoc._attachments) {
       this.latestAttachmentName = this.documentService.getLatestAttchmentFileName(
-        this.attachments
+        this.normDoc._attachments
       );
     }
   }
 
   private processFormData() {
     console.log('processFormdata');
-    this.writeItem = {};
 
     // Condition if we have a new norm or an update
-    if (this.normForm.value._id) {
-      this.writeItem['_id'] = this.normForm.value._id;
-    }
+    const normNumber = this.normForm.value.normNumber;
+
+    this.normDoc = {
+      _id: this.normForm.value._id,
+      type: 'norm',
+      normNumber
+    };
 
     if (this.normForm.value._rev) {
-      this.writeItem['_rev'] = this.normForm.value._rev;
+      this.normDoc._rev = this.normForm.value._rev;
     }
 
-    this.writeItem['type'] = 'norm';
-    this.writeItem['normNumber'] =
-      this.normForm.value.normNumber || this.normNumber;
-    this.writeItem['revision'] = this.normForm.value.revision || this.revision;
-    this.writeItem['revisionDate'] =
-      this.normForm.value.revisionDate || this.revisionDate;
-    this.writeItem['normLanguage'] =
-      this.normForm.value.normLanguage || this.normLanguage;
-    this.writeItem['description'] = {};
-    this.writeItem['description']['de'] =
-      this.normForm.value.descriptionDE || this.descriptionDE;
-    this.writeItem['description']['en'] =
-      this.normForm.value.descriptionEN || this.descriptionEN;
-    this.writeItem['description']['fr'] =
-      this.normForm.value.descriptionFR || this.descriptionFR;
-    this.writeItem['scope'] = this.normForm.value.scope || this.scope;
-    this.writeItem['active'] = this.normForm.value.active || this.active;
+    this.normDoc.revision = this.normForm.value.revision;
+    this.normDoc.revisionDate = this.normForm.value.revisionDate;
+    this.normDoc.normLanguage = this.normForm.value.normLanguage;
+    this.normDoc.description = {};
+    this.normDoc.description.de = this.normForm.value.descriptionDE;
+    this.normDoc.description.en = this.normForm.value.descriptionEN;
+    this.normDoc.description.fr = this.normForm.value.descriptionFR;
+    this.normDoc.scope = this.normForm.value.scope;
+    this.normDoc.active = this.normForm.value.active;
 
     const selectedRelatedObjects = [];
     this.selectedRelatedNorms.forEach(element => {
       selectedRelatedObjects.push(element['id']);
     });
-    this.writeItem['relatedNorms'] =
+    this.normDoc.relatedNorms =
       selectedRelatedObjects || this.selectedRelatedNorms;
 
     const selectedRelatedFromObjects = [];
     this.relatedNormsFrom.forEach(element => {
       selectedRelatedFromObjects.push(element['id']);
     });
-    this.writeItem['relatedFrom'] =
+    this.normDoc.relatedFrom =
       selectedRelatedFromObjects || this.relatedNormsFrom;
 
     // write current norm to related norms for "reletedFrom"
@@ -426,22 +415,24 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.setSelectedUser();
     this.setSelectedTags();
 
-    const selOwner = this.owners.find(
+    const selOwner: User = this.owners.find(
       own => own['_id'] === this.normForm.value.ownerId
     );
-    this.writeItem['owner'] = selOwner || this.owner;
+    this.normDoc.owner = selOwner || this.owner;
 
-    const selProcessType = this.processTypes.find(type => {
-      return type['id'] === parseInt(this.normForm.value.processTypeId, 0);
+    const selProcessType = this.processTypes.find(processType => {
+      return (
+        processType['id'] === parseInt(this.normForm.value.processTypeId, 0)
+      );
     });
-    this.writeItem['processType'] = selProcessType || this.processType;
+    this.normDoc.processType = selProcessType || this.processType;
 
     // If there is a new PDF upload add to revisions and attachment Array
     if (!_.isEmpty(this.attachment)) {
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
       this.revisionDocument['name'] = this.newAttachmentName;
-      this.revisionDocument['revisionID'] = this.revision;
+      this.revisionDocument['revisionID'] = this.normDoc.revision;
       this.revisionDocument['path'] = this.uploadDir.replace(
         this.uploadDir.match(/[^\/]*\/[^\/]*/)[0],
         ''
@@ -449,34 +440,37 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.revisionDocuments.push(this.revisionDocument);
 
       // Add new attachment by merge
-      const tempAttachmentObject = this.attachments;
-      this.attachments = { ...tempAttachmentObject, ...this.attachment };
+      const tempAttachmentObject = this.normDoc._attachments;
+      this.normDoc._attachments = {
+        ...tempAttachmentObject,
+        ...this.attachment
+      };
     }
-    this.writeItem['revisions'] = this.revisionDocuments || [];
-    this.writeItem['_attachments'] = this.attachments || [];
+    this.normDoc.revisions = this.revisionDocuments || [];
 
     // add update status to users to be notified
     this.setUserNotification(this.normForm.value.revision);
-    return this.writeItem;
+    console.log(this.normDoc);
+    return this.normDoc;
   }
 
   public deleteDocument(): void {
     this.confirmationService.confirm({
-      message: 'Sie wollen den Datensatz ' + this.normNumber + '?',
+      message: 'Sie wollen den Datensatz ' + this.normDoc.normNumber + '?',
       accept: () => {
         this.couchDBService
-          .deleteEntry(this.id, this.rev)
+          .deleteEntry(this.normDoc._id, this.normDoc._rev)
           .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
-              this.deleteRelatedDBEntries(this.id);
+              this.deleteRelatedDBEntries(this.normDoc._id);
             },
             error => {
               this.logger.error(error.message);
               this.showConfirmation('error', error.message);
             },
             () => {
-              console.log(this.writeItem);
+              console.log(this.normDoc);
               this.sendStateUpdate(this.id, 'delete');
               this.router.navigate(['../document']);
             }
@@ -494,16 +488,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     for (const file of event.files) {
       this.fileUpload = file;
     }
-
-    const isIn = this.checkForExistingAttachment(
-      this.attachments,
-      this.revision.replace(/\s/g, '').toLowerCase()
-    );
+    let isIn = false;
+    if (this.normDoc._attachments) {
+      isIn = this.checkForExistingAttachment(
+        this.normDoc._attachments,
+        this.normDoc.revision.replace(/\s/g, '').toLowerCase()
+      );
+    }
 
     if (isIn) {
       this.confirmationService.confirm({
         message:
-          'Es gibt bereits eine Datei zur Revision: ' + this.revision + '?',
+          'Es gibt bereits eine Datei zur Revision: ' +
+          this.normDoc.revision +
+          '?',
         accept: () => {
           this.processUpload(uploadField);
         },
@@ -524,7 +522,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.newAttachmentName =
             this.id +
             '_' +
-            this.revision.replace(/\s/g, '').toLowerCase() +
+            this.normDoc.revision.replace(/\s/g, '').toLowerCase() +
             '.' +
             this.fileUpload.name.split('.').pop();
           this.attachment = {
@@ -554,12 +552,18 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private uploadPDF(): Observable<any> {
+    console.log(this.uploadUrl + '/');
+    console.log(this.fileUpload);
+    console.log(this.normDoc);
+    console.log(this.id);
+    console.log(this.env.uploadDir);
+    console.log(this.normDoc.revision);
     return this.serverService.uploadFile(
       this.uploadUrl + '/',
       this.fileUpload,
-      this.id,
+      this.normDoc._id,
       this.env.uploadDir,
-      this.revision
+      this.normDoc.revision
     );
   }
 
@@ -602,12 +606,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getNormsForRelatedSelect() {
+    console.log('getNormsForRelatedSelect');
     this.relatedNormsSelectList = [];
 
     this.documentService.getDocuments().then(norms => {
       // Add all users for the selectable owner dropdown
       const normMap: NormDocument[] = norms.map(norm => {
-        const selectedNormObject = {};
+        const selectedNormObject = {} as NormDocument;
         selectedNormObject['id'] = norm['_id'];
         selectedNormObject['normNumber'] = norm['normNumber'];
         return selectedNormObject;
@@ -677,7 +682,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             const newAssociatedNorm = {
               normId: this.id,
               revisionId: revision,
-              normNumber: this.normNumber,
+              normNumber: this.normDoc.normNumber,
               date: isoString,
               confirmed: false,
               confirmedDate: ''
@@ -836,7 +841,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       ...this.selectedTags2,
       ...this.selectedTags3
     ];
-    this.writeItem['tags'] = selectedTags || [];
+    this.normDoc['tags'] = selectedTags || [];
   }
 
   private setSelectedUser() {
@@ -847,16 +852,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         })
       )
     ];
-    this.writeItem['users'] = selectedUserObjects || [];
+    this.normDoc['users'] = selectedUserObjects || [];
   }
 
   private setRelatedNorms(relatedNorms: any[]) {
+    console.log('setRelatedNorms');
+    console.log(relatedNorms);
     this.documentService.setRelated(relatedNorms).then(res => {
       this.selectedRelatedNorms = res;
     });
   }
 
   private setRelatedNormsFrom(relatedNormsFrom: any[]) {
+    console.log('setRelatedNormsFrom');
+    console.log(relatedNormsFrom);
     this.documentService.setRelated(relatedNormsFrom).then(res => {
       this.relatedNormsFrom = res;
     });
@@ -943,7 +952,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private sendStateUpdate(id: string, action: string): void {
     // send message to subscribers via observable subject
-    this.couchDBService.sendStateUpdate('document', id, action, this.writeItem);
+    this.couchDBService.sendStateUpdate('document', id, action, this.normDoc);
   }
 
   private convertToBase64(file: File): Observable<string> {

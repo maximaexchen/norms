@@ -9,7 +9,7 @@ import { Publisher } from '../models/publisher.model';
 import { User } from '@app/models/user.model';
 import { NormDocument } from './../models/document.model';
 import { Group } from '@app/models/group.model';
-import { filter } from 'rxjs/operators';
+import { Tag } from '@app/models/tag.model';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
@@ -42,7 +42,12 @@ export class DocumentService {
     return this.couchDBService
       .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
       .toPromise()
-      .then(response => response as NormDocument)
+      .then(response => {
+        // console.log('getDocuments Promise');
+        // console.log(response);
+
+        return response as NormDocument;
+      })
       .catch(this.handleError);
   }
 
@@ -80,8 +85,6 @@ export class DocumentService {
   }
 
   public setRelated(related: any[]): any {
-    console.log('setRelated');
-    console.log(related);
     return this.getDocuments().then(norms => {
       const filtered = norms.filter(norm => related.indexOf(norm['_id']) > -1);
 
@@ -132,7 +135,7 @@ export class DocumentService {
     return Promise.reject(error.message || error);
   }
 
-  public getTags(): Observable<User[]> {
+  public getTags(): Observable<Tag[]> {
     return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-tags?include_docs=true'
     );
