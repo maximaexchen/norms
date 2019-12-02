@@ -62,7 +62,10 @@ export class DocumentService {
     return this.couchDBService
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .toPromise()
-      .then(response => response as User)
+      .then(response => {
+        const activeUser = response.filter(user => user.active !== false);
+        return activeUser as User;
+      })
       .catch(this.handleError);
   }
 

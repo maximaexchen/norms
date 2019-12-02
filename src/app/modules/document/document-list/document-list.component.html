@@ -113,7 +113,7 @@
 
       <td>{{ document.revisionDate | date }}</td>
       <td>
-        <span *ngIf="document.owner.lastName || document.owner.firstName">
+        <span *ngIf="document.owner">
           {{ document.owner.lastName }},
           {{ document.owner.firstName }}
         </span>
