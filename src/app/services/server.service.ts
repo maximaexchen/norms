@@ -1,3 +1,4 @@
+import { DocumentService } from 'src/app/services/document.service';
 import { Injectable } from '@angular/core';
 import {
   HttpClient,
@@ -10,7 +11,10 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ServerService {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private documentService: DocumentService
+  ) {}
 
   public findDirectory(id: string): Observable<HttpEvent<any>> {
     const url = 'http://localhost:4000/api/findDirectory/' + id;
@@ -26,7 +30,7 @@ export class ServerService {
   ): Observable<HttpEvent<any>> {
     const formData = new FormData();
 
-    revision = revision.replace(/\s/g, '').toLowerCase();
+    revision = this.documentService.removeSpecialChars(revision);
 
     console.log('-------------------------------------');
     console.log(file);

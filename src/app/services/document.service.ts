@@ -130,6 +130,10 @@ export class DocumentService {
     return latest['id'];
   }
 
+  public removeSpecialChars(str: string): string {
+    return str.replace(/[^a-z0-9]/gi, '').toLowerCase();
+  }
+
   private handleError(error: any): Promise<any> {
     console.error('Ein fehler ist aufgetreten', error);
     return Promise.reject(error.message || error);

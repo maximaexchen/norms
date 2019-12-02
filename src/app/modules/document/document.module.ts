@@ -10,6 +10,8 @@ import { DocumentEditComponent } from './document-edit/document-edit.component';
 import { DocumentStartComponent } from './document-start/document-start.component';
 import { GroupModule } from '../group/group.module';
 
+import { NgxSpinnerModule } from 'ngx-spinner';
+
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CalendarModule } from 'primeng/calendar';
 import { ToastModule } from 'primeng/toast';
@@ -30,6 +32,7 @@ import { GeneralModule } from 'src/app/modules/general.module';
     GeneralModule,
     DocumentRoutingModule,
     ProgressSpinnerModule,
+    NgxSpinnerModule,
     CalendarModule,
     ToastModule,
     FileUploadModule,

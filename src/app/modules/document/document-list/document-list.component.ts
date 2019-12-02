@@ -71,7 +71,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         message => {
-          console.log(message);
           if (message.model === 'document') {
             this.updateList(message);
           }
@@ -82,6 +81,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private updateList(changedInfo: any) {
+    console.log(changedInfo);
+
     const updateItem = this.documents.find(
       item => item['_id'] === changedInfo.id
     );

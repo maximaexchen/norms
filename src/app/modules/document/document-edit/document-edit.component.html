@@ -1,7 +1,6 @@
-<div class="loading-indicator" *ngIf="isLoading">
-  <p-progressSpinner [style]="{ width: '80px', height: '80px' }" strokeWidth="5" animationDuration=".8s">
-  </p-progressSpinner>
-</div>
+<ngx-spinner bdColor="rgba(255, 255, 255, 0.8)" size="small" color="#235780" type="square-spin">
+  <p style="color: #235780"> Lade Daten ... </p>
+</ngx-spinner>
 <div class="row detail-edit-header">
   <div class="col-sm-4">
     <h1 *ngIf="normDoc.normNumber">{{ normDoc.normNumber }}</h1>
@@ -85,7 +84,7 @@
             <label class="col-sm-4 col-form-label" i18n="@@string-descriptionEN-dataset">Beschreibung en</label>
             <div class="col-sm-8">
               <textarea class="form-control" i18n-placeholder placeholder="Beschreibung en" [(ngModel)]="normDoc.description.en"
-                name="descriptionEN" [disabled]="!editable" [required]="normDoc.normLanguage === 'en' ||normDoc. normLanguage === 'de' || normDoc.normLanguage === 'fr'"></textarea>
+                name="descriptionEN" [disabled]="!editable" [required]="normDoc.normLanguage === 'en' || normDoc.normLanguage === 'de' || normDoc.normLanguage === 'fr'"></textarea>
             </div>
           </div>
 
@@ -225,7 +224,7 @@
           </button>
 
           <hr *ngIf="latestAttachmentName" />
-
+          <div *appIsGranted="'MAINTAIN'">
           <p-fieldset legend="Dokumenten Historie" [toggleable]="true" [transitionOptions]="'100ms'" [collapsed]="false"
             *ngIf="revisionDocuments.length > 0">
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
@@ -253,6 +252,7 @@
               <hr *ngIf="i < revisionDocuments.length - 1" />
             </div>
           </p-fieldset>
+          </div>
         </div>
       </div>
     </p-tabPanel>

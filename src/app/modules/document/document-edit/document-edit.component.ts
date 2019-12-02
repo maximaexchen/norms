@@ -23,6 +23,7 @@ import { DocumentService } from 'src/app/services/document.service';
 import { ServerService } from 'src/app/services/server.service';
 
 import { EnvService } from 'src/app/services/env.service';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-document-edit',
@@ -106,7 +107,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private notificationsService: NotificationsService,
     private confirmationService: ConfirmationService,
     private authService: AuthenticationService,
-    private logger: NGXLogger
+    private logger: NGXLogger,
+    private spinner: NgxSpinnerService
   ) {}
 
   ngOnInit() {
@@ -154,7 +156,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       type: 'norm',
       normNumber: '',
       normLanguage: 'en',
-      description: {}
+      description: {},
+      active: false
     };
     this.ownerId = '';
     this.editable = false;
@@ -198,6 +201,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    */
   public onSubmit(): void {
     this.isLoading = true;
+    this.spinner.show();
     if (this.normForm.value.isNew) {
       this.saveDocument();
     } else {
@@ -213,6 +217,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private saveDocument(): void {
     console.log('saveDocument');
     this.isLoading = true;
+    this.spinner.show();
     this.processFormData();
     this.normForm.form.markAsPristine();
 
@@ -229,21 +234,25 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
                 res => {},
                 error => {
                   this.logger.error(error.message);
+                  this.spinner.hide();
                   this.showConfirmation('error', error.message);
                 },
                 () => {
                   this.router.navigate(['../document/' + this.id + '/edit']);
+                  this.spinner.hide();
                   this.showConfirmation('success', 'Upload erfolgreich');
                 }
               );
           }
           this.router.navigate(['../document/' + this.id + '/edit']);
           this.isLoading = false;
+          this.spinner.hide();
           this.sendStateUpdate(this.id, 'save');
         },
         error => {
           this.logger.error(error.message);
           this.isLoading = false;
+          this.spinner.hide();
         },
         () => {}
       );
@@ -259,6 +268,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           result => {},
           error => {
             this.logger.error(error.message);
+            this.spinner.hide();
             this.showConfirmation('error', error.message);
           },
           () => {
@@ -305,12 +315,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         },
         error => {
           this.isLoading = false;
+          this.spinner.hide();
           this.logger.error(error.message);
           this.showConfirmation('error', error.message);
         },
         () => {
           // Inform about database change.
           this.isLoading = false;
+          this.spinner.hide();
           this.sendStateUpdate(this.id, 'update');
           this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
@@ -493,7 +505,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.normDoc._attachments) {
       isIn = this.checkForExistingAttachment(
         this.normDoc._attachments,
-        this.normDoc.revision.replace(/\s/g, '').toLowerCase()
+        this.documentService.removeSpecialChars(this.normDoc.revision)
       );
     }
 
@@ -521,9 +533,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         result => {
           this.newAttachmentName =
-            this.id +
+            this.normDoc._id +
             '_' +
-            this.normDoc.revision.replace(/\s/g, '').toLowerCase() +
+            this.documentService.removeSpecialChars(this.normDoc.revision) +
             '.' +
             this.fileUpload.name.split('.').pop();
           this.attachment = {
@@ -536,9 +548,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         error => {
           this.logger.error(error.message);
           this.isLoading = false;
+          this.spinner.hide();
         },
         () => {
           this.isLoading = false;
+          this.spinner.hide();
           this.showConfirmation('success', 'Files added');
         }
       );

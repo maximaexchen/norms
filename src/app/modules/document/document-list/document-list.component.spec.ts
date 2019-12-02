@@ -22,6 +22,8 @@ describe('DocumentListComponent', () => {
     navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
   };
   let actualResult: any;
+  let changeInfo: any;
+  let expectedObject: any;
 
   Given(() => {
     TestBed.configureTestingModule({
@@ -39,6 +41,8 @@ describe('DocumentListComponent', () => {
 
     fakeDocumentData = undefined;
     actualResult = undefined;
+    changeInfo = undefined;
+    expectedObject = undefined;
     // router = undefined;
   });
 
@@ -91,7 +95,6 @@ describe('DocumentListComponent', () => {
 
     describe('EXPECT mocked documents to be correct document object', () => {
       Then(() => {
-        console.log(componentUnderTest.documents);
         expect(componentUnderTest.documents).toEqual(fakeDocumentData);
       });
     });
@@ -116,5 +119,88 @@ describe('DocumentListComponent', () => {
         ]);
       })
     );
+  });
+
+  describe('METHOD: updateList(changedInfo)', () => {
+    Given(() => {
+      // @ts-ignores
+      spyOn(componentUnderTest, 'updateList');
+      fakeDocumentData = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber'
+        }
+      ];
+    });
+
+    describe('check delete', () => {
+      Given(() => {
+        changeInfo = {
+          model: 'document',
+          id: '1',
+          action: 'delete',
+          object: expectedObject
+        };
+      });
+
+      When(() => {
+        // @ts-ignore
+        componentUnderTest.updateList(changeInfo);
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.documents.length).toEqual(0);
+      });
+    });
+
+    describe('check update', () => {
+      Given(() => {
+        fakeDocumentData = [
+          {
+            _id: '1',
+            _rev: '1',
+            type: 'document',
+            normNumber: 'Normnumber'
+          }
+        ];
+        spyOn(couchDBService, 'findDocuments').and.returnValue(
+          of(fakeDocumentData)
+        );
+
+        expectedObject = {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'New normnumber'
+        };
+
+        changeInfo = {
+          model: 'document',
+          id: '1',
+          action: 'update',
+          object: expectedObject
+        };
+      });
+
+      When(() => {
+        // @ts-ignore
+        componentUnderTest.getDocuments();
+        fixture.detectChanges();
+
+        // @ts-ignore
+        componentUnderTest.updateList(changeInfo);
+        fixture.detectChanges();
+      });
+
+      Then(() => {
+        console.log(componentUnderTest.documents[0]);
+        console.log(expectedObject);
+        // @ts-ignore
+        expect(componentUnderTest.documents[0]).toEqual(expectedObject);
+      });
+    });
   });
 });
