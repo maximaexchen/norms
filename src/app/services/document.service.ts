@@ -9,7 +9,7 @@ import { Publisher } from '../models/publisher.model';
 import { User } from '@app/models/user.model';
 import { NormDocument } from './../models/document.model';
 import { Group } from '@app/models/group.model';
-import { filter } from 'rxjs/operators';
+import { Tag } from '@app/models/tag.model';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
@@ -38,11 +38,16 @@ export class DocumentService {
     );
   } */
 
-  public getDocuments(): any {
+  public getDocuments(): Promise<NormDocument[]> {
     return this.couchDBService
       .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
       .toPromise()
-      .then(response => response as NormDocument)
+      .then(response => {
+        // console.log('getDocuments Promise');
+        // console.log(response);
+
+        return response as NormDocument;
+      })
       .catch(this.handleError);
   }
 
@@ -62,7 +67,10 @@ export class DocumentService {
     return this.couchDBService
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .toPromise()
-      .then(response => response as User)
+      .then(response => {
+        const activeUser = response.filter(user => user.active !== false);
+        return activeUser as User;
+      })
       .catch(this.handleError);
   }
 
@@ -78,19 +86,19 @@ export class DocumentService {
 
   public setRelated(related: any[]): any {
     return this.getDocuments().then(norms => {
-      const filtered = norms.filter(norm => related.indexOf(norm._id) > -1);
+      const filtered = norms.filter(norm => related.indexOf(norm['_id']) > -1);
 
       return filtered.map(mapped => {
         let revDescription: string;
-        switch (mapped.normLanguage) {
+        switch (mapped['normLanguage']) {
           case 'de':
-            revDescription = mapped.description.de;
+            revDescription = mapped['description.de'];
             break;
           case 'en':
-            revDescription = mapped.description.en;
+            revDescription = mapped['description.en'];
             break;
           case 'fr':
-            revDescription = mapped.description.en;
+            revDescription = mapped['description.en'];
             break;
         }
 
@@ -111,8 +119,8 @@ export class DocumentService {
     });
   }
 
-  public getLatestAttchmentFileName(attachemnts: any): string {
-    const sortedByRevision = _.sortBy(attachemnts, (object, key) => {
+  public getLatestAttchmentFileName(attachements: any): string {
+    const sortedByRevision = _.sortBy(attachements, (object, key) => {
       object['id'] = key;
       return object['revpos'];
     }).reverse();
@@ -127,7 +135,7 @@ export class DocumentService {
     return Promise.reject(error.message || error);
   }
 
-  public getTags(): Observable<User[]> {
+  public getTags(): Observable<Tag[]> {
     return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-tags?include_docs=true'
     );

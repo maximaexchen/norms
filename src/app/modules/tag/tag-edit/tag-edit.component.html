@@ -23,14 +23,15 @@
 </div>
 <p-tabView>
   <p-tabPanel header="Stammdaten">
+    a {{ tag._id | json }} a
     <form
       class="form form-horizontal"
       (ngSubmit)="onSubmit()"
       #tagForm="ngForm"
     >
       <input type="hidden" [(ngModel)]="isNew" name="isNew" />
-      <input type="hidden" [(ngModel)]="id" name="_id" />
-      <input type="hidden" [(ngModel)]="rev" name="_rev" />
+      <input type="hidden" [(ngModel)]="tag._id" name="_id" />
+      <input type="hidden" [(ngModel)]="tag._rev" name="_rev" />
       <div class="row">
         <div class="col-sm-8">
           <div class="form-group row">
@@ -44,7 +45,7 @@
                 i18n-placeholder
                 placeholder="Name"
                 required
-                [(ngModel)]="name"
+                [(ngModel)]="tag.name"
                 name="name"
                 #nameCheck="ngModel"
                 [disabled]="!editable"
@@ -68,7 +69,7 @@
                   name="tagType"
                   value="level1"
                   label="Stufe 1"
-                  [(ngModel)]="tagType"
+                  [(ngModel)]="tag.tagType"
                   inputId="level1"
                   [disabled]="!editable"
                 ></p-radioButton>
@@ -78,7 +79,7 @@
                   name="tagType"
                   value="level2"
                   label="Stufe 2"
-                  [(ngModel)]="tagType"
+                  [(ngModel)]="tag.tagType"
                   inputId="level2"
                   [disabled]="!editable"
                 ></p-radioButton>
@@ -88,7 +89,7 @@
                   name="tagType"
                   value="level3"
                   label="Stufe 3"
-                  [(ngModel)]="tagType"
+                  [(ngModel)]="tag.tagType"
                   inputId="level3"
                   [disabled]="!editable"
                 ></p-radioButton>
@@ -112,7 +113,7 @@
                   }
                 ]"
                 name="active"
-                [(ngModel)]="active"
+                [(ngModel)]="tag.active"
                 [disabled]="!editable"
               ></p-selectButton>
             </div>

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "baseUrl": "./",
-    "types": ["jasmine", "node"],
+    "types": ["jasmine-given", "jasmine", "node"],
     "paths": {
       "@app/*": ["src/app/*"],
       "@environments/*": ["src/environments/*"],

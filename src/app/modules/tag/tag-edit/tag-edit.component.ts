@@ -6,6 +6,8 @@ import { takeWhile } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 
+import uuidv4 from '@bundled-es-modules/uuid/v4.js';
+
 import { Tag } from '@app/models/tag.model';
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
@@ -27,7 +29,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
   formTitle: string;
   isNew = true; // 1 = new - 0 = update
 
-  writeItem: Tag;
+  tag: Tag;
   tags: Tag[] = [];
 
   id: string;
@@ -75,12 +77,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
   private resetComponent() {
     console.log('restComponent');
     this.editable = false;
-    this.id = '';
-    this.rev = '';
-    this.type = '';
-    this.name = '';
-    this.tagType = 'level1';
-    this.active = null;
+    this.tag = { _id: this.id, type: 'tag' };
   }
 
   private newTag() {
@@ -89,6 +86,8 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.editable = true;
     this.formTitle = 'Neuen Tag anlegen';
     this.tags = [];
+    this.id = uuidv4();
+    this.tag = { _id: this.id, type: 'tag' };
   }
 
   private editTag(results) {
@@ -99,21 +98,8 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.couchDBService
       .fetchEntry('/' + results['id'])
       .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        entry => {
-          this.getTagData(entry);
-        },
-        error => this.logger.error(error.message)
-      );
-  }
-
-  private getTagData(entry: any) {
-    this.id = entry['_id'];
-    this.rev = entry['_rev'];
-    this.type = 'tag';
-    this.name = entry['name'];
-    this.tagType = entry['tagType'];
-    this.active = entry['active'];
+      .toPromise()
+      .then(tag => (this.tag = tag));
   }
 
   public onSubmit(): void {
@@ -133,10 +119,8 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private onUpdateTag(): void {
-    this.createWriteItem();
-
     this.couchDBService
-      .updateEntry(this.writeItem, this.tagForm.value._id)
+      .updateEntry(this.tag, this.tagForm.value._id)
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
@@ -178,32 +162,27 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private updateRelated(related: any) {
-    console.log('updateRelated');
-    console.log(related);
     const bulkUpdateObject = {};
     bulkUpdateObject['docs'] = [];
     related.docs.forEach(norm => {
       // reasing the new name to the found Norm with tag
-      _.findWhere(norm['tags'], { id: this.id })['name'] = this.name;
-      console.log('norm');
-      console.log(norm);
+      _.findWhere(norm['tags'], { id: this.tag._id })['name'] = this.tag.name;
       bulkUpdateObject['docs'].push(norm);
     });
 
     this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(
-      res => {
-        console.log('bulkUpdate');
-        console.log(res);
-      },
+      res => {},
       error => this.logger.error(error.message)
     );
   }
 
   private onCreateTag(): void {
-    this.createWriteItem();
+    console.log('this.tag');
+    console.log(this.tag);
+    // this.createWriteItem();
 
     this.couchDBService
-      .writeEntry(this.writeItem)
+      .writeEntry(this.tag)
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
@@ -219,7 +198,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
       message: 'Sie wollen den Datensatz ' + this.name + '?',
       accept: () => {
         this.couchDBService
-          .deleteEntry(this.id, this.rev)
+          .deleteEntry(this.tag._id, this.tag._rev)
           .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
@@ -236,24 +215,6 @@ export class TagEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private createWriteItem() {
-    this.writeItem = {};
-    this.writeItem['type'] = 'tag';
-    this.writeItem['name'] = this.tagForm.value.name || '';
-    this.writeItem['tagType'] = this.tagForm.value.tagType || '';
-    this.writeItem['active'] = this.tagForm.value.active || false;
-
-    if (this.tagForm.value._id) {
-      this.writeItem['_id'] = this.tagForm.value._id;
-    }
-
-    if (this.tagForm.value._id) {
-      this.writeItem['_rev'] = this.tagForm.value._rev;
-    }
-
-    return this.writeItem;
-  }
-
   private showConfirm(type: string, result: string) {
     this.notificationsService.addSingle(
       type,
@@ -263,7 +224,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private sendStateUpdate(action: string): void {
-    this.couchDBService.sendStateUpdate('tag', this.writeItem, action);
+    this.couchDBService.sendStateUpdate('tag', this.tag, action);
   }
 
   public ngOnDestroy(): void {
