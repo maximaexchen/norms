@@ -42,7 +42,12 @@ export class DocumentService {
     return this.couchDBService
       .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
       .toPromise()
-      .then(response => response as NormDocument)
+      .then(response => {
+        // console.log('getDocuments Promise');
+        // console.log(response);
+
+        return response as NormDocument;
+      })
       .catch(this.handleError);
   }
 

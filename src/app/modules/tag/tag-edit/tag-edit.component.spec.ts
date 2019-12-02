@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+/* import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { GeneralModule } from './../../general.module';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { TagEditComponent } from './tag-edit.component';
@@ -74,3 +74,4 @@ describe('TagEditComponent', () => {
     });
   });
 });
+ */
