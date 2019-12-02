@@ -76,7 +76,7 @@
           <div class="form-group row">
             <label class="col-sm-4 col-form-label" i18n="@@string-descriptionDE-dataset">Beschreibung de</label>
             <div class="col-sm-8">
-              <textarea class="form-control" i18n-placeholder placeholder="Beschreibung de" [required]="normLanguage === 'en' || normLanguage === 'de'  || normLanguage === 'fr'"
+              <textarea class="form-control" i18n-placeholder placeholder="Beschreibung de" [required]="normDoc.normLanguage === 'en' || normDoc.normLanguage === 'de'  || normDoc.normLanguage === 'fr'"
                 [(ngModel)]="normDoc.description.de" name="descriptionDE" [disabled]="!editable"></textarea>
             </div>
           </div>
@@ -85,7 +85,7 @@
             <label class="col-sm-4 col-form-label" i18n="@@string-descriptionEN-dataset">Beschreibung en</label>
             <div class="col-sm-8">
               <textarea class="form-control" i18n-placeholder placeholder="Beschreibung en" [(ngModel)]="normDoc.description.en"
-                name="descriptionEN" [disabled]="!editable" [required]="normLanguage === 'en' || normLanguage === 'de' || normLanguage === 'fr'"></textarea>
+                name="descriptionEN" [disabled]="!editable" [required]="normDoc.normLanguage === 'en' ||normDoc. normLanguage === 'de' || normDoc.normLanguage === 'fr'"></textarea>
             </div>
           </div>
 
@@ -93,7 +93,7 @@
             <label class="col-sm-4 col-form-label" i18n="@@string-descriptionFR-dataset">Beschreibung fr</label>
             <div class="col-sm-8">
               <textarea class="form-control" i18n-placeholder placeholder="Beschreibung fr" [(ngModel)]="normDoc.description.fr"
-                name="descriptionFR" [disabled]="!editable" [required]="normLanguage === 'fr'" ></textarea>
+                name="descriptionFR" [disabled]="!editable" [required]="normDoc.normLanguage === 'fr'" ></textarea>
             </div>
           </div>
 

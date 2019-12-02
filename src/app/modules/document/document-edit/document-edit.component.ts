@@ -79,11 +79,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   revision: string;
 
   scope: string;
-  normLanguage = 'en';
+
   descriptionDE: string;
   descriptionEN: string;
   descriptionFR: string;
     active: boolean;*/
+  normLanguage = 'en';
   revisionDocument: RevisionDocument;
   uploadPath: string;
   owner: User;
