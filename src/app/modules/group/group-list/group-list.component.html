@@ -1,48 +1,48 @@
 <div class="info-panel position-top">
   <h1 i18n="@@string-group-selection">Auswahl Gruppe</h1>
 </div>
-<p-table
-  #dataTable
-  [value]="groups"
-  [paginator]="true"
-  [rows]="13"
-  class="table"
-  selectionMode="single"
-  [resizableColumns]="true"
-  columnResizeMode="fit"
-  [(selection)]="selectedGroup"
-  (onRowSelect)="onRowSelect($event)"
-  [globalFilterFields]="['name']"
-  (onFilter)="onFilter($event)"
->
-  <ng-template pTemplate="caption">
-    <div style="text-align: center;">
-      <i class="fas fa-search" style="margin:4px 6px 0 0;"></i>
-      <input
-        type="text"
-        pInputText
-        size="50"
-        i18n-placeholder
-        placeholder="Globale Suche"
-        (input)="dataTable.filterGlobal($event.target.value, 'contains')"
-        style="width:auto"
-      />
-    </div>
-  </ng-template>
-  <ng-template pTemplate="header">
-    <tr>
-      <th>Name</th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-group>
-    <tr [pSelectableRow]="group">
-      <td>{{ group.name }}</td>
-    </tr>
-  </ng-template>
-</p-table>
-<div class="info-panel position-bottom">
-  <p i18n="@@group-status-data-count">
-    Es {groupCount, plural, =0 {wurde keine Gruppe gefunden} =1 {wurde 1 Gruppe
-    gefunden} other { wurden {{ groupCount }} Gruppen gefunden }}
-  </p>
-</div>
+<ng-container *ngIf="groups$ | async as groups">
+  <p-table
+    #dataTable
+    [value]="groups"
+    [paginator]="true"
+    [rows]="13"
+    class="table"
+    selectionMode="single"
+    [resizableColumns]="true"
+    columnResizeMode="fit"
+    (onRowSelect)="onRowSelect($event)"
+    [globalFilterFields]="['name']"
+  >
+    <ng-template pTemplate="caption">
+      <div style="text-align: center;">
+        <i class="fas fa-search" style="margin:4px 6px 0 0;"></i>
+        <input
+          type="text"
+          pInputText
+          size="50"
+          i18n-placeholder
+          placeholder="Globale Suche"
+          (input)="dataTable.filterGlobal($event.target.value, 'contains')"
+          style="width:auto"
+        />
+      </div>
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-group>
+      <tr [pSelectableRow]="group">
+        <td>{{ group.name }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <div class="info-panel position-bottom" *ngIf="groups.length > 0">
+    <p i18n="@@group-status-data-count">
+      Es {groups.length, plural, =0 {wurde keine Gruppe gefunden} =1 {wurde 1
+      Gruppe gefunden} other { wurden {{ groups.length }} Gruppen gefunden }}
+    </p>
+  </div>
+</ng-container>

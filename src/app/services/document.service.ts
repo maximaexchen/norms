@@ -151,7 +151,7 @@ export class DocumentService {
     );
   }
 
-  public getGroups(): Observable<User[]> {
+  public getGroups(): Observable<Group[]> {
     return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-groups?include_docs=true'
     );
