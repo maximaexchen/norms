@@ -2,7 +2,7 @@ export interface GroupProperties {
   _id?: string;
   _rev?: string;
   type?: string;
-  groupName?: string;
+  name?: string;
   users?: string;
   active?: boolean;
 }

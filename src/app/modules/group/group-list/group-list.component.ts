@@ -16,7 +16,7 @@ import { Group } from '../../../models/group.model';
 export class GroupListComponent implements OnInit, OnDestroy {
   @ViewChild('dataTable', { static: false }) dataTable: any;
   alive = true;
-  groups$: Observable<Group>;
+  groups$: Observable<Group[]>;
 
   constructor(
     private couchDBService: CouchDBService,
