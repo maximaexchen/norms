@@ -127,7 +127,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           switch (this.authService.getUserRole()) {
             case 'owner':
               this.documents = this.documents.filter(obj => {
-                return obj['owner']['_id'] === userId;
+                if (!!obj['owner']) {
+                  return obj['owner']['_id'] === userId;
+                }
               });
               break;
             case 'user':
