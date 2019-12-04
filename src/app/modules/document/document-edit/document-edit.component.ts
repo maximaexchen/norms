@@ -291,9 +291,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .pipe(takeWhile(() => this.alive))
       .subscribe(
         normDoc => {
-          console.log(normDoc);
           this.normDoc = normDoc;
-
           this.setAdditionalNormDocData();
         },
         error => {
@@ -333,6 +331,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setAdditionalNormDocData() {
+    console.log('setAdditionalNormDocData');
     this.revisionDate = new Date(this.normDoc.revisionDate);
 
     if (this.normDoc.owner) {
@@ -350,11 +349,17 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.setSelectedUsers(this.normDoc.users);
     }
 
-    if (this.normDoc.relatedNorms) {
+    if (
+      Array.isArray(this.normDoc.relatedNorms) &&
+      this.normDoc.relatedNorms.length
+    ) {
       this.setRelatedNorms(this.normDoc.relatedNorms);
     }
 
-    if (this.normDoc.relatedFrom) {
+    if (
+      Array.isArray(this.normDoc.relatedFrom) &&
+      this.normDoc.relatedFrom.length
+    ) {
       this.setRelatedNormsFrom(this.normDoc.relatedFrom);
     }
 
