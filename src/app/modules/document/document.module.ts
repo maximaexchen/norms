@@ -20,13 +20,15 @@ import { DialogModule } from 'primeng/dialog';
 import { FileUploadModule } from 'primeng/fileupload';
 
 import { GeneralModule } from 'src/app/modules/general.module';
+import { AsciiInputValidatorDirective } from '@app/services/ascii-input-validator.directive';
 
 @NgModule({
   declarations: [
     DocumentComponent,
     DocumentListComponent,
     DocumentEditComponent,
-    DocumentStartComponent
+    DocumentStartComponent,
+    AsciiInputValidatorDirective
   ],
   imports: [
     GeneralModule,
