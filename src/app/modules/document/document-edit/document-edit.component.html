@@ -28,8 +28,11 @@
               <div class="form-group row">
                 <label for="normNumber" class="col-sm-6 col-form-label" i18n="@@string-number-dataset">Nummer</label>
                 <div class="col-sm-6">
-                  <input type="text" class="form-control" i18n-placeholder placeholder="Nummer" [(ngModel)]="normDoc.normNumber"
-                    name="normNumber" required [readOnly]="!editable" />
+                  <input type="text" class="form-control" i18n-placeholder placeholder="Nummer" [ngModel]="normDoc.normNumber"
+                    name="normNumber" asciiInputValidator required [readOnly]="!editable" ngModel #ascii="ngModel" />
+                    <div *ngIf="ascii.dirty && ascii.errors?.asciiInput" class="error">
+                      {{ascii.errors.asciiInput}}
+                    </div>
                 </div>
               </div>
             </div>

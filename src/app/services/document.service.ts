@@ -134,6 +134,11 @@ export class DocumentService {
     return str.replace(/[^a-z0-9]/gi, '').toLowerCase();
   }
 
+  public checkASCIIRange(checkString): boolean {
+    const check = /^(?:(?!["';<=>\\])[\x20-\x7E])+$/u.test(checkString);
+    return check;
+  }
+
   private handleError(error: any): Promise<any> {
     console.error('Ein fehler ist aufgetreten', error);
     return Promise.reject(error.message || error);

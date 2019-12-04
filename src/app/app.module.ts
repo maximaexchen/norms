@@ -19,6 +19,7 @@ import { NotificationsComponent } from './shared/notifications.component';
 
 import { HeaderComponent } from './components/header/header.component';
 
+import { AsciiInputValidatorDirective } from './services/ascii-input-validator.directive';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthModule } from '@modules/auth/auth.module';
@@ -34,7 +35,8 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
     StartComponent,
     HeaderComponent,
     FileInputValueAccessor,
-    NotificationsComponent
+    NotificationsComponent,
+    AsciiInputValidatorDirective
   ],
   imports: [
     CoreModule,

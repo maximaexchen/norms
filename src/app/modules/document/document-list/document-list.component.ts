@@ -176,9 +176,12 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   public onFilter(event: any, dt: any): void {
     // Check for simple ASCII Characters and give warning
     if (!_.isEmpty(event.filters.global)) {
-      this.filterInputCheck = /^(?:(?!["';<=>\\])[\x20-\x7E])+$/u.test(
+      this.filterInputCheck = this.documentService.checkASCIIRange(
         event.filters.global.value
       );
+      /* this.filterInputCheck = /^(?:(?!["';<=>\\])[\x20-\x7E])+$/u.test(
+        event.filters.global.value
+      ); */
     }
 
     this.documentCount = event.filteredValue.length;

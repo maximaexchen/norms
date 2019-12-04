@@ -69,7 +69,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   selectedTags2: Tag[] = [];
   selectedTags3: Tag[] = [];
 
-  id: string;
+  _id: string;
   /*   rev: string;
   type: string; */
   publisherId: string;
@@ -152,7 +152,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('resetComponent');
 
     this.normDoc = {
-      _id: this.id,
+      _id: uuidv4(),
       type: 'norm',
       normNumber: '',
       normLanguage: 'en',
@@ -192,7 +192,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.formTitle = 'Neue Norm anlegen';
     this.owner = '';
     this.processType = '';
-    this.id = uuidv4();
+    this._id = uuidv4();
   }
 
   /**
@@ -238,16 +238,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
                   this.showConfirmation('error', error.message);
                 },
                 () => {
-                  this.router.navigate(['../document/' + this.id + '/edit']);
+                  this.router.navigate(['../document/' + this._id + '/edit']);
                   this.spinner.hide();
                   this.showConfirmation('success', 'Upload erfolgreich');
                 }
               );
           }
-          this.router.navigate(['../document/' + this.id + '/edit']);
+          this.router.navigate(['../document/' + this._id + '/edit']);
           this.isLoading = false;
           this.spinner.hide();
-          this.sendStateUpdate(this.id, 'save');
+          this.sendStateUpdate(this._id, 'save');
         },
         error => {
           this.logger.error(error.message);
@@ -323,7 +323,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           // Inform about database change.
           this.isLoading = false;
           this.spinner.hide();
-          this.sendStateUpdate(this.id, 'update');
+          this.sendStateUpdate(this._id, 'update');
           this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
           this.setStartValues();
@@ -484,7 +484,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             },
             () => {
               console.log(this.normDoc);
-              this.sendStateUpdate(this.id, 'delete');
+              this.sendStateUpdate(this._id, 'delete');
               this.router.navigate(['../document']);
             }
           );
@@ -570,7 +570,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log(this.uploadUrl + '/');
     console.log(this.fileUpload);
     console.log(this.normDoc);
-    console.log(this.id);
+    console.log(this._id);
     console.log(this.env.uploadDir);
     console.log(this.normDoc.revision);
     return this.serverService.uploadFile(
@@ -695,7 +695,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             const isoString = now.toISOString();
 
             const newAssociatedNorm = {
-              normId: this.id,
+              normId: this._id,
               revisionId: revision,
               normNumber: this.normDoc.normNumber,
               date: isoString,
@@ -751,7 +751,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private deleteRelatedDBEntries(id: string) {
-    this.deleteAssociatedNormEntriesInUser(this.id);
+    this.deleteAssociatedNormEntriesInUser(this._id);
 
     const deleteQuery = {
       use_index: ['_design/search_norm'],
@@ -893,13 +893,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         .fetchEntry('/' + relatedNorm)
         .pipe(
           switchMap(linkedNorm => {
-            const newLinkedNorm = this.id;
+            const newLinkedNorm = this._id;
 
             if (!linkedNorm['relatedFrom']) {
               linkedNorm.relatedFrom = [];
             }
 
-            if (linkedNorm.relatedFrom.indexOf(this.id) === -1) {
+            if (linkedNorm.relatedFrom.indexOf(this._id) === -1) {
               linkedNorm.relatedFrom.push(newLinkedNorm);
             }
 
@@ -937,7 +937,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               console.log(linkedNorm);
 
               const filtered = linkedNorm.relatedFrom.filter(relNorm => {
-                return relNorm !== this.id;
+                return relNorm !== this._id;
               });
 
               linkedNorm.relatedFrom = filtered;
