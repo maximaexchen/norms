@@ -221,7 +221,7 @@
 
           <hr *ngIf="latestAttachmentName" />
 
-          <button type="button" (click)="getDownload(id, latestAttachmentName)" *ngIf="latestAttachmentName"
+          <button type="button" (click)="getDownload(normDoc._id, latestAttachmentName)" *ngIf="latestAttachmentName"
             title="{{ latestAttachmentName }}" class="btn btn-acp attachmentDownload">
             <i class="fas fa-file-download"></i> Download Norm
           </button>
@@ -231,7 +231,7 @@
           <p-fieldset legend="Dokumenten Historie" [toggleable]="true" [transitionOptions]="'100ms'" [collapsed]="false"
             *ngIf="revisionDocuments.length > 0">
             <div *ngFor="let revDoc of revisionDocuments; let i = index">
-              <a class="dynamic-link" (click)="getDownload(id, revDoc['name'])"><i class="fas fa-file-download"></i>
+              <a class="dynamic-link" (click)="getDownload(normDoc._id, revDoc['name'])"><i class="fas fa-file-download"></i>
                 {{ revDoc['revisionID'] }}</a>
 
               <!-- Link to the server file
