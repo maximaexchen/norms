@@ -24,7 +24,7 @@ export class DocumentService {
   owners: User = [];
   users: User = [];
   selectedtUsers: User[] = [];
-  groups: Group = [];
+  groups: Group[] = [];
 
   constructor(
     private http: HttpClient,

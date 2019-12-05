@@ -1,3 +1,4 @@
+import { GroupFormComponent } from './shared/form/group-form.component';
 import { NgModule } from '@angular/core';
 
 import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
@@ -9,7 +10,12 @@ import { GroupListComponent } from './group-list/group-list.component';
 import { GroupRoutingModule } from './group-routing.module';
 
 @NgModule({
-  declarations: [GroupComponent, GroupEditComponent, GroupListComponent],
+  declarations: [
+    GroupComponent,
+    GroupEditComponent,
+    GroupListComponent,
+    GroupFormComponent
+  ],
   imports: [GeneralModule, GroupRoutingModule, AngularMultiSelectModule],
   exports: []
 })

@@ -1,18 +1,8 @@
-export interface GroupProperties {
-  _id?: string;
+export interface Group {
+  _id: string;
   _rev?: string;
-  type?: string;
+  type: string;
   name?: string;
-  users?: string;
+  users?: string[];
   active?: boolean;
-}
-
-export class Group {
-  constructor(kwArgs: GroupProperties = {}) {
-    for (const key in kwArgs) {
-      if (kwArgs[key]) {
-        this[key] = kwArgs[key];
-      }
-    }
-  }
 }

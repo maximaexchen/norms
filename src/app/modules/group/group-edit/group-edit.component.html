@@ -1,7 +1,7 @@
 <div class="row detail-edit-header">
   <div class="col-sm-4">
-    <h1 *ngIf="name">{{ name }}</h1>
-    <h1 *ngIf="!name" i18n="@@string-new-dataset">
+    <h1 *ngIf="group?.name">{{ group?.name }}</h1>
+    <h1 *ngIf="!group?.name" i18n="@@string-new-dataset">
       Datensatz erstellen
     </h1>
   </div>
@@ -27,83 +27,17 @@
       (ngSubmit)="onSubmit()"
       #groupForm="ngForm"
     >
-      <input type="hidden" [(ngModel)]="isNew" name="isNew" />
-      <input type="hidden" [(ngModel)]="id" name="_id" />
-      <input type="hidden" [(ngModel)]="rev" name="_rev" />
-      <div class="row">
-        <div class="col-sm-8">
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-Name"
-              >Name</label
-            >
-            <div class="col-sm-10">
-              <input
-                type="text"
-                class="form-control"
-                i18n-placeholder
-                placeholder="Name"
-                required
-                [(ngModel)]="name"
-                name="name"
-                #nameCheck="ngModel"
-                [disabled]="!editable"
-              />
-              <small
-                class="form-text text-muted"
-                i18n="@@string-name-required"
-                *ngIf="!nameCheck.valid && nameCheck.touched"
-                >Bitte geben Sie einen Namen ein.</small
-              >
-            </div>
-          </div>
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-benutzer"
-              >Benutzer</label
-            >
-            <div class="col-sm-10">
-              <angular2-multiselect
-                name="users"
-                [data]="users"
-                [(ngModel)]="selectedtUsers"
-                [settings]="dropdownSettings"
-                (onSelect)="onItemSelect($event)"
-                (onDeSelect)="onItemDeSelect($event)"
-                (onSelectAll)="onSelectAll($event)"
-                (onDeSelectAll)="onDeSelectAll($event)"
-                [disabled]="!editable"
-              >
-                <c-item>
-                  <ng-template let-item="item">
-                    <label> {{ item.name }}</label>
-                  </ng-template>
-                </c-item>
-              </angular2-multiselect>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-4">
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Status</label>
-            <div class="col-sm-10">
-              <p-selectButton
-                [options]="[
-                  {
-                    label: 'aktiv',
-                    value: true
-                  },
-                  {
-                    label: 'gesperrt',
-                    value: false
-                  }
-                ]"
-                name="active"
-                [(ngModel)]="active"
-                [disabled]="!editable"
-              ></p-selectButton>
-            </div>
-          </div>
-        </div>
-      </div>
+      <ng-container *ngIf="group"
+        ><app-group-form
+          [group]="group"
+          [users]="users"
+          [isNew]="isNew"
+          [editable]="editable"
+          [selectedUsers]="selectedUsers"
+          [dropdownSettings]="dropdownSettings"
+          (deselectAll)="onDeselectAll($event)"
+        ></app-group-form
+      ></ng-container>
     </form>
   </p-tabPanel>
 </p-tabView>
