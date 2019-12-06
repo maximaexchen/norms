@@ -45,7 +45,6 @@ export class TagEditComponent implements OnInit, OnDestroy {
   ) {}
 
   public ngOnInit() {
-    console.log('TagEditComponent');
     this.setStartValues();
   }
 
@@ -58,7 +57,6 @@ export class TagEditComponent implements OnInit, OnDestroy {
 
     this.subsink.sink = this.route.params.subscribe(
       results => {
-        // check if we are updating
         if (results['id']) {
           this.editTag(results);
         } else {
@@ -70,12 +68,10 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private resetComponent() {
-    console.log('restComponent');
     this.tag = { _id: uuidv4(), type: 'tag', active: false };
   }
 
   private newTag() {
-    console.log('New mode');
     this.isNew = true;
     this.editable = true;
     this.formTitle = 'Neuen Tag anlegen';
@@ -93,11 +89,9 @@ export class TagEditComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     if (this.tagForm.value.isNew) {
-      console.log('Create a tag');
       this.resetComponent();
       this.onCreateTag();
     } else {
-      console.log('Update a tag');
       this.onUpdateTag();
     }
   }
@@ -111,7 +105,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
       .updateEntry(this.tag, this.tagForm.value._id)
       .subscribe(
         result => {
-          // Query for NormDocuments having the changed publisher
+          // Query for NormDocuments having the changed tags
           const updateQuery = {
             use_index: ['_design/search_norm'],
             selector: {
@@ -125,7 +119,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
             }
           };
 
-          // Update all NormDocuments with the changed publisher
+          // Update all NormDocuments with the changed tags
           this.subsink.sink = this.couchDBService.search(updateQuery).subscribe(
             results => {
               this.updateRelated(results);
@@ -149,15 +143,17 @@ export class TagEditComponent implements OnInit, OnDestroy {
     const bulkUpdateObject = {};
     bulkUpdateObject['docs'] = [];
     related.docs.forEach(norm => {
-      // reasing the new name to the found Norm with tag
+      // reassing the new name to the found Norm with tag
       _.findWhere(norm['tags'], { id: this.tag._id })['name'] = this.tag.name;
       bulkUpdateObject['docs'].push(norm);
     });
 
-    this.couchDBService.bulkUpdate(bulkUpdateObject).subscribe(
-      res => {},
-      error => this.logger.error(error.message)
-    );
+    this.subsink.sink = this.couchDBService
+      .bulkUpdate(bulkUpdateObject)
+      .subscribe(
+        res => {},
+        error => this.logger.error(error.message)
+      );
   }
 
   private onCreateTag(): void {
