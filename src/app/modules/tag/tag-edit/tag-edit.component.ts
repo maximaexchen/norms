@@ -24,14 +24,10 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class TagEditComponent implements OnInit, OnDestroy {
   @ViewChild('tagForm', { static: false }) tagForm: NgForm;
-
   subsink = new SubSink();
-
   editable = false;
-
   formTitle: string;
   isNew = true;
-
   tag: Tag;
 
   constructor(
@@ -69,7 +65,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.isNew = true;
     this.editable = true;
     this.formTitle = 'Neuen Tag anlegen';
-    this.tag = { _id: uuidv4(), type: 'tag', active: false };
+    this.tag = { _id: uuidv4(), name: '', type: 'tag', active: false };
   }
 
   private editTag(results) {

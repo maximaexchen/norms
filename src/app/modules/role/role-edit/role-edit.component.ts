@@ -3,8 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
 import { ConfirmationService } from 'primeng/api';
-import { takeWhile } from 'rxjs/operators';
-
+import { SubSink } from 'SubSink';
 import { NGXLogger } from 'ngx-logger';
 import uuidv4 from '@bundled-es-modules/uuid/v4.js';
 
@@ -20,8 +19,7 @@ import { Role } from '@models/index';
 })
 export class RoleEditComponent implements OnInit, OnDestroy {
   @ViewChild('roleForm', { static: false }) roleForm: NgForm;
-
-  alive = true;
+  subsink = new SubSink();
   editable = false;
 
   formTitle: string;
@@ -59,7 +57,7 @@ export class RoleEditComponent implements OnInit, OnDestroy {
       this.roleForm.form.markAsPristine();
     }
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+    this.subsink.sink = this.route.params.subscribe(
       results => {
         // check if we are updating
         if (results['id']) {
@@ -83,16 +81,13 @@ export class RoleEditComponent implements OnInit, OnDestroy {
   public editRole(id: string) {
     this.isNew = false;
     this.formTitle = 'Rolle bearbeiten';
-    this.couchDBService
-      .fetchEntry('/' + id)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        entry => {
-          this.getRoleData(entry);
-        },
-        error => this.logger.error(error.message),
-        () => console.log('Rolle Observer got a complete notification')
-      );
+    this.subsink.sink = this.couchDBService.fetchEntry('/' + id).subscribe(
+      entry => {
+        this.getRoleData(entry);
+      },
+      error => this.logger.error(error.message),
+      () => console.log('Rolle Observer got a complete notification')
+    );
   }
 
   private getRoleData(entry: any) {
@@ -125,9 +120,8 @@ export class RoleEditComponent implements OnInit, OnDestroy {
   public updateRole() {
     this.createWriteItem();
 
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .updateEntry(this.writeItem, this.roleForm.value._id)
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
           this.router.navigate(['../role']);
@@ -142,9 +136,8 @@ export class RoleEditComponent implements OnInit, OnDestroy {
   public createRole() {
     this.createWriteItem();
 
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .writeEntry(this.writeItem)
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
           this.router.navigate(['../role']);
@@ -158,9 +151,8 @@ export class RoleEditComponent implements OnInit, OnDestroy {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.name + '?',
       accept: () => {
-        this.couchDBService
+        this.subsink.sink = this.couchDBService
           .deleteEntry(this.id, this.rev)
-          .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
               this.sendStateUpdate(this.id, 'delete');
@@ -209,6 +201,6 @@ export class RoleEditComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

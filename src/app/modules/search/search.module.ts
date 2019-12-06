@@ -6,6 +6,7 @@ import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { GeneralModule } from 'src/app/modules/general.module';
 import { SearchRoutingModule } from './search-routing.module';
 import { SearchComponent } from './search.component';
+import { AuthModule } from '../auth/auth.module';
 
 @NgModule({
   declarations: [SearchComponent],
@@ -13,7 +14,8 @@ import { SearchComponent } from './search.component';
     GeneralModule,
     SearchRoutingModule,
     DialogModule,
-    AngularMultiSelectModule
+    AngularMultiSelectModule,
+    AuthModule
   ],
   exports: [SearchComponent]
 })

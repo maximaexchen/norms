@@ -3,10 +3,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ApiService } from '@services/api.service';
 import { Router } from '@angular/router';
 
+import { NGXLogger } from 'ngx-logger';
+
+import { SubSink } from 'SubSink';
+
 import { MessagingService } from './services/messaging.service';
 import { AuthenticationService } from './modules/auth/services/authentication.service';
-import { NGXLogger } from 'ngx-logger';
-import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +16,7 @@ import { takeWhile } from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  alive = true;
+  subsink = new SubSink();
   title = 'Normenverwaltung';
 
   public user: any;
@@ -33,18 +35,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public login(event) {
     if (event.isValidUser) {
-      this.authService.userIsLoggedIn$
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          res => {
-            if (sessionStorage.getItem('role') === 'user') {
-              this.router.navigate(['/start']);
-            } else {
-              this.router.navigate(['/document']);
-            }
-          },
-          error => this.logger.error(error.message)
-        );
+      this.subsink.sink = this.authService.userIsLoggedIn$.subscribe(
+        res => {
+          if (sessionStorage.getItem('role') === 'user') {
+            this.router.navigate(['/start']);
+          } else {
+            this.router.navigate(['/document']);
+          }
+        },
+        error => this.logger.error(error.message)
+      );
     }
   }
 
@@ -54,6 +54,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

@@ -1,19 +1,19 @@
-import { NormDocument } from './../../../models/document.model';
 import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
 import { ConfirmationService } from 'primeng/api';
-import { takeWhile } from 'rxjs/operators';
-
-import { CouchDBService } from '@services/couchDB.service';
-import { NotificationsService } from '@services/notifications.service';
-import { User } from '@models/index';
-import { Roles } from '@app/modules/auth/models/roles.enum';
-import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import _ = require('underscore');
 import { Md5 } from 'ts-md5/dist/md5';
 import { NGXLogger } from 'ngx-logger';
+import { SubSink } from 'SubSink';
+
+import { CouchDBService } from '@services/couchDB.service';
+import { NotificationsService } from '@services/notifications.service';
+import { NormDocument } from './../../../models/document.model';
+import { User } from '@models/index';
+import { Roles } from '@app/modules/auth/models/roles.enum';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 
 @Component({
   selector: 'app-user-edit',
@@ -22,16 +22,15 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class UserEditComponent implements OnInit, OnDestroy {
   @ViewChild('userForm', { static: false }) userForm: NgForm;
-
-  alive = true;
+  subsink = new SubSink();
   editable = false;
 
   currentUserRole: User;
 
   formTitle: string;
-  isNew = true; // 1 = new - 2 = update
+  isNew = true;
 
-  writeItem: User;
+  user: User;
   users: User[] = [];
   role: string;
   selectedRole: string;
@@ -81,7 +80,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
     this.getUser();
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+    this.subsink.sink = this.route.params.subscribe(
       results => {
         // check if we are updating
         if (results['id']) {
@@ -123,9 +122,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.isNew = false;
     this.formTitle = 'User bearbeiten';
 
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .fetchEntry('/' + results['id'])
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         entry => {
           this.id = entry['_id'];
@@ -147,7 +145,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   private getUser() {
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+    this.subsink.sink = this.route.params.subscribe(
       results => {
         // check if we are updating
         if (results['id']) {
@@ -155,9 +153,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
           this.isNew = false;
           this.formTitle = 'User bearbeiten';
 
-          this.couchDBService
+          this.subsink.sink = this.couchDBService
             .fetchEntry('/' + results['id'])
-            .pipe(takeWhile(() => this.alive))
             .subscribe(
               entry => {
                 this.id = entry['_id'];
@@ -200,9 +197,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
   private onUpdateUser(): void {
     this.createWriteItem();
 
-    this.couchDBService
-      .updateEntry(this.writeItem, this.userForm.value._id)
-      .pipe(takeWhile(() => this.alive))
+    this.subsink.sink = this.couchDBService
+      .updateEntry(this.user, this.userForm.value._id)
       .subscribe(
         result => {
           // Inform about Database change.
@@ -244,20 +240,17 @@ export class UserEditComponent implements OnInit, OnDestroy {
     }
 
     // Update all NormDocuments with the changed user
-    this.couchDBService
-      .search(updateQuery)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        results => {
-          this.updateRelated(results);
+    this.subsink.sink = this.couchDBService.search(updateQuery).subscribe(
+      results => {
+        this.updateRelated(results);
 
-          // Inform about Database change.
-          // this.sendStateUpdate();
-          this.router.navigate(['../user']);
-        },
-        error => this.logger.error(error.message),
-        () => {}
-      );
+        // Inform about Database change.
+        // this.sendStateUpdate();
+        this.router.navigate(['../user']);
+      },
+      error => this.logger.error(error.message),
+      () => {}
+    );
   }
 
   private updateRelated(related: any) {
@@ -307,25 +300,21 @@ export class UserEditComponent implements OnInit, OnDestroy {
   private onCreateUser(): void {
     this.createWriteItem();
 
-    this.couchDBService
-      .writeEntry(this.writeItem)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          this.router.navigate(['../user']);
-          this.sendStateUpdate(this.id, 'save');
-        },
-        error => this.logger.error(error.message)
-      );
+    this.subsink.sink = this.couchDBService.writeEntry(this.user).subscribe(
+      result => {
+        this.router.navigate(['../user']);
+        this.sendStateUpdate(this.id, 'save');
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   public onDelete(): void {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.lastName + '?',
       accept: () => {
-        this.couchDBService
+        this.subsink.sink = this.couchDBService
           .deleteEntry(this.id, this.rev)
-          .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
               this.sendStateUpdate(this.id, 'delete');
@@ -342,28 +331,27 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   private createWriteItem() {
-    this.writeItem = {};
-    this.writeItem['type'] = 'user';
-    this.writeItem['externalID'] = this.userForm.value.externalID || '';
-    this.writeItem['userName'] = this.userForm.value.userName || '';
-    this.writeItem['firstName'] = this.userForm.value.firstName || '';
-    this.writeItem['lastName'] = this.userForm.value.lastName || '';
-    this.writeItem['email'] = this.userForm.value.email || '';
-    this.writeItem['password'] =
-      Md5.hashStr(this.userForm.value.password) || '';
-    this.writeItem['role'] = this.userForm.value.selectedRole || '';
-    this.writeItem['active'] = this.userForm.value.active || false;
-    this.writeItem['associatedNorms'] = this.associatedNorms || '';
+    this.user = {};
+    this.user['type'] = 'user';
+    this.user['externalID'] = this.userForm.value.externalID || '';
+    this.user['userName'] = this.userForm.value.userName || '';
+    this.user['firstName'] = this.userForm.value.firstName || '';
+    this.user['lastName'] = this.userForm.value.lastName || '';
+    this.user['email'] = this.userForm.value.email || '';
+    this.user['password'] = Md5.hashStr(this.userForm.value.password) || '';
+    this.user['role'] = this.userForm.value.selectedRole || '';
+    this.user['active'] = this.userForm.value.active || false;
+    this.user['associatedNorms'] = this.associatedNorms || '';
 
     if (this.userForm.value._id) {
-      this.writeItem['_id'] = this.userForm.value._id;
+      this.user['_id'] = this.userForm.value._id;
     }
 
     if (this.userForm.value._id) {
-      this.writeItem['_rev'] = this.userForm.value._rev;
+      this.user['_rev'] = this.userForm.value._rev;
     }
 
-    return this.writeItem;
+    return this.user;
   }
 
   private showConfirm(type: string, result: string) {
@@ -376,15 +364,15 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   private sendStateUpdate(id: string, action: string): void {
     // send message to subscribers via observable subject
-    console.log(id, action, this.writeItem);
-    this.couchDBService.sendStateUpdate('user', id, action, this.writeItem);
-  }
-
-  public ngOnDestroy(): void {
-    this.alive = false;
+    console.log(id, action, this.user);
+    this.couchDBService.sendStateUpdate('user', id, action, this.user);
   }
 
   public onEdit() {
     this.editable = true;
+  }
+
+  public ngOnDestroy(): void {
+    this.subsink.unsubscribe();
   }
 }

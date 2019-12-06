@@ -21,26 +21,26 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class SearchComponent implements OnInit, OnDestroy {
   @ViewChild('searchForm', { static: false }) searchForm: NgForm;
-  private subsink = new SubSink();
-  private foundDocuments: Document[];
-  private newUserArray: any[];
-  private display = false;
-  private modalTitle = '';
-  private modalContent = '';
-  private activeNorms = true;
+  subsink = new SubSink();
+  foundDocuments: Document[];
+  newUserArray: any[];
+  display = false;
+  modalTitle = '';
+  modalContent = '';
+  activeNorms = true;
 
-  private publishers: Publisher[];
-  private publisherId = null;
-  private owners: User[];
-  private ownerId = null;
-  private users: User[];
-  private userId: string;
-  private groups: Group[];
-  private groupId: string;
-  private tags: Tag[] = [];
-  private selectedTags: Tag[] = [];
-  private tagDropdownSettings = {};
-  private tagIds: string[];
+  publishers: Publisher[];
+  publisherId = null;
+  owners: User[];
+  ownerId = null;
+  users: User[];
+  userId: string;
+  groups: Group[];
+  groupId: string;
+  tags: Tag[] = [];
+  selectedTags: Tag[] = [];
+  tagDropdownSettings = {};
+  tagIds: string[];
 
   constructor(
     private route: ActivatedRoute,
@@ -85,11 +85,6 @@ export class SearchComponent implements OnInit, OnDestroy {
       this.subsink.sink = this.documentService.getTags().subscribe(
         tags => {
           this.tags = _.sortBy(tags, 'tagType');
-          /* this.tags = tags.sort((a, b) => {
-            console.log(a.tagType);
-            console.log(b.tagType);
-            return a.tagType.localeCompare(b.tagType);
-          }); */
         },
         error => this.logger.error(error.message)
       );

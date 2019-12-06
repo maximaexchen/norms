@@ -1,15 +1,17 @@
-import { MessagingService } from './../../services/messaging.service';
-import { DocumentService } from './../../services/document.service';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
-import * as _ from 'underscore';
 
+import { Observable } from 'rxjs';
+
+import { NGXLogger } from 'ngx-logger';
+import * as _ from 'underscore';
+import { SubSink } from 'SubSink';
+
+import { MessagingService } from './../../services/messaging.service';
+import { DocumentService } from './../../services/document.service';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from './../../modules/auth/services/authentication.service';
 import { User } from '@app/models';
-import { takeWhile } from 'rxjs/operators';
-import { from, Observable } from 'rxjs';
-import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-start',
@@ -17,7 +19,7 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./start.component.scss']
 })
 export class StartComponent implements OnInit, OnDestroy {
-  alive = true;
+  subsink = new SubSink();
   currentUser: User;
   currentUserId: string;
   userName: string;
@@ -59,7 +61,7 @@ export class StartComponent implements OnInit, OnDestroy {
   }
 
   public setUserData(id: string) {
-    this.couchDBService.fetchEntry('/' + id).subscribe(
+    this.subsink.sink = this.couchDBService.fetchEntry('/' + id).subscribe(
       user => {
         this.currentUser = user;
 
@@ -96,7 +98,7 @@ export class StartComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.couchDBService.search(ownerQuery).subscribe(
+    this.subsink.sink = this.couchDBService.search(ownerQuery).subscribe(
       result => {
         this.ownerData['norms'] = {};
 
@@ -179,51 +181,47 @@ export class StartComponent implements OnInit, OnDestroy {
   }
 
   public inform(normId: string, userId: string) {
-    this.getUpdateNormUser(userId)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        user => {
-          const informUser = user;
+    this.subsink.sink = this.getUpdateNormUser(userId).subscribe(
+      user => {
+        const informUser = user;
 
-          const now = new Date();
-          const isoString = now.toISOString();
+        const now = new Date();
+        const isoString = now.toISOString();
 
-          informUser['associatedNorms'].map(asocN => {
-            if (asocN['normId'] === normId) {
-              asocN['informed'] = true;
-              asocN['informedDate'] = isoString;
+        informUser['associatedNorms'].map(asocN => {
+          if (asocN['normId'] === normId) {
+            asocN['informed'] = true;
+            asocN['informedDate'] = isoString;
+          }
+          return asocN;
+        });
+
+        const messageParams = {};
+        messageParams['userMail'] = informUser['email'];
+        messageParams['normId'] = normId;
+
+        this.subsink.sink = this.messagingService
+          .sendMessage(messageParams)
+          .subscribe(
+            send => {
+              console.log(send);
+            },
+            error => {
+              this.logger.error(error.message);
             }
-            return asocN;
-          });
+          );
 
-          const messageParams = {};
-          messageParams['userMail'] = informUser['email'];
-          messageParams['normId'] = normId;
-
-          this.messagingService
-            .sendMessage(messageParams)
-            .pipe(takeWhile(() => this.alive))
-            .subscribe(
-              send => {
-                console.log(send);
-              },
-              error => {
-                this.logger.error(error.message);
-              }
-            );
-
-          this.couchDBService
-            .writeEntry(informUser)
-            .pipe(takeWhile(() => this.alive))
-            .subscribe(
-              result => {
-                this.setOwnerData();
-              },
-              error => this.logger.error(error.message)
-            );
-        },
-        error => this.logger.error(error.message)
-      );
+        this.subsink.sink = this.couchDBService
+          .writeEntry(informUser)
+          .subscribe(
+            result => {
+              this.setOwnerData();
+            },
+            error => this.logger.error(error.message)
+          );
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   public gotoNorm(id: string) {
@@ -244,9 +242,8 @@ export class StartComponent implements OnInit, OnDestroy {
       return asocN;
     });
 
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .writeEntry(this.currentUser)
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
           this.setUserData(this.currentUserId);
@@ -262,6 +259,6 @@ export class StartComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

@@ -14,13 +14,13 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./tag-list.component.scss']
 })
 export class TagListComponent implements OnInit, OnDestroy {
-  private subsink = new SubSink();
+  subsink = new SubSink();
 
-  private tags: Tag[] = [];
-  private tagsLevel1: Tag[] = [];
-  private tagsLevel2: Tag[] = [];
-  private tagsLevel3: Tag[] = [];
-  private tagCount = 0;
+  tags: Tag[] = [];
+  tagsLevel1: Tag[] = [];
+  tagsLevel2: Tag[] = [];
+  tagsLevel3: Tag[] = [];
+  tagCount = 0;
 
   constructor(
     private couchDBService: CouchDBService,

@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable, Subscriber, of } from 'rxjs';
-import { takeWhile, switchMap, take, map, tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
@@ -11,6 +11,7 @@ import { FileUpload } from 'primeng/fileupload';
 import uuidv4 from '@bundled-es-modules/uuid/v4.js';
 import * as _ from 'underscore';
 import { NGXLogger } from 'ngx-logger';
+import { SubSink } from 'SubSink';
 
 import { NormDocument } from './../../../models/document.model';
 import { AuthenticationService } from './../../auth/services/authentication.service';
@@ -33,8 +34,8 @@ import { NgxSpinnerService } from 'ngx-spinner';
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
   @ViewChild('fileUploadInput', { static: true }) fileUploadInput: FileUpload;
+  subsink = new SubSink();
   currentUserRole: User;
-  alive = true;
   isLoading = false;
   editable = false;
   deletable = false;
@@ -122,7 +123,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private setStartValues() {
     console.log('setStartValues');
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+    this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
         this.currentUserRole = this.authService.getUserRole();
 
@@ -222,59 +223,52 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.normForm.form.markAsPristine();
 
     // First save to get a document id for the attachment path and name
-    this.couchDBService
-      .writeEntry(this.normDoc)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          if (this.fileUpload) {
-            this.uploadPDF()
-              .pipe(takeWhile(() => this.alive))
-              .subscribe(
-                res => {},
-                error => {
-                  this.logger.error(error.message);
-                  this.spinner.hide();
-                  this.showConfirmation('error', error.message);
-                },
-                () => {
-                  this.router.navigate(['../document/' + this._id + '/edit']);
-                  this.spinner.hide();
-                  this.showConfirmation('success', 'Upload erfolgreich');
-                }
-              );
-          }
-          this.router.navigate(['../document/' + this._id + '/edit']);
-          this.isLoading = false;
-          this.spinner.hide();
-          this.sendStateUpdate(this._id, 'save');
-        },
-        error => {
-          this.logger.error(error.message);
-          this.isLoading = false;
-          this.spinner.hide();
-        },
-        () => {}
-      );
+    this.subsink.sink = this.couchDBService.writeEntry(this.normDoc).subscribe(
+      result => {
+        if (this.fileUpload) {
+          this.subsink.sink = this.uploadPDF().subscribe(
+            res => {},
+            error => {
+              this.logger.error(error.message);
+              this.spinner.hide();
+              this.showConfirmation('error', error.message);
+            },
+            () => {
+              this.router.navigate(['../document/' + this._id + '/edit']);
+              this.spinner.hide();
+              this.showConfirmation('success', 'Upload erfolgreich');
+            }
+          );
+        }
+        this.router.navigate(['../document/' + this._id + '/edit']);
+        this.isLoading = false;
+        this.spinner.hide();
+        this.sendStateUpdate(this._id, 'save');
+      },
+      error => {
+        this.logger.error(error.message);
+        this.isLoading = false;
+        this.spinner.hide();
+      },
+      () => {}
+    );
   }
 
   private updateDocument(): void {
     this.processFormData();
 
     if (this.fileUpload) {
-      this.uploadPDF()
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          result => {},
-          error => {
-            this.logger.error(error.message);
-            this.spinner.hide();
-            this.showConfirmation('error', error.message);
-          },
-          () => {
-            this.writeUpdate();
-          }
-        );
+      this.subsink.sink = this.uploadPDF().subscribe(
+        result => {},
+        error => {
+          this.logger.error(error.message);
+          this.spinner.hide();
+          this.showConfirmation('error', error.message);
+        },
+        () => {
+          this.writeUpdate();
+        }
+      );
     } else {
       this.writeUpdate();
     }
@@ -286,9 +280,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .fetchEntry('/' + selectedNorm['id'])
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         normDoc => {
           this.normDoc = normDoc;
@@ -304,9 +297,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private writeUpdate() {
     console.log('writeUpdate');
     this.isLoading = true;
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .updateEntry(this.normDoc, this.normForm.value._id)
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         results => {
           console.log('writeUpdate', results);
@@ -476,9 +468,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normDoc.normNumber + '?',
       accept: () => {
-        this.couchDBService
+        this.subsink.sink = this.couchDBService
           .deleteEntry(this.normDoc._id, this.normDoc._rev)
-          .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
               this.deleteRelatedDBEntries(this.normDoc._id);
@@ -533,34 +524,32 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public processUpload(uploadField) {
-    this.convertToBase64(this.fileUpload)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          this.newAttachmentName =
-            this.normDoc._id +
-            '_' +
-            this.documentService.removeSpecialChars(this.normDoc.revision) +
-            '.' +
-            this.fileUpload.name.split('.').pop();
-          this.attachment = {
-            [this.newAttachmentName]: {
-              data: result,
-              content_type: 'application/pdf'
-            }
-          };
-        },
-        error => {
-          this.logger.error(error.message);
-          this.isLoading = false;
-          this.spinner.hide();
-        },
-        () => {
-          this.isLoading = false;
-          this.spinner.hide();
-          this.showConfirmation('success', 'Files added');
-        }
-      );
+    this.subsink.sink = this.convertToBase64(this.fileUpload).subscribe(
+      result => {
+        this.newAttachmentName =
+          this.normDoc._id +
+          '_' +
+          this.documentService.removeSpecialChars(this.normDoc.revision) +
+          '.' +
+          this.fileUpload.name.split('.').pop();
+        this.attachment = {
+          [this.newAttachmentName]: {
+            data: result,
+            content_type: 'application/pdf'
+          }
+        };
+      },
+      error => {
+        this.logger.error(error.message);
+        this.isLoading = false;
+        this.spinner.hide();
+      },
+      () => {
+        this.isLoading = false;
+        this.spinner.hide();
+        this.showConfirmation('success', 'Files added');
+      }
+    );
   }
 
   private checkForExistingAttachment(obj, searchKey): boolean {
@@ -645,9 +634,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.tagsLevel1 = [];
     this.tagsLevel2 = [];
     this.tagsLevel3 = [];
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         results => {
           results.forEach(tag => {
@@ -685,9 +673,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    */
   private setUserNotification(revision: string) {
     this.selectedUsers.forEach(user => {
-      this.couchDBService
+      this.subsink.sink = this.couchDBService
         .fetchEntry('/' + user['id'])
-        .pipe(takeWhile(() => this.alive))
         .subscribe(
           entry => {
             let associatedNorms = [];
@@ -736,9 +723,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               associatedNorms
             };
 
-            this.couchDBService
+            this.subsink.sink = this.couchDBService
               .writeEntry(updateUser)
-              .pipe(takeWhile(() => this.alive))
               .subscribe(
                 result => {
                   // this.sendStateUpdate();
@@ -796,9 +782,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           normId => normId !== id
         );
 
-        this.couchDBService
+        this.subsink.sink = this.couchDBService
           .updateEntry(foundNorm, foundNorm._id)
-          .pipe(takeWhile(() => this.alive))
           .subscribe(
             result => {},
             error => {
@@ -840,9 +825,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           norm => norm.normId !== id
         );
 
-        this.couchDBService
+        this.subsink.sink = this.couchDBService
           .updateEntry(foundUser, foundUser._id)
-          .pipe(takeWhile(() => this.alive))
           .subscribe(
             result => {
               console.log(user);
@@ -1097,6 +1081,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

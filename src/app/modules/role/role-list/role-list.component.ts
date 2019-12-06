@@ -1,13 +1,11 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Subscription } from 'rxjs';
+import { NGXLogger } from 'ngx-logger';
+import { SubSink } from 'SubSink';
 
 import { CouchDBService } from '@app/services/couchDB.service';
-import { DocumentService } from 'src/app//services/document.service';
 import { Role } from '@app/modules/auth/models/role.model';
-import { takeWhile } from 'rxjs/operators';
-import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-role-list',
@@ -16,8 +14,7 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class RoleListComponent implements OnInit, OnDestroy {
   @ViewChild('dataTable', { static: false }) dataTable: any;
-  alive = true;
-
+  subsink = new SubSink();
   roles: Role[] = [];
   selectedRole: Role;
   roleCount = 0;
@@ -29,18 +26,15 @@ export class RoleListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.couchDBService
-      .setStateUpdate()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        message => {
-          console.log(message);
-          if (message.model === 'role') {
-            this.updateList(message);
-          }
-        },
-        error => this.logger.error(error.message)
-      );
+    this.subsink.sink = this.couchDBService.setStateUpdate().subscribe(
+      message => {
+        console.log(message);
+        if (message.model === 'role') {
+          this.updateList(message);
+        }
+      },
+      error => this.logger.error(error.message)
+    );
 
     this.getRoles();
   }
@@ -74,16 +68,13 @@ export class RoleListComponent implements OnInit, OnDestroy {
   }
 
   private getRoles() {
-    this.couchDBService
-      .getRoles()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        res => {
-          this.roles = res;
-          this.roleCount = this.roles.length;
-        },
-        error => this.logger.error(error.message)
-      );
+    this.subsink.sink = this.couchDBService.getRoles().subscribe(
+      res => {
+        this.roles = res;
+        this.roleCount = this.roles.length;
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   public onRowSelect(event) {
@@ -100,6 +91,6 @@ export class RoleListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Observable } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
+import { SubSink } from 'SubSink';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
@@ -15,7 +15,7 @@ import { Group } from '../../../models/group.model';
 })
 export class GroupListComponent implements OnInit, OnDestroy {
   @ViewChild('dataTable', { static: false }) dataTable: any;
-  alive = true;
+  subsink = new SubSink();
   groups$: Observable<Group[]>;
 
   constructor(
@@ -25,15 +25,12 @@ export class GroupListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.couchDBService
-      .setStateUpdate()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        message => {
-          this.getGroups();
-        },
-        error => console.log(error.message)
-      );
+    this.subsink.sink = this.couchDBService.setStateUpdate().subscribe(
+      message => {
+        this.getGroups();
+      },
+      error => console.log(error.message)
+    );
 
     this.getGroups();
   }
@@ -47,6 +44,6 @@ export class GroupListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

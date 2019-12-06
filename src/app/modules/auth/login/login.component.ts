@@ -1,4 +1,3 @@
-import { AuthenticationService } from '@modules/auth/services/authentication.service';
 import {
   Component,
   OnInit,
@@ -6,7 +5,8 @@ import {
   Output,
   OnDestroy
 } from '@angular/core';
-import { takeWhile } from 'rxjs/operators';
+import { AuthenticationService } from '@modules/auth/services/authentication.service';
+import { SubSink } from 'SubSink';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -16,11 +16,11 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class LoginComponent implements OnInit, OnDestroy {
   @Output() loginEvent = new EventEmitter();
-  alive = true;
-  public display = true;
-  public headerMsg = '';
-  public userName = '';
-  public passWord = '';
+  subsink = new SubSink();
+  display = true;
+  headerMsg = '';
+  userName = '';
+  passWord = '';
 
   constructor(
     private authService: AuthenticationService,
@@ -30,9 +30,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   public login() {
-    this.authService
+    this.subsink.sink = this.authService
       .login(this.userName, this.passWord)
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
           this.display = !result;
@@ -53,6 +52,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

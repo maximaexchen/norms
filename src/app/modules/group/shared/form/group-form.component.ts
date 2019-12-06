@@ -27,7 +27,7 @@ export class GroupFormComponent {
   @Input() selectedUsers: string[];
   @Input() dropdownSettings: any;
 
-  @Output() deSelectAll = new EventEmitter();
+  // @Output() deSelectAll = new EventEmitter();
 
   constructor(private eventbus: EventBusService) {}
 

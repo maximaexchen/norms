@@ -31,12 +31,12 @@
         >Benutzer</label
       >
       <div class="col-sm-10">
+        <!-- (OnDeSelectAll)="deSelectAll($event)" -->
         <angular2-multiselect
           name="users"
           [data]="users"
           [(ngModel)]="selectedUsers"
           [settings]="dropdownSettings"
-          (OnDeSelectAll)="deSelectAll($event)"
           [disabled]="!editable"
           (ngModelChange)="selectedChange($event)"
         >
