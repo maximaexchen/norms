@@ -6,6 +6,8 @@ import { takeWhile } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 
+import { SubSink } from 'SubSink';
+
 import uuidv4 from '@bundled-es-modules/uuid/v4.js';
 
 import { Tag } from '@app/models/tag.model';
@@ -23,21 +25,14 @@ import { NGXLogger } from 'ngx-logger';
 export class TagEditComponent implements OnInit, OnDestroy {
   @ViewChild('tagForm', { static: false }) tagForm: NgForm;
 
-  alive = true;
+  subsink = new SubSink();
+
   editable = false;
 
   formTitle: string;
-  isNew = true; // 1 = new - 0 = update
+  isNew = true;
 
   tag: Tag;
-  tags: Tag[] = [];
-
-  id: string;
-  rev: string;
-  type: string;
-  name: string;
-  tagType = 'level1';
-  active = 0;
 
   constructor(
     private couchDBService: CouchDBService,
@@ -61,7 +56,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
       this.tagForm.form.markAsPristine();
     }
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(
+    this.subsink.sink = this.route.params.subscribe(
       results => {
         // check if we are updating
         if (results['id']) {
@@ -76,8 +71,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
 
   private resetComponent() {
     console.log('restComponent');
-    this.editable = false;
-    this.tag = { _id: this.id, type: 'tag' };
+    this.tag = { _id: uuidv4(), type: 'tag', active: false };
   }
 
   private newTag() {
@@ -85,9 +79,6 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.isNew = true;
     this.editable = true;
     this.formTitle = 'Neuen Tag anlegen';
-    this.tags = [];
-    this.id = uuidv4();
-    this.tag = { _id: this.id, type: 'tag' };
   }
 
   private editTag(results) {
@@ -95,11 +86,9 @@ export class TagEditComponent implements OnInit, OnDestroy {
     this.isNew = false;
     this.formTitle = 'Tag bearbeiten';
 
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .fetchEntry('/' + results['id'])
-      .pipe(takeWhile(() => this.alive))
-      .toPromise()
-      .then(tag => (this.tag = tag));
+      .subscribe(tag => (this.tag = tag));
   }
 
   public onSubmit(): void {
@@ -114,14 +103,12 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   public onEdit() {
-    console.log(this.editable);
     this.editable = true;
   }
 
   private onUpdateTag(): void {
-    this.couchDBService
+    this.subsink.sink = this.couchDBService
       .updateEntry(this.tag, this.tagForm.value._id)
-      .pipe(takeWhile(() => this.alive))
       .subscribe(
         result => {
           // Query for NormDocuments having the changed publisher
@@ -139,20 +126,17 @@ export class TagEditComponent implements OnInit, OnDestroy {
           };
 
           // Update all NormDocuments with the changed publisher
-          this.couchDBService
-            .search(updateQuery)
-            .pipe(takeWhile(() => this.alive))
-            .subscribe(
-              results => {
-                this.updateRelated(results);
+          this.subsink.sink = this.couchDBService.search(updateQuery).subscribe(
+            results => {
+              this.updateRelated(results);
 
-                // Inform about Database change.
-                this.sendStateUpdate('update');
-                this.router.navigate(['../tag']);
-              },
-              error => this.logger.error(error.message),
-              () => {}
-            );
+              // Inform about Database change.
+              this.sendStateUpdate('update');
+              this.router.navigate(['../tag']);
+            },
+            error => this.logger.error(error.message),
+            () => {}
+          );
         },
         error => {
           this.logger.error(error.message);
@@ -177,29 +161,21 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private onCreateTag(): void {
-    console.log('this.tag');
-    console.log(this.tag);
-    // this.createWriteItem();
-
-    this.couchDBService
-      .writeEntry(this.tag)
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          this.router.navigate(['../tag']);
-          this.sendStateUpdate('save');
-        },
-        error => this.logger.error(error.message)
-      );
+    this.subsink.sink = this.couchDBService.writeEntry(this.tag).subscribe(
+      result => {
+        this.router.navigate(['../tag']);
+        this.sendStateUpdate('save');
+      },
+      error => this.logger.error(error.message)
+    );
   }
 
   public onDelete(): void {
     this.confirmationService.confirm({
-      message: 'Sie wollen den Datensatz ' + this.name + '?',
+      message: 'Sie wollen den Datensatz ' + this.tag.name + '?',
       accept: () => {
-        this.couchDBService
+        this.subsink.sink = this.couchDBService
           .deleteEntry(this.tag._id, this.tag._rev)
-          .pipe(takeWhile(() => this.alive))
           .subscribe(
             res => {
               this.sendStateUpdate('delete');
@@ -228,6 +204,6 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

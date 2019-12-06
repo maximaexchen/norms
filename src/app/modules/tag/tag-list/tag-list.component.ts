@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { takeWhile } from 'rxjs/operators';
+import { SubSink } from 'SubSink';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
@@ -14,7 +14,7 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./tag-list.component.scss']
 })
 export class TagListComponent implements OnInit, OnDestroy {
-  alive = true;
+  subsink = new SubSink();
 
   tags: Tag[] = [];
   tagsLevel1: Tag[] = [];
@@ -30,18 +30,16 @@ export class TagListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.couchDBService
-      .setStateUpdate()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        message => {
-          if (message.text === 'tag') {
-            this.getTags();
-          }
-        },
-        error => this.logger.error(error.message),
-        () => console.log('completed.')
-      );
+    this.subsink.sink = this.couchDBService.setStateUpdate().subscribe(
+      message => {
+        console.log(message);
+        if (message.model === 'tag') {
+          this.getTags();
+        }
+      },
+      error => this.logger.error(error.message),
+      () => console.log('completed.')
+    );
 
     this.getTags();
   }
@@ -51,43 +49,40 @@ export class TagListComponent implements OnInit, OnDestroy {
   }
 
   private getTags() {
-    this.documentService
-      .getTags()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        res => {
-          this.tags = [];
-          this.tagsLevel1 = [];
-          this.tagsLevel2 = [];
-          this.tagsLevel3 = [];
+    this.subsink.sink = this.documentService.getTags().subscribe(
+      res => {
+        this.tags = [];
+        this.tagsLevel1 = [];
+        this.tagsLevel2 = [];
+        this.tagsLevel3 = [];
 
-          this.tags = res;
-          this.tagCount = this.tags.length;
+        this.tags = res;
+        this.tagCount = this.tags.length;
 
-          for (const tag of this.tags) {
-            switch (tag['tagType']) {
-              case 'level1': {
-                this.tagsLevel1.push(tag);
-                break;
-              }
-              case 'level2': {
-                this.tagsLevel2.push(tag);
-                break;
-              }
-              case 'level3': {
-                this.tagsLevel3.push(tag);
-                break;
-              }
-              default: {
-                break;
-              }
+        for (const tag of this.tags) {
+          switch (tag['tagType']) {
+            case 'level1': {
+              this.tagsLevel1.push(tag);
+              break;
+            }
+            case 'level2': {
+              this.tagsLevel2.push(tag);
+              break;
+            }
+            case 'level3': {
+              this.tagsLevel3.push(tag);
+              break;
+            }
+            default: {
+              break;
             }
           }
-        },
-        error => {
-          this.logger.error(error.message);
         }
-      );
+      },
+      error => {
+        this.logger.error(error.message);
+      }
+    );
   }
 
   public showDetail(id: string) {
@@ -95,6 +90,6 @@ export class TagListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

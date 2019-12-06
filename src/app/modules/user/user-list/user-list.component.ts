@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { SubSink } from 'SubSink';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { User } from '../../../models/user.model';
-import { takeWhile } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
 @Component({
@@ -14,7 +14,7 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class UserListComponent implements OnInit, OnDestroy {
   @ViewChild('dataTable', { static: false }) dataTable: any;
-  alive = true;
+  subsink = new SubSink();
 
   users: User[] = [];
   selectedUser: User;
@@ -28,19 +28,16 @@ export class UserListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.couchDBService
-      .setStateUpdate()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        message => {
-          console.log(message);
-          if (message.model === 'user') {
-            this.updateList(message);
-          }
-        },
-        error => this.logger.error(error.message),
-        () => console.log('completed.')
-      );
+    this.subsink.sink = this.couchDBService.setStateUpdate().subscribe(
+      message => {
+        console.log(message);
+        if (message.model === 'user') {
+          this.updateList(message);
+        }
+      },
+      error => this.logger.error(error.message),
+      () => console.log('completed.')
+    );
 
     this.getUsers();
   }
@@ -98,6 +95,6 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }
