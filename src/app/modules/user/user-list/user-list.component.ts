@@ -6,7 +6,6 @@ import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { User } from '../../../models/user.model';
 import { NGXLogger } from 'ngx-logger';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-user-list',
@@ -18,7 +17,6 @@ export class UserListComponent implements OnInit, OnDestroy {
   subsink = new SubSink();
 
   users: User[] = [];
-  users$: Observable<User[]>;
   selectedUser: User;
   userCount = 0;
 
@@ -42,13 +40,6 @@ export class UserListComponent implements OnInit, OnDestroy {
     );
 
     this.getUsers();
-  }
-
-  private getUsers(): void {
-    this.documentService.getUsers().then(users => {
-      this.users = users;
-      this.userCount = this.users.length;
-    });
   }
 
   private updateList(changedInfo: any) {
@@ -82,6 +73,13 @@ export class UserListComponent implements OnInit, OnDestroy {
     if (this.dataTable.hasFilter()) {
       this.dataTable.filter();
     }
+  }
+
+  private getUsers(): void {
+    this.documentService.getUsers().then(users => {
+      this.users = users;
+      this.userCount = this.users.length;
+    });
   }
 
   public onRowSelect(event) {
