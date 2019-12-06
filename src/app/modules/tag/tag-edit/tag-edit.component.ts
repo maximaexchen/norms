@@ -49,8 +49,6 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private setStartValues() {
-    this.resetComponent();
-
     if (this.tagForm) {
       this.tagForm.form.markAsPristine();
     }
@@ -67,18 +65,14 @@ export class TagEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private resetComponent() {
-    this.tag = { _id: uuidv4(), type: 'tag', active: false };
-  }
-
   private newTag() {
     this.isNew = true;
     this.editable = true;
     this.formTitle = 'Neuen Tag anlegen';
+    this.tag = { _id: uuidv4(), type: 'tag', active: false };
   }
 
   private editTag(results) {
-    this.resetComponent();
     this.isNew = false;
     this.formTitle = 'Tag bearbeiten';
 
@@ -89,7 +83,6 @@ export class TagEditComponent implements OnInit, OnDestroy {
 
   public onSubmit(): void {
     if (this.tagForm.value.isNew) {
-      this.resetComponent();
       this.onCreateTag();
     } else {
       this.onUpdateTag();

@@ -1,13 +1,15 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { NormDocument } from '@app/models';
 import { EnvService } from './env.service';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { CouchDBService } from './couchDB.service';
 import { NGXLogger } from 'ngx-logger';
+import { SubSink } from 'SubSink';
 
 @Injectable({ providedIn: 'root' })
-export class SearchService {
+export class SearchService implements OnDestroy {
+  private subsink = new SubSink();
   private baseUrl = this.env.dbBaseUrl;
   private dbName = this.env.dbName;
   public dbRequest = this.baseUrl + this.dbName;
@@ -26,15 +28,17 @@ export class SearchService {
   public search(searchObject?: any) {
     if (searchObject) {
       console.log('search');
-      this.http.post(this.dbRequest + '/_find', searchObject).subscribe(
-        result => {
-          this.searchResult.next(result['docs']);
-        },
-        error => this.logger.error(error.message)
-      );
+      this.subsink.sink = this.http
+        .post(this.dbRequest + '/_find', searchObject)
+        .subscribe(
+          result => {
+            this.searchResult.next(result['docs']);
+          },
+          error => this.logger.error(error.message)
+        );
     } else {
       console.log('all');
-      this.couchDBService
+      this.subsink.sink = this.couchDBService
         .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
         .subscribe(
           result => {
@@ -43,5 +47,9 @@ export class SearchService {
           error => this.logger.error(error.message)
         );
     }
+  }
+
+  ngOnDestroy() {
+    this.subsink.unsubscribe();
   }
 }

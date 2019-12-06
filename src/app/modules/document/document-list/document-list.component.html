@@ -44,32 +44,41 @@
         style="width:auto"
       />
     </div>
-    <div *ngIf="!filterInputCheck" class="alert alert-danger" role="alert">
+    <div
+      *ngIf="!filterInputCheck"
+      class="alert alert-danger"
+      role="alert"
+      i18n="@@string-ascii-warning"
+    >
       Erlaubt ASCII_Zeichen von 32 bis 126
     </div>
   </ng-template>
   <ng-template pTemplate="header">
     <tr>
       <th [pSortableColumn]="'normNumber'" width="120">
-        Nummer<p-sortIcon [field]="'normNumber'"></p-sortIcon>
+        <span i18n="@@string-headline-number">Nummer</span
+        ><p-sortIcon [field]="'normNumber'"></p-sortIcon>
       </th>
       <th [pSortableColumn]="'revision'" width="90">
-        Revision<p-sortIcon [field]="'revision'"></p-sortIcon>
+        <span i18n="@@string-headline-revision">Revision</span
+        ><p-sortIcon [field]="'revision'"></p-sortIcon>
       </th>
       <th [pSortableColumn]="'publisher'" width="110">
-        Herausgeber
+        <span i18n="@@string-headline-publisher">Herausgeber</span>
         <p-sortIcon [field]="'publisher'"></p-sortIcon>
       </th>
-      <th>Beschreibung</th>
+      <th><span i18n="@@string-headline-description">Beschreibung</span></th>
 
       <th [pSortableColumn]="'revisionDate'" width="110">
-        Rev-Datum<p-sortIcon [field]="'revisionDate'"></p-sortIcon>
+        <span i18n="@@string-headline-revisionDate">Rev-Datum</span
+        ><p-sortIcon [field]="'revisionDate'"></p-sortIcon>
       </th>
       <th [pSortableColumn]="'document.owner.lastName'">
-        Owner<p-sortIcon [field]="'owner'"></p-sortIcon>
+        <span i18n="@@string-headline-owner">Owner</span
+        ><p-sortIcon [field]="'owner'"></p-sortIcon>
       </th>
       <th width="40">
-        Aktiv
+        <span i18n="@@string-headline-active">Aktiv</span>
       </th>
     </tr>
   </ng-template>

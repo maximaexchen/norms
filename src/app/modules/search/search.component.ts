@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NgForm } from '@angular/forms';
 
 import * as _ from 'underscore';
+import { SubSink } from 'SubSink';
 
 import { DocumentService } from '../../services/document.service';
 import { Group } from '@app/models/group.model';
@@ -20,27 +21,26 @@ import { NGXLogger } from 'ngx-logger';
 })
 export class SearchComponent implements OnInit, OnDestroy {
   @ViewChild('searchForm', { static: false }) searchForm: NgForm;
+  private subsink = new SubSink();
+  private foundDocuments: Document[];
+  private newUserArray: any[];
+  private display = false;
+  private modalTitle = '';
+  private modalContent = '';
+  private activeNorms = true;
 
-  alive = true;
-  foundDocuments: Document[];
-  newUserArray: any[];
-  display = false;
-  modalTitle = '';
-  modalContent = '';
-  activeNorms = true;
-
-  publishers: Publisher[];
-  publisherId = null;
-  owners: User[];
-  ownerId = null;
-  users: User[];
-  userId: string;
-  groups: Group[];
-  groupId: string;
-  tags: Tag[] = [];
-  selectedTags: Tag[] = [];
-  tagDropdownSettings = {};
-  tagIds: string[];
+  private publishers: Publisher[];
+  private publisherId = null;
+  private owners: User[];
+  private ownerId = null;
+  private users: User[];
+  private userId: string;
+  private groups: Group[];
+  private groupId: string;
+  private tags: Tag[] = [];
+  private selectedTags: Tag[] = [];
+  private tagDropdownSettings = {};
+  private tagIds: string[];
 
   constructor(
     private route: ActivatedRoute,
@@ -67,36 +67,32 @@ export class SearchComponent implements OnInit, OnDestroy {
       groupBy: 'tagType'
     };
 
-    this.route.params.pipe(takeWhile(() => this.alive)).subscribe(results => {
-      this.documentService
-        .getGroups()
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          res => {
-            this.groups = res;
-          },
-          error => this.logger.error(error.message)
-        );
+    this.subsink.sink = this.route.params.subscribe(results => {
+      this.subsink.sink = this.documentService.getGroups().subscribe(
+        res => {
+          this.groups = res;
+        },
+        error => this.logger.error(error.message)
+      );
 
-      this.documentService
-        .getPublishers()
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          res => {
-            this.publishers = res;
-          },
-          error => this.logger.error(error.message)
-        );
+      this.subsink.sink = this.documentService.getPublishers().subscribe(
+        res => {
+          this.publishers = res;
+        },
+        error => this.logger.error(error.message)
+      );
 
-      this.documentService
-        .getTags()
-        .pipe(takeWhile(() => this.alive))
-        .subscribe(
-          res => {
-            this.tags = res;
-          },
-          error => this.logger.error(error.message)
-        );
+      this.subsink.sink = this.documentService.getTags().subscribe(
+        tags => {
+          this.tags = _.sortBy(tags, 'tagType');
+          /* this.tags = tags.sort((a, b) => {
+            console.log(a.tagType);
+            console.log(b.tagType);
+            return a.tagType.localeCompare(b.tagType);
+          }); */
+        },
+        error => this.logger.error(error.message)
+      );
 
       this.documentService.getUsers().then(users => {
         this.owners = users;
@@ -258,6 +254,6 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }

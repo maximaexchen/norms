@@ -7,7 +7,9 @@ import {
   ViewChild
 } from '@angular/core';
 
-import { Subscription, Observable } from 'rxjs';
+import { Subscription } from 'rxjs';
+
+import { SubSink } from 'SubSink';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
@@ -29,60 +31,97 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   @ViewChild('dataTable', { static: false }) dataTable: any;
   @Output() openSideBar: EventEmitter<any> = new EventEmitter();
   @Output() closeSideBar: EventEmitter<any> = new EventEmitter();
-  alive = true;
+  subsink = new SubSink();
   visible = true;
   filterInputCheck = true;
-
-  docs: Array<NormDocument> = [];
-
   documents: NormDocument[] = [];
-  documentCount = 0;
   selectedDocument: NormDocument;
-
-  descriptionDE: string;
-
+  documentCount = 0;
+  currentUserId: string;
   messages: any[] = [];
   changeSubscription: Subscription;
-
   uploadRoot: string = this.env.uploadRoot;
 
   constructor(
+    private router: Router,
     private env: EnvService,
+    private authService: AuthenticationService,
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
     private searchService: SearchService,
-    private router: Router,
-    private authService: AuthenticationService,
     private logger: NGXLogger
-  ) {
-    this.searchService.searchResultData.subscribe(
+  ) {}
+
+  ngOnInit() {
+    this.setup();
+  }
+
+  private setup() {
+    this.addSearchListener();
+
+    this.subsink.sink = this.couchDBService.setStateUpdate().subscribe(
+      message => {
+        if (message.model === 'document') {
+          this.updateList(message);
+        }
+      },
+      error => this.logger.error(error.message)
+    );
+    this.getDocuments();
+  }
+
+  private addSearchListener() {
+    this.subsink.sink = this.searchService.searchResultData.subscribe(
       result => {
-        this.documents = result;
-        this.setPublisherFromTags();
-        this.documentCount = this.documents.length;
+        this.initDocumentList(result);
       },
       error => this.logger.error(error.message)
     );
   }
 
-  ngOnInit() {
-    this.couchDBService
-      .setStateUpdate()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        message => {
-          if (message.model === 'document') {
-            this.updateList(message);
+  private initDocumentList(result: any) {
+    this.currentUserId = this.authService.getCurrentUserID();
+    this.documents = result;
+    this.documentCount = this.documents.length;
+    this.filterDocumentList();
+    this.setPublisherFromTags();
+  }
+
+  private getDocuments() {
+    this.subsink.sink = this.couchDBService.findDocuments().subscribe(
+      result => {
+        this.initDocumentList(result);
+      },
+      error => {
+        this.logger.error(error.message);
+      },
+      () => {}
+    );
+  }
+
+  private filterDocumentList() {
+    // Filter the documents by given owner or user
+    switch (this.authService.getUserRole()) {
+      case 'owner':
+        this.documents = this.documents.filter(obj => {
+          if (!!obj['owner']) {
+            return obj['owner']['_id'] === this.currentUserId;
           }
-        },
-        error => this.logger.error(error.message)
-      );
-    this.getDocuments();
+        });
+        break;
+      case 'user':
+        this.documents = this.documents.filter(obj => {
+          console.log(obj);
+          return _.find(obj['users'], id => {
+            return String(id) === this.currentUserId && obj['active'] === true;
+          });
+        });
+
+        break;
+    }
   }
 
   private updateList(changedInfo: any) {
-    console.log(changedInfo);
-
     const updateItem = this.documents.find(
       item => item['_id'] === changedInfo.id
     );
@@ -110,49 +149,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     if (this.dataTable.hasFilter()) {
       this.dataTable.filter();
     }
-  }
-
-  private getDocuments() {
-    this.couchDBService
-      .findDocuments()
-      .pipe(takeWhile(() => this.alive))
-      .subscribe(
-        result => {
-          this.documents = result;
-          this.documentCount = this.documents.length;
-          this.setPublisherFromTags();
-          const userId = this.authService.getCurrentUserID();
-
-          // Filter the documents by given owner or user
-          switch (this.authService.getUserRole()) {
-            case 'owner':
-              this.documents = this.documents.filter(obj => {
-                if (!!obj['owner']) {
-                  return obj['owner']['_id'] === userId;
-                }
-              });
-              break;
-            case 'user':
-              this.documents = this.documents.filter(obj => {
-                return _.find(obj['users'], id => {
-                  return String(id) === userId;
-                });
-              });
-
-              /* this.documents = _.filter(this.documents, obj => {
-                return _.find(obj['users'], id => {
-                  return String(id) === userId;
-                });
-              }); */
-
-              break;
-          }
-        },
-        error => {
-          this.logger.error(error.message);
-        },
-        () => {}
-      );
   }
 
   private setPublisherFromTags() {
@@ -203,6 +199,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.alive = false;
+    this.subsink.unsubscribe();
   }
 }
