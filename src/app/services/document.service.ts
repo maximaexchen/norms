@@ -21,8 +21,8 @@ export class DocumentService {
   updateSubscription = new Subscription();
 
   publishers: Publisher = [];
-  owners: User = [];
-  users: User = [];
+  owners: User[] = [];
+  users: User[] = [];
   selectedtUsers: User[] = [];
   groups: Group[] = [];
 

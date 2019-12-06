@@ -48,7 +48,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   groupWithUsers$: any;
   users: User[] = [];
   users$: Promise<User[]>;
-  selectedUsers: User[] = [];
+  selectedUsers: any[] = [];
   dropdownSettings = {};
 
   constructor(

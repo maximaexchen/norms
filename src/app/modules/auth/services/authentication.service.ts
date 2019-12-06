@@ -171,7 +171,7 @@ export class AuthenticationService {
     return !this.jwtHelper.isTokenExpired(token);
   }
 
-  public get currentUserValue(): User {
+  public get currentUserValue(): string {
     return this.currentTokenSubject.value;
   }
 }

@@ -25,7 +25,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   subsink = new SubSink();
   editable = false;
 
-  currentUserRole: User;
+  currentUserRole: string;
 
   formTitle: string;
   isNew = true;
@@ -46,8 +46,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
   lastName: string;
   email: string;
   password: string;
-  associatedNorms: [];
-  active = 0;
+  associatedNorms: any[];
+  active = false;
 
   constructor(
     private couchDBService: CouchDBService,
@@ -288,11 +288,11 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   private updateRelatedOwner(norm: NormDocument): NormDocument {
-    norm['owner']['firstName'] = this.firstName;
-    norm['owner']['lastName'] = this.lastName;
-    norm['owner']['email'] = this.email;
-    norm['owner']['externalID'] = this.externalID;
-    norm['owner']['active'] = this.active;
+    norm.owner.firstName = this.firstName;
+    norm.owner.lastName = this.lastName;
+    norm.owner.email = this.email;
+    norm.owner.externalID = this.externalID;
+    norm.owner.active = this.active;
 
     return norm;
   }
@@ -331,17 +331,19 @@ export class UserEditComponent implements OnInit, OnDestroy {
   }
 
   private createWriteItem() {
-    this.user = {};
-    this.user['type'] = 'user';
-    this.user['externalID'] = this.userForm.value.externalID || '';
-    this.user['userName'] = this.userForm.value.userName || '';
-    this.user['firstName'] = this.userForm.value.firstName || '';
-    this.user['lastName'] = this.userForm.value.lastName || '';
-    this.user['email'] = this.userForm.value.email || '';
-    this.user['password'] = Md5.hashStr(this.userForm.value.password) || '';
-    this.user['role'] = this.userForm.value.selectedRole || '';
-    this.user['active'] = this.userForm.value.active || false;
-    this.user['associatedNorms'] = this.associatedNorms || '';
+    this.user = {
+      _id: '',
+      type: 'user',
+      externalID: this.userForm.value.externalID || '',
+      userName: this.userForm.value.userName || '',
+      firstName: this.userForm.value.firstName || '',
+      lastName: this.userForm.value.lastName || '',
+      email: this.userForm.value.email || '',
+      password: String(Md5.hashStr(this.userForm.value.password)) || '',
+      role: this.userForm.value.selectedRole || '',
+      active: this.userForm.value.active || false,
+      associatedNorms: this.associatedNorms || []
+    };
 
     if (this.userForm.value._id) {
       this.user['_id'] = this.userForm.value._id;

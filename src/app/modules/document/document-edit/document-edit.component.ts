@@ -35,7 +35,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
   @ViewChild('fileUploadInput', { static: true }) fileUploadInput: FileUpload;
   subsink = new SubSink();
-  currentUserRole: User;
+  currentUserRole: string;
   isLoading = false;
   editable = false;
   deletable = false;
@@ -49,7 +49,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   normDoc: NormDocument;
   owners: User[] = [];
   users: User[] = [];
-  selectedUsers: User[] = [];
+  selectedUsers: any[] = [];
 
   processType: any;
   processTypes: any[] = [];
@@ -89,7 +89,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   normLanguage = 'en';
   revisionDocument: RevisionDocument;
   uploadPath: string;
-  owner: User;
+  owner: any;
   ownerId: string;
 
   userDropdownSettings = {};
@@ -602,7 +602,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private setSelectedUsers(users: any[]) {
     this.documentService.getSelectedUsers(users).then(res => {
-      const userMap: User[] = res.map(user => {
+      /* const userMap: User[] = res.map(user => {
         const selectedUserObject = {};
         selectedUserObject['id'] = user['_id'];
         selectedUserObject['name'] =
@@ -610,7 +610,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         selectedUserObject['email'] = user['email'];
         return selectedUserObject;
       });
-      this.selectedUsers = userMap;
+      this.selectedUsers = userMap; */
+      this.selectedUsers = res.map(user => ({
+        id: user['_id'],
+        name: user['lastName'] + ', ' + user['firstName']
+      }));
     });
   }
 
