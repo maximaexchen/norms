@@ -119,6 +119,16 @@ export class DocumentService {
     });
   }
 
+  public getLatestRevision(revisions: any): any {
+    const sortedByDate = _.sortBy(revisions, (object, key) => {
+      return object['date'];
+    }).reverse();
+
+    // take the first
+    const latest = _.first(sortedByDate);
+    return latest;
+  }
+
   public getLatestAttchmentFileName(attachements: any): string {
     const sortedByRevision = _.sortBy(attachements, (object, key) => {
       object['id'] = key;

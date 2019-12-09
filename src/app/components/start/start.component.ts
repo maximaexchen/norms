@@ -1,7 +1,8 @@
+import { NormDocument } from './../../models/document.model';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'underscore';
@@ -12,6 +13,7 @@ import { DocumentService } from './../../services/document.service';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from './../../modules/auth/services/authentication.service';
 import { User } from '@app/models';
+import { map, mergeMap, flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-start',
@@ -32,6 +34,7 @@ export class StartComponent implements OnInit, OnDestroy {
   selectedAssocNorms: Array<any>;
   firstName: string;
   lastName: string;
+  norms: NormDocument[];
 
   ownerData = {};
 
@@ -98,82 +101,21 @@ export class StartComponent implements OnInit, OnDestroy {
       }
     };
 
-    this.subsink.sink = this.couchDBService.search(ownerQuery).subscribe(
-      result => {
-        this.ownerData['norms'] = {};
-
-        result.docs.forEach(norm => {
-          this.ownerData['norms'][norm.normNumber] = {};
-          this.ownerData['norms'][norm.normNumber]['id'] = norm._id;
-
-          console.log();
-          this.ownerData['norms'][norm.normNumber]['users'] = {};
-
-          norm.users.forEach(userId => {
-            const userQuery = {
-              use_index: ['_design/search_norm'],
-              selector: {
-                _id: {
-                  $eq: userId
-                },
-                type: {
-                  $eq: 'user'
-                },
-                $and: [
-                  {
-                    associatedNorms: {
-                      $elemMatch: {
-                        normNumber: {
-                          $eq: norm.normNumber
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            };
-
-            this.couchDBService.search(userQuery).subscribe(
-              user => {
-                if (user.docs.length > 0) {
-                  user.docs.forEach(userData => {
-                    this.ownerData['norms'][norm.normNumber]['users'][
-                      userData['_id']
-                    ] = {};
-
-                    this.ownerData['norms'][norm.normNumber]['users'][
-                      userData['_id']
-                    ]['name'] =
-                      userData['firstName'] + ' ' + userData['lastName'];
-
-                    this.ownerData['norms'][norm.normNumber]['users'][
-                      userData['_id']
-                    ]['name'] =
-                      userData['firstName'] + ' ' + userData['lastName'];
-
-                    this.ownerData['norms'][norm.normNumber]['users'][
-                      userData['_id']
-                    ]['associatedNorms'] = {};
-
-                    // this.ownerData['norms'][norm.normNumber]['id']['name'] = users.firstName + ' ' + users.lastName;
-                    this.ownerData['norms'][norm.normNumber]['users'][
-                      userData['_id']
-                    ]['associatedNorms'] = _.uniq(
-                      userData.associatedNorms,
-                      'normId'
-                    ).filter(obj => {
-                      return obj['normId'] === norm._id;
-                    });
-                  });
-                }
-              },
-              error => this.logger.error(error.message)
-            );
-          });
+    const test = this.couchDBService.search(ownerQuery).pipe(
+      flatMap(res => {
+        res.docs.map(response => {
+          response.revisionLatest = this.documentService.getLatestRevision(
+            response.revisions
+          );
+          return response;
         });
-      },
-      error => this.logger.error(error.message)
+        return of(res);
+      })
     );
+
+    this.subsink.sink = test.subscribe(r => {
+      this.norms = r.docs;
+    });
   }
 
   public getUpdateNormUser(id: string): Observable<User> {
@@ -254,7 +196,8 @@ export class StartComponent implements OnInit, OnDestroy {
       );
   }
 
-  public getDownload(id: string, name: string) {
+  public getDownload(id: string, attachchments: any) {
+    const name = this.documentService.getLatestAttchmentFileName(attachchments);
     this.documentService.getDownload(id, name);
   }
 

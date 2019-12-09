@@ -46,7 +46,7 @@
     i18n-label="@@btn-edit"
     class="btn btn-default btn-sm btn-headline"
     label="Bearbeiten"
-    *ngIf="!editable && (role === 'admin' || role === 'owner')"
+    *ngIf="!editable && role === 'admin'"
     (click)="onEdit()"
   ></button>
   <button

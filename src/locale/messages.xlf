@@ -27,7 +27,7 @@
           <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-new-dataset" datatype="html">
+      <trans-unit id="string-new" datatype="html">
         <source>
       Datensatz erstellen
     </source>
@@ -52,7 +52,7 @@
           <context context-type="linenumber">4</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-number-dataset" datatype="html">
+      <trans-unit id="string-number" datatype="html">
         <source>Nummer</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
@@ -66,7 +66,7 @@
           <context context-type="linenumber">49</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-revision-dataset" datatype="html">
+      <trans-unit id="string-revision" datatype="html">
         <source>Revision</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
@@ -80,28 +80,28 @@
           <context context-type="linenumber">69</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-distributor-dataset" datatype="html">
+      <trans-unit id="string-distributor" datatype="html">
         <source>Herausgeber</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
           <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-date-dataset" datatype="html">
+      <trans-unit id="string-date" datatype="html">
         <source>Datum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
           <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-language-dataset" datatype="html">
+      <trans-unit id="string-language" datatype="html">
         <source>Sprache</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
           <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-descriptionDE-dataset" datatype="html">
+      <trans-unit id="string-descriptionDE" datatype="html">
         <source>Beschreibung de</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
@@ -115,7 +115,7 @@
           <context context-type="linenumber">163</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-descriptionEN-dataset" datatype="html">
+      <trans-unit id="string-descriptionEN" datatype="html">
         <source>Beschreibung en</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
@@ -129,7 +129,7 @@
           <context context-type="linenumber">181</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-descriptionFR-dataset" datatype="html">
+      <trans-unit id="string-descriptionFR" datatype="html">
         <source>Beschreibung fr</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
@@ -143,7 +143,7 @@
           <context context-type="linenumber">198</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-scope-dataset" datatype="html">
+      <trans-unit id="string-scope" datatype="html">
         <source>Scope</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
@@ -157,28 +157,28 @@
           <context context-type="linenumber">214</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-tags-dataset" datatype="html">
+      <trans-unit id="string-tags" datatype="html">
         <source>Tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
           <context context-type="linenumber">223</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-status-dataset" datatype="html">
+      <trans-unit id="string-status" datatype="html">
         <source>Status</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
           <context context-type="linenumber">259</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-normfileUpload-dataset" datatype="html">
+      <trans-unit id="string-normfileUpload" datatype="html">
         <source>Normdatei (PDF upload)</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
           <context context-type="linenumber">286</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-fillRecomendedFields-dataset" datatype="html">
+      <trans-unit id="string-fillRecomendedFields" datatype="html">
         <source>
                 Bitte erst die Pflichtfelder ausfüllen
               </source>
@@ -187,7 +187,7 @@
           <context context-type="linenumber">302</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-references-dataset" datatype="html">
+      <trans-unit id="string-references" datatype="html">
         <source>
       Referenzen
     </source>
@@ -196,21 +196,21 @@
           <context context-type="linenumber">369</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-owner-dataset" datatype="html">
+      <trans-unit id="string-owner" datatype="html">
         <source>Owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
           <context context-type="linenumber">377</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-user-dataset" datatype="html">
+      <trans-unit id="string-user" datatype="html">
         <source>Benutzer</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/modules/document/document-edit/document-edit.component.html</context>
           <context context-type="linenumber">392</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="string-history-dataset" datatype="html">
+      <trans-unit id="string-history" datatype="html">
         <source>
       Historie
     </source>

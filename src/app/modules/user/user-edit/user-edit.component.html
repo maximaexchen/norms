@@ -1,7 +1,7 @@
 <div class="row detail-edit-header">
   <div class="col-sm-4">
     <h1 *ngIf="firstName || lastName">{{ firstName }} {{ lastName }}</h1>
-    <h1 *ngIf="!firstName || !lastName" i18n="@@string-new-dataset">
+    <h1 *ngIf="!firstName || !lastName" i18n="@@string-new">
       Datensatz erstellen
     </h1>
   </div>
@@ -180,7 +180,7 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-role-dataset"
+            <label class="col-sm-2 col-form-label" i18n="@@string-role"
               >Rolle</label
             >
 

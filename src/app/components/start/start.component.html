@@ -1,172 +1,47 @@
 <div class="row">
   <div class="col-md-6">
-    <h1 style="margin-bottom: 30px;">
-      Willkommen! {{ firstName }} {{ lastName }}
-    </h1>
+    <h1 style="margin-bottom: 30px;">Willkommen {{ userName }}!</h1>
 
-    <div *ngIf="userRole === 'owner'; else UserContent">
-      <table
-        class="table table-striped"
-        style=" border-bottom: 1px solid #dee2e6"
-      >
-        <tr>
-          <th scope="col" width="10%">User</th>
-          <th scope="col" width="10%">
-            Bestätigt
-          </th>
-          <th scope="col" width="10%">
-            Bestätigt am:
-          </th>
-          <th scope="col" width="10%">
-            Benachrichtigt am:
-          </th>
-          <th width="10%" style="text-align: center;">
-            Benachrichtigung
-          </th>
-        </tr>
-      </table>
-
-      <div *ngFor="let norm of ownerData['norms'] | keyvalue">
-        <h2 *ngIf="(norm.value.users | json) != '{}'">
-          <strong>Norm: {{ norm.key }}</strong>
-        </h2>
-        <table
-          class="table table-striped"
-          *ngIf="(norm.value.users | json) != '{}'"
-        >
-          <!-- <tr>
-            <th scope="col" width="10%">User</th>
-            <th scope="col" width="10%">Bestätigt</th>
-            <th scope="col" width="10%">Datum</th>
-            <th width="10%" style="text-align: center;">Benachrichtigung</th>
-          </tr> -->
-
-          <tr *ngFor="let user of norm.value.users | keyvalue">
-            <td width="10%">{{ user.value.name }}</td>
-            <td width="10%">
-              <i
-                aria-hidden="true"
-                class="fas fa-ban"
-                style="font-size: 16px; color: red;"
-                *ngIf="
-                  user.value.associatedNorms &&
-                  !user.value.associatedNorms[0]?.confirmed
-                "
-              ></i>
-              <i
-                aria-hidden="true"
-                class="fas fa-check-circle"
-                style="font-size: 16px; color: green;"
-                *ngIf="
-                  user.value.associatedNorms &&
-                  user.value.associatedNorms[0]?.confirmed
-                "
-              ></i>
-            </td>
-            <td width="10%">
-              {{
-                user.value.associatedNorms &&
-                  user.value.associatedNorms[0]?.confirmedDate | date
-              }}
-              <br />
-            </td>
-            <td width="10%">
-              {{
-                user.value.associatedNorms &&
-                  user.value.associatedNorms[0]?.informedDate | date
-              }}
-              <br />
-            </td>
-            <td style="text-align: center;" width="10%">
-              <div
-                *ngIf="
-                  user.value.associatedNorms &&
-                    user.value.associatedNorms[0]?.hasOwnProperty('informed');
-                  else confirmButton
-                "
-              >
-                <i
-                  aria-hidden="true"
-                  class="fas fa-check-circle"
-                  style="font-size: 16px; color: green;"
-                ></i>
-              </div>
-              <ng-template #confirmButton>
-                <button
-                  (click)="
-                    inform(user.value.associatedNorms[0]?.normId, user.key)
-                  "
-                  class="btn btn-default"
-                  *ngIf="
-                    user.value.associatedNorms &&
-                    !user.value.associatedNorms[0]?.confirmed
-                  "
-                >
-                  Benachrichtigen
-                </button>
-              </ng-template>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
-    <ng-template #UserContent>
-      <h2>Zu bestätigende Normen Updates</h2>
-
-      <table class="table table-striped">
-        <tr>
-          <th scope="col">
-            Nummer
-          </th>
-          <th scope="col">Revision</th>
-          <th scope="col">PDF</th>
-          <th scope="col">Received</th>
-          <th scope="col">Confirm</th>
-        </tr>
-        <tr *ngFor="let associatedNorm of associatedNorms">
-          <td>
-            <a class="js-link" (click)="gotoNorm(associatedNorm.normId)"
-              ><i class="fas fa-link"></i> {{ associatedNorm.normNumber }}
-            </a>
-          </td>
-          <td>
-            <a class="js-link" (click)="gotoNorm(associatedNorm.normId)"
-              ><i class="fas fa-exchange-alt"></i>
-              {{ associatedNorm.revisionId }}</a
-            >
-          </td>
-          <td>
+    <table class="table table-striped">
+      <tr>
+        <th scope="col" i18n="@@string-number">
+          Nummer
+        </th>
+        <th scope="col" i18n="@@string-revision">Revision</th>
+        <th scope="col" i18n="@@string-pdf">PDF</th>
+        <th scope="col" i18n="@@string-revisionDate">Datum Revision</th>
+      </tr>
+      <tr *ngFor="let norm of norms">
+        <td>
+          <a class="js-link" (click)="gotoNorm(norm._id)"
+            ><i class="fas fa-link"></i>{{ norm.normNumber }}
+          </a>
+        </td>
+        <td>
+          <a class="js-link" (click)="gotoNorm(norm._id)"
+            ><i class="fas fa-exchange-alt"></i> {{ norm.revision }}</a
+          >
+        </td>
+        <td>
+          <span *ngIf="norm._attachments">
             <a
               class="js-link"
-              (click)="
-                getDownload(associatedNorm.normId, associatedNorm.normDocument)
-              "
+              (click)="getDownload(norm._id, norm._attachments)"
               ><i class="fas fa-file-download"></i> Download PDF</a
             >
-          </td>
-          <td>
+          </span>
+        </td>
+        <td>
+          <span *ngIf="norm['revisionLatest']">
             <i class="far fa-calendar"></i>
-            {{ associatedNorm.date | date: 'dd.MM.yyyy' }}
-          </td>
-          <td>
-            <button
-              (click)="confirm(associatedNorm.normId)"
-              class="btn btn-default"
-              *ngIf="!associatedNorm.confirmed"
-            >
-              <i class="fas fa-clipboard-check"></i> Bestätigen
-            </button>
-            <span *ngIf="associatedNorm.confirmed"
-              ><i class="far fa-calendar-check"></i>
-              {{ associatedNorm.confirmedDate | date: 'dd.MM.yyyy' }}</span
-            >
-          </td>
-        </tr>
-      </table>
+            {{ norm['revisionLatest']['date'] | date: 'dd.MM.yyyy' }}
+          </span>
+        </td>
+      </tr>
+    </table>
 
-      <div class="form-check mb-2 mr-sm-2">
-        <br />
-      </div>
-    </ng-template>
+    <div class="form-check mb-2 mr-sm-2">
+      <br />
+    </div>
   </div>
 </div>

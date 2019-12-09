@@ -10,7 +10,7 @@
 <div class="row detail-edit-header">
   <div class="col-sm-4">
     <h1 *ngIf="normDoc.normNumber">{{ normDoc.normNumber }}</h1>
-    <h1 *ngIf="!normDoc.normNumber" i18n="@@string-new-dataset">
+    <h1 *ngIf="!normDoc.normNumber" i18n="@@string-new">
       Datensatz erstellen
     </h1>
   </div>
@@ -48,7 +48,7 @@
                 <label
                   for="normNumber"
                   class="col-sm-6 col-form-label"
-                  i18n="@@string-number-dataset"
+                  i18n="@@string-number"
                   >Nummer</label
                 >
                 <div class="col-sm-6">
@@ -81,7 +81,7 @@
               <div class="form-group row">
                 <label
                   class="col-sm-4 col-form-label"
-                  i18n="@@string-revision-dataset"
+                  i18n="@@string-revision"
                   >Revision</label
                 >
                 <div class="col-sm-8">
@@ -104,7 +104,7 @@
             <label
               class="col-sm-4 col-form-label"
               for="revisionDate"
-              i18n="@@string-date-dataset"
+              i18n="@@string-date"
               >Datum</label
             >
             <div class="col-sm-4">
@@ -124,7 +124,7 @@
           <div class="form-group row">
             <label
               class="col-sm-4 col-form-label"
-              i18n="@@string-language-dataset"
+              i18n="@@string-language"
               >Sprache</label
             >
             <div class="col-sm-8">
@@ -153,7 +153,7 @@
           <div class="form-group row">
             <label
               class="col-sm-4 col-form-label"
-              i18n="@@string-descriptionDE-dataset"
+              i18n="@@string-descriptionDE"
               >Beschreibung de</label
             >
             <div class="col-sm-8">
@@ -176,7 +176,7 @@
           <div class="form-group row">
             <label
               class="col-sm-4 col-form-label"
-              i18n="@@string-descriptionEN-dataset"
+              i18n="@@string-descriptionEN"
               >Beschreibung en</label
             >
             <div class="col-sm-8">
@@ -199,7 +199,7 @@
           <div class="form-group row">
             <label
               class="col-sm-4 col-form-label"
-              i18n="@@string-descriptionFR-dataset"
+              i18n="@@string-descriptionFR"
               >Beschreibung fr</label
             >
             <div class="col-sm-8">
@@ -216,7 +216,7 @@
           </div>
 
           <div class="form-group row">
-            <label class="col-sm-4 col-form-label" i18n="@@string-scope-dataset"
+            <label class="col-sm-4 col-form-label" i18n="@@string-scope"
               >Scope</label
             >
             <div class="col-sm-8">
@@ -233,11 +233,11 @@
           </div>
 
           <div class="form-group row document-tags">
-            <label class="col-sm-4 col-form-label" i18n="@@string-tags-dataset"
+            <label class="col-sm-4 col-form-label" i18n="@@string-tags"
               >Tags</label
             >
             <div class="col-sm-8">
-              <p i18n="@@string-tag-level1-dataset">Level 1 (Herausgeber)</p>
+              <p i18n="@@string-tag-level1">Level 1 (Herausgeber)</p>
               <angular2-multiselect
                 name="tagsLevel1"
                 [data]="tagsLevel1"
@@ -263,7 +263,7 @@
                   </ng-template>
                 </c-item>
               </angular2-multiselect>
-              <p i18n="@@string-tag-level2-dataset">Level 2</p>
+              <p i18n="@@string-tag-level2">Level 2</p>
               <angular2-multiselect
                 required
                 name="tagsLevel2"
@@ -289,7 +289,7 @@
                   </ng-template>
                 </c-item>
               </angular2-multiselect>
-              <p i18n="@@string-tag-level3-dataset">Level 3</p>
+              <p i18n="@@string-tag-level3">Level 3</p>
               <angular2-multiselect
                 name="tagsLevel3"
                 [data]="tagsLevel3"
@@ -320,7 +320,7 @@
           <div class="form-group row">
             <label
               class="col-sm-4 col-form-label"
-              i18n="@@string-processType-dataset"
+              i18n="@@string-processType"
               >Einteilung als</label
             >
             <div class="col-sm-8">
@@ -348,7 +348,7 @@
             <div class="form-group row">
               <label
                 class="col-sm-4 col-form-label"
-                i18n="@@string-status-dataset"
+                i18n="@@string-status"
                 >Status</label
               >
               <div class="col-sm-8">
@@ -376,7 +376,7 @@
           <div class="form-group row" *appIsGranted="'MAINTAIN'">
             <label
               class="col-sm-12 col-form-label text-left"
-              i18n="@@string-normfileUpload-dataset"
+              i18n="@@string-normfileUpload"
               >Normdatei (PDF upload)</label
             >
             <div class="col-sm-12">
@@ -401,7 +401,7 @@
               </p-fileUpload>
               <p
                 *ngIf="!normForm.valid"
-                i18n="@@string-fillRecomendedFields-dataset"
+                i18n="@@string-fillRecomendedFields"
               >
                 Bitte erst die Pflichtfelder ausfüllen
               </p>
@@ -463,13 +463,13 @@
       </div>
     </p-tabPanel>
 
-    <p-tabPanel header="Referenzen" i18n="@@string-references-dataset">
+    <p-tabPanel header="Referenzen" i18n="@@string-references">
       <div class="row">
         <div class="col-sm-12">
           <div class="form-group row">
             <label
               class="col-sm-2 col-form-label"
-              i18n="@@string-related-dataset"
+              i18n="@@string-related"
               >Referenzen wählen</label
             >
             <div class="col-sm-10">
@@ -498,7 +498,7 @@
           <div class="row">
             <label
               class="col-sm-2 col-form-label"
-              i18n="@@string-related-dataset"
+              i18n="@@string-related"
               >Referenzen</label
             >
             <div class="col-sm-10">
@@ -558,7 +558,7 @@
           <div class="row">
             <label
               class="col-sm-2 col-form-label"
-              i18n="@@string-relatedFrom-dataset"
+              i18n="@@string-relatedFrom"
               >Referenziert von</label
             >
             <div class="col-sm-10">
@@ -608,7 +608,7 @@
       <div class="row">
         <div class="col-sm-6">
           <div *appIsGranted="'MAINTAIN'" class="form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-owner-dataset"
+            <label class="col-sm-2 col-form-label" i18n="@@string-owner"
               >Owner</label
             >
             <div class="col-sm-10">
@@ -630,7 +630,7 @@
             </div>
           </div>
           <div class="form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-user-dataset"
+            <label class="col-sm-2 col-form-label" i18n="@@string-user"
               >Benutzer</label
             >
             <div class="col-sm-10">
@@ -656,7 +656,7 @@
       </div>
     </p-tabPanel>
 
-    <p-tabPanel header="Historie" i18n="@@string-history-dataset">
+    <p-tabPanel header="Historie" i18n="@@string-history">
       Historie
     </p-tabPanel>
   </p-tabView>
