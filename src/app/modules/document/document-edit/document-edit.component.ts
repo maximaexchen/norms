@@ -590,8 +590,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private getUsersForSelect(): void {
     this.documentService.getUsers().then(users => {
       // Add all users for the selectable owner dropdown
+      this.owners = _.filter(
+        users,
+        user => user.supplierId === 0 && user.supplierId !== undefined
+      );
 
-      this.owners = users;
+      users = _.filter(
+        users,
+        user => user['supplierId'] !== 0 && user['supplierId'] !== undefined
+      );
 
       users.forEach(user => {
         const userObject = {} as User;
@@ -599,6 +606,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         userObject['name'] = user['lastName'] + ', ' + user['firstName'];
         this.users.push(userObject);
       });
+      console.log(this.users);
     });
   }
 

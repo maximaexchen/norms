@@ -10,7 +10,7 @@ export interface User {
   lastName?: string;
   email?: string;
   password?: string;
-  supplierId?: string;
+  supplierId?: number;
   levels?: string;
   associatedNorms?: any[];
   role?: Role;

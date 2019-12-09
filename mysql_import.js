@@ -33,6 +33,7 @@ con.connect(function(err) {
     email: 'admin@aircraft-philipp.com',
     password: '21232f297a57a5a743894a0e4a801fc3',
     role: 'admin',
+    supplierId: 0,
     active: true
   });
 
@@ -44,6 +45,7 @@ con.connect(function(err) {
     lastName: 'Owner',
     email: 'owner@aircraft-philipp.com',
     role: 'owner',
+    supplierId: 0,
     password: '72122ce96bfec66e2396d2e25225d70a',
     active: true,
     associatedNorms: [
@@ -65,6 +67,7 @@ con.connect(function(err) {
     firstName: 'Testusers',
     lastName: 'User',
     email: 'user@aircraft-philipp.com',
+    supplierId: 0,
     role: 'user',
     password: 'ee11cbb19052e40b07aac0ca060c23ee',
     active: true,
@@ -79,6 +82,19 @@ con.connect(function(err) {
         normDocument: '0c6401c7aa2d7c05631768dfc600fb9f-Issue6.pdf'
       }
     ]
+  });
+
+  users.push({
+    type: 'user',
+    externalID: '9999',
+    userName: 'externaluser',
+    firstName: 'A',
+    lastName: 'External',
+    email: 'externaluser@aircraft-philipp.com',
+    password: '',
+    role: 'other',
+    supplierId: 2,
+    active: true
   });
 
   result.forEach(element => {
