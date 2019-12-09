@@ -43,6 +43,10 @@ body {
   }
 
   .icon-p-selectButton {
+    .ui-state-disabled,
+    .ui-widget:disabled {
+      opacity: 0.8;
+    }
     .ui-selectbutton {
       .ui-button {
         background-color: transparent;
@@ -64,6 +68,15 @@ body {
           }
           .fa-ban {
             color: theme-color('acp-red');
+          }
+
+          &.ui-state-disabled {
+            .fa-check-circle {
+              color: theme-color('acp-green');
+            }
+            .fa-ban {
+              color: theme-color('acp-red');
+            }
           }
         }
 

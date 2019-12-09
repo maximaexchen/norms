@@ -1,9 +1,18 @@
 body {
+  .fas.fa-check-circle {
+    color: theme-color('acp-green');
+  }
+
+  .fas.fa-ban {
+    color: theme-color('acp-red');
+  }
+
   app-document-search {
     button {
       margin-left: 50px;
     }
   }
+
   .sidebar-content {
     &.collapsed {
       width: 60px;
