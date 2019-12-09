@@ -15,12 +15,12 @@ var value = 'user';
 var sql =
   'SELECT id, user, firstname, lastname, email, password, supplier_id, levels, active  FROM acp_visualisation.acp_user_access';
 
-con.connect(function(err) {
+/*con.connect(function(err) {
   if (err) throw err;
   console.log('Connected.');
 });
 
-/* con.query(sql, function(err, result) {
+ con.query(sql, function(err, result) {
   if (err) throw err;
   const users = [];
 
@@ -115,13 +115,13 @@ con.connect(function(err) {
 
   db.bulk({ docs: users }, function(err, body) {
     if (err) throw err;
-  }); */
+  });
 });
 
-con.end();
+con.end();*/
 
 // Delete user
-/* db.list(
+db.list(
   {
     include_docs: true
   },
@@ -163,4 +163,4 @@ con.end();
       }
     }
   }
-); */
+);
