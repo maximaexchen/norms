@@ -12,8 +12,8 @@ function asciiInputValidator(): ValidatorFn {
     console.log(c.value);
 
     const notValid = /^(?:(?!["';<=>\\])[\x20-\x7E])+$/u.test(c.value);
-    console.log(notValid);
-    if (notValid) {
+    console.log(!notValid);
+    if (!notValid) {
       return {
         asciiInput: {
           notValid: true

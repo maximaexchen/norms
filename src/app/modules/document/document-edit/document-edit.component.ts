@@ -33,7 +33,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
-  @ViewChild('fileUploadInput', { static: true }) fileUploadInput: FileUpload;
+  @ViewChild('fileUploadInput', { static: false }) fileUploadInput: FileUpload;
   subsink = new SubSink();
   currentUserRole: string;
   isLoading = false;
@@ -152,14 +152,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private resetComponent() {
     console.log('resetComponent');
 
-    this.normDoc = {
-      _id: uuidv4(),
-      type: 'norm',
-      normNumber: '',
-      normLanguage: 'en',
-      description: {},
-      active: false
-    };
     this.ownerId = '';
     this.editable = false;
     this.users = [];
@@ -180,9 +172,32 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.normForm) {
       this.normForm.form.markAsPristine();
     }
-    this.fileUploadInput.clear();
+    if (this.normForm) {
+      this.fileUploadInput.clear();
+    }
+
     // reset the multiselects also
     this.assignMultiselectConfig();
+  }
+
+  private editDocument(selectedNorm) {
+    this.isNew = false;
+    this.resetComponent();
+
+    this.formTitle = 'Norm bearbeiten';
+    // fetch document which should be upated
+    this.subsink.sink = this.couchDBService
+      .fetchEntry('/' + selectedNorm['id'])
+      .subscribe(
+        normDoc => {
+          this.normDoc = normDoc;
+          this.setAdditionalNormDocData();
+        },
+        error => {
+          this.logger.error(error.message);
+        },
+        () => {}
+      );
   }
 
   private newDocument() {
@@ -193,7 +208,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.formTitle = 'Neue Norm anlegen';
     this.owner = '';
     this.processType = '';
-    this._id = uuidv4();
+    this.normDoc = {
+      _id: uuidv4(),
+      type: 'norm',
+      normNumber: '',
+      normLanguage: 'en',
+      description: {},
+      active: false
+    };
   }
 
   /**
@@ -272,26 +294,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.writeUpdate();
     }
-  }
-
-  private editDocument(selectedNorm) {
-    this.isNew = false;
-    this.resetComponent();
-
-    this.formTitle = 'Norm bearbeiten';
-    // fetch document which should be upated
-    this.subsink.sink = this.couchDBService
-      .fetchEntry('/' + selectedNorm['id'])
-      .subscribe(
-        normDoc => {
-          this.normDoc = normDoc;
-          this.setAdditionalNormDocData();
-        },
-        error => {
-          this.logger.error(error.message);
-        },
-        () => {}
-      );
   }
 
   private writeUpdate() {
@@ -383,13 +385,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private processFormData() {
     console.log('processFormdata');
 
-    // Condition if we have a new norm or an update
-    const normNumber = this.normForm.value.normNumber;
+    console.log(this.normDoc);
 
-    this.normDoc = {
+    /* this.normDoc = {
       _id: this.normForm.value._id,
       type: 'norm',
-      normNumber
+      normNumber: this.normForm.value.normNumber
     };
 
     if (this.normForm.value._rev) {
@@ -398,13 +399,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.normDoc.revision = this.normForm.value.revision;
     this.normDoc.revisionDate = this.normForm.value.revisionDate;
-    this.normDoc.normLanguage = this.normForm.value.normLanguage;
-    this.normDoc.description = {};
+    this.normDoc.normLanguage = this.normForm.value.normLanguage; */
+
+    /* this.normDoc.description = {};
     this.normDoc.description.de = this.normForm.value.descriptionDE;
     this.normDoc.description.en = this.normForm.value.descriptionEN;
     this.normDoc.description.fr = this.normForm.value.descriptionFR;
     this.normDoc.scope = this.normForm.value.scope;
-    this.normDoc.active = this.normForm.value.active;
+    this.normDoc.active = this.normForm.value.active; */
 
     const selectedRelatedObjects = [];
     this.selectedRelatedNorms.forEach(element => {

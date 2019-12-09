@@ -6,6 +6,7 @@
 >
   <p style="color: #235780">Lade Daten ...</p>
 </ngx-spinner>
+<div *ngIf="normDoc">
 <div class="row detail-edit-header">
   <div class="col-sm-4">
     <h1 *ngIf="normDoc.normNumber">{{ normDoc.normNumber }}</h1>
@@ -65,7 +66,7 @@
                   />
                   <div
                     *ngIf="
-                      !normNumber.errors?.asciiInput?.notValid &&
+                      normNumber.errors?.asciiInput?.notValid &&
                       normDoc.normNumber !== ''
                     "
                     class="alert alert-danger"
@@ -372,7 +373,7 @@
 
           <hr />
 
-          <div class="form-group row">
+          <div class="form-group row" *appIsGranted="'MAINTAIN'">
             <label
               class="col-sm-12 col-form-label text-left"
               i18n="@@string-normfileUpload-dataset"
@@ -420,7 +421,7 @@
           </button>
 
           <hr *ngIf="latestAttachmentName" />
-          <div *appIsGranted="'MAINTAIN'">
+          <div *appIsGranted="'UPDATE'">
             <p-fieldset
               legend="Dokumenten Historie"
               [toggleable]="true"
@@ -660,3 +661,4 @@
     </p-tabPanel>
   </p-tabView>
 </form>
+</div>
