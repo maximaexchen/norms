@@ -2,20 +2,17 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import { takeWhile } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
-
-import { SubSink } from 'SubSink';
-
+import _ = require('underscore');
 import uuidv4 from '@bundled-es-modules/uuid/v4.js';
+import { NGXLogger } from 'ngx-logger';
+import { SubSink } from 'SubSink';
 
 import { Tag } from '@app/models/tag.model';
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
-import _ = require('underscore');
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
-import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-tag-edit',

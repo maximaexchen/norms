@@ -123,8 +123,6 @@ describe('DocumentListComponent', () => {
 
   describe('METHOD: updateList(changedInfo)', () => {
     Given(() => {
-      // @ts-ignores
-      spyOn(componentUnderTest, 'updateList');
       fakeDocumentData = [
         {
           _id: '1',
@@ -143,6 +141,9 @@ describe('DocumentListComponent', () => {
           action: 'delete',
           object: expectedObject
         };
+
+        // @ts-ignores
+        spyOn(componentUnderTest, 'updateList');
       });
 
       When(() => {
@@ -156,20 +157,8 @@ describe('DocumentListComponent', () => {
       });
     });
 
-    /* describe('check update', () => {
+    describe('check update', () => {
       Given(() => {
-        fakeDocumentData = [
-          {
-            _id: '1',
-            _rev: '1',
-            type: 'document',
-            normNumber: 'Normnumber'
-          }
-        ];
-        spyOn(couchDBService, 'findDocuments').and.returnValue(
-          of(fakeDocumentData)
-        );
-
         expectedObject = {
           _id: '1',
           _rev: '1',
@@ -181,14 +170,18 @@ describe('DocumentListComponent', () => {
           model: 'document',
           id: '1',
           action: 'update',
-          object: expectedObject
+          object: fakeDocumentData
         };
+
+        spyOn(couchDBService, 'findDocuments').and.returnValue(
+          of(expectedObject)
+        );
       });
 
       When(() => {
         // @ts-ignore
-        componentUnderTest.getDocuments();
-        fixture.detectChanges();
+        /* componentUnderTest.getDocuments();
+        fixture.detectChanges(); */
 
         // @ts-ignore
         componentUnderTest.updateList(changeInfo);
@@ -201,6 +194,6 @@ describe('DocumentListComponent', () => {
         // @ts-ignore
         expect(componentUnderTest.documents[0]).toEqual(expectedObject);
       });
-    }); */
+    });
   });
 });

@@ -65,7 +65,7 @@ export class UserListComponent implements OnInit, OnDestroy {
       this.users.splice(index, 1);
     }
 
-    // If the list is filtered, we have to reset the filter to reflect teh updated list values
+    // If the list is filtered, we have to reset the filter to reflect the updated list values
     this.resetFilter();
   }
 

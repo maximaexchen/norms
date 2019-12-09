@@ -102,23 +102,22 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   private filterDocumentList() {
     // Filter the documents by given owner or user
     switch (this.authService.getUserRole()) {
-      case 'owner':
+      /* case 'owner':
         this.documents = this.documents.filter(obj => {
           if (!!obj['owner']) {
             return obj['owner']['_id'] === this.currentUserId;
           }
         });
-        break;
+        break; */
       case 'user':
         this.documents = this.documents.filter(obj => {
-          console.log(obj);
-          return _.find(obj['users'], id => {
-            return String(id) === this.currentUserId && obj['active'] === true;
-          });
+          return obj['active'] === true;
         });
 
         break;
     }
+
+    this.documentCount = this.documents.length;
   }
 
   private updateList(changedInfo: any) {

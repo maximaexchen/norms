@@ -9,7 +9,7 @@ import { of } from 'rxjs';
 import { Router } from '@angular/router';
 import { Tag } from '@app/models/tag.model';
 
-describe('CustomerListComponent', () => {
+describe('TagListComponent', () => {
   let componentUnderTest: TagListComponent;
   let fixture: ComponentFixture<TagListComponent>;
   let documentServiceSpy: Spy<DocumentService>;
