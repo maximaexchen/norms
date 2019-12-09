@@ -351,15 +351,18 @@
                   <p-selectButton
                     [options]="[
                       {
-                        label: 'aktiv',
-                        value: true
+                        value: true,
+                        icon: 'fas fa-check-circle',
+                        class: 'isActive'
                       },
                       {
-                        label: 'gesperrt',
-                        value: false
+                        value: false,
+                        icon: 'fas fa-ban',
+                        class: 'notActive'
                       }
                     ]"
                     name="active"
+                    class="icon-p-selectButton"
                     [(ngModel)]="normDoc.active"
                     [disabled]="!editable"
                   ></p-selectButton>

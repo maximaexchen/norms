@@ -41,4 +41,59 @@ body {
       }
     }
   }
+
+  .icon-p-selectButton {
+    .ui-selectbutton {
+      .ui-button {
+        background-color: transparent;
+        border: 0px;
+        font-size: 1rem;
+
+        .fa-check-circle {
+          color: lighten(theme-color('acp-green'), 30%);
+        }
+        .fa-ban {
+          color: lighten(theme-color('acp-red'), 30%);
+        }
+
+        &.ui-state-active {
+          background-color: transparent;
+
+          .fa-check-circle {
+            color: theme-color('acp-green');
+          }
+          .fa-ban {
+            color: theme-color('acp-red');
+          }
+        }
+
+        &:not(.ui-state-disabled):not(.ui-state-active):hover {
+          background-color: transparent;
+          .fa-check-circle {
+            color: theme-color('acp-green');
+          }
+          .fa-ban {
+            color: theme-color('acp-red');
+          }
+        }
+
+        &.ui-state-active:not(.ui-state-disabled):hover .ui-button-icon-left {
+          background-color: transparent;
+          &.fa-check-circle {
+            color: theme-color('acp-green');
+          }
+          &.fa-ban {
+            color: theme-color('acp-red');
+          }
+        }
+
+        &.ui-state-active:not(.ui-state-disabled):hover {
+          background-color: transparent;
+        }
+
+        &.ui-state-active .ui-button-icon-right {
+        }
+      }
+    }
+  }
 }

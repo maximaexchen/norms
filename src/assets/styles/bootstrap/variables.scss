@@ -45,7 +45,9 @@ $dark: $gray-800;
 $theme-colors: (
   'primary': $primary,
   'primary-light': lighten($primary, 15%),
-  'acp': $primary
+  'acp': $primary,
+  'acp-green': $green,
+  'acp-red': $red
 );
 
 $card-bg: $gray-100;
