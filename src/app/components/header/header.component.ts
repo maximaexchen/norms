@@ -21,16 +21,7 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // this.initMainMenu();
-
-    this.authenticationService.userName$.subscribe(
-      res => {
-        console.log(this.authenticationService);
-        console.log(res);
-        this.userName = res;
-      },
-      error => this.logger.error(error.message)
-    );
+    this.userName = this.authenticationService.getCurrentUserFullName();
 
     this.authenticationService.userIsLoggedIn$.subscribe(
       res => {

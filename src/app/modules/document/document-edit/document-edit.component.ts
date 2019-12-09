@@ -70,7 +70,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   selectedTags2: Tag[] = [];
   selectedTags3: Tag[] = [];
 
-  _id: string;
   /*   rev: string;
   type: string; */
   publisherId: string;
@@ -256,16 +255,18 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               this.showConfirmation('error', error.message);
             },
             () => {
-              this.router.navigate(['../document/' + this._id + '/edit']);
+              this.router.navigate([
+                '../document/' + this.normDoc._id + '/edit'
+              ]);
               this.spinner.hide();
               this.showConfirmation('success', 'Upload erfolgreich');
             }
           );
         }
-        this.router.navigate(['../document/' + this._id + '/edit']);
+        this.router.navigate(['../document/' + this.normDoc._id + '/edit']);
         this.isLoading = false;
         this.spinner.hide();
-        this.sendStateUpdate(this._id, 'save');
+        this.sendStateUpdate(this.normDoc._id, 'save');
       },
       error => {
         this.logger.error(error.message);
@@ -300,7 +301,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('writeUpdate');
     this.isLoading = true;
     this.subsink.sink = this.couchDBService
-      .updateEntry(this.normDoc, this.normForm.value._id)
+      .updateEntry(this.normDoc, this.normDoc._id)
       .subscribe(
         results => {
           console.log('writeUpdate', results);
@@ -315,7 +316,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           // Inform about database change.
           this.isLoading = false;
           this.spinner.hide();
-          this.sendStateUpdate(this._id, 'update');
+          this.sendStateUpdate(this.normDoc._id, 'update');
           this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
           this.setStartValues();
@@ -384,29 +385,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private processFormData() {
     console.log('processFormdata');
-
     console.log(this.normDoc);
-
-    /* this.normDoc = {
-      _id: this.normForm.value._id,
-      type: 'norm',
-      normNumber: this.normForm.value.normNumber
-    };
-
-    if (this.normForm.value._rev) {
-      this.normDoc._rev = this.normForm.value._rev;
-    }
-
-    this.normDoc.revision = this.normForm.value.revision;
-    this.normDoc.revisionDate = this.normForm.value.revisionDate;
-    this.normDoc.normLanguage = this.normForm.value.normLanguage; */
-
-    /* this.normDoc.description = {};
-    this.normDoc.description.de = this.normForm.value.descriptionDE;
-    this.normDoc.description.en = this.normForm.value.descriptionEN;
-    this.normDoc.description.fr = this.normForm.value.descriptionFR;
-    this.normDoc.scope = this.normForm.value.scope;
-    this.normDoc.active = this.normForm.value.active; */
 
     const selectedRelatedObjects = [];
     this.selectedRelatedNorms.forEach(element => {
@@ -449,6 +428,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.uploadDir.match(/[^\/]*\/[^\/]*/)[0],
         ''
       );
+      this.revisionDocument['isActive'] = false;
       this.revisionDocuments.push(this.revisionDocument);
 
       // Add new attachment by merge
@@ -482,7 +462,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             },
             () => {
               console.log(this.normDoc);
-              this.sendStateUpdate(this._id, 'delete');
+              this.sendStateUpdate(this.normDoc._id, 'delete');
               this.router.navigate(['../document']);
             }
           );
@@ -566,7 +546,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log(this.uploadUrl + '/');
     console.log(this.fileUpload);
     console.log(this.normDoc);
-    console.log(this._id);
+    console.log(this.normDoc._id);
     console.log(this.env.uploadDir);
     console.log(this.normDoc.revision);
     return this.serverService.uploadFile(
@@ -612,15 +592,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private setSelectedUsers(users: any[]) {
     this.documentService.getSelectedUsers(users).then(res => {
-      /* const userMap: User[] = res.map(user => {
-        const selectedUserObject = {};
-        selectedUserObject['id'] = user['_id'];
-        selectedUserObject['name'] =
-          user['lastName'] + ', ' + user['firstName'];
-        selectedUserObject['email'] = user['email'];
-        return selectedUserObject;
-      });
-      this.selectedUsers = userMap; */
       this.selectedUsers = res.map(user => ({
         id: user['_id'],
         name: user['lastName'] + ', ' + user['firstName']
@@ -701,7 +672,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             const isoString = now.toISOString();
 
             const newAssociatedNorm = {
-              normId: this._id,
+              normId: this.normDoc._id,
               revisionId: revision,
               normNumber: this.normDoc.normNumber,
               date: isoString,
@@ -756,7 +727,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private deleteRelatedDBEntries(id: string) {
-    this.deleteAssociatedNormEntriesInUser(this._id);
+    this.deleteAssociatedNormEntriesInUser(this.normDoc._id);
 
     const deleteQuery = {
       use_index: ['_design/search_norm'],
@@ -853,6 +824,19 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
+  public changeRevisionActive(revisionId: string) {
+    this.revisionDocuments.map(revDoc => {
+      console.log(revisionId);
+      console.log(revDoc['revisionID']);
+      if (revDoc['revisionID'] === revisionId) {
+        revDoc['isActive'] = true;
+      } else {
+        revDoc['isActive'] = false;
+      }
+      return revDoc;
+    });
+  }
+
   private setSelectedTags() {
     const selectedTags = [
       ...this.selectedTags1,
@@ -896,13 +880,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         .fetchEntry('/' + relatedNorm)
         .pipe(
           switchMap(linkedNorm => {
-            const newLinkedNorm = this._id;
+            const newLinkedNorm = this.normDoc._id;
 
             if (!linkedNorm['relatedFrom']) {
               linkedNorm.relatedFrom = [];
             }
 
-            if (linkedNorm.relatedFrom.indexOf(this._id) === -1) {
+            if (linkedNorm.relatedFrom.indexOf(this.normDoc._id) === -1) {
               linkedNorm.relatedFrom.push(newLinkedNorm);
             }
 
@@ -940,7 +924,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               console.log(linkedNorm);
 
               const filtered = linkedNorm.relatedFrom.filter(relNorm => {
-                return relNorm !== this._id;
+                return relNorm !== this.normDoc._id;
               });
 
               linkedNorm.relatedFrom = filtered;
