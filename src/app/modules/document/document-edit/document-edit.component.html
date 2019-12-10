@@ -344,29 +344,29 @@
           <div class="col-sm-6">
             <div class="col-sm-12">
               <div class="form-group row">
-                <label class="col-sm-4 col-form-label" i18n="@@string-status"
+                <div class="col-sm-12">
+                <label i18n="@@string-status" class=" col-form-label"
                   >Status</label
                 >
-                <div class="col-sm-8">
-                  <p-selectButton
-                    [options]="[
-                      {
-                        value: true,
-                        icon: 'fas fa-check-circle',
-                        class: 'isActive'
-                      },
-                      {
-                        value: false,
-                        icon: 'fas fa-ban',
-                        class: 'notActive'
-                      }
-                    ]"
-                    name="active"
-                    class="icon-p-selectButton"
-                    [(ngModel)]="normDoc.active"
-                    [disabled]="!editable"
-                  ></p-selectButton>
-                </div>
+                <p-selectButton
+                  [options]="[
+                    {
+                      value: true,
+                      icon: 'fas fa-check-circle',
+                      class: 'isActive'
+                    },
+                    {
+                      value: false,
+                      icon: 'fas fa-ban',
+                      class: 'notActive'
+                    }
+                  ]"
+                  name="active"
+                  class="icon-p-selectButton"
+                  [(ngModel)]="normDoc.active"
+                  [disabled]="!editable"
+                ></p-selectButton>
+              </div>
               </div>
             </div>
 

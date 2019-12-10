@@ -43,6 +43,8 @@ body {
   }
 
   .icon-p-selectButton {
+    margin-left: 25px;
+    width: auto;
     .ui-state-disabled,
     .ui-widget:disabled {
       opacity: 0.8;
@@ -54,10 +56,12 @@ body {
         font-size: 1rem;
 
         .fa-check-circle {
-          color: lighten(theme-color('acp-green'), 30%);
+          color: theme-color('acp-green');
+          opacity: 0.4;
         }
         .fa-ban {
-          color: lighten(theme-color('acp-red'), 30%);
+          color: theme-color('acp-red');
+          opacity: 0.4;
         }
 
         &.ui-state-active {
@@ -65,9 +69,11 @@ body {
 
           .fa-check-circle {
             color: theme-color('acp-green');
+            opacity: 1;
           }
           .fa-ban {
             color: theme-color('acp-red');
+            opacity: 1;
           }
 
           &.ui-state-disabled {
