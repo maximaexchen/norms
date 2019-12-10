@@ -16,7 +16,6 @@ import { DocumentService } from 'src/app//services/document.service';
 import { NormDocument } from '../../../models/document.model';
 import { EnvService } from 'src/app//services/env.service';
 import { Router } from '@angular/router';
-import { takeWhile } from 'rxjs/operators';
 import { SearchService } from '@app/services/search.service';
 import { AuthenticationService } from './../../auth/services/authentication.service';
 import _ = require('underscore');
@@ -28,7 +27,7 @@ import { NGXLogger } from 'ngx-logger';
   styleUrls: ['./document-list.component.scss']
 })
 export class DocumentListComponent implements OnInit, OnDestroy {
-  @ViewChild('dataTable', { static: false }) dataTable: any;
+  @ViewChild('dataTable', { static: false }) dataTable;
   @Output() openSideBar: EventEmitter<any> = new EventEmitter();
   @Output() closeSideBar: EventEmitter<any> = new EventEmitter();
   subsink = new SubSink();
@@ -145,8 +144,10 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private resetFilter(): void {
-    if (this.dataTable.hasFilter()) {
-      this.dataTable.filter();
+    if (this.dataTable) {
+      if (this.dataTable.hasFilter()) {
+        this.dataTable.filter();
+      }
     }
   }
 
