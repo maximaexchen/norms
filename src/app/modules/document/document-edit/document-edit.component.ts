@@ -70,21 +70,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   selectedTags2: Tag[] = [];
   selectedTags3: Tag[] = [];
 
-  /*   rev: string;
-  type: string; */
   publisherId: string;
   revisionDate: Date;
-  /*   normNumber: string; */
-
-  /*   name: string;
-  revision: string;
-
-  scope: string;
-
-  descriptionDE: string;
-  descriptionEN: string;
-  descriptionFR: string;
-    active: boolean;*/
   normLanguage = 'en';
   revisionDocument: RevisionDocument;
   uploadPath: string;
@@ -120,8 +107,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    *
    */
   private setStartValues() {
-    console.log('setStartValues');
-
     this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
         this.currentUserRole = this.authService.getUserRole();
@@ -146,37 +131,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       },
       error => this.logger.error(error.message)
     );
-  }
-
-  private resetComponent() {
-    console.log('resetComponent');
-
-    this.ownerId = '';
-    this.editable = false;
-    this.users = [];
-    this.owners = [];
-    this.attachment = {};
-    this.selectedRelatedNorms = [];
-    this.relatedNormsFrom = [];
-    this.revisionDocuments = [];
-    this.latestAttachmentName = '';
-    this.selectedUsers = [];
-    this.selectedTags1 = [];
-    this.selectedTags2 = [];
-    this.selectedTags3 = [];
-    this.selectedTab = 0;
-
-    this.processTypeId = '';
-
-    if (this.normForm) {
-      this.normForm.form.markAsPristine();
-    }
-    if (this.normForm) {
-      this.fileUploadInput.clear();
-    }
-
-    // reset the multiselects also
-    this.assignMultiselectConfig();
   }
 
   private editDocument(selectedNorm) {
@@ -238,9 +192,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private saveDocument(): void {
     console.log('saveDocument');
+    this.processFormData();
     this.isLoading = true;
     this.spinner.show();
-    this.processFormData();
     this.normForm.form.markAsPristine();
 
     // First save to get a document id for the attachment path and name
@@ -376,6 +330,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       });
     }
 
+    console.log(this.normDoc);
     if (this.normDoc._attachments) {
       this.latestAttachmentName = this.documentService.getLatestAttchmentFileName(
         this.normDoc._attachments
@@ -385,26 +340,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private processFormData() {
     console.log('processFormdata');
-    console.log(this.normDoc);
 
-    const selectedRelatedObjects = [];
-    this.selectedRelatedNorms.forEach(element => {
-      selectedRelatedObjects.push(element['id']);
-    });
-    this.normDoc.relatedNorms =
-      selectedRelatedObjects || this.selectedRelatedNorms;
-
-    const selectedRelatedFromObjects = [];
-    this.relatedNormsFrom.forEach(element => {
-      selectedRelatedFromObjects.push(element['id']);
-    });
-    this.normDoc.relatedFrom =
-      selectedRelatedFromObjects || this.relatedNormsFrom;
-
+    const selectedRelatedObjects = this.processRelatedNorms();
+    this.processRelatedFromNorms();
     // write current norm to related norms for "reletedFrom"
     this.writeRelatedNormsFrom(selectedRelatedObjects);
     this.setSelectedUser();
     this.setSelectedTags();
+    // If there is a new PDF upload add to revisions and attachment Array
+    this.processRevisonUpload();
 
     const selOwner: User = this.owners.find(
       own => own['_id'] === this.normForm.value.ownerId
@@ -418,7 +362,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
     this.normDoc.processType = selProcessType || this.processType;
 
-    // If there is a new PDF upload add to revisions and attachment Array
+    // add update status to users to be notified
+    this.setUserNotification(this.normForm.value.revision);
+    return this.normDoc;
+  }
+
+  processRevisonUpload() {
     if (!_.isEmpty(this.attachment)) {
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
@@ -439,11 +388,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       };
     }
     this.normDoc.revisions = this.revisionDocuments || [];
+  }
 
-    // add update status to users to be notified
-    this.setUserNotification(this.normForm.value.revision);
-    console.log(this.normDoc);
-    return this.normDoc;
+  private processRelatedNorms(): any[] {
+    const selectedRelatedNorms = [];
+    this.selectedRelatedNorms.forEach(element => {
+      selectedRelatedNorms.push(element['id']);
+    });
+    this.normDoc.relatedNorms =
+      selectedRelatedNorms || this.selectedRelatedNorms;
+
+    return selectedRelatedNorms;
+  }
+
+  private processRelatedFromNorms() {
+    const selectedRelatedFromNorms = [];
+    this.relatedNormsFrom.forEach(element => {
+      selectedRelatedFromNorms.push(element['id']);
+    });
+    this.normDoc.relatedFrom =
+      selectedRelatedFromNorms || this.relatedNormsFrom;
   }
 
   public deleteDocument(): void {
@@ -471,11 +435,42 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
+  private resetComponent() {
+    this.ownerId = '';
+    this.editable = false;
+    this.users = [];
+    this.owners = [];
+    this.attachment = {};
+    this.selectedRelatedNorms = [];
+    this.relatedNormsFrom = [];
+    this.revisionDocuments = [];
+    this.latestAttachmentName = '';
+    this.selectedUsers = [];
+    this.tagsLevel1 = [];
+    this.tagsLevel2 = [];
+    this.tagsLevel3 = [];
+    this.selectedTags1 = [];
+    this.selectedTags2 = [];
+    this.selectedTags3 = [];
+    this.selectedTab = 0;
+    this.processTypeId = '';
+
+    if (this.normForm) {
+      this.normForm.form.markAsPristine();
+    }
+    if (this.normForm) {
+      this.fileUploadInput.clear();
+    }
+
+    // reasign/reset the multiselects also
+    this.assignMultiselectConfig();
+  }
+
   /**
    * Upload methods
    *
    */
-  public checkUpload(event, uploadField) {
+  public checkIfUploadExistsForRevision(event, uploadField) {
     for (const file of event.files) {
       this.fileUpload = file;
     }
@@ -537,7 +532,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private checkForExistingAttachment(obj, searchKey): boolean {
     return Object.keys(obj).some(prop => {
       const needle = /_([^.]+)./.exec(prop)[1];
-
       return needle.includes(searchKey);
     });
   }
@@ -616,9 +610,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private getTagsForSelect(): void {
-    this.tagsLevel1 = [];
-    this.tagsLevel2 = [];
-    this.tagsLevel3 = [];
     this.subsink.sink = this.couchDBService
       .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
       .subscribe(

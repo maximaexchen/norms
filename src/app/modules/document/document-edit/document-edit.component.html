@@ -345,28 +345,28 @@
             <div class="col-sm-12">
               <div class="form-group row">
                 <div class="col-sm-12">
-                <label i18n="@@string-status" class=" col-form-label"
-                  >Status</label
-                >
-                <p-selectButton
-                  [options]="[
-                    {
-                      value: true,
-                      icon: 'fas fa-check-circle',
-                      class: 'isActive'
-                    },
-                    {
-                      value: false,
-                      icon: 'fas fa-ban',
-                      class: 'notActive'
-                    }
-                  ]"
-                  name="active"
-                  class="icon-p-selectButton"
-                  [(ngModel)]="normDoc.active"
-                  [disabled]="!editable"
-                ></p-selectButton>
-              </div>
+                  <label i18n="@@string-status" class=" col-form-label"
+                    >Status</label
+                  >
+                  <p-selectButton
+                    [options]="[
+                      {
+                        value: true,
+                        icon: 'fas fa-check-circle',
+                        class: 'isActive'
+                      },
+                      {
+                        value: false,
+                        icon: 'fas fa-ban',
+                        class: 'notActive'
+                      }
+                    ]"
+                    name="active"
+                    class="icon-p-selectButton"
+                    [(ngModel)]="normDoc.active"
+                    [disabled]="!editable"
+                  ></p-selectButton>
+                </div>
               </div>
             </div>
 
@@ -610,7 +610,7 @@
         </div>
       </p-tabPanel>
 
-      <p-tabPanel header="User">
+      <p-tabPanel header="User"  *appIsGranted="'UPDATE'">
         <div class="row">
           <div class="col-sm-6">
             <div *appIsGranted="'MAINTAIN'" class="form-group row">
@@ -662,7 +662,7 @@
         </div>
       </p-tabPanel>
 
-      <p-tabPanel header="Historie" i18n="@@string-history">
+      <p-tabPanel header="Historie" i18n="@@string-history"  *appIsGranted="'UPDATE'">
         Historie
       </p-tabPanel>
     </p-tabView>
