@@ -90,6 +90,14 @@ export class AuthenticationService {
     sessionStorage.setItem('email', user['email']);
   }
 
+  public isAdmin(): boolean {
+    console.log(this.getUserRole());
+    if (this.getUserRole() === 'admin') {
+      return true;
+    }
+    return false;
+  }
+
   public getUserRole(): string {
     return sessionStorage.getItem('role');
   }

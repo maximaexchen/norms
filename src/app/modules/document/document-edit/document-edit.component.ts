@@ -108,19 +108,19 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    *
    */
   private setStartValues() {
-    // fetch data for select-boxes
-    this.getUsersForSelect();
-    this.getTagsForSelect();
-    this.getNormsForRelatedSelect();
-
-    this.processTypes = [
-      { id: 1, name: 'Spezialprozess' },
-      { id: 2, name: 'kein Spezialprozess' },
-      { id: 3, name: 'Normschrift' }
-    ];
-
     this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
+        // fetch data for select-boxes
+        this.getUsersForSelect();
+        this.getTagsForSelect();
+        this.getNormsForRelatedSelect();
+
+        this.processTypes = [
+          { id: 1, name: 'Spezialprozess' },
+          { id: 2, name: 'kein Spezialprozess' },
+          { id: 3, name: 'Normschrift' }
+        ];
+
         // check if we have new document or we are updating
         if (selectedNorm['id']) {
           this.editDocument(selectedNorm);
@@ -291,7 +291,21 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.processTypeId = this.normDoc.processType['id'];
     }
 
-    this.revisionDocuments = _.sortBy(this.normDoc.revisions, 'date').reverse();
+    this.revisionDocuments = _.sortBy(this.normDoc.revisions, 'date')
+      .reverse()
+      .filter(element => {
+        if (this.authService.isAdmin()) {
+          return element;
+        }
+
+        if (this.normDoc.owner) {
+          if (this.normDoc.owner._id === this.authService.getCurrentUserID()) {
+            return element;
+          }
+        }
+
+        return;
+      });
 
     if (this.normDoc.users) {
       this.setSelectedUsers(this.normDoc.users);
@@ -344,17 +358,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     const selectedRelatedNorms = this.processRelatedNorms();
     this.processRelatedFromNorms();
     // write current norm to related norms for "reletedFrom"
-    this.addCurrentNormToRelatedNormFrom(selectedRelatedNorms);
+    this.addNormToLinkedNorms(selectedRelatedNorms);
 
-    console.log(this.normDoc.relatedNorms);
     console.log(this.selectedRelatedNorms);
+    console.log(this.normDoc.relatedNorms);
     console.log(this.normDoc.relatedFrom);
-    console.log(this.setRelatedNormsFrom);
 
     this.setSelectedUser();
     this.setSelectedTags();
     // If there is a new PDF upload add to revisions and attachment Array
-    this.processRevisonUpload();
+    this.addNewRevision();
 
     const selOwner: User = this.owners.find(
       own => own['_id'] === this.normForm.value.ownerId
@@ -373,7 +386,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     return this.normDoc;
   }
 
-  processRevisonUpload() {
+  addNewRevision() {
     if (!_.isEmpty(this.attachment)) {
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
@@ -464,7 +477,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.normForm) {
       this.normForm.form.markAsPristine();
     }
-    if (this.normForm) {
+
+    if (this.fileUploadInput) {
       this.fileUploadInput.clear();
     }
 
@@ -543,12 +557,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private uploadPDF(): Observable<any> {
-    console.log(this.uploadUrl + '/');
-    console.log(this.fileUpload);
-    console.log(this.normDoc);
-    console.log(this.normDoc._id);
-    console.log(this.env.uploadDir);
-    console.log(this.normDoc.revision);
     return this.serverService.uploadFile(
       this.uploadUrl + '/',
       this.fileUpload,
@@ -822,13 +830,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   public changeRevisionActive(revisionId: string) {
     this.revisionDocuments.map(revDoc => {
-      console.log(revisionId);
-      console.log(revDoc['revisionID']);
-      if (revDoc['revisionID'] === revisionId) {
-        revDoc['isActive'] = true;
-      } else {
-        revDoc['isActive'] = false;
-      }
+      revDoc['isActive'] = revDoc['revisionID'] === revisionId ? true : false;
       return revDoc;
     });
   }
@@ -869,7 +871,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private addCurrentNormToRelatedNormFrom(relatedNorms: any[]) {
+  private addNormToLinkedNorms(relatedNorms: any[]) {
     relatedNorms.forEach(relatedNorm => {
       // get the linked Norm
       this.subsink.sink = this.couchDBService
@@ -882,6 +884,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               linkedNorm.relatedFrom = [];
             }
 
+            // If norm not already exist - add it
             if (linkedNorm.relatedFrom.indexOf(this.normDoc._id) === -1) {
               linkedNorm.relatedFrom.push(newLinkedNorm);
             }
