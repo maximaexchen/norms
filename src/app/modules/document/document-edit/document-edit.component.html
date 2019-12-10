@@ -109,7 +109,7 @@
               >
               <div class="col-sm-4">
                 <p-calendar
-                  [(ngModel)]="revisionDate"
+                  [(ngModel)]="normDoc.revisionDate"
                   [showIcon]="false"
                   [inline]="false"
                   dateFormat="dd.mm.yy"
@@ -389,7 +389,7 @@
                   #fileUploadInput
                   [disabled]="normForm.invalid || !editable"
                   name="files"
-                  (onSelect)="checkUpload($event, fileUploadInput)"
+                  (onSelect)="checkIfUploadExistsForRevision($event, fileUploadInput)"
                   accept="application/pdf"
                   [showUploadButton]="false"
                   [showCancelButton]="true"
