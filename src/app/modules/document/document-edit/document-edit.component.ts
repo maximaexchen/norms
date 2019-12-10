@@ -578,9 +578,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private getUsersForSelect(): void {
     this.documentService.getUsers().then(users => {
       // Add all users for the selectable owner dropdown
+
+      users.forEach(element => {
+        console.log(element['userName']);
+        console.log(element['supplierId']);
+      });
       this.owners = _.filter(
         users,
-        user => user.supplierId === 0 && user.supplierId !== undefined
+        user => user['supplierId'] === 0 && user['supplierId'] !== undefined
       );
 
       users = _.filter(

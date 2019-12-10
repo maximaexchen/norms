@@ -13,14 +13,16 @@ var key = 'type';
 var value = 'user';
 
 var sql =
-  'SELECT id, user, firstname, lastname, email, password, supplier_id, levels, active  FROM acp_visualisation.acp_user_access';
+  'SELECT id, user, firstname, lastname, email, password, supplier_id, levels, active ' +
+  'FROM acp_visualisation.acp_user_access ' +
+  'WHERE active = 1';
 
-/*con.connect(function(err) {
+con.connect(function(err) {
   if (err) throw err;
   console.log('Connected.');
 });
 
- con.query(sql, function(err, result) {
+con.query(sql, function(err, result) {
   if (err) throw err;
   const users = [];
 
@@ -62,6 +64,20 @@ var sql =
 
   users.push({
     type: 'user',
+    userName: 'owner2',
+    externalID: '9999',
+    firstName: 'Zweiter',
+    lastName: 'Owner',
+    email: 'owner2@aircraft-philipp.com',
+    role: 'owner',
+    supplierId: 0,
+    password: 'b1e3677cd7c6f633e6c08037583c846f',
+    active: true,
+    associatedNorms: []
+  });
+
+  users.push({
+    type: 'user',
     userName: 'user',
     externalID: 9999,
     firstName: 'Testusers',
@@ -91,7 +107,7 @@ var sql =
     firstName: 'A',
     lastName: 'External',
     email: 'externaluser@aircraft-philipp.com',
-    password: '',
+    password: 'd5b65e6d96957a40bd5a033859fe380b',
     role: 'other',
     supplierId: 2,
     active: true
@@ -118,10 +134,10 @@ var sql =
   });
 });
 
-con.end();*/
+con.end();
 
 // Delete user
-db.list(
+/* db.list(
   {
     include_docs: true
   },
@@ -164,3 +180,4 @@ db.list(
     }
   }
 );
+ */

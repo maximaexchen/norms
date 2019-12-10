@@ -47,6 +47,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
   email: string;
   password: string;
   associatedNorms: any[];
+  supplierId: number;
   active = false;
 
   constructor(
@@ -105,6 +106,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.lastName = '';
     this.email = '';
     this.password = '';
+    this.supplierId = null;
     this.associatedNorms = null;
     this.active = null;
   }
@@ -137,6 +139,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
           this.password = entry['password'];
           this.role = entry['role'];
           this.selectedRole = entry['role'];
+          this.supplierId = entry['supplierId'];
           this.active = entry['active'];
           this.associatedNorms = entry['associatedNorms'];
         },
@@ -167,6 +170,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
                 this.email = entry['email'];
                 this.password = entry['password'];
                 this.role = entry['role'];
+                this.supplierId = entry['supplierId'];
                 this.selectedRole = entry['role'];
                 this.active = entry['active'];
                 this.associatedNorms = entry['associatedNorms'];
@@ -282,6 +286,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
     foundUser['firstName'] = this.firstName;
     foundUser['lastName'] = this.lastName;
     foundUser['email'] = this.email;
+    foundUser['externalID'] = this.externalID;
+    foundUser['supplierId'] = this.supplierId;
     foundUser['active'] = this.active;
 
     return norm;
@@ -292,6 +298,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     norm.owner.lastName = this.lastName;
     norm.owner.email = this.email;
     norm.owner.externalID = this.externalID;
+    norm.owner.supplierId = this.supplierId;
     norm.owner.active = this.active;
 
     return norm;
@@ -341,6 +348,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
       email: this.userForm.value.email || '',
       password: String(Md5.hashStr(this.userForm.value.password)) || '',
       role: this.userForm.value.selectedRole || '',
+      supplierId: this.userForm.value.supplierId || null,
       active: this.userForm.value.active || false,
       associatedNorms: this.associatedNorms || []
     };

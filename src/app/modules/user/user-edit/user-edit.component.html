@@ -180,6 +180,30 @@
             </div>
           </div>
           <div class="form-group row">
+            <label class="col-sm-2 col-form-label" i18n="@@string-supplierId"
+              >Supplier ID</label
+            >
+            <div class="col-sm-10">
+              <input
+                type="supplierId"
+                class="form-control"
+                i18n-placeholder
+                placeholder="Supplier ID"
+                [(ngModel)]="supplierId"
+                name="supplierId"
+                required
+                #supplierIdCheck="ngModel"
+                [readOnly]="!editable"
+              />
+              <small
+                class="form-text text-muted"
+                i18n="@@string-supplierId-required"
+                *ngIf="!supplierIdCheck.valid && supplierIdCheck.touched"
+                >Bitte geben Sie einen supplier ID ein.</small
+              >
+            </div>
+          </div>
+          <div class="form-group row">
             <label class="col-sm-2 col-form-label" i18n="@@string-role"
               >Rolle</label
             >
