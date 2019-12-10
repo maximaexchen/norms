@@ -10,7 +10,6 @@ export class IsGrantedDirective {
     private permissionManagerService: PermissionManagerService
   ) {}
   @Input() set appIsGranted(permission: PermissionType) {
-    console.log(permission);
     this.isGranted(permission);
   }
   private isGranted(permission: PermissionType) {

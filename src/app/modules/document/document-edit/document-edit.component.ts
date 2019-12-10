@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable, Subscriber, of } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { switchMap, tap, pluck } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
@@ -99,6 +99,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.currentUserRole = this.authService.getUserRole();
     this.setStartValues();
   }
 
@@ -107,21 +108,19 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    *
    */
   private setStartValues() {
+    // fetch data for select-boxes
+    this.getUsersForSelect();
+    this.getTagsForSelect();
+    this.getNormsForRelatedSelect();
+
+    this.processTypes = [
+      { id: 1, name: 'Spezialprozess' },
+      { id: 2, name: 'kein Spezialprozess' },
+      { id: 3, name: 'Normschrift' }
+    ];
+
     this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
-        this.currentUserRole = this.authService.getUserRole();
-
-        // fetch data for select-boxes
-        this.getUsersForSelect();
-        this.getTagsForSelect();
-        this.getNormsForRelatedSelect();
-
-        this.processTypes = [
-          { id: 1, name: 'Spezialprozess' },
-          { id: 2, name: 'kein Spezialprozess' },
-          { id: 3, name: 'Normschrift' }
-        ];
-
         // check if we have new document or we are updating
         if (selectedNorm['id']) {
           this.editDocument(selectedNorm);
@@ -144,6 +143,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         normDoc => {
           this.normDoc = normDoc;
+          console.log(this.normDoc);
           this.setAdditionalNormDocData();
         },
         error => {
@@ -280,9 +280,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setAdditionalNormDocData() {
-    console.log('setAdditionalNormDocData');
+    console.log('setAdditionalNormDocData begin');
     this.revisionDate = new Date(this.normDoc.revisionDate);
-
     if (this.normDoc.owner) {
       this.ownerId = this.normDoc.owner['_id'];
     }
@@ -330,7 +329,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       });
     }
 
-    console.log(this.normDoc);
     if (this.normDoc._attachments) {
       this.latestAttachmentName = this.documentService.getLatestAttchmentFileName(
         this.normDoc._attachments
@@ -341,10 +339,18 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private processFormData() {
     console.log('processFormdata');
 
-    const selectedRelatedObjects = this.processRelatedNorms();
+    this.normDoc.revisionDate = this.normForm.value.revisionDate;
+
+    const selectedRelatedNorms = this.processRelatedNorms();
     this.processRelatedFromNorms();
     // write current norm to related norms for "reletedFrom"
-    this.writeRelatedNormsFrom(selectedRelatedObjects);
+    this.addCurrentNormToRelatedNormFrom(selectedRelatedNorms);
+
+    console.log(this.normDoc.relatedNorms);
+    console.log(this.selectedRelatedNorms);
+    console.log(this.normDoc.relatedFrom);
+    console.log(this.setRelatedNormsFrom);
+
     this.setSelectedUser();
     this.setSelectedTags();
     // If there is a new PDF upload add to revisions and attachment Array
@@ -580,7 +586,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         userObject['name'] = user['lastName'] + ', ' + user['firstName'];
         this.users.push(userObject);
       });
-      console.log(this.users);
     });
   }
 
@@ -864,10 +869,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private writeRelatedNormsFrom(relatedNorms: any[]) {
+  private addCurrentNormToRelatedNormFrom(relatedNorms: any[]) {
     relatedNorms.forEach(relatedNorm => {
       // get the linked Norm
-      this.couchDBService
+      this.subsink.sink = this.couchDBService
         .fetchEntry('/' + relatedNorm)
         .pipe(
           switchMap(linkedNorm => {
@@ -881,6 +886,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               linkedNorm.relatedFrom.push(newLinkedNorm);
             }
 
+            // write current norm into linked norm under relatedFrom
             return this.couchDBService
               .updateEntry(linkedNorm, linkedNorm['_id'])
               .pipe(
@@ -890,7 +896,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
               );
           })
         )
-        .subscribe(result => {});
+        .subscribe(
+          result => {},
+          error => {
+            console.log(error.message);
+          }
+        );
     });
   }
 
