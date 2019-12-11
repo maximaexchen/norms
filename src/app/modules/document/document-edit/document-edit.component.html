@@ -429,13 +429,7 @@
               >
                 <table class="table" style="width: 100%;">
                   <tr *ngFor="let revDoc of revisionDocuments; let i = index">
-                    <td>
-                      <a
-                        *ngIf="revDoc['isActive']"
-                        class="dynamic-link"
-                        (click)="getDownload(normDoc._id, revDoc['name'])"
-                        ><i class="fas fa-file-download"></i>
-                      </a>
+                    <td style="width: 30%;">
                       {{ revDoc['revisionID'] }}
                     </td>
                     <td>
@@ -456,6 +450,14 @@
                           aria-hidden="true"
                         ></i
                       ></a>
+                    </td>
+                    <td>
+                      <a
+                        *ngIf="revDoc['isActive']"
+                        class="dynamic-link"
+                        (click)="getDownload(normDoc._id, revDoc['name'])"
+                        ><i class="fas fa-file-download"></i> Download
+                      </a>
                     </td>
                     <td style="text-align: right;">
                       vom {{ revDoc['date'] | date: 'dd.MM.y' }}

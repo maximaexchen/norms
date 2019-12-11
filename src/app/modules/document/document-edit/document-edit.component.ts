@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable, Subscriber } from 'rxjs';
-import { switchMap, tap, first } from 'rxjs/operators';
+import { switchMap, tap, first, reduce } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
@@ -140,6 +140,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('editDocument');
     this.isNew = false;
     this.formTitle = 'Norm bearbeiten';
+    console.log(this.normDoc);
     // fetch document which should be upated
     this.subsink.sink = this.documentService
       .getDocument('/' + selectedNorm['id'])
@@ -147,6 +148,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         normDoc => {
           console.log('editDocument subscribe WATER');
           this.normDoc = normDoc;
+          console.log(this.normDoc);
           this.isOwner = this.documentService.isNormOwner(
             this.authService.getCurrentUserID(),
             this.normDoc
@@ -269,7 +271,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .updateEntry(this.normDoc, this.normDoc._id)
       .subscribe(
         results => {
-          console.log('writeUpdate', results);
+          // Set updated _rev
+          this.normDoc._rev = results.rev;
+          this.editable = false;
         },
         error => {
           this.isLoading = false;
@@ -317,6 +321,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         return;
       });
 
+    if (this.documentService.getLatestActiveRevision(this.revisionDocuments)) {
+      this.latestAttachmentName = this.documentService.getLatestActiveRevision(
+        this.revisionDocuments
+      ).name;
+    }
+
     if (this.normDoc.users) {
       this.setSelectedUsers(this.normDoc.users);
     }
@@ -353,11 +363,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       });
     }
 
-    if (this.normDoc._attachments) {
+    /* if (this.normDoc._attachments) {
       this.latestAttachmentName = this.documentService.getLatestAttchmentFileName(
         this.normDoc._attachments
       );
-    }
+    } */
   }
 
   private processFormData() {
@@ -467,8 +477,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private resetComponent() {
     this.ownerId = '';
     this.editable = false;
-    this.users = [];
-    this.owners = [];
+    // this.users = [];
+    // this.owners = [];
     this.attachment = {};
     this.selectedRelatedNorms = [];
     this.relatedNormsFrom = [];
@@ -585,11 +595,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private getUsersForSelect(): void {
     this.documentService.getUsers().then(users => {
       // Add all users for the selectable owner dropdown
-
-      /* users.forEach(element => {
-        console.log(element['userName']);
-        console.log(element['supplierId']);
-      }); */
+      this.owners = [];
       this.owners = _.filter(
         users,
         user => user['supplierId'] === 0 && user['supplierId'] !== undefined
@@ -600,6 +606,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         user => user['supplierId'] !== 0 && user['supplierId'] !== undefined
       );
 
+      this.users = [];
       users.forEach(user => {
         const userObject = {} as User;
         userObject['id'] = user['_id'];
@@ -845,15 +852,33 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   public changeRevisionActive(revisionId: string) {
     this.revisionDocuments.map(revDoc => {
-      revDoc['isActive'] = revDoc['revisionID'] === revisionId ? true : false;
+      //revDoc['isActive'] = revDoc['revisionID'] === revisionId ? true : false;
+
+      revDoc['isActive'] =
+        revDoc['revisionID'] !== revisionId
+          ? ''
+          : revDoc['isActive'] === true
+          ? false
+          : true;
       return revDoc;
     });
 
-    this.revisionDocuments.filter(element => {
-      if (element['isActive'] === true) {
-        this.normDoc.active = true;
-      }
-    });
+    const filterActive = this.revisionDocuments.filter(
+      element => element['isActive']
+    );
+    if (Array.isArray(filterActive) && filterActive.length) {
+      this.normDoc.active = true;
+    } else {
+      this.normDoc.active = false;
+    }
+    console.log(this.revisionDocuments);
+    console.log(
+      this.documentService.getLatestActiveRevision(this.revisionDocuments).name
+    );
+
+    this.latestAttachmentName = this.documentService.getLatestActiveRevision(
+      this.revisionDocuments
+    ).name;
   }
 
   private setSelectedTags() {

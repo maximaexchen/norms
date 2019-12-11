@@ -126,13 +126,18 @@ export class DocumentService {
     });
   }
 
-  public getLatestRevision(revisions: any): any {
-    const sortedByDate = _.sortBy(revisions, (object, key) => {
-      return object['date'];
-    }).reverse();
+  public getLatestActiveRevision(revisions: any): any {
+    const sortedByDate = _.chain(revisions)
+      .filter(active => active['isActive'] === true)
+      .sortBy(revisions, (object, key) => {
+        return object['date'];
+      })
+      .reverse();
+
+    console.log(sortedByDate['_wrapped']);
 
     // take the first
-    const latest = _.first(sortedByDate);
+    const latest = _.first(sortedByDate['_wrapped']);
     return latest;
   }
 

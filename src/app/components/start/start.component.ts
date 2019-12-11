@@ -104,7 +104,7 @@ export class StartComponent implements OnInit, OnDestroy {
     const test = this.couchDBService.search(ownerQuery).pipe(
       flatMap(res => {
         res.docs.map(response => {
-          response.revisionLatest = this.documentService.getLatestRevision(
+          response.revisionLatest = this.documentService.getLatestActiveRevision(
             response.revisions
           );
           return response;
