@@ -1,4 +1,11 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  OnDestroy,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -31,7 +38,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
   templateUrl: './document-edit.component.html',
   styleUrls: ['./document-edit.component.scss']
 })
-export class DocumentEditComponent implements OnInit, OnDestroy {
+export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
   @ViewChild('fileUploadInput', { static: false }) fileUploadInput: FileUpload;
   subsink = new SubSink();
@@ -101,6 +108,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.currentUserRole = this.authService.getUserRole();
     this.setStartValues();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('ngOnChanges');
+    console.log(changes);
   }
 
   /**
@@ -360,9 +372,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // write current norm to related norms for "reletedFrom"
     this.addNormToLinkedNorms(selectedRelatedNorms);
 
-    console.log(this.selectedRelatedNorms);
+    /* console.log(this.selectedRelatedNorms);
     console.log(this.normDoc.relatedNorms);
-    console.log(this.normDoc.relatedFrom);
+    console.log(this.normDoc.relatedFrom); */
 
     this.setSelectedUser();
     this.setSelectedTags();
@@ -579,10 +591,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.documentService.getUsers().then(users => {
       // Add all users for the selectable owner dropdown
 
-      users.forEach(element => {
+      /* users.forEach(element => {
         console.log(element['userName']);
         console.log(element['supplierId']);
-      });
+      }); */
       this.owners = _.filter(
         users,
         user => user['supplierId'] === 0 && user['supplierId'] !== undefined
