@@ -4,13 +4,14 @@ import {
   ViewChild,
   OnDestroy,
   OnChanges,
-  SimpleChanges
+  SimpleChanges,
+  AfterViewInit
 } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable, Subscriber, of } from 'rxjs';
-import { switchMap, tap, pluck } from 'rxjs/operators';
+import { switchMap, tap, pluck, take, first } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
@@ -38,7 +39,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
   templateUrl: './document-edit.component.html',
   styleUrls: ['./document-edit.component.scss']
 })
-export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
+export class DocumentEditComponent implements OnInit, OnDestroy {
   @ViewChild('normForm', { static: false }) normForm: NgForm;
   @ViewChild('fileUploadInput', { static: false }) fileUploadInput: FileUpload;
   subsink = new SubSink();
@@ -110,16 +111,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
     this.setStartValues();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log('ngOnChanges');
-    console.log(changes);
-  }
-
   /**
    * Setup
    *
    */
   private setStartValues() {
+    console.log('setStartValues');
     this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
         // fetch data for select-boxes
@@ -135,6 +132,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
 
         // check if we have new document or we are updating
         if (selectedNorm['id']) {
+          console.log('check if we have new document or we are updating');
           this.editDocument(selectedNorm);
         } else {
           this.newDocument();
@@ -145,6 +143,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private editDocument(selectedNorm) {
+    console.log('editDocument');
     this.isNew = false;
     this.resetComponent();
 
@@ -155,13 +154,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
       .subscribe(
         normDoc => {
           this.normDoc = normDoc;
-          console.log(this.normDoc);
-          this.setAdditionalNormDocData();
         },
         error => {
           this.logger.error(error.message);
         },
-        () => {}
+        () => {
+          console.log('editDocument FIRE');
+          this.setAdditionalNormDocData();
+        }
       );
   }
 
@@ -209,7 +209,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
     this.spinner.show();
     this.normForm.form.markAsPristine();
 
-    // First save to get a document id for the attachment path and name
     this.subsink.sink = this.couchDBService.writeEntry(this.normDoc).subscribe(
       result => {
         if (this.fileUpload) {
@@ -229,10 +228,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
             }
           );
         }
-        this.router.navigate(['../document/' + this.normDoc._id + '/edit']);
         this.isLoading = false;
         this.spinner.hide();
         this.sendStateUpdate(this.normDoc._id, 'save');
+        // this.resetComponent();
+        this.router.navigate(['../document/' + this.normDoc._id + '/edit']);
       },
       error => {
         this.logger.error(error.message);
@@ -292,7 +292,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setAdditionalNormDocData() {
-    console.log('setAdditionalNormDocData begin');
+    console.log('setAdditionalNormDocData');
+    this.resetComponent();
     this.revisionDate = new Date(this.normDoc.revisionDate);
     if (this.normDoc.owner) {
       this.ownerId = this.normDoc.owner['_id'];
@@ -624,7 +625,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private getNormsForRelatedSelect() {
-    console.log('getNormsForRelatedSelect');
     this.relatedNormsSelectList = [];
 
     this.documentService.getDocuments().then(norms => {
@@ -873,16 +873,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setRelatedNorms(relatedNorms: any[]) {
-    console.log('setRelatedNorms');
-    console.log(relatedNorms);
     this.documentService.setRelated(relatedNorms).then(res => {
       this.selectedRelatedNorms = res;
     });
   }
 
   private setRelatedNormsFrom(relatedNormsFrom: any[]) {
-    console.log('setRelatedNormsFrom');
-    console.log(relatedNormsFrom);
     this.documentService.setRelated(relatedNormsFrom).then(res => {
       this.relatedNormsFrom = res;
     });
@@ -911,7 +907,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy, OnChanges {
               .updateEntry(linkedNorm, linkedNorm['_id'])
               .pipe(
                 tap(r => {
-                  console.log(r);
+                  // console.log(r);
                 })
               );
           })

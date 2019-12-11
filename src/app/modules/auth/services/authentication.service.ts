@@ -91,7 +91,6 @@ export class AuthenticationService {
   }
 
   public isAdmin(): boolean {
-    console.log(this.getUserRole());
     if (this.getUserRole() === 'admin') {
       return true;
     }

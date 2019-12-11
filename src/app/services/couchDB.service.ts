@@ -2,8 +2,8 @@ import { User } from './../models/user.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { map } from 'rxjs/operators';
-import { Observable, Subject } from 'rxjs';
+import { map, take, publishLast } from 'rxjs/operators';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 import { EnvService } from './env.service';
 import { Role } from '@models/index';
@@ -16,6 +16,8 @@ export class CouchDBService {
   private baseUrl = this.env.dbBaseUrl;
   private dbName = this.env.dbName;
   public dbRequest = this.baseUrl + this.dbName;
+
+  public fetchData: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   private updateSubject = new Subject<any>();
 
@@ -54,6 +56,15 @@ export class CouchDBService {
 
   public fetchEntry(param: string): Observable<any> {
     return this.http.get(this.dbRequest + param);
+  }
+
+  public fetchEntryBehaviour(param: string): void {
+    this.http
+      .get(this.dbRequest + param)
+      .toPromise()
+      .then(data => {
+        this.fetchData.next(data);
+      });
   }
 
   public bulkUpdate(bulkObject: any): Observable<any> {
