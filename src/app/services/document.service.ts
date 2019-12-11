@@ -32,20 +32,18 @@ export class DocumentService {
     private logger: NGXLogger
   ) {}
 
-  /* public getDocuments(): Observable<any> {
-    return this.couchDBService.fetchEntries(
-      '/_design/norms/_view/all-norms?include_docs=true'
-    );
-  } */
+  public getDocument(param: string): Observable<any> {
+    console.log('fetchEntry in CouchService');
+    console.log(param);
+    // return this.couchDBService.fetchEntry('/' + param);
+    return this.http.get(this.couchDBService.dbRequest + param);
+  }
 
   public getDocuments(): Promise<NormDocument[]> {
     return this.couchDBService
       .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
       .toPromise()
       .then(response => {
-        // console.log('getDocuments Promise');
-        // console.log(response);
-
         return response as NormDocument;
       })
       .catch(this.handleError);
@@ -82,6 +80,15 @@ export class DocumentService {
     return this.couchDBService.fetchEntries(
       '/_design/norms/_view/all-level1-tags?include_docs=true'
     );
+  }
+
+  public isNormOwner(ownerID: string, norm: NormDocument): boolean {
+    if (norm.owner) {
+      if (ownerID === norm.owner._id) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public setRelated(related: any[]): any {

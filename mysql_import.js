@@ -71,7 +71,7 @@ con.query(sql, function(err, result) {
     email: 'owner2@aircraft-philipp.com',
     role: 'owner',
     supplierId: 0,
-    password: 'b1e3677cd7c6f633e6c08037583c846f',
+    password: 'b74800433dce0f768d22b5fed4e0edaf',
     active: true,
     associatedNorms: []
   });

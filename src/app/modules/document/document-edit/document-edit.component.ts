@@ -1,17 +1,9 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  OnDestroy,
-  OnChanges,
-  SimpleChanges,
-  AfterViewInit
-} from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Observable, Subscriber, of } from 'rxjs';
-import { switchMap, tap, pluck, take, first } from 'rxjs/operators';
+import { Observable, Subscriber } from 'rxjs';
+import { switchMap, tap, first } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
@@ -45,6 +37,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   subsink = new SubSink();
   currentUserRole: string;
   isLoading = false;
+  isOwner = false;
+  isAdmin = false;
   editable = false;
   deletable = false;
   readyToSave = false;
@@ -117,12 +111,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    */
   private setStartValues() {
     console.log('setStartValues');
+    this.getUsersForSelect();
+    this.getTagsForSelect();
+    this.getNormsForRelatedSelect();
     this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
         // fetch data for select-boxes
-        this.getUsersForSelect();
-        this.getTagsForSelect();
-        this.getNormsForRelatedSelect();
 
         this.processTypes = [
           { id: 1, name: 'Spezialprozess' },
@@ -145,21 +139,27 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private editDocument(selectedNorm) {
     console.log('editDocument');
     this.isNew = false;
-    this.resetComponent();
-
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
-    this.subsink.sink = this.couchDBService
-      .fetchEntry('/' + selectedNorm['id'])
+    this.subsink.sink = this.documentService
+      .getDocument('/' + selectedNorm['id'])
       .subscribe(
         normDoc => {
+          console.log('editDocument subscribe WATER');
           this.normDoc = normDoc;
+          this.isOwner = this.documentService.isNormOwner(
+            this.authService.getCurrentUserID(),
+            this.normDoc
+          );
+          this.isAdmin = this.authService.isAdmin();
         },
         error => {
           this.logger.error(error.message);
         },
         () => {
-          console.log('editDocument FIRE');
+          console.log('editDocument finally FIRE');
+          console.log(this.normDoc.normNumber);
+          this.resetComponent();
           this.setAdditionalNormDocData();
         }
       );
@@ -231,7 +231,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.spinner.hide();
         this.sendStateUpdate(this.normDoc._id, 'save');
-        // this.resetComponent();
         this.router.navigate(['../document/' + this.normDoc._id + '/edit']);
       },
       error => {
@@ -285,7 +284,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.sendStateUpdate(this.normDoc._id, 'update');
           this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
-          this.setStartValues();
           this.normForm.form.markAsPristine();
         }
       );
@@ -293,7 +291,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private setAdditionalNormDocData() {
     console.log('setAdditionalNormDocData');
-    this.resetComponent();
     this.revisionDate = new Date(this.normDoc.revisionDate);
     if (this.normDoc.owner) {
       this.ownerId = this.normDoc.owner['_id'];
@@ -307,7 +304,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.revisionDocuments = _.sortBy(this.normDoc.revisions, 'date')
       .reverse()
       .filter(element => {
-        if (this.authService.isAdmin()) {
+        if (this.isAdmin) {
           return element;
         }
 
@@ -478,9 +475,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.revisionDocuments = [];
     this.latestAttachmentName = '';
     this.selectedUsers = [];
-    this.tagsLevel1 = [];
-    this.tagsLevel2 = [];
-    this.tagsLevel3 = [];
     this.selectedTags1 = [];
     this.selectedTags2 = [];
     this.selectedTags3 = [];
@@ -642,8 +636,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private getTagsForSelect(): void {
     this.subsink.sink = this.couchDBService
       .fetchEntries('/_design/norms/_view/all-tags?include_docs=true')
+      .pipe(first())
       .subscribe(
         results => {
+          this.tagsLevel1 = [];
+          this.tagsLevel2 = [];
+          this.tagsLevel3 = [];
           results.forEach(tag => {
             const tagObject = {} as Tag;
             tagObject['id'] = tag._id;
@@ -849,6 +847,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.revisionDocuments.map(revDoc => {
       revDoc['isActive'] = revDoc['revisionID'] === revisionId ? true : false;
       return revDoc;
+    });
+
+    this.revisionDocuments.filter(element => {
+      if (element['isActive'] === true) {
+        this.normDoc.active = true;
+      }
     });
   }
 

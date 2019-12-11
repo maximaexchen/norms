@@ -407,17 +407,17 @@
             </div>
 
             <hr *ngIf="latestAttachmentName" />
-
-            <button
-              type="button"
-              (click)="getDownload(normDoc._id, latestAttachmentName)"
-              *ngIf="latestAttachmentName"
-              title="{{ latestAttachmentName }}"
-              class="btn btn-acp attachmentDownload"
-            >
-              <i class="fas fa-file-download"></i> Download Norm
-            </button>
-
+            <span *ngIf="normDoc.active">
+              <button
+                type="button"
+                (click)="getDownload(normDoc._id, latestAttachmentName)"
+                *ngIf="latestAttachmentName"
+                title="{{ latestAttachmentName }}"
+                class="btn btn-acp attachmentDownload"
+              >
+                <i class="fas fa-file-download"></i> Download Norm
+              </button>
+            </span>
             <hr *ngIf="latestAttachmentName" />
             <div *appIsGranted="'UPDATE'">
               <p-fieldset
@@ -425,17 +425,18 @@
                 [toggleable]="true"
                 [transitionOptions]="'100ms'"
                 [collapsed]="false"
-                *ngIf="revisionDocuments.length > 0"
+                *ngIf="revisionDocuments.length > 0 && (isAdmin || isOwner)"
               >
                 <table class="table" style="width: 100%;">
                   <tr *ngFor="let revDoc of revisionDocuments; let i = index">
                     <td>
                       <a
+                        *ngIf="revDoc['isActive']"
                         class="dynamic-link"
                         (click)="getDownload(normDoc._id, revDoc['name'])"
                         ><i class="fas fa-file-download"></i>
-                        {{ revDoc['revisionID'] }}</a
-                      >
+                      </a>
+                      {{ revDoc['revisionID'] }}
                     </td>
                     <td>
                       <a

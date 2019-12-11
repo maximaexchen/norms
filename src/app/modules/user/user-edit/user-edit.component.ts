@@ -341,14 +341,14 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.user = {
       _id: '',
       type: 'user',
-      externalID: this.userForm.value.externalID || '',
+      externalID: parseInt(this.userForm.value.externalID, 10) || null,
       userName: this.userForm.value.userName || '',
       firstName: this.userForm.value.firstName || '',
       lastName: this.userForm.value.lastName || '',
       email: this.userForm.value.email || '',
       password: String(Md5.hashStr(this.userForm.value.password)) || '',
       role: this.userForm.value.selectedRole || '',
-      supplierId: this.userForm.value.supplierId || null,
+      supplierId: parseInt(this.userForm.value.supplierId, 10),
       active: this.userForm.value.active || false,
       associatedNorms: this.associatedNorms || []
     };
