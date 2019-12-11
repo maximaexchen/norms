@@ -41,6 +41,7 @@ export class AsciiInputValidatorDirective implements Validator {
   }
 
   validate(c: FormControl) {
+    console.log(c);
     return this.validator(c);
   }
 }

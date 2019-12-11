@@ -204,6 +204,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.editable = true;
   }
 
+  public onCancle() {
+    this.editable = false;
+  }
+
   private saveDocument(): void {
     console.log('saveDocument');
     this.processFormData();

@@ -29,6 +29,7 @@ export class CrudNavComponent implements OnInit {
   @Output() create = new EventEmitter();
   @Output() edit = new EventEmitter();
   @Output() delete = new EventEmitter();
+  @Output() cancle = new EventEmitter();
 
   constructor(
     private router: Router,
@@ -51,5 +52,9 @@ export class CrudNavComponent implements OnInit {
 
   public onDelete() {
     this.delete.emit('CrudNav Delete');
+  }
+
+  public onCancle() {
+    this.cancle.emit('CrudNav Cancle');
   }
 }
