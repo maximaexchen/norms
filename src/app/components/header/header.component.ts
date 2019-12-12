@@ -21,16 +21,18 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.userName = this.authenticationService.getCurrentUserFullName();
-
     this.authenticationService.userIsLoggedIn$.subscribe(
       res => {
-        this.initMainMenu();
+        if (this.authenticationService.isAuthenticated) {
+          this.userName = this.authenticationService.getCurrentUserFullName();
+          this.initMainMenu();
+        }
       },
       error => this.logger.error(error.message)
     );
 
     if (this.authenticationService.isAuthenticated) {
+      this.userName = this.authenticationService.getCurrentUserFullName();
       this.initMainMenu();
     }
   }

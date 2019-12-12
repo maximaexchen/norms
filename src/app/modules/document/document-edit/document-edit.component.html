@@ -391,7 +391,7 @@
                   [disabled]="normForm.invalid || !editable"
                   name="files"
                   (onSelect)="
-                    checkIfUploadExistsForRevision($event, fileUploadInput)
+                    addPDFToNorm($event, fileUploadInput)
                   "
                   accept="application/pdf"
                   [showUploadButton]="false"
@@ -436,7 +436,7 @@
                     <td>
                       <a
                         class="dynamic-link"
-                        (click)="changeRevisionActive(revDoc['revisionID'])"
+                        (click)="changeRevisionState(revDoc['dateHash'])"
                         [style.pointer-events]="!editable ? 'none' : 'auto'"
                       >
                         <i
@@ -461,7 +461,7 @@
                       </a>
                     </td>
                     <td style="text-align: right;">
-                      vom {{ revDoc['date'] | date: 'dd.MM.y' }}
+                      vom {{ revDoc['date'] | date: 'dd.MM.y / hh:mm' }}
                     </td>
                   </tr>
                 </table>
@@ -525,7 +525,7 @@
                       <td>
                         <a
                           class="dynamic-link"
-                          (click)="showRelated(related.id)"
+                          (click)="goToNorm(related.id)"
                           ><i class="fas fa-link"></i>
                           {{ related.normNumber }}</a
                         >
@@ -585,9 +585,9 @@
                   <tbody>
                     <tr *ngFor="let relatedFrom of relatedNormsFrom">
                       <td>
-                        <a
+                        <a  
                           class="dynamic-link"
-                          (click)="showRelated(relatedFrom.id)"
+                          (click)="goToNorm(relatedFrom.id)"
                           ><i class="fas fa-link"></i>
                           {{ relatedFrom.normNumber }}</a
                         >

@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable, Subscriber } from 'rxjs';
-import { switchMap, tap, first, reduce } from 'rxjs/operators';
+import { switchMap, tap, first, reduce, flatMap } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
@@ -100,34 +100,31 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     private spinner: NgxSpinnerService
   ) {}
 
+  /**
+   * Setup
+   *
+   */
   ngOnInit() {
     this.currentUserRole = this.authService.getUserRole();
     this.setStartValues();
   }
 
-  /**
-   * Setup
-   *
-   */
   private setStartValues() {
     console.log('setStartValues');
+    // fetch data for select-boxes
     this.getUsersForSelect();
     this.getTagsForSelect();
     this.getNormsForRelatedSelect();
     this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
-        // fetch data for select-boxes
-
         this.processTypes = [
           { id: 1, name: 'Spezialprozess' },
           { id: 2, name: 'kein Spezialprozess' },
           { id: 3, name: 'Normschrift' }
         ];
-
         // check if we have new document or we are updating
         if (selectedNorm['id']) {
-          console.log('check if we have new document or we are updating');
-          this.editDocument(selectedNorm);
+          this.editDocument(selectedNorm['id']);
         } else {
           this.newDocument();
         }
@@ -136,35 +133,32 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private editDocument(selectedNorm) {
+  /**
+   * CRUD methods
+   *
+   */
+  private editDocument(id) {
     console.log('editDocument');
+    this.resetComponent();
     this.isNew = false;
     this.formTitle = 'Norm bearbeiten';
-    console.log(this.normDoc);
     // fetch document which should be upated
-    this.subsink.sink = this.documentService
-      .getDocument('/' + selectedNorm['id'])
-      .subscribe(
-        normDoc => {
-          console.log('editDocument subscribe WATER');
-          this.normDoc = normDoc;
-          console.log(this.normDoc);
-          this.isOwner = this.documentService.isNormOwner(
-            this.authService.getCurrentUserID(),
-            this.normDoc
-          );
-          this.isAdmin = this.authService.isAdmin();
-        },
-        error => {
-          this.logger.error(error.message);
-        },
-        () => {
-          console.log('editDocument finally FIRE');
-          console.log(this.normDoc.normNumber);
-          this.resetComponent();
-          this.setAdditionalNormDocData();
-        }
-      );
+    this.subsink.sink = this.documentService.getDocument('/' + id).subscribe(
+      normDoc => {
+        this.normDoc = normDoc;
+        this.isOwner = this.documentService.isNormOwner(
+          this.authService.getCurrentUserID(),
+          this.normDoc
+        );
+        this.isAdmin = this.authService.isAdmin();
+      },
+      error => {
+        this.logger.error(error.message);
+      },
+      () => {
+        this.setAdditionalNormDocData();
+      }
+    );
   }
 
   private newDocument() {
@@ -185,10 +179,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     };
   }
 
-  /**
-   * CRUD methods
-   *
-   */
+  public onEdit() {
+    this.setMultiselects();
+    this.editable = true;
+  }
+
+  public onCancle() {
+    this.editable = false;
+    this.assignMultiselectConfig();
+  }
+
   public onSubmit(): void {
     this.isLoading = true;
     this.spinner.show();
@@ -197,15 +197,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.updateDocument();
     }
-  }
-
-  public onEdit() {
-    this.setMultiselects();
-    this.editable = true;
-  }
-
-  public onCancle() {
-    this.editable = false;
   }
 
   private saveDocument(): void {
@@ -217,27 +208,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.subsink.sink = this.couchDBService.writeEntry(this.normDoc).subscribe(
       result => {
-        if (this.fileUpload) {
-          this.subsink.sink = this.uploadPDF().subscribe(
-            res => {},
-            error => {
-              this.logger.error(error.message);
-              this.spinner.hide();
-              this.showConfirmation('error', error.message);
-            },
-            () => {
-              this.router.navigate([
-                '../document/' + this.normDoc._id + '/edit'
-              ]);
-              this.spinner.hide();
-              this.showConfirmation('success', 'Upload erfolgreich');
-            }
-          );
-        }
         this.isLoading = false;
         this.spinner.hide();
         this.sendStateUpdate(this.normDoc._id, 'save');
-        this.router.navigate(['../document/' + this.normDoc._id + '/edit']);
+        this.goToNorm(this.normDoc._id);
       },
       error => {
         this.logger.error(error.message);
@@ -249,33 +223,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private updateDocument(): void {
+    this.isLoading = true;
     this.processFormData();
 
-    if (this.fileUpload) {
-      this.subsink.sink = this.uploadPDF().subscribe(
-        result => {},
-        error => {
-          this.logger.error(error.message);
-          this.spinner.hide();
-          this.showConfirmation('error', error.message);
-        },
-        () => {
-          this.writeUpdate();
-        }
-      );
-    } else {
-      this.writeUpdate();
-    }
-  }
-
-  private writeUpdate() {
-    console.log('writeUpdate');
-    this.isLoading = true;
     this.subsink.sink = this.couchDBService
       .updateEntry(this.normDoc, this.normDoc._id)
       .subscribe(
         results => {
           // Set updated _rev
+          console.log(results);
           this.normDoc._rev = results.rev;
           this.editable = false;
         },
@@ -300,6 +256,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private setAdditionalNormDocData() {
     console.log('setAdditionalNormDocData');
     this.revisionDate = new Date(this.normDoc.revisionDate);
+
     if (this.normDoc.owner) {
       this.ownerId = this.normDoc.owner['_id'];
     }
@@ -366,12 +323,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         }
       });
     }
-
-    /* if (this.normDoc._attachments) {
-      this.latestAttachmentName = this.documentService.getLatestAttchmentFileName(
-        this.normDoc._attachments
-      );
-    } */
   }
 
   private processFormData() {
@@ -383,16 +334,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.processRelatedFromNorms();
     // write current norm to related norms for "reletedFrom"
     this.addNormToLinkedNorms(selectedRelatedNorms);
-
-    /* console.log(this.selectedRelatedNorms);
-    console.log(this.normDoc.relatedNorms);
-    console.log(this.normDoc.relatedFrom); */
-
     this.setSelectedUser();
     this.setSelectedTags();
     // If there is a new PDF upload add to revisions and attachment Array
     this.addNewRevision();
 
+    console.log(this.fileUpload);
+
+    if (this.fileUpload) {
+      this.uploadFileToServer();
+    }
     const selOwner: User = this.owners.find(
       own => own['_id'] === this.normForm.value.ownerId
     );
@@ -410,10 +361,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     return this.normDoc;
   }
 
-  addNewRevision() {
+  private addNewRevision() {
     if (!_.isEmpty(this.attachment)) {
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
+      this.revisionDocument['dateHash'] = this.documentService.extractDateHash(
+        this.newAttachmentName
+      );
       this.revisionDocument['name'] = this.newAttachmentName;
       this.revisionDocument['revisionID'] = this.normDoc.revision;
       this.revisionDocument['path'] = this.uploadDir.replace(
@@ -481,8 +435,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private resetComponent() {
     this.ownerId = '';
     this.editable = false;
-    // this.users = [];
-    // this.owners = [];
     this.attachment = {};
     this.selectedRelatedNorms = [];
     this.relatedNormsFrom = [];
@@ -508,13 +460,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Upload methods
+   * Filehandling
    *
    */
-  public checkIfUploadExistsForRevision(event, uploadField) {
+  /* public checkIfUploadExistsForRevision(event, uploadField) {
     for (const file of event.files) {
       this.fileUpload = file;
     }
+
     let isIn = false;
     if (this.normDoc._attachments) {
       isIn = this.checkForExistingAttachment(
@@ -539,15 +492,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.processUpload(uploadField);
     }
-  }
+  } */
 
-  public processUpload(uploadField) {
+  public addPDFToNorm(event, uploadField) {
+    for (const file of event.files) {
+      this.fileUpload = file;
+    }
+
     this.subsink.sink = this.convertToBase64(this.fileUpload).subscribe(
       result => {
         this.newAttachmentName =
           this.normDoc._id +
           '_' +
-          this.documentService.removeSpecialChars(this.normDoc.revision) +
+          // this.documentService.removeSpecialChars(this.normDoc.revision) +
+          this.documentService.getDateHash() +
           '.' +
           this.fileUpload.name.split('.').pop();
         this.attachment = {
@@ -570,32 +528,45 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private checkForExistingAttachment(obj, searchKey): boolean {
-    return Object.keys(obj).some(prop => {
-      const needle = /_([^.]+)./.exec(prop)[1];
-      return needle.includes(searchKey);
-    });
-  }
-
-  private uploadPDF(): Observable<any> {
-    return this.serverService.uploadFile(
-      this.uploadUrl + '/',
-      this.fileUpload,
-      this.normDoc._id,
-      this.env.uploadDir,
-      this.normDoc.revision
-    );
+  private uploadFileToServer() {
+    console.log(this.latestAttachmentName);
+    this.subsink.sink = this.serverService
+      .uploadFileToServer(
+        this.uploadUrl + '/',
+        this.fileUpload,
+        this.normDoc._id,
+        this.env.uploadDir,
+        this.normDoc.revision
+      )
+      .subscribe(
+        res => {},
+        error => {
+          this.logger.error(error.message);
+          this.spinner.hide();
+          this.showConfirmation('error', error.message);
+        },
+        () => {
+          this.showConfirmation('success', 'Upload erfolgreich');
+        }
+      );
   }
 
   public getDownload(id: string, name: any) {
     this.documentService.getDownload(id, name);
   }
 
+  /* private checkForExistingAttachment(obj, searchKey): boolean {
+    return Object.keys(obj).some(prop => {
+      const needle = /_([^.]+)./.exec(prop)[1];
+      return needle.includes(searchKey);
+    });
+  }
+ */
+
   /**
    * Data for selectboxes
    *
    */
-
   private getUsersForSelect(): void {
     this.documentService.getUsers().then(users => {
       // Add all users for the selectable owner dropdown
@@ -854,12 +825,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  public changeRevisionActive(revisionId: string) {
+  public changeRevisionState(dateHash: string) {
     this.revisionDocuments.map(revDoc => {
       //revDoc['isActive'] = revDoc['revisionID'] === revisionId ? true : false;
 
       revDoc['isActive'] =
-        revDoc['revisionID'] !== revisionId
+        revDoc['dateHash'] !== dateHash
           ? ''
           : revDoc['isActive'] === true
           ? false
@@ -875,14 +846,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.normDoc.active = false;
     }
-    console.log(this.revisionDocuments);
-    console.log(
-      this.documentService.getLatestActiveRevision(this.revisionDocuments).name
-    );
 
-    this.latestAttachmentName = this.documentService.getLatestActiveRevision(
-      this.revisionDocuments
-    ).name;
+    if (this.documentService.getLatestActiveRevision(this.revisionDocuments)) {
+      this.latestAttachmentName = this.documentService.getLatestActiveRevision(
+        this.revisionDocuments
+      ).name;
+    }
   }
 
   private setSelectedTags() {
@@ -954,7 +923,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  public showRelated(id: string) {
+  public goToNorm(id: string) {
     this.router.navigate(['../document/' + id + '/edit']);
   }
 
@@ -1032,6 +1001,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    * Multiselect configuration and actions
    */
   private assignMultiselectConfig() {
+    console.log(this.editable);
+    console.log(!this.isNew);
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',
@@ -1043,7 +1014,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       enableSearchFilter: true,
       searchPlaceholderText: 'User Auswahl',
       noDataLabel: 'Keinen Benutzer gefunden',
-      disabled: this.editable || !this.isNew
+      disabled: !this.editable || !this.isNew
     };
 
     this.relatedDropdownSettings = {
@@ -1058,7 +1029,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'Referenz Auswahl',
       noDataLabel: 'Keine Referenz gefunden',
       classes: 'relatedClass',
-      disabled: this.editable || !this.isNew
+      disabled: !this.editable || !this.isNew
     };
 
     this.tagDropdownSettings = {
@@ -1073,7 +1044,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       searchPlaceholderText: 'Tag Auswahl',
       noDataLabel: 'Keinen Tag gefunden',
       classes: 'tag-multiselect',
-      disabled: this.editable || !this.isNew
+      disabled: !this.editable || !this.isNew
     };
   }
 
@@ -1091,7 +1062,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  private disableMultiselect() {
+  /*  private disableMultiselect() {
     this.tagDropdownSettings['disabled'] = true;
     this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
 
@@ -1103,7 +1074,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       {},
       this.relatedDropdownSettings
     );
-  }
+  } */
 
   public onItemSelect(item: any) {}
   public onItemDeSelect(item: any) {}

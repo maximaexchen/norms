@@ -13,7 +13,7 @@ import { DocumentService } from './../../services/document.service';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from './../../modules/auth/services/authentication.service';
 import { User } from '@app/models';
-import { map, mergeMap, flatMap } from 'rxjs/operators';
+import { flatMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-start',

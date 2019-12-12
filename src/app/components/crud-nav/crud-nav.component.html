@@ -20,7 +20,7 @@
     i18n-label="@@btn-new"
     class="btn btn-default btn-sm btn-headline"
     (click)="onSubmit()"
-    *ngIf="isNew && !editable && role === 'admin'"
+    *ngIf="isNew && editable && role === 'admin'"
     [disabled]="!validForm"
     [ngClass]="{ 'ready-save-btn': dirtyForm && validForm }"
   ></button>

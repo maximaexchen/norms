@@ -21,7 +21,7 @@ export class ServerService {
     return this.http.request(new HttpRequest('GET', url));
   }
 
-  public uploadFile(
+  public uploadFileToServer(
     url: string,
     file: File,
     createid: string,
@@ -31,6 +31,8 @@ export class ServerService {
     const formData = new FormData();
 
     revision = this.documentService.removeSpecialChars(revision);
+
+    const datehash = this.documentService.extractDateHash(file.name);
 
     console.log('-------------------------------------');
     console.log(file);
@@ -43,6 +45,7 @@ export class ServerService {
     formData.append('createID', createid);
     formData.append('uploadDir', uploadDir);
     formData.append('revision', revision);
+    formData.append('datehash', datehash);
 
     const params = new HttpParams();
 

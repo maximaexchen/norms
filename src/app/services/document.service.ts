@@ -127,6 +127,7 @@ export class DocumentService {
   }
 
   public getLatestActiveRevision(revisions: any): any {
+    console.log(revisions);
     const sortedByDate = _.chain(revisions)
       .filter(active => active['isActive'] === true)
       .sortBy(revisions, (object, key) => {
@@ -150,6 +151,21 @@ export class DocumentService {
     // take the first
     const latest = _.first(sortedByRevision);
     return latest['id'];
+  }
+
+  public getDateHash(): string {
+    // console.log((+new Date() + Math.random() * 100).toString(32));
+    // console.log((+new Date()).toString(36));
+    return (+new Date()).toString(36);
+  }
+
+  public extractDateHash(name): string {
+    // console.log((+new Date() + Math.random() * 100).toString(32));
+    // console.log((+new Date()).toString(36));
+    return name
+      .split('_')
+      .pop()
+      .split('.')[0];
   }
 
   public removeSpecialChars(str: string): string {
