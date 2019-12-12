@@ -126,6 +126,116 @@ export class DocumentService {
     });
   }
 
+  public deleteRelatedDBEntries(id: string) {
+    console.log('deleteRelatedDBEntries');
+    this.deleteAssociatedNormEntriesInUser(id);
+
+    const deleteQuery = {
+      use_index: ['_design/search_norm'],
+      selector: {
+        _id: {
+          $gt: null
+        },
+        type: {
+          $eq: 'norm'
+        },
+        $or: [
+          {
+            relatedNorms: {
+              $elemMatch: {
+                $eq: id
+              }
+            }
+          },
+          {
+            relatedFrom: {
+              $elemMatch: {
+                $eq: id
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    this.couchDBService.search(deleteQuery).subscribe(norm => {
+      norm.docs.forEach(foundNorm => {
+        foundNorm.relatedNorms = foundNorm.relatedNorms.filter(
+          normId => normId !== id
+        );
+
+        foundNorm.relatedFrom = foundNorm.relatedFrom.filter(
+          normId => normId !== id
+        );
+
+        this.couchDBService.updateEntry(foundNorm, foundNorm._id).subscribe(
+          result => {},
+          error => {
+            this.logger.error(error.message);
+          }
+        );
+      });
+    });
+  }
+
+  public deleteAssociatedNormEntriesInUser(id: string) {
+    const deleteQuery = {
+      use_index: ['_design/search_norm'],
+      selector: {
+        _id: {
+          $gt: null
+        },
+        type: {
+          $eq: 'user'
+        },
+        $and: [
+          {
+            associatedNorms: {
+              $elemMatch: {
+                normId: {
+                  $eq: id
+                }
+              }
+            }
+          }
+        ]
+      }
+    };
+
+    this.couchDBService.search(deleteQuery).subscribe(user => {
+      user.docs.forEach(foundUser => {
+        // filter out the deleted associatedNorms for given id
+        foundUser.associatedNorms = foundUser.associatedNorms.filter(
+          norm => norm.normId !== id
+        );
+
+        this.couchDBService.updateEntry(foundUser, foundUser._id).subscribe(
+          result => {
+            console.log(user);
+          },
+          error => {
+            this.logger.error(error.message);
+          }
+        );
+      });
+    });
+  }
+
+  public getLatestRevision(revisions: any): any {
+    console.log(revisions);
+    const sortedByDate = _.chain(revisions)
+      .sortBy(revisions, (object, key) => {
+        return object['date'];
+      })
+      .reverse();
+
+    console.log(sortedByDate['_wrapped']);
+
+    // take the first
+    const latest = _.first(sortedByDate['_wrapped']);
+    return latest;
+  }
+
   public getLatestActiveRevision(revisions: any): any {
     console.log(revisions);
     const sortedByDate = _.chain(revisions)

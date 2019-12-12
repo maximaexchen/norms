@@ -26,31 +26,24 @@ export class ServerService {
     file: File,
     createid: string,
     uploadDir: string,
-    revision: string
+    filename: string
   ): Observable<HttpEvent<any>> {
     const formData = new FormData();
-
-    revision = this.documentService.removeSpecialChars(revision);
-
-    const datehash = this.documentService.extractDateHash(file.name);
-
     console.log('-------------------------------------');
     console.log(file);
     console.log(file.name);
     console.log(createid);
     console.log(uploadDir);
-    console.log(revision);
     console.log('-------------------------------------');
     formData.append('uploadFile', file, file.name);
     formData.append('createID', createid);
     formData.append('uploadDir', uploadDir);
-    formData.append('revision', revision);
-    formData.append('datehash', datehash);
+    formData.append('filename', filename);
 
     const params = new HttpParams();
 
     const headers = new HttpHeaders({
-      revision,
+      filename,
       createid
     });
 

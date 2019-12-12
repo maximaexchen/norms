@@ -25,7 +25,7 @@ var allowCrossDomain = function(req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, revision, createid, body, datehash'
+    'Content-Type, Authorization, revision, createid, body, filename'
   );
 
   // intercept OPTIONS method
@@ -82,12 +82,7 @@ var storage = multer.diskStorage({
     callback(null, './uploadsTemp/');
   },
   filename: (req, file, callback) => {
-    fileName =
-      req.headers.createid +
-      '_' +
-      req.headers.datehash +
-      '.' +
-      file.originalname.split('.').pop();
+    fileName = req.headers.filename;
     callback(null, fileName);
   }
 });

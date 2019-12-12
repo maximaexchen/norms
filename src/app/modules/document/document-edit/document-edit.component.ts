@@ -339,8 +339,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // If there is a new PDF upload add to revisions and attachment Array
     this.addNewRevision();
 
-    console.log(this.fileUpload);
-
     if (this.fileUpload) {
       this.uploadFileToServer();
     }
@@ -415,14 +413,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .deleteEntry(this.normDoc._id, this.normDoc._rev)
           .subscribe(
             res => {
-              this.deleteRelatedDBEntries(this.normDoc._id);
+              this.documentService.deleteRelatedDBEntries(this.normDoc._id);
             },
             error => {
               this.logger.error(error.message);
               this.showConfirmation('error', error.message);
             },
             () => {
-              console.log(this.normDoc);
               this.sendStateUpdate(this.normDoc._id, 'delete');
               this.router.navigate(['../document']);
             }
@@ -492,7 +489,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     } else {
       this.processUpload(uploadField);
     }
-  } */
+  }
+  private checkForExistingAttachment(obj, searchKey): boolean {
+    return Object.keys(obj).some(prop => {
+      const needle = /_([^.]+)./.exec(prop)[1];
+      return needle.includes(searchKey);
+    });
+  }
+ */
 
   public addPDFToNorm(event, uploadField) {
     for (const file of event.files) {
@@ -529,14 +533,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private uploadFileToServer() {
-    console.log(this.latestAttachmentName);
+    console.log(this.documentService.getLatestRevision(this.revisionDocuments));
+    console.log(this.normDoc);
     this.subsink.sink = this.serverService
       .uploadFileToServer(
         this.uploadUrl + '/',
         this.fileUpload,
         this.normDoc._id,
         this.env.uploadDir,
-        this.normDoc.revision
+        this.documentService.getLatestRevision(this.revisionDocuments).name
       )
       .subscribe(
         res => {},
@@ -554,14 +559,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public getDownload(id: string, name: any) {
     this.documentService.getDownload(id, name);
   }
-
-  /* private checkForExistingAttachment(obj, searchKey): boolean {
-    return Object.keys(obj).some(prop => {
-      const needle = /_([^.]+)./.exec(prop)[1];
-      return needle.includes(searchKey);
-    });
-  }
- */
 
   /**
    * Data for selectboxes
@@ -712,9 +709,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             this.subsink.sink = this.couchDBService
               .writeEntry(updateUser)
               .subscribe(
-                result => {
-                  // this.sendStateUpdate();
-                },
+                result => {},
                 error => {
                   this.logger.error(error.message);
                 }
@@ -727,108 +722,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deleteRelatedDBEntries(id: string) {
-    this.deleteAssociatedNormEntriesInUser(this.normDoc._id);
-
-    const deleteQuery = {
-      use_index: ['_design/search_norm'],
-      selector: {
-        _id: {
-          $gt: null
-        },
-        type: {
-          $eq: 'norm'
-        },
-        $or: [
-          {
-            relatedNorms: {
-              $elemMatch: {
-                $eq: id
-              }
-            }
-          },
-          {
-            relatedFrom: {
-              $elemMatch: {
-                $eq: id
-              }
-            }
-          }
-        ]
-      }
-    };
-
-    this.couchDBService.search(deleteQuery).subscribe(norm => {
-      norm.docs.forEach(foundNorm => {
-        foundNorm.relatedNorms = foundNorm.relatedNorms.filter(
-          normId => normId !== id
-        );
-
-        foundNorm.relatedFrom = foundNorm.relatedFrom.filter(
-          normId => normId !== id
-        );
-
-        this.subsink.sink = this.couchDBService
-          .updateEntry(foundNorm, foundNorm._id)
-          .subscribe(
-            result => {},
-            error => {
-              this.logger.error(error.message);
-            }
-          );
-      });
-    });
-  }
-
-  private deleteAssociatedNormEntriesInUser(id: string) {
-    const deleteQuery = {
-      use_index: ['_design/search_norm'],
-      selector: {
-        _id: {
-          $gt: null
-        },
-        type: {
-          $eq: 'user'
-        },
-        $and: [
-          {
-            associatedNorms: {
-              $elemMatch: {
-                normId: {
-                  $eq: id
-                }
-              }
-            }
-          }
-        ]
-      }
-    };
-
-    this.couchDBService.search(deleteQuery).subscribe(user => {
-      user.docs.forEach(foundUser => {
-        // filter out the deleted associatedNorms for given id
-        foundUser.associatedNorms = foundUser.associatedNorms.filter(
-          norm => norm.normId !== id
-        );
-
-        this.subsink.sink = this.couchDBService
-          .updateEntry(foundUser, foundUser._id)
-          .subscribe(
-            result => {
-              console.log(user);
-            },
-            error => {
-              this.logger.error(error.message);
-            }
-          );
-      });
-    });
-  }
-
   public changeRevisionState(dateHash: string) {
     this.revisionDocuments.map(revDoc => {
-      //revDoc['isActive'] = revDoc['revisionID'] === revisionId ? true : false;
-
       revDoc['isActive'] =
         revDoc['dateHash'] !== dateHash
           ? ''
@@ -1061,20 +956,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.relatedDropdownSettings
     );
   }
-
-  /*  private disableMultiselect() {
-    this.tagDropdownSettings['disabled'] = true;
-    this.tagDropdownSettings = Object.assign({}, this.tagDropdownSettings);
-
-    this.userDropdownSettings['disabled'] = true;
-    this.userDropdownSettings = Object.assign({}, this.userDropdownSettings);
-
-    this.relatedDropdownSettings['disabled'] = true;
-    this.relatedDropdownSettings = Object.assign(
-      {},
-      this.relatedDropdownSettings
-    );
-  } */
 
   public onItemSelect(item: any) {}
   public onItemDeSelect(item: any) {}
