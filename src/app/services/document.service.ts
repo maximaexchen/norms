@@ -33,6 +33,9 @@ export class DocumentService {
   ) {}
 
   public getDocument(param: string): Observable<any> {
+    console.log('fetchEntry in CouchService');
+    console.log(param);
+    // return this.couchDBService.fetchEntry('/' + param);
     return this.http.get(this.couchDBService.dbRequest + param);
   }
 
@@ -91,18 +94,17 @@ export class DocumentService {
   public setRelated(related: any[]): any {
     return this.getDocuments().then(norms => {
       const filtered = norms.filter(norm => related.indexOf(norm['_id']) > -1);
-
       return filtered.map(mapped => {
         let revDescription: string;
         switch (mapped['normLanguage']) {
           case 'de':
-            revDescription = mapped['description.de'];
+            revDescription = mapped['description']['de'];
             break;
           case 'en':
-            revDescription = mapped['description.en'];
+            revDescription = mapped['description']['en'];
             break;
           case 'fr':
-            revDescription = mapped['description.en'];
+            revDescription = mapped['description']['fr'];
             break;
         }
 
@@ -123,110 +125,6 @@ export class DocumentService {
     });
   }
 
-  public deleteRelatedDBEntries(id: string) {
-    this.deleteAssociatedNormEntriesInUser(id);
-
-    const deleteQuery = {
-      use_index: ['_design/search_norm'],
-      selector: {
-        _id: {
-          $gt: null
-        },
-        type: {
-          $eq: 'norm'
-        },
-        $or: [
-          {
-            relatedNorms: {
-              $elemMatch: {
-                $eq: id
-              }
-            }
-          },
-          {
-            relatedFrom: {
-              $elemMatch: {
-                $eq: id
-              }
-            }
-          }
-        ]
-      }
-    };
-
-    this.couchDBService.search(deleteQuery).subscribe(norm => {
-      norm.docs.forEach(foundNorm => {
-        foundNorm.relatedNorms = foundNorm.relatedNorms.filter(
-          normId => normId !== id
-        );
-
-        foundNorm.relatedFrom = foundNorm.relatedFrom.filter(
-          normId => normId !== id
-        );
-
-        this.couchDBService.updateEntry(foundNorm, foundNorm._id).subscribe(
-          result => {},
-          error => {
-            this.logger.error(error.message);
-          }
-        );
-      });
-    });
-  }
-
-  public deleteAssociatedNormEntriesInUser(id: string) {
-    const deleteQuery = {
-      use_index: ['_design/search_norm'],
-      selector: {
-        _id: {
-          $gt: null
-        },
-        type: {
-          $eq: 'user'
-        },
-        $and: [
-          {
-            associatedNorms: {
-              $elemMatch: {
-                normId: {
-                  $eq: id
-                }
-              }
-            }
-          }
-        ]
-      }
-    };
-
-    this.couchDBService.search(deleteQuery).subscribe(user => {
-      user.docs.forEach(foundUser => {
-        // filter out the deleted associatedNorms for given id
-        foundUser.associatedNorms = foundUser.associatedNorms.filter(
-          norm => norm.normId !== id
-        );
-
-        this.couchDBService.updateEntry(foundUser, foundUser._id).subscribe(
-          result => {},
-          error => {
-            this.logger.error(error.message);
-          }
-        );
-      });
-    });
-  }
-
-  public getLatestRevision(revisions: any): any {
-    const sortedByDate = _.chain(revisions)
-      .sortBy(revisions, (object, key) => {
-        return object['date'];
-      })
-      .reverse();
-
-    // take the first
-    const latest = _.first(sortedByDate['_wrapped']);
-    return latest;
-  }
-
   public getLatestActiveRevision(revisions: any): any {
     const sortedByDate = _.chain(revisions)
       .filter(active => active['isActive'] === true)
@@ -235,33 +133,22 @@ export class DocumentService {
       })
       .reverse();
 
+    console.log(sortedByDate['_wrapped']);
+
     // take the first
     const latest = _.first(sortedByDate['_wrapped']);
     return latest;
   }
 
   public getLatestAttchmentFileName(attachements: any): string {
-    const sortedByRevisions = _.sortBy(attachements, (object, key) => {
+    const sortedByRevision = _.sortBy(attachements, (object, key) => {
       object['id'] = key;
       return object['revpos'];
     }).reverse();
 
     // take the first
-    const latest = _.first(sortedByRevisions);
+    const latest = _.first(sortedByRevision);
     return latest['id'];
-  }
-
-  public getDateHash(): string {
-    // console.log((+new Date() + Math.random() * 100).toString(32));
-    // console.log((+new Date()).toString(36));
-    return (+new Date()).toString(36);
-  }
-
-  public extractDateHash(name): string {
-    return name
-      .split('_')
-      .pop()
-      .split('.')[0];
   }
 
   public removeSpecialChars(str: string): string {
@@ -355,10 +242,16 @@ export class DocumentService {
    * Helperfunctions
    */
   public renameKeys(keysMap, obj) {
+    // debugger;
+
     return Object.keys(obj).reduce((acc, key) => {
+      // debugger;
+
       const renamedObject = {
         [keysMap[key] || key]: obj[key]
       };
+
+      // debugger;
 
       return {
         ...acc,

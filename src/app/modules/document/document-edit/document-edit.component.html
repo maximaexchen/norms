@@ -390,9 +390,7 @@
                   #fileUploadInput
                   [disabled]="normForm.invalid || !editable"
                   name="files"
-                  (onSelect)="
-                    addPDFToNorm($event, fileUploadInput)
-                  "
+                  (onSelect)="addPDFToNorm($event, fileUploadInput)"
                   accept="application/pdf"
                   [showUploadButton]="false"
                   [showCancelButton]="true"
@@ -523,9 +521,7 @@
                   <tbody>
                     <tr *ngFor="let related of selectedRelatedNorms">
                       <td>
-                        <a
-                          class="dynamic-link"
-                          (click)="goToNorm(related.id)"
+                        <a class="dynamic-link" (click)="goToNorm(related.id)"
                           ><i class="fas fa-link"></i>
                           {{ related.normNumber }}</a
                         >
