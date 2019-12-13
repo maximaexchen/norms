@@ -29,9 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private logger: NGXLogger
   ) {}
 
-  ngOnInit() {
-    console.log('send message');
-  }
+  ngOnInit() {}
 
   public login(event) {
     if (event.isValidUser) {

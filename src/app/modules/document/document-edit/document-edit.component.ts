@@ -110,7 +110,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setStartValues() {
-    console.log('setStartValues');
     // fetch data for select-boxes
     this.getUsersForSelect();
     this.getTagsForSelect();
@@ -231,7 +230,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       .subscribe(
         results => {
           // Set updated _rev
-          console.log(results);
           this.normDoc._rev = results.rev;
           this.editable = false;
         },
@@ -254,7 +252,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setAdditionalNormDocData() {
-    console.log('setAdditionalNormDocData');
     this.revisionDate = new Date(this.normDoc.revisionDate);
 
     if (this.normDoc.owner) {
@@ -273,9 +270,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           return element;
         }
 
-        if (this.normDoc.owner) {
+        if (!!this.normDoc.owner) {
           if (this.normDoc.owner._id === this.authService.getCurrentUserID()) {
             return element;
+          } else {
+            return element['isActive'] === true ? element : undefined;
           }
         }
 
@@ -326,8 +325,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processFormData() {
-    console.log('processFormdata');
-
     this.normDoc.revisionDate = this.normForm.value.revisionDate;
 
     const selectedRelatedNorms = this.processRelatedNorms();
@@ -356,10 +353,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     // add update status to users to be notified
     this.setUserNotification(this.normForm.value.revision);
+
+    this.resetTempData();
     return this.normDoc;
   }
 
   private addNewRevision() {
+    console.log(this.attachment);
+    console.log(!_.isEmpty(this.attachment));
     if (!_.isEmpty(this.attachment)) {
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
@@ -429,7 +430,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
+  private resetTempData() {
+    this.attachment = {};
+  }
+
   private resetComponent() {
+    console.log('resetComponent');
+    console.log(this.attachment);
     this.ownerId = '';
     this.editable = false;
     this.attachment = {};
@@ -444,6 +451,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedTab = 0;
     this.processTypeId = '';
 
+    console.log(this.attachment);
     if (this.normForm) {
       this.normForm.form.markAsPristine();
     }
@@ -527,14 +535,13 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       () => {
         this.isLoading = false;
         this.spinner.hide();
+        this.normForm.form.markAsDirty();
         this.showConfirmation('success', 'Files added');
       }
     );
   }
 
   private uploadFileToServer() {
-    console.log(this.documentService.getLatestRevision(this.revisionDocuments));
-    console.log(this.normDoc);
     this.subsink.sink = this.serverService
       .uploadFileToServer(
         this.uploadUrl + '/',
@@ -802,11 +809,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
             // write current norm into linked norm under relatedFrom
             return this.couchDBService
               .updateEntry(linkedNorm, linkedNorm['_id'])
-              .pipe(
-                tap(r => {
-                  // console.log(r);
-                })
-              );
+              .pipe(tap(r => {}));
           })
         )
         .subscribe(
@@ -836,8 +839,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .fetchEntry('/' + id)
           .pipe(
             switchMap(linkedNorm => {
-              console.log(linkedNorm);
-
               const filtered = linkedNorm.relatedFrom.filter(relNorm => {
                 return relNorm !== this.normDoc._id;
               });
@@ -846,13 +847,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
               return this.couchDBService
                 .updateEntry(linkedNorm, linkedNorm['_id'])
-                .pipe(
-                  tap(r => {
-                    console.log(r);
-
-                    // this.onSubmit();
-                  })
-                );
+                .pipe(tap(r => {}));
             })
           )
           .subscribe(result => {});
@@ -896,8 +891,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    * Multiselect configuration and actions
    */
   private assignMultiselectConfig() {
-    console.log(this.editable);
-    console.log(!this.isNew);
     this.userDropdownSettings = {
       singleSelection: false,
       idField: 'id',

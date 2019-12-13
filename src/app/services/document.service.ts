@@ -33,9 +33,6 @@ export class DocumentService {
   ) {}
 
   public getDocument(param: string): Observable<any> {
-    console.log('fetchEntry in CouchService');
-    console.log(param);
-    // return this.couchDBService.fetchEntry('/' + param);
     return this.http.get(this.couchDBService.dbRequest + param);
   }
 
@@ -127,7 +124,6 @@ export class DocumentService {
   }
 
   public deleteRelatedDBEntries(id: string) {
-    console.log('deleteRelatedDBEntries');
     this.deleteAssociatedNormEntriesInUser(id);
 
     const deleteQuery = {
@@ -210,9 +206,7 @@ export class DocumentService {
         );
 
         this.couchDBService.updateEntry(foundUser, foundUser._id).subscribe(
-          result => {
-            console.log(user);
-          },
+          result => {},
           error => {
             this.logger.error(error.message);
           }
@@ -222,14 +216,11 @@ export class DocumentService {
   }
 
   public getLatestRevision(revisions: any): any {
-    console.log(revisions);
     const sortedByDate = _.chain(revisions)
       .sortBy(revisions, (object, key) => {
         return object['date'];
       })
       .reverse();
-
-    console.log(sortedByDate['_wrapped']);
 
     // take the first
     const latest = _.first(sortedByDate['_wrapped']);
@@ -237,7 +228,6 @@ export class DocumentService {
   }
 
   public getLatestActiveRevision(revisions: any): any {
-    console.log(revisions);
     const sortedByDate = _.chain(revisions)
       .filter(active => active['isActive'] === true)
       .sortBy(revisions, (object, key) => {
@@ -245,21 +235,19 @@ export class DocumentService {
       })
       .reverse();
 
-    console.log(sortedByDate['_wrapped']);
-
     // take the first
     const latest = _.first(sortedByDate['_wrapped']);
     return latest;
   }
 
   public getLatestAttchmentFileName(attachements: any): string {
-    const sortedByRevision = _.sortBy(attachements, (object, key) => {
+    const sortedByRevisions = _.sortBy(attachements, (object, key) => {
       object['id'] = key;
       return object['revpos'];
     }).reverse();
 
     // take the first
-    const latest = _.first(sortedByRevision);
+    const latest = _.first(sortedByRevisions);
     return latest['id'];
   }
 
@@ -270,8 +258,6 @@ export class DocumentService {
   }
 
   public extractDateHash(name): string {
-    // console.log((+new Date() + Math.random() * 100).toString(32));
-    // console.log((+new Date()).toString(36));
     return name
       .split('_')
       .pop()
@@ -369,16 +355,10 @@ export class DocumentService {
    * Helperfunctions
    */
   public renameKeys(keysMap, obj) {
-    // debugger;
-
     return Object.keys(obj).reduce((acc, key) => {
-      // debugger;
-
       const renamedObject = {
         [keysMap[key] || key]: obj[key]
       };
-
-      // debugger;
 
       return {
         ...acc,

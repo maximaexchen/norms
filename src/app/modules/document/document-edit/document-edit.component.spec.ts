@@ -1,8 +1,7 @@
 import { CalendarModule } from 'primeng/calendar';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { DocumentService } from 'src/app/services/document.service';
-import { RouterTestingModule } from '@angular/router/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GeneralModule } from '@app/modules/general.module';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
@@ -20,6 +19,9 @@ import { UserModule } from '@app/modules/user/user.module';
 import { SearchModule } from '@app/modules/search/search.module';
 import { AuthModule } from '@app/modules/auth/auth.module';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { RouterTestingModule } from '@angular/router/testing';
+import { MessageService, ConfirmationService } from 'primeng/api';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
@@ -29,7 +31,7 @@ describe('DocumentEditComponent', () => {
   let couchDBServiceSpy: Spy<CouchDBService>;
   let couchDBService: CouchDBService;
   let fakeDocumentData: NormDocument[];
-  let router = {
+  const router = {
     navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
   };
   let actualResult: any;
@@ -52,7 +54,7 @@ describe('DocumentEditComponent', () => {
         AuthModule
       ],
       declarations: [DocumentEditComponent],
-      providers: [{ provide: Router, useValue: router }],
+      providers: [MessageService, ConfirmationService, AuthenticationService],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
@@ -69,7 +71,7 @@ describe('DocumentEditComponent', () => {
     expectedObject = undefined;
   });
 
-  /* describe('INIT', () => {
+  describe('INIT', () => {
     Given(() => {
       // @ts-ignores
       spyOn(componentUnderTest, 'setStartValues').and.callThrough();
@@ -82,9 +84,14 @@ describe('DocumentEditComponent', () => {
     });
 
     Then(() => {
-      expect(componentUnderTest).toBeTruthy();
+      // expect(componentUnderTest).toBeTruthy();
       // @ts-ignore
       expect(componentUnderTest.setStartValues).toHaveBeenCalled();
+      expect(componentUnderTest.processTypes).toEqual([
+        { id: 1, name: 'Spezialprozess' },
+        { id: 2, name: 'kein Spezialprozess' },
+        { id: 3, name: 'Normschrift' }
+      ]);
     });
-  }); */
+  });
 });
