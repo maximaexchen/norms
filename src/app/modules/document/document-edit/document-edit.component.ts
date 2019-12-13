@@ -435,8 +435,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private resetComponent() {
-    console.log('resetComponent');
-    console.log(this.attachment);
     this.ownerId = '';
     this.editable = false;
     this.attachment = {};
@@ -451,7 +449,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedTab = 0;
     this.processTypeId = '';
 
-    console.log(this.attachment);
     if (this.normForm) {
       this.normForm.form.markAsPristine();
     }
@@ -580,16 +577,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         user => user['supplierId'] === 0 && user['supplierId'] !== undefined
       );
 
-      users = _.filter(
-        users,
-        user => user['supplierId'] !== 0 && user['supplierId'] !== undefined
-      );
+      const externalUsers = _.filter(users, user => {
+        return user['supplierId'] !== 0 && user['supplierId'] !== undefined;
+      });
 
       this.users = [];
-      users.forEach(user => {
+      externalUsers.forEach(user => {
         const userObject = {} as User;
-        userObject['id'] = user['_id'];
-        userObject['name'] = user['lastName'] + ', ' + user['firstName'];
+        userObject._id = user['_id'];
+        userObject.type = user['type'];
+        userObject.name = user['lastName'] + ', ' + user['firstName'];
         this.users.push(userObject);
       });
     });
@@ -598,7 +595,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private setSelectedUsers(users: any[]) {
     this.documentService.getSelectedUsers(users).then(res => {
       this.selectedUsers = res.map(user => ({
-        id: user['_id'],
+        _id: user['_id'],
         name: user['lastName'] + ', ' + user['firstName']
       }));
     });
@@ -611,8 +608,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       // Add all users for the selectable owner dropdown
       const normMap: NormDocument[] = norms.map(norm => {
         const selectedNormObject = {} as NormDocument;
-        selectedNormObject['id'] = norm['_id'];
-        selectedNormObject['normNumber'] = norm['normNumber'];
+        selectedNormObject._id = norm['_id'];
+        selectedNormObject.type = 'norm';
+        selectedNormObject.normNumber = norm['normNumber'];
         return selectedNormObject;
       });
       this.relatedNormsSelectList = normMap;
@@ -664,7 +662,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private setUserNotification(revision: string) {
     this.selectedUsers.forEach(user => {
       this.subsink.sink = this.couchDBService
-        .fetchEntry('/' + user['id'])
+        .fetchEntry('/' + user['_id'])
         .subscribe(
           entry => {
             let associatedNorms = [];
@@ -769,7 +767,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     const selectedUserObjects = [
       ...new Set(
         this.selectedUsers.map(user => {
-          return user['id'];
+          return user['_id'];
         })
       )
     ];
@@ -893,7 +891,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private assignMultiselectConfig() {
     this.userDropdownSettings = {
       singleSelection: false,
-      idField: 'id',
+      idField: '_id',
       text: 'Benutzer wählen',
       textField: 'name',
       labelKey: 'name',

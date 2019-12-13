@@ -47,7 +47,7 @@ export class GroupEditComponent implements OnInit, OnDestroy {
   group$: Observable<Group>;
   groupWithUsers$: any;
   users: User[] = [];
-  users$: Promise<User[]>;
+  users$: Promise<any | User[]>;
   selectedUsers: any[] = [];
   dropdownSettings = {};
 
@@ -175,10 +175,11 @@ export class GroupEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getUsers(): void {
+  private getUsers() {
     this.users$ = this.documentService.getUsers().then(users => {
       this.users = users.map(user => ({
-        id: user['_id'],
+        _id: user['_id'],
+        type: 'user',
         name: user['lastName'] + ', ' + user['firstName']
       }));
     });

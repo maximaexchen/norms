@@ -16,4 +16,6 @@ export interface User {
   role?: Role;
   token?: string;
   active?: boolean;
+  name?: string;
+  id?: string;
 }

@@ -58,7 +58,7 @@ export class DocumentService {
     });
   }
 
-  public getUsers(): any {
+  public getUsers(): Promise<User[]> {
     return this.couchDBService
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .toPromise()

@@ -642,6 +642,9 @@
                 >Benutzer</label
               >
               <div class="col-sm-10">
+
+                {{selectedUsers | json}}
+                {{users | json}}
                 <angular2-multiselect
                   name="users"
                   [data]="users"
