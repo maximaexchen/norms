@@ -584,7 +584,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.users = [];
       externalUsers.forEach(user => {
         const userObject = {} as User;
-        userObject._id = user['_id'];
+        userObject['_id'] = user['_id'];
         userObject.type = user['type'];
         userObject.name = user['lastName'] + ', ' + user['firstName'];
         this.users.push(userObject);
@@ -891,7 +891,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private assignMultiselectConfig() {
     this.userDropdownSettings = {
       singleSelection: false,
-      idField: '_id',
+      primaryKey: '_id',
       text: 'Benutzer wählen',
       textField: 'name',
       labelKey: 'name',
@@ -905,7 +905,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.relatedDropdownSettings = {
       singleSelection: false,
-      idField: 'id',
+      primaryKey: 'id',
       text: 'Referenz wählen',
       textField: 'normNumber',
       labelKey: 'normNumber',
@@ -920,7 +920,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.tagDropdownSettings = {
       singleSelection: false,
-      idField: 'id',
+      primaryKey: 'id',
       text: 'Tag wählen',
       textField: 'name',
       labelKey: 'name',

@@ -17,5 +17,4 @@ export interface User {
   token?: string;
   active?: boolean;
   name?: string;
-  id?: string;
 }
