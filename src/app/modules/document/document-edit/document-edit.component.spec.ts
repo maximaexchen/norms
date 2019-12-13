@@ -28,6 +28,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
+import { of } from 'rxjs';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
@@ -36,8 +37,9 @@ describe('DocumentEditComponent', () => {
   // let documentService: DocumentService;
   let couchDBServiceSpy: Spy<CouchDBService>;
   // let couchDBService: CouchDBService;
-  let fakeDocumentData: NormDocument[];
-  const router = {
+  let fakeDocuments: NormDocument[];
+  let fakeDocument: NormDocument;
+  let router = {
     navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
   };
   let fakeUsers: User[];
@@ -86,7 +88,8 @@ describe('DocumentEditComponent', () => {
     // couchDBServiceSpy = createSpyFromClass(CouchDBService);
     couchDBServiceSpy = TestBed.get(CouchDBService);
 
-    fakeDocumentData = undefined;
+    fakeDocuments = undefined;
+    fakeDocument = undefined;
     fakeUsers = undefined;
     fakeOwners = undefined;
     fakeTags = undefined;
@@ -97,7 +100,7 @@ describe('DocumentEditComponent', () => {
 
   describe('INIT', () => {
     Given(() => {
-      fakeDocumentData = [
+      fakeDocuments = [
         {
           _id: '1',
           _rev: '1',
@@ -105,7 +108,7 @@ describe('DocumentEditComponent', () => {
           normNumber: 'AAA'
         }
       ];
-      documentServiceSpy.getDocuments.and.resolveWith(fakeDocumentData);
+      documentServiceSpy.getDocuments.and.resolveWith(fakeDocuments);
 
       fakeTags = [
         {
@@ -220,4 +223,65 @@ describe('DocumentEditComponent', () => {
       });
     });
   });
+
+  describe('METHOD: editDocument(id)', () => {
+    const id = '1';
+    Given(() => {
+      router = TestBed.get(Router);
+
+      fakeDocument = {
+        _id: '1',
+        _rev: '1',
+        type: 'norm',
+        normNumber: 'AAA'
+      };
+
+      // @ts-ignores
+      spyOn(documentServiceSpy, 'getDocument')
+        .withArgs(id)
+        .and.returnValue(of(fakeDocument));
+    });
+
+    When(() => {
+      // @ts-ignores
+      componentUnderTest.editDocument(id);
+      fixture.detectChanges();
+    });
+
+    Then(() => {
+      expect(router.navigate).toHaveBeenCalledWith([
+        '../document/' + id + '/edit'
+      ]);
+    });
+  });
+
+  /* describe('METHOD editDocument', () => {
+    Given(() => {
+      fakeDocument = {
+        _id: '1',
+        _rev: '1',
+        type: 'user',
+        normNumber: 'AAA'
+      };
+      documentServiceSpy.getDocument.and.nextOneTimeWith(fakeDocument);
+
+      // @ts-ignores
+      spyOn(componentUnderTest, 'editDocument').and.callThrough();
+    });
+
+    When(() => {
+      // @ts-ignore
+      componentUnderTest.editDocument(1);
+      fixture.detectChanges();
+    });
+
+    Then(() => {
+      expect(componentUnderTest.normDoc).toEqual({
+        _id: '1',
+        _rev: '1',
+        type: 'user',
+        normNumber: 'AAA'
+      });
+    });
+  }); */
 });
