@@ -1,18 +1,13 @@
 import { CalendarModule } from 'primeng/calendar';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { DocumentService } from 'src/app/services/document.service';
-import {
-  ComponentFixture,
-  TestBed,
-  fakeAsync,
-  async
-} from '@angular/core/testing';
+import { TestBed, async, fakeAsync, tick } from '@angular/core/testing';
 
 import { GeneralModule } from '@app/modules/general.module';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 
 import { NgxSpinnerModule } from 'ngx-spinner';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { NormDocument, User } from '@app/models';
 import { DocumentEditComponent } from './document-edit.component';
@@ -28,20 +23,16 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
-import { of } from 'rxjs';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
-  let fixture: ComponentFixture<DocumentEditComponent>;
+  // let fixture: ComponentFixture<DocumentEditComponent>;
   let documentServiceSpy: Spy<DocumentService>;
   // let documentService: DocumentService;
   let couchDBServiceSpy: Spy<CouchDBService>;
   // let couchDBService: CouchDBService;
   let fakeDocuments: NormDocument[];
   let fakeDocument: NormDocument;
-  let router = {
-    navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
-  };
   let fakeUsers: User[];
   let fakeOwners: User[];
   let fakeTags: Tag[];
@@ -50,10 +41,12 @@ describe('DocumentEditComponent', () => {
   let expectedObject: any;
 
   Given(() => {
+    // jasmine.getEnv().allowRespy(true);
+
     TestBed.configureTestingModule({
       imports: [
-        GeneralModule,
         RouterTestingModule,
+        GeneralModule,
         NgxSpinnerModule,
         CalendarModule,
         FileUploadModule,
@@ -64,8 +57,9 @@ describe('DocumentEditComponent', () => {
         SearchModule,
         AuthModule
       ],
-      declarations: [DocumentEditComponent],
+      declarations: [],
       providers: [
+        DocumentEditComponent,
         {
           provide: CouchDBService,
           useValue: createSpyFromClass(CouchDBService)
@@ -74,18 +68,24 @@ describe('DocumentEditComponent', () => {
           provide: DocumentService,
           useValue: createSpyFromClass(DocumentService)
         },
-        MessageService,
-        ConfirmationService,
-        AuthenticationService
+        {
+          provide: MessageService,
+          useValue: createSpyFromClass(MessageService)
+        },
+        {
+          provide: ConfirmationService,
+          useValue: createSpyFromClass(ConfirmationService)
+        },
+        {
+          provide: AuthenticationService,
+          useValue: createSpyFromClass(AuthenticationService)
+        }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DocumentEditComponent);
-    componentUnderTest = fixture.componentInstance;
-    // documentServiceSpy = createSpyFromClass(DocumentService);
+    componentUnderTest = TestBed.get(DocumentEditComponent);
     documentServiceSpy = TestBed.get(DocumentService);
-    // couchDBServiceSpy = createSpyFromClass(CouchDBService);
     couchDBServiceSpy = TestBed.get(CouchDBService);
 
     fakeDocuments = undefined;
@@ -98,7 +98,7 @@ describe('DocumentEditComponent', () => {
     expectedObject = undefined;
   });
 
-  describe('INIT', () => {
+  describe('WHEN onNgInit', () => {
     Given(() => {
       fakeDocuments = [
         {
@@ -128,10 +128,10 @@ describe('DocumentEditComponent', () => {
     });
 
     When(
-      async(() => {
+      fakeAsync(() => {
         // @ts-ignore
         componentUnderTest.ngOnInit();
-        fixture.detectChanges();
+        tick();
       })
     );
 
@@ -166,7 +166,7 @@ describe('DocumentEditComponent', () => {
       });
     });
 
-    describe('Attribute owners is set', () => {
+    describe('GIVEN owners THEN store owners for select', () => {
       Given(() => {
         fakeUsers = [
           {
@@ -195,7 +195,7 @@ describe('DocumentEditComponent', () => {
       });
     });
 
-    describe('Attribute users is set', () => {
+    describe('GIVEN users THEN expect users to be laoded', () => {
       Given(() => {
         fakeUsers = [
           {
@@ -224,38 +224,8 @@ describe('DocumentEditComponent', () => {
     });
   });
 
-  describe('METHOD: editDocument(id)', () => {
-    const id = '1';
-    Given(() => {
-      router = TestBed.get(Router);
-
-      fakeDocument = {
-        _id: '1',
-        _rev: '1',
-        type: 'norm',
-        normNumber: 'AAA'
-      };
-
-      // @ts-ignores
-      spyOn(documentServiceSpy, 'getDocument')
-        .withArgs(id)
-        .and.returnValue(of(fakeDocument));
-    });
-
-    When(() => {
-      // @ts-ignores
-      componentUnderTest.editDocument(id);
-      fixture.detectChanges();
-    });
-
-    Then(() => {
-      expect(router.navigate).toHaveBeenCalledWith([
-        '../document/' + id + '/edit'
-      ]);
-    });
-  });
-
-  /* describe('METHOD editDocument', () => {
+  describe('METHOD editDocument', () => {
+    let id = '1';
     Given(() => {
       fakeDocument = {
         _id: '1',
@@ -269,19 +239,36 @@ describe('DocumentEditComponent', () => {
       spyOn(componentUnderTest, 'editDocument').and.callThrough();
     });
 
-    When(() => {
-      // @ts-ignore
-      componentUnderTest.editDocument(1);
-      fixture.detectChanges();
-    });
+    When(
+      fakeAsync(() => {
+        // @ts-ignore
+        componentUnderTest.editDocument(id);
+        // fixture.detectChanges();
+      })
+    );
 
-    Then(() => {
-      expect(componentUnderTest.normDoc).toEqual({
-        _id: '1',
-        _rev: '1',
-        type: 'user',
-        normNumber: 'AAA'
+    describe('GIVEN existing id THEN get normDocument', () => {
+      id = '1';
+      Given(() => {});
+
+      Then(() => {
+        // @ts-ignore
+        documentServiceSpy.getDocument
+          .mustBeCalledWith(id)
+          .nextOneTimeWith(fakeDocument);
+
+        expect(componentUnderTest.normDoc).toEqual(fakeDocument);
       });
     });
-  }); */
+  });
+
+  describe('METHOD editDocument', () => {
+    Given(() => {});
+
+    When(() => {});
+
+    describe('GIVEN existing id THEN get normDocument', () => {
+      Then(() => {});
+    });
+  });
 });
