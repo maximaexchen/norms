@@ -1,124 +1,127 @@
-<div class="row detail-edit-header">
-  <div class="col-sm-4">
-    <h1 *ngIf="tag.name">{{ tag.name }}</h1>
-    <h1 *ngIf="!tag.name" i18n="@@string-new">
-      Datensatz erstellen
-    </h1>
+<ng-container *ngIf="tag">
+  <div class="row detail-edit-header">
+    <div class="col-sm-4">
+      <h1 *ngIf="tag.name">{{ tag.name }}</h1>
+      <h1 *ngIf="!tag.name" i18n="@@string-new">
+        Datensatz erstellen
+      </h1>
+    </div>
+
+    <div class="col-sm-8 text-right">
+      <app-crud-nav
+        [isNew]="isNew"
+        [validForm]="tagForm.valid"
+        [dirtyForm]="tagForm.dirty"
+        [routeNew]="'/tag/new'"
+        [editable]="editable"
+        [role]="authService.getUserRole()"
+        (save)="onSubmit()"
+        (add)="onSubmit()"
+        (edit)="onEdit()"
+        (delete)="onDelete()"
+      ></app-crud-nav>
+    </div>
   </div>
 
-  <div class="col-sm-8 text-right">
-    <app-crud-nav
-      [isNew]="isNew"
-      [validForm]="tagForm.valid"
-      [dirtyForm]="tagForm.dirty"
-      [routeNew]="'/tag/new'"
-      [editable]="editable"
-      [role]="authService.getUserRole()"
-      (save)="onSubmit()"
-      (add)="onSubmit()"
-      (edit)="onEdit()"
-      (delete)="onDelete()"
-    ></app-crud-nav>
-  </div>
-</div>
-<p-tabView>
-  <p-tabPanel header="Stammdaten">
-    <form
-      class="form form-horizontal"
-      (ngSubmit)="onSubmit()"
-      #tagForm="ngForm"
-    >
-      <input type="hidden" [(ngModel)]="isNew" name="isNew" />
-      <input type="hidden" [(ngModel)]="tag._id" name="_id" />
-      <input type="hidden" [(ngModel)]="tag._rev" name="_rev" />
-      <div class="row">
-        <div class="col-sm-8">
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-name"
-              >Name</label
-            >
-            <div class="col-sm-10">
-              <input
-                type="text"
-                class="form-control"
-                i18n-placeholder
-                placeholder="Name"
-                required
-                [(ngModel)]="tag.name"
-                name="name"
-                #nameCheck="ngModel"
-                [disabled]="!editable"
-              />
-              <small
-                class="form-text text-muted"
-                i18n="@@string-name-required"
-                *ngIf="!nameCheck.valid && nameCheck.touched"
-                >Bitte geben Sie einen Namen ein.</small
+  <p-tabView>
+    <p-tabPanel header="Stammdaten">
+      <form
+        class="form form-horizontal"
+        (ngSubmit)="onSubmit()"
+        #tagForm="ngForm"
+      >
+        <input type="hidden" [(ngModel)]="isNew" name="isNew" />
+        <input type="hidden" [(ngModel)]="tag._id" name="_id" />
+        <input type="hidden" [(ngModel)]="tag._rev" name="_rev" />
+        <div class="row">
+          <div class="col-sm-8">
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label" i18n="@@string-name"
+                >Name</label
               >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  i18n-placeholder
+                  placeholder="Name"
+                  required
+                  [(ngModel)]="tag.name"
+                  name="name"
+                  #nameCheck="ngModel"
+                  [disabled]="!editable"
+                />
+                <small
+                  class="form-text text-muted"
+                  i18n="@@string-name-required"
+                  *ngIf="!nameCheck.valid && nameCheck.touched"
+                  >Bitte geben Sie einen Namen ein.</small
+                >
+              </div>
             </div>
-          </div>
 
-          <div class="ui-g form-group row">
-            <label class="col-sm-2 col-form-label" i18n="@@string-name"
-              >Level</label
-            >
-            <div class="col-sm-10">
-              <div class="ui-g-12">
-                <p-radioButton
-                  name="tagType"
-                  value="level1"
-                  label="Stufe 1"
-                  [(ngModel)]="tag.tagType"
-                  inputId="level1"
-                  [disabled]="!editable"
-                ></p-radioButton>
+            <div class="ui-g form-group row">
+              <label class="col-sm-2 col-form-label" i18n="@@string-name"
+                >Level</label
+              >
+              <div class="col-sm-10">
+                <div class="ui-g-12">
+                  <p-radioButton
+                    name="tagType"
+                    value="level1"
+                    label="Stufe 1"
+                    [(ngModel)]="tag.tagType"
+                    inputId="level1"
+                    [disabled]="!editable"
+                  ></p-radioButton>
+                </div>
+                <div class="ui-g-12">
+                  <p-radioButton
+                    name="tagType"
+                    value="level2"
+                    label="Stufe 2"
+                    [(ngModel)]="tag.tagType"
+                    inputId="level2"
+                    [disabled]="!editable"
+                  ></p-radioButton>
+                </div>
+                <div class="ui-g-12">
+                  <p-radioButton
+                    name="tagType"
+                    value="level3"
+                    label="Stufe 3"
+                    [(ngModel)]="tag.tagType"
+                    inputId="level3"
+                    [disabled]="!editable"
+                  ></p-radioButton>
+                </div>
               </div>
-              <div class="ui-g-12">
-                <p-radioButton
-                  name="tagType"
-                  value="level2"
-                  label="Stufe 2"
-                  [(ngModel)]="tag.tagType"
-                  inputId="level2"
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">Status</label>
+              <div class="col-sm-10">
+                <p-selectButton
+                  [options]="[
+                    {
+                      label: 'aktiv',
+                      value: true
+                    },
+                    {
+                      label: 'gesperrt',
+                      value: false
+                    }
+                  ]"
+                  name="active"
+                  [(ngModel)]="tag.active"
                   [disabled]="!editable"
-                ></p-radioButton>
-              </div>
-              <div class="ui-g-12">
-                <p-radioButton
-                  name="tagType"
-                  value="level3"
-                  label="Stufe 3"
-                  [(ngModel)]="tag.tagType"
-                  inputId="level3"
-                  [disabled]="!editable"
-                ></p-radioButton>
+                ></p-selectButton>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-sm-4">
-          <div class="form-group row">
-            <label class="col-sm-2 col-form-label">Status</label>
-            <div class="col-sm-10">
-              <p-selectButton
-                [options]="[
-                  {
-                    label: 'aktiv',
-                    value: true
-                  },
-                  {
-                    label: 'gesperrt',
-                    value: false
-                  }
-                ]"
-                name="active"
-                [(ngModel)]="tag.active"
-                [disabled]="!editable"
-              ></p-selectButton>
-            </div>
-          </div>
-        </div>
-      </div>
-    </form>
-  </p-tabPanel>
-</p-tabView>
+      </form>
+    </p-tabPanel>
+  </p-tabView>
+</ng-container>

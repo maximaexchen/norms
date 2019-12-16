@@ -68,6 +68,8 @@ export class CouchDBService {
   }
 
   public bulkUpdate(bulkObject: any): Observable<any> {
+    /* console.log(JSON.stringify(bulkObject));
+    console.log(this.dbRequest + '/_bulk_docs'); */
     return this.http.post(this.dbRequest + '/_bulk_docs', bulkObject);
   }
 

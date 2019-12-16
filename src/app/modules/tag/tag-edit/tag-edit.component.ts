@@ -66,12 +66,15 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private editTag(results) {
+    console.log(results);
     this.isNew = false;
     this.formTitle = 'Tag bearbeiten';
 
     this.subsink.sink = this.couchDBService
       .fetchEntry('/' + results['id'])
-      .subscribe(tag => (this.tag = tag));
+      .subscribe(tag => {
+        this.tag = tag;
+      });
   }
 
   public onSubmit(): void {
@@ -109,10 +112,6 @@ export class TagEditComponent implements OnInit, OnDestroy {
           this.subsink.sink = this.couchDBService.search(updateQuery).subscribe(
             results => {
               this.updateRelated(results);
-
-              // Inform about Database change.
-              this.sendStateUpdate('update');
-              this.router.navigate(['../tag']);
             },
             error => this.logger.error(error.message),
             () => {}
@@ -133,12 +132,15 @@ export class TagEditComponent implements OnInit, OnDestroy {
       _.findWhere(norm['tags'], { id: this.tag._id })['name'] = this.tag.name;
       bulkUpdateObject['docs'].push(norm);
     });
-
     this.subsink.sink = this.couchDBService
       .bulkUpdate(bulkUpdateObject)
       .subscribe(
-        res => {},
-        error => this.logger.error(error.message)
+        res => {
+          // Inform about Database change.
+          this.sendStateUpdate('update');
+          this.router.navigate(['../tag']);
+        },
+        error => console.log('ERROR: ' + error.message)
       );
   }
 
