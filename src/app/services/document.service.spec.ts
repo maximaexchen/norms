@@ -1,6 +1,6 @@
 import { Tag } from './../models/tag.model';
 import { DocumentService } from 'src/app/services/document.service';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, async } from '@angular/core/testing';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { HttpClient } from '@angular/common/http';
@@ -12,6 +12,7 @@ describe('DocumentService test', () => {
   let couchDBServiceSpy: Spy<CouchDBService>;
   let httpSpy: Spy<HttpClient>;
   let fakeNormDocuments: NormDocument[];
+  let fakeNormDocument: NormDocument;
   let fakeTags: Tag[];
   let fakeAttributes: any;
   let actualResult: any;
@@ -34,8 +35,65 @@ describe('DocumentService test', () => {
     httpSpy = TestBed.get(HttpClient);
 
     fakeNormDocuments = undefined;
+    fakeNormDocument = undefined;
     fakeTags = undefined;
     actualResult = undefined;
+  });
+
+  describe('METHOD: getDocument()', () => {
+    const id = '1';
+    Given(() => {
+      fakeNormDocument = {
+        _id: '1',
+        _rev: '1',
+        type: 'user',
+        normNumber: 'AAA'
+      };
+      httpSpy.get.and.nextOneTimeWith(fakeNormDocument);
+    });
+
+    When(
+      fakeAsync(() => {
+        serviceUnderTest.getDocument('/' + id).subscribe(value => {
+          actualResult = value;
+        });
+      })
+    );
+
+    Then(() => {
+      expect(actualResult).toEqual(fakeNormDocument);
+      expect(actualResult.length).not.toBeNull();
+    });
+  });
+
+  describe('METHOD: getDocuments()', () => {
+    const id = '1';
+    Given(() => {
+      fakeNormDocuments = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          normNumber: 'AAA'
+        }
+      ];
+
+      couchDBServiceSpy.fetchEntries.and.nextOneTimeWith(fakeNormDocuments);
+    });
+
+    When(
+      fakeAsync(async () => {
+        // with additional async and await
+        // Short form for
+        // serviceUnderTest.getDocuments().then(value => actualResult = value);
+        actualResult = await serviceUnderTest.getDocuments();
+      })
+    );
+
+    Then(() => {
+      expect(actualResult).toEqual(fakeNormDocuments);
+      expect(actualResult.length).toBeGreaterThan(0);
+    });
   });
 
   describe('METHOD: getTags()', () => {
@@ -52,7 +110,6 @@ describe('DocumentService test', () => {
     });
 
     When(() => {
-      console.log('When: METHOD: getTags');
       serviceUnderTest.getTags().subscribe(result => (actualResult = result));
     });
 

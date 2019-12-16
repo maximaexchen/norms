@@ -3,7 +3,7 @@ import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Observable, Subscriber } from 'rxjs';
-import { switchMap, tap, first, reduce, flatMap } from 'rxjs/operators';
+import { switchMap, tap, first } from 'rxjs/operators';
 
 import { ConfirmationService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';

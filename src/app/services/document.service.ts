@@ -33,7 +33,7 @@ export class DocumentService {
   ) {}
 
   public getDocument(param: string): Observable<any> {
-    return this.http.get(this.couchDBService.dbRequest + param);
+    return this.http.get<NormDocument[]>(this.couchDBService.dbRequest + param);
   }
 
   public getDocuments(): Promise<NormDocument[]> {
@@ -41,7 +41,7 @@ export class DocumentService {
       .fetchEntries('/_design/norms/_view/all-norms?include_docs=true')
       .toPromise()
       .then(response => {
-        return response as NormDocument;
+        return response as NormDocument[];
       })
       .catch(this.handleError);
   }
@@ -63,8 +63,8 @@ export class DocumentService {
       .fetchEntries('/_design/norms/_view/all-users?include_docs=true')
       .toPromise()
       .then(response => {
-        const activeUser = response.filter(user => user.active !== false);
-        return activeUser as User;
+        const activeUsers = response.filter(user => user.active !== false);
+        return activeUsers as User[];
       })
       .catch(this.handleError);
   }

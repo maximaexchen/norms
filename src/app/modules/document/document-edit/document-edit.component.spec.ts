@@ -7,7 +7,6 @@ import { GeneralModule } from '@app/modules/general.module';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 
 import { NgxSpinnerModule } from 'ngx-spinner';
-import { Router, ActivatedRoute } from '@angular/router';
 
 import { NormDocument, User } from '@app/models';
 import { DocumentEditComponent } from './document-edit.component';
@@ -26,11 +25,8 @@ import { Tag } from '@app/models/tag.model';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
-  // let fixture: ComponentFixture<DocumentEditComponent>;
   let documentServiceSpy: Spy<DocumentService>;
-  // let documentService: DocumentService;
   let couchDBServiceSpy: Spy<CouchDBService>;
-  // let couchDBService: CouchDBService;
   let fakeDocuments: NormDocument[];
   let fakeDocument: NormDocument;
   let fakeUsers: User[];

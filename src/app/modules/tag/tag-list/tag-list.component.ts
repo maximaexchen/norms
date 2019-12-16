@@ -30,9 +30,12 @@ export class TagListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.start();
+  }
+
+  private start() {
     this.subsink.sink = this.couchDBService.setStateUpdate().subscribe(
       message => {
-        console.log(message);
         if (message.model === 'tag') {
           this.getTags();
         }
@@ -42,10 +45,6 @@ export class TagListComponent implements OnInit, OnDestroy {
     );
 
     this.getTags();
-  }
-
-  public onFilter(event: any): void {
-    this.tagCount = event.filteredValue.length;
   }
 
   private getTags() {

@@ -19,7 +19,7 @@ export class CouchDBService {
 
   public fetchData: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  private updateSubject = new Subject<any>();
+  public updateSubject = new Subject<any>();
 
   constructor(private env: EnvService, private http: HttpClient) {}
 
@@ -100,7 +100,7 @@ export class CouchDBService {
     );
   }
 
-  public getRoles(): Observable<any[]> {
+  public getRoles(): Observable<Role[]> {
     return this.fetchEntries(
       '/_design/norms/_view/all-roles?include_docs=true'
     );
