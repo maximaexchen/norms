@@ -28,7 +28,7 @@ con.query(sql, function(err, result) {
 
   users.push({
     type: 'user',
-    externalID: '9999',
+    externalID: 10001,
     userName: 'admin',
     firstName: 'My',
     lastName: 'Admin',
@@ -42,7 +42,7 @@ con.query(sql, function(err, result) {
   users.push({
     type: 'user',
     userName: 'owner',
-    externalID: '9999',
+    externalID: 10002,
     firstName: 'test',
     lastName: 'Owner',
     email: 'owner@aircraft-philipp.com',
@@ -65,7 +65,7 @@ con.query(sql, function(err, result) {
   users.push({
     type: 'user',
     userName: 'owner2',
-    externalID: '9999',
+    externalID: 10003,
     firstName: 'Zweiter',
     lastName: 'Owner',
     email: 'owner2@aircraft-philipp.com',
@@ -79,7 +79,7 @@ con.query(sql, function(err, result) {
   users.push({
     type: 'user',
     userName: 'user',
-    externalID: 9999,
+    externalID: 10004,
     firstName: 'Testusers',
     lastName: 'User',
     email: 'user@aircraft-philipp.com',
@@ -102,7 +102,7 @@ con.query(sql, function(err, result) {
 
   users.push({
     type: 'user',
-    externalID: '9999',
+    externalID: 10005,
     userName: 'externaluser',
     firstName: 'A',
     lastName: 'External',

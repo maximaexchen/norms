@@ -84,6 +84,7 @@ export class AuthenticationService {
 
   private persistUserData(user: User) {
     sessionStorage.setItem('userId', user['_id']);
+    sessionStorage.setItem('externalId', '' + user['externalID']);
     sessionStorage.setItem('userName', user['userName']);
     sessionStorage.setItem('firstName', user['firstName']);
     sessionStorage.setItem('lastName', user['lastName']);
