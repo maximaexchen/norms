@@ -120,20 +120,15 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private updateList(changedInfo: any) {
-    console.log(changedInfo);
-    console.log(changedInfo.id);
-    console.log(this.documents);
     const updateItem = this.documents.find(
       item => item['_id'] === changedInfo.id
     );
 
     const index = this.documents.indexOf(updateItem);
-    console.log(index);
     if (changedInfo.action !== 'delete') {
       if (index === -1) {
         // Add to list
         this.documents.push(changedInfo.object);
-        console.log(changedInfo.object);
       } else {
         // Update object in list
         this.documents[index] = changedInfo.object;
@@ -156,13 +151,15 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private setPublisherFromTags() {
-    if (this.documents.length > 1) {
+    if (this.documents.length > 0) {
       this.documents.forEach(norm => {
-        norm['tags'].forEach(tag => {
-          if (tag.tagType === 'level1') {
-            norm['publisher'] = tag.name;
-          }
-        });
+        if (norm['tags']) {
+          norm['tags'].forEach(tag => {
+            if (tag.tagType === 'level1') {
+              norm['publisher'] = tag.name;
+            }
+          });
+        }
       });
     }
   }
@@ -196,7 +193,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   public toggleSidebar() {
     this.visible = !this.visible;
     if (this.visible) {
-      this.closeSideBar.emit(null); //emit event here
+      this.closeSideBar.emit(null);
+      // emit event here
     } else {
       this.openSideBar.emit(null);
     }

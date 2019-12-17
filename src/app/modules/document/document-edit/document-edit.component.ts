@@ -821,7 +821,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public deleteRelated(id: string) {
     this.confirmationService.confirm({
       message:
-        'Sie wollen die Referenz wirklich entfernen?<br><strong><span class="text-warning">Bitte Norm speichern nicht vergessen!!</span></strong>',
+        'Sie wollen die Referenz wirklich ' +
+        'entfernen?<br><strong><span class="text-warning">' +
+        'Bitte Norm speichern nicht vergessen!!</span></strong>',
       accept: () => {
         this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
           item => item['id'] !== id

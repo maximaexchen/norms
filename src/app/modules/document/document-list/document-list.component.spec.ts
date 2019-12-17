@@ -1,7 +1,7 @@
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { DocumentService } from 'src/app/services/document.service';
 import { RouterTestingModule } from '@angular/router/testing';
-import { async, TestBed, fakeAsync } from '@angular/core/testing';
+import { async, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { GeneralModule } from '@app/modules/general.module';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { of, Subject } from 'rxjs';
@@ -21,8 +21,6 @@ describe('DocumentListComponent', () => {
   let actualResult: any;
   let changeInfo: any;
   let expectedObject: any;
-
-  let activatedRoute: any;
 
   const activatedRouteStub = {
     params: {
@@ -90,6 +88,7 @@ describe('DocumentListComponent', () => {
       fakeAsync(() => {
         // @ts-ignore
         componentUnderTest.ngOnInit();
+        tick();
       })
     );
 
@@ -117,6 +116,7 @@ describe('DocumentListComponent', () => {
       fakeAsync(() => {
         // @ts-ignore
         componentUnderTest.getDocuments();
+        tick();
       })
     );
 
@@ -144,6 +144,7 @@ describe('DocumentListComponent', () => {
     When(
       fakeAsync(() => {
         componentUnderTest.showDetail(id);
+        tick();
       })
     );
 
@@ -261,6 +262,67 @@ describe('DocumentListComponent', () => {
           'Normnumber1'
         );
       });
+    });
+  });
+
+  describe('METHOD set setPublisherFromTags', () => {});
+
+  describe('setPublisherFromTags', () => {
+    Given(() => {
+      componentUnderTest.documents = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          tags: [
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Boeing',
+              tagType: 'level1',
+              active: true
+            },
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Tessla',
+              tagType: 'level2',
+              active: true
+            }
+          ]
+        },
+        {
+          _id: '2',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber2',
+          tags: [
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Boeing',
+              tagType: 'level1',
+              active: true
+            },
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Tessla',
+              tagType: 'level2',
+              active: true
+            }
+          ]
+        }
+      ];
+
+      // @ts-ignores
+      spyOn(componentUnderTest, 'setPublisherFromTags').and.callThrough();
+    });
+
+    When(() => {
+      // @ts-ignores
+      componentUnderTest.setPublisherFromTags();
+    });
+
+    Then(() => {
+      expect(componentUnderTest.documents[0]['publisher']).toEqual('Boeing');
     });
   });
 });
