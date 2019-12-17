@@ -18,7 +18,7 @@ export interface NormDocument {
   descriptionDE?: string;
   descriptionEN?: string;
   descriptionFR?: string;
-  owner?: User;
+  owner?: string;
   users?: string[];
   tags?: any[];
   group?: string;

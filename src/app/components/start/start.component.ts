@@ -24,8 +24,10 @@ export class StartComponent implements OnInit, OnDestroy {
   subsink = new SubSink();
   currentUser: User;
   currentUserId: string;
+  currentExternalId: string;
   userName: string;
   userId: string;
+  externalID: string;
   userRev: string;
   userRole: string;
   date: Date;
@@ -53,6 +55,7 @@ export class StartComponent implements OnInit, OnDestroy {
 
   private initComponent() {
     this.currentUserId = this.authService.getCurrentUserID();
+    this.currentExternalId = this.authService.getCurrentUserExternalID();
     this.userName = this.authService.getCurrentUserFullName();
     this.userRole = this.authService.getUserRole();
 
@@ -69,6 +72,7 @@ export class StartComponent implements OnInit, OnDestroy {
         this.currentUser = user;
 
         this.userId = this.authService.getCurrentUserID();
+        this.externalID = this.authService.getCurrentUserExternalID();
         this.userRev = this.currentUser['_rev'];
         this.userName = this.authService.getCurrentUserFullName();
         this.userRole = this.authService.getUserRole();
@@ -94,9 +98,7 @@ export class StartComponent implements OnInit, OnDestroy {
           $eq: 'norm'
         },
         owner: {
-          _id: {
-            $eq: this.currentUserId
-          }
+          $eq: this.currentExternalId
         }
       }
     };

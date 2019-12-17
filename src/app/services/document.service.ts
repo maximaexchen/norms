@@ -48,13 +48,15 @@ export class DocumentService {
 
   public getSelectedOwner(ownerId: string[]): Promise<User[]> {
     return this.getUsers().then(users => {
-      return users.filter(owner => ownerId.indexOf(owner._id) > -1);
+      return users.filter(owner => ownerId.indexOf(owner.externalID) > -1);
     });
   }
 
-  public getSelectedUsers(usersIds: string[]): Promise<User[]> {
+  public getSelectedUsers(usersIds: string[]): Promise<any[]> {
     return this.getUsers().then(users => {
-      return users.filter(user => usersIds.indexOf(user._id) > -1);
+      return users.filter(user => {
+        return usersIds.indexOf(user.externalID) > -1;
+      });
     });
   }
 
@@ -81,7 +83,7 @@ export class DocumentService {
 
   public isNormOwner(ownerID: string, norm: NormDocument): boolean {
     if (norm.owner) {
-      if (ownerID === norm.owner._id) {
+      if (ownerID === norm.owner) {
         return true;
       }
     }

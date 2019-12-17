@@ -341,7 +341,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     this.user = {
       _id: '',
       type: 'user',
-      externalID: parseInt(this.userForm.value.externalID, 10) || null,
+      externalID: this.userForm.value.externalID || null,
       userName: this.userForm.value.userName || '',
       firstName: this.userForm.value.firstName || '',
       lastName: this.userForm.value.lastName || '',

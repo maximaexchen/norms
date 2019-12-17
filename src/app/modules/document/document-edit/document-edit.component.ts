@@ -77,8 +77,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   normLanguage = 'en';
   revisionDocument: RevisionDocument;
   uploadPath: string;
-  owner: any;
-  ownerId: string;
+  owner: string;
 
   userDropdownSettings = {};
   tagDropdownSettings = {};
@@ -146,7 +145,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       normDoc => {
         this.normDoc = normDoc;
         this.isOwner = this.documentService.isNormOwner(
-          this.authService.getCurrentUserID(),
+          this.authService.getCurrentUserExternalID(),
           this.normDoc
         );
         this.isAdmin = this.authService.isAdmin();
@@ -191,11 +190,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public onSubmit(): void {
     this.isLoading = true;
     this.spinner.show();
+    console.log(this.isNew);
+    console.log(this.normForm.value.isNew);
     if (this.normForm.value.isNew) {
       this.saveDocument();
     } else {
       this.updateDocument();
     }
+    this.assignMultiselectConfig();
   }
 
   private saveDocument(): void {
@@ -204,6 +206,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.spinner.show();
     this.normForm.form.markAsPristine();
+
+    console.log(this.normDoc);
 
     this.subsink.sink = this.couchDBService.writeEntry(this.normDoc).subscribe(
       result => {
@@ -224,6 +228,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private updateDocument(): void {
     this.isLoading = true;
     this.processFormData();
+
+    console.log(this.normDoc);
 
     this.subsink.sink = this.couchDBService
       .updateEntry(this.normDoc, this.normDoc._id)
@@ -253,9 +259,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private setAdditionalNormDocData() {
     this.revisionDate = new Date(this.normDoc.revisionDate);
-
     if (this.normDoc.owner) {
-      this.ownerId = this.normDoc.owner['_id'];
+      this.owner = this.normDoc.owner;
     }
 
     this.processType = this.normDoc.processType;
@@ -271,7 +276,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         }
 
         if (!!this.normDoc.owner) {
-          if (this.normDoc.owner._id === this.authService.getCurrentUserID()) {
+          if (
+            this.normDoc.owner === this.authService.getCurrentUserExternalID()
+          ) {
             return element;
           } else {
             return element['isActive'] === true ? element : undefined;
@@ -340,10 +347,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.uploadFileToServer();
     }
     const selOwner: User = this.owners.find(
-      own => own['_id'] === this.normForm.value.ownerId
+      own => own === this.normForm.value.owner
     );
-    this.normDoc.owner = selOwner || this.owner;
-
+    this.normDoc.owner = ((selOwner as unknown) as string) || this.owner;
+    console.log(selOwner);
+    console.log(this.owner);
     const selProcessType = this.processTypes.find(processType => {
       return (
         processType['id'] === parseInt(this.normForm.value.processTypeId, 0)
@@ -359,8 +367,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private addNewRevision() {
-    console.log(this.attachment);
-    console.log(!_.isEmpty(this.attachment));
     if (!_.isEmpty(this.attachment)) {
       this.revisionDocument = {};
       this.revisionDocument['date'] = new Date();
@@ -435,7 +441,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private resetComponent() {
-    this.ownerId = '';
+    this.owner = '';
     this.editable = false;
     this.attachment = {};
     this.selectedRelatedNorms = [];
@@ -585,6 +591,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       externalUsers.forEach(user => {
         const userObject = {} as User;
         userObject['_id'] = user['_id'];
+        userObject['externalID'] = user['externalID'];
         userObject.type = user['type'];
         userObject.name = user['lastName'] + ', ' + user['firstName'];
         this.users.push(userObject);
@@ -596,6 +603,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.documentService.getSelectedUsers(users).then(res => {
       this.selectedUsers = res.map(user => ({
         _id: user['_id'],
+        externalID: user['externalID'],
         name: user['lastName'] + ', ' + user['firstName']
       }));
     });
@@ -764,10 +772,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setSelectedUser() {
-    const selectedUserObjects = [
+    const selectedUserObjects: string[] = [
       ...new Set(
         this.selectedUsers.map(user => {
-          return user['_id'];
+          return user['externalID'];
         })
       )
     ];
@@ -891,7 +899,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private assignMultiselectConfig() {
     this.userDropdownSettings = {
       singleSelection: false,
-      primaryKey: '_id',
+      primaryKey: 'externalID',
       text: 'Benutzer wählen',
       textField: 'name',
       labelKey: 'name',

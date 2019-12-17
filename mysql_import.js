@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 var nano = require('nano')('http://root:root@127.0.0.1:5984');
 
-var db = nano.db.use('norm_documents');
+var db = nano.db.use('norm_local');
 
 var con = mysql.createConnection({
   host: 'localhost',
@@ -28,7 +28,7 @@ con.query(sql, function(err, result) {
 
   users.push({
     type: 'user',
-    externalID: 10001,
+    externalID: '10001',
     userName: 'admin',
     firstName: 'My',
     lastName: 'Admin',
@@ -42,7 +42,7 @@ con.query(sql, function(err, result) {
   users.push({
     type: 'user',
     userName: 'owner',
-    externalID: 10002,
+    externalID: '10002',
     firstName: 'test',
     lastName: 'Owner',
     email: 'owner@aircraft-philipp.com',
@@ -65,13 +65,13 @@ con.query(sql, function(err, result) {
   users.push({
     type: 'user',
     userName: 'owner2',
-    externalID: 10003,
+    externalID: '10003',
     firstName: 'Zweiter',
     lastName: 'Owner',
     email: 'owner2@aircraft-philipp.com',
     role: 'owner',
     supplierId: 0,
-    password: 'b74800433dce0f768d22b5fed4e0edaf',
+    password: 'b1e3677cd7c6f633e6c08037583c846f',
     active: true,
     associatedNorms: []
   });
@@ -79,7 +79,7 @@ con.query(sql, function(err, result) {
   users.push({
     type: 'user',
     userName: 'user',
-    externalID: 10004,
+    externalID: '10004',
     firstName: 'Testusers',
     lastName: 'User',
     email: 'user@aircraft-philipp.com',
@@ -102,7 +102,7 @@ con.query(sql, function(err, result) {
 
   users.push({
     type: 'user',
-    externalID: 10005,
+    externalID: '10005',
     userName: 'externaluser',
     firstName: 'A',
     lastName: 'External',
@@ -116,7 +116,7 @@ con.query(sql, function(err, result) {
   result.forEach(element => {
     const user = {};
     user.type = 'user';
-    user.externalID = element.id;
+    user.externalID = '' + element.id;
     user.userName = element.user;
     user.firstName = element.firstname;
     user.lastName = element.lastname;
