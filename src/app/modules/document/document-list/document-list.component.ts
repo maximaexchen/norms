@@ -120,16 +120,20 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private updateList(changedInfo: any) {
+    console.log(changedInfo);
+    console.log(changedInfo.id);
+    console.log(this.documents);
     const updateItem = this.documents.find(
       item => item['_id'] === changedInfo.id
     );
 
     const index = this.documents.indexOf(updateItem);
-
+    console.log(index);
     if (changedInfo.action !== 'delete') {
       if (index === -1) {
         // Add to list
         this.documents.push(changedInfo.object);
+        console.log(changedInfo.object);
       } else {
         // Update object in list
         this.documents[index] = changedInfo.object;

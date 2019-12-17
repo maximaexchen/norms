@@ -1,46 +1,67 @@
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { DocumentService } from 'src/app/services/document.service';
 import { RouterTestingModule } from '@angular/router/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, TestBed, fakeAsync } from '@angular/core/testing';
 import { GeneralModule } from '@app/modules/general.module';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
-import { of } from 'rxjs';
-import { Router } from '@angular/router';
+import { of, Subject } from 'rxjs';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentListComponent } from './document-list.component';
 import { NormDocument } from '@app/models';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('DocumentListComponent', () => {
   let componentUnderTest: DocumentListComponent;
-  let fixture: ComponentFixture<DocumentListComponent>;
   let documentServiceSpy: Spy<DocumentService>;
-  let documentService: DocumentService;
   let couchDBServiceSpy: Spy<CouchDBService>;
-  let couchDBService: CouchDBService;
-  let fakeDocumentData: NormDocument[];
-  let router = {
+  let fakeDocuments: NormDocument[];
+  let routerSpy = {
     navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
   };
   let actualResult: any;
   let changeInfo: any;
   let expectedObject: any;
 
+  let activatedRoute: any;
+
+  const activatedRouteStub = {
+    params: {
+      subscribe() {
+        return of({ id: 1 });
+      }
+    }
+  };
+
   Given(() => {
     TestBed.configureTestingModule({
-      imports: [GeneralModule, RouterTestingModule],
+      imports: [
+        GeneralModule,
+        RouterTestingModule.withRoutes([
+          { path: 'document/1/edit', component: DocumentListComponent }
+        ])
+      ],
       declarations: [DocumentListComponent],
-      providers: [{ provide: Router, useValue: router }],
+      providers: [
+        DocumentListComponent,
+        {
+          provide: CouchDBService,
+          useValue: createSpyFromClass(CouchDBService)
+        },
+        {
+          provide: DocumentService,
+          useValue: createSpyFromClass(DocumentService)
+        },
+        { provide: ActivatedRoute, useValue: activatedRouteStub },
+        { provide: Router, useValue: routerSpy }
+      ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DocumentListComponent);
-    componentUnderTest = fixture.componentInstance;
-    documentServiceSpy = createSpyFromClass(DocumentService);
-    documentService = TestBed.get(DocumentService);
-    couchDBServiceSpy = createSpyFromClass(CouchDBService);
-    couchDBService = TestBed.get(CouchDBService);
+    componentUnderTest = TestBed.get(DocumentListComponent);
+    documentServiceSpy = TestBed.get(DocumentService);
+    couchDBServiceSpy = TestBed.get(CouchDBService);
 
-    fakeDocumentData = undefined;
+    fakeDocuments = undefined;
     actualResult = undefined;
     changeInfo = undefined;
     expectedObject = undefined;
@@ -49,15 +70,28 @@ describe('DocumentListComponent', () => {
 
   describe('INIT', () => {
     Given(() => {
+      fakeDocuments = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          normNumber: 'AAA'
+        }
+      ];
+
+      couchDBServiceSpy.findDocuments.and.nextOneTimeWith(fakeDocuments);
+
+      couchDBServiceSpy.setStateUpdate.and.returnValue(of(new Subject<any>()));
       // @ts-ignores
       spyOn(componentUnderTest, 'getDocuments').and.callThrough();
     });
 
-    When(() => {
-      // @ts-ignore
-      componentUnderTest.ngOnInit();
-      fixture.detectChanges();
-    });
+    When(
+      fakeAsync(() => {
+        // @ts-ignore
+        componentUnderTest.ngOnInit();
+      })
+    );
 
     Then(() => {
       expect(componentUnderTest).toBeTruthy();
@@ -68,7 +102,7 @@ describe('DocumentListComponent', () => {
 
   describe('METHOD: getDocuments()', () => {
     Given(() => {
-      fakeDocumentData = [
+      fakeDocuments = [
         {
           _id: '1',
           _rev: '1',
@@ -76,16 +110,15 @@ describe('DocumentListComponent', () => {
           normNumber: 'Normnumber'
         }
       ];
-      spyOn(couchDBService, 'findDocuments').and.returnValue(
-        of(fakeDocumentData)
-      );
+      couchDBServiceSpy.findDocuments.and.returnValue(of(fakeDocuments));
     });
 
-    When(() => {
-      // @ts-ignore
-      componentUnderTest.getDocuments();
-      fixture.detectChanges();
-    });
+    When(
+      fakeAsync(() => {
+        // @ts-ignore
+        componentUnderTest.getDocuments();
+      })
+    );
 
     describe('EXPECT mocked documents to be one', () => {
       Then(() => {
@@ -96,7 +129,7 @@ describe('DocumentListComponent', () => {
 
     describe('EXPECT mocked documents to be correct document object', () => {
       Then(() => {
-        expect(componentUnderTest.documents).toEqual(fakeDocumentData);
+        expect(componentUnderTest.documents).toEqual(fakeDocuments);
       });
     });
   });
@@ -105,17 +138,18 @@ describe('DocumentListComponent', () => {
     const id = '1';
 
     Given(() => {
-      router = TestBed.get(Router);
+      routerSpy = TestBed.get(Router);
     });
 
-    When(() => {
-      componentUnderTest.showDetail(id);
-      fixture.detectChanges();
-    });
+    When(
+      fakeAsync(() => {
+        componentUnderTest.showDetail(id);
+      })
+    );
 
     Then(
       async(() => {
-        expect(router.navigate).toHaveBeenCalledWith([
+        expect(routerSpy.navigate).toHaveBeenCalledWith([
           '../document/' + id + '/edit'
         ]);
       })
@@ -124,7 +158,7 @@ describe('DocumentListComponent', () => {
 
   describe('METHOD: updateList(changedInfo)', () => {
     Given(() => {
-      fakeDocumentData = [
+      fakeDocuments = [
         {
           _id: '1',
           _rev: '1',
@@ -158,43 +192,75 @@ describe('DocumentListComponent', () => {
       });
     });
 
-    /* describe('check update', () => {
+    describe('check add', () => {
       Given(() => {
-        expectedObject = {
-          _id: '1',
+        componentUnderTest.documents = [];
+        const newNorm = {
+          _id: '2',
           _rev: '1',
           type: 'document',
-          normNumber: 'New normnumber'
+          normNumber: 'Normnumber2'
         };
-
         changeInfo = {
           model: 'document',
-          id: '1',
-          action: 'update',
-          object: fakeDocumentData
+          id: '2',
+          action: 'save',
+          object: newNorm
         };
 
-        spyOn(couchDBService, 'findDocuments').and.returnValue(
-          of(expectedObject)
-        );
+        // @ts-ignores
+        spyOn(componentUnderTest, 'updateList').and.callThrough();
       });
 
       When(() => {
         // @ts-ignore
-        componentUnderTest.getDocuments();
-        fixture.detectChanges();
-
-        // @ts-ignore
         componentUnderTest.updateList(changeInfo);
-        fixture.detectChanges();
       });
 
       Then(() => {
-        console.log(componentUnderTest.documents[0]);
-        console.log(expectedObject);
         // @ts-ignore
-        expect(componentUnderTest.documents[0]).toEqual(expectedObject);
+        expect(componentUnderTest.documents.length).toEqual(1);
       });
-    }); */
+    });
+
+    describe('check update', () => {
+      Given(() => {
+        componentUnderTest.documents = [
+          {
+            _id: '2',
+            _rev: '1',
+            type: 'document',
+            normNumber: 'Normnumber2'
+          }
+        ];
+        const newNorm = {
+          _id: '2',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber1'
+        };
+        changeInfo = {
+          model: 'document',
+          id: '2',
+          action: 'update',
+          object: newNorm
+        };
+
+        // @ts-ignores
+        spyOn(componentUnderTest, 'updateList').and.callThrough();
+      });
+
+      When(() => {
+        // @ts-ignore
+        componentUnderTest.updateList(changeInfo);
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.documents[0].normNumber).toEqual(
+          'Normnumber1'
+        );
+      });
+    });
   });
 });

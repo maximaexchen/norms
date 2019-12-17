@@ -1,7 +1,7 @@
 import { CalendarModule } from 'primeng/calendar';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { DocumentService } from 'src/app/services/document.service';
-import { TestBed, async, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { GeneralModule } from '@app/modules/general.module';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
@@ -22,10 +22,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { not } from '@angular/compiler/src/output/output_ast';
-import { FormGroup, FormBuilder, NgForm, NgModelGroup } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { of } from 'rxjs';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;

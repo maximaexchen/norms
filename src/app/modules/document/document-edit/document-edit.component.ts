@@ -344,7 +344,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.fileUpload) {
       this.uploadFileToServer();
     }
-
+    this.normDoc.processType = {};
     this.normDoc.processType.id = this.processTypeId;
     // add update status to users to be notified
     this.setUserNotification(this.normDoc.revision);
