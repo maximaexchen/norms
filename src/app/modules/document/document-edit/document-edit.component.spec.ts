@@ -22,6 +22,10 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { not } from '@angular/compiler/src/output/output_ast';
+import { FormGroup, FormBuilder, NgForm, NgModelGroup } from '@angular/forms';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
@@ -36,9 +40,18 @@ describe('DocumentEditComponent', () => {
   let changeInfo: any;
   let expectedObject: any;
 
+  let activatedRoute: any;
+
+  const activatedRouteStub = {
+    params: {
+      subscribe() {
+        return of({ id: 1 });
+      }
+    }
+  };
+
   Given(() => {
     // jasmine.getEnv().allowRespy(true);
-
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
@@ -75,7 +88,8 @@ describe('DocumentEditComponent', () => {
         {
           provide: AuthenticationService,
           useValue: createSpyFromClass(AuthenticationService)
-        }
+        },
+        { provide: ActivatedRoute, useValue: activatedRouteStub }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -83,6 +97,7 @@ describe('DocumentEditComponent', () => {
     componentUnderTest = TestBed.get(DocumentEditComponent);
     documentServiceSpy = TestBed.get(DocumentService);
     couchDBServiceSpy = TestBed.get(CouchDBService);
+    activatedRoute = TestBed.get(ActivatedRoute);
 
     fakeDocuments = undefined;
     fakeDocument = undefined;
@@ -119,6 +134,7 @@ describe('DocumentEditComponent', () => {
       fakeUsers = [];
       documentServiceSpy.getUsers.and.resolveWith(fakeUsers);
 
+      spyOn(activatedRoute.params, 'subscribe');
       // @ts-ignores
       spyOn(componentUnderTest, 'setStartValues').and.callThrough();
     });
@@ -135,6 +151,30 @@ describe('DocumentEditComponent', () => {
       Then(() => {
         // @ts-ignore
         expect(componentUnderTest.setStartValues).toHaveBeenCalled();
+      });
+    });
+
+    describe('GIVEN activatedRoute params THEN call editDocument', () => {
+      Given(() => {
+        activatedRoute.params = of({ id: 1 });
+        // @ts-ignore
+        spyOn(componentUnderTest, 'editDocument');
+      });
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.editDocument).toHaveBeenCalled();
+      });
+    });
+
+    describe('GIVEN empty activatedRoute params THEN call newDocument', () => {
+      Given(() => {
+        activatedRoute.params = of({});
+        // @ts-ignore
+        spyOn(componentUnderTest, 'newDocument');
+      });
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.newDocument).toHaveBeenCalled();
       });
     });
 
@@ -168,6 +208,7 @@ describe('DocumentEditComponent', () => {
           {
             _id: '1',
             _rev: '1',
+            externalID: '1001',
             type: 'user',
             userName: 'owner',
             role: 'owner',
@@ -182,6 +223,7 @@ describe('DocumentEditComponent', () => {
           {
             _id: '1',
             _rev: '1',
+            externalID: '1001',
             type: 'user',
             userName: 'owner',
             role: 'owner',
@@ -197,6 +239,7 @@ describe('DocumentEditComponent', () => {
           {
             _id: '1',
             _rev: '1',
+            externalID: '1001',
             type: 'user',
             userName: 'admin',
             firstName: 'Max',
@@ -213,6 +256,7 @@ describe('DocumentEditComponent', () => {
           {
             _id: '1',
             type: 'user',
+            externalID: '1001',
             name: 'Mustermann, Max'
           }
         ]);
@@ -258,13 +302,144 @@ describe('DocumentEditComponent', () => {
     });
   });
 
-  describe('METHOD editDocument', () => {
-    Given(() => {});
+  describe('METHOD newDocument', () => {
+    Given(() => {
+      componentUnderTest.editable = false;
+      componentUnderTest.isNew = false;
+      componentUnderTest.formTitle = 'JAJ anlegen';
+      componentUnderTest.owner = '123';
+      componentUnderTest.processType = 'Norm';
 
-    When(() => {});
+      // @ts-ignores
+      spyOn(componentUnderTest, 'resetComponent');
+      // @ts-ignores
+      spyOn(componentUnderTest, 'setMultiselects');
+    });
 
-    describe('GIVEN existing id THEN get normDocument', () => {
-      Then(() => {});
+    When(
+      fakeAsync(() => {
+        // @ts-ignores
+        componentUnderTest.newDocument();
+      })
+    );
+
+    describe('GIVEN default values THEN setup for empty normDocument', () => {
+      Then(() => {
+        expect(componentUnderTest.isNew).toBe(true);
+        expect(componentUnderTest.editable).toBe(true);
+        expect(componentUnderTest.formTitle).toEqual('Neue Norm anlegen');
+        expect(componentUnderTest.owner).toEqual('');
+        expect(componentUnderTest.processType).toEqual('');
+        expect(componentUnderTest.normDoc.type).toEqual('norm');
+        expect(componentUnderTest.normDoc.normLanguage).toEqual('en');
+        expect(componentUnderTest.normDoc.active).toBe(false);
+        // @ts-ignores
+        expect(componentUnderTest.resetComponent).toHaveBeenCalled();
+        // @ts-ignores
+        expect(componentUnderTest.setMultiselects).toHaveBeenCalled();
+      });
     });
   });
+
+  describe('METHOD onEdit', () => {
+    Given(() => {
+      componentUnderTest.editable = false;
+      // @ts-ignores
+      spyOn(componentUnderTest, 'setMultiselects');
+    });
+
+    When(() => {
+      componentUnderTest.onEdit();
+    });
+
+    Then(() => {
+      // @ts-ignores
+      expect(componentUnderTest.setMultiselects).toHaveBeenCalled();
+      expect(componentUnderTest.editable).toBe(true);
+    });
+  });
+
+  describe('METHOD onCancle', () => {
+    Given(() => {
+      componentUnderTest.editable = true;
+      // @ts-ignores
+      spyOn(componentUnderTest, 'assignMultiselectConfig');
+    });
+
+    When(() => {
+      componentUnderTest.onCancle();
+    });
+
+    Then(() => {
+      // @ts-ignores
+      expect(componentUnderTest.assignMultiselectConfig).toHaveBeenCalled();
+      expect(componentUnderTest.editable).toBe(false);
+    });
+  });
+
+  /* describe('METHOD onSubmit', () => {
+    Given(() => {
+      componentUnderTest.isLoading = false;
+      componentUnderTest.normDoc = {
+        _id: '1',
+        type: 'norm',
+        normNumber: '1',
+        processType: { id: '1' }
+      };
+
+      // componentUnderTest.normForm = {
+      //   value: componentUnderTest.normDoc
+      // } as NgForm;
+
+      // const dormGroupDir: NgModelGroup = new NgModelGroup(null, null, null);
+      // componentUnderTest.normForm.addFormGroup(dormGroupDir);
+
+      // @ts-ignores
+      spyOn(componentUnderTest.spinner, 'show');
+      // @ts-ignores
+      spyOn(componentUnderTest, 'assignMultiselectConfig');
+    });
+
+    When(
+      fakeAsync(() => {
+        componentUnderTest.onSubmit();
+      })
+    );
+
+    describe('GIVEN default call', () => {
+      Then(() => {
+        // @ts-ignores
+        expect(componentUnderTest.spinner.show).toHaveBeenCalled();
+        // @ts-ignores
+        expect(componentUnderTest.assignMultiselectConfig).toHaveBeenCalled();
+        expect(componentUnderTest.isLoading).toBe(true);
+      });
+    });
+
+    describe('GIVEN isNew true', () => {
+      Given(() => {
+        componentUnderTest.isNew = true;
+        // @ts-ignores
+        spyOn(componentUnderTest, 'saveDocument');
+      });
+
+      Then(() => {
+        // @ts-ignores
+        expect(componentUnderTest.saveDocument).toHaveBeenCalled();
+      });
+    });
+
+    describe('GIVEN isNew false', () => {
+      Given(() => {
+        componentUnderTest.isNew = false;
+        // @ts-ignores
+        spyOn(componentUnderTest, 'updateDocument');
+      });
+
+      Then(() => {
+        // @ts-ignores
+        expect(componentUnderTest.updateDocument).toHaveBeenCalled();
+      });
+    });
+  }); */
 });

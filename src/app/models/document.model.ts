@@ -29,6 +29,8 @@ export interface NormDocument {
   revisions?: any;
   relatedNorms?: string[];
   relatedFrom?: string[];
-  processType?: object;
+  processType?: {
+    id?: string;
+  };
   _attachments?: any;
 }

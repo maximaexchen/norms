@@ -190,11 +190,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public onSubmit(): void {
     this.isLoading = true;
     this.spinner.show();
-    console.log(this.isNew);
-    console.log(this.normForm.value.isNew);
-    if (this.normForm.value.isNew) {
+    if (this.isNew) {
+      console.log('00');
       this.saveDocument();
     } else {
+      console.log('01');
       this.updateDocument();
     }
     this.assignMultiselectConfig();
@@ -332,8 +332,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processFormData() {
-    this.normDoc.revisionDate = this.normForm.value.revisionDate;
-
     const selectedRelatedNorms = this.processRelatedNorms();
     this.processRelatedFromNorms();
     // write current norm to related norms for "reletedFrom"
@@ -346,22 +344,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.fileUpload) {
       this.uploadFileToServer();
     }
-    const selOwner: User = this.owners.find(
-      own => own === this.normForm.value.owner
-    );
-    this.normDoc.owner = ((selOwner as unknown) as string) || this.owner;
-    console.log(selOwner);
-    console.log(this.owner);
-    const selProcessType = this.processTypes.find(processType => {
-      return (
-        processType['id'] === parseInt(this.normForm.value.processTypeId, 0)
-      );
-    });
-    this.normDoc.processType = selProcessType || this.processType;
 
+    this.normDoc.processType.id = this.processTypeId;
     // add update status to users to be notified
-    this.setUserNotification(this.normForm.value.revision);
-
+    this.setUserNotification(this.normDoc.revision);
     this.resetTempData();
     return this.normDoc;
   }
@@ -397,6 +383,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedRelatedNorms.forEach(element => {
       selectedRelatedNorms.push(element['id']);
     });
+    console.log(this.normDoc);
     this.normDoc.relatedNorms =
       selectedRelatedNorms || this.selectedRelatedNorms;
 
