@@ -208,7 +208,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
           // Inform about Database change.
           this.getUser();
           this.sendStateUpdate(this.id, 'update');
-          this.searchRelatedUser(result);
+          // this.searchRelatedUser(result);
           this.router.navigate(['../user']);
         },
         error => {
@@ -263,7 +263,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     bulkUpdateObject['docs'] = [];
     related.docs.forEach(norm => {
       if (this.role === 'owner') {
-        this.updateRelatedOwner(norm);
+        // this.updateRelatedOwner(norm);
       } else {
         this.updateRelatedUser(norm);
       }
@@ -293,8 +293,8 @@ export class UserEditComponent implements OnInit, OnDestroy {
     return norm;
   }
 
-  private updateRelatedOwner(norm: NormDocument): NormDocument {
-    norm.owner.firstName = this.firstName;
+  /*private updateRelatedOwner(norm: NormDocument): NormDocument {
+     norm.owner.firstName = this.firstName;
     norm.owner.lastName = this.lastName;
     norm.owner.email = this.email;
     norm.owner.externalID = this.externalID;
@@ -302,7 +302,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
     norm.owner.active = this.active;
 
     return norm;
-  }
+  } */
 
   private onCreateUser(): void {
     this.createWriteItem();

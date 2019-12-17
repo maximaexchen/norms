@@ -1,7 +1,7 @@
 var mysql = require('mysql');
 var nano = require('nano')('http://root:root@127.0.0.1:5984');
 
-var db = nano.db.use('norm_local');
+var db = nano.db.use('norm_documents');
 
 var con = mysql.createConnection({
   host: 'localhost',
