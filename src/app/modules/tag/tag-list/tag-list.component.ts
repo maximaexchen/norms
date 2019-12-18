@@ -36,13 +36,11 @@ export class TagListComponent implements OnInit, OnDestroy {
   private setup() {
     this.subsink.sink = this.couchDBService.setStateUpdate().subscribe(
       message => {
-        console.log(message);
         if (message.model === 'tag') {
           this.getTags();
         }
       },
-      error => this.logger.error(error.message),
-      () => console.log('completed.')
+      error => this.logger.error(error.message)
     );
 
     this.getTags();
@@ -73,13 +71,11 @@ export class TagListComponent implements OnInit, OnDestroy {
               this.tagsLevel3.push(tag);
               break;
             }
-            default: {
-              break;
-            }
           }
         }
       },
       error => {
+        console.error(error);
         this.logger.error(error.message);
       }
     );

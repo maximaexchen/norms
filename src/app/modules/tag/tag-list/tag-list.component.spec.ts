@@ -1,6 +1,6 @@
 import { async, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
@@ -17,7 +17,9 @@ describe('TagListComponent', () => {
   let couchDBServiceSpy: Spy<CouchDBService>;
   let router: Spy<Router>;
   let fakeTags: Tag[];
-  let fakeMessage: any;
+  let fakeTag: Tag;
+  let changeInfo: any;
+  let expectedObject: any;
 
   Given(() => {
     TestBed.configureTestingModule({
@@ -49,7 +51,10 @@ describe('TagListComponent', () => {
     couchDBServiceSpy = TestBed.get(CouchDBService);
 
     fakeTags = undefined;
-    fakeMessage = undefined;
+    fakeTag = undefined;
+    changeInfo = undefined;
+    changeInfo = undefined;
+    expectedObject = undefined;
   });
 
   describe('INIT', () => {
@@ -78,21 +83,24 @@ describe('TagListComponent', () => {
         }
       ];
 
-      // @ts-ignores
       documentServiceSpy.getTags.and.nextOneTimeWith(fakeTags);
-
-      // @ts-ignores
-      spyOn(componentUnderTest, 'getTags').and.callThrough();
+      spyOn(componentUnderTest as any, 'getTags').and.callThrough();
     });
 
+    When(
+      fakeAsync(() => {
+        // @ts-ignore
+        componentUnderTest.ngOnInit();
+        tick();
+      })
+    );
+
     describe('GIVEN startup THEN getTags to be called', () => {
-      When(
-        fakeAsync(() => {
-          // @ts-ignore
-          componentUnderTest.ngOnInit();
-          tick();
-        })
-      );
+      Given(() => {
+        couchDBServiceSpy.setStateUpdate.and.returnValue(
+          of(new Subject<any>())
+        );
+      });
       Then(() => {
         expect(componentUnderTest).toBeTruthy();
         // @ts-ignore
@@ -100,27 +108,19 @@ describe('TagListComponent', () => {
       });
     });
 
-    describe('GIVEN update message THEN call getTags', () => {
+    describe('GIVEN Obeservable error THEN call error callback', () => {
       Given(() => {
-        fakeMessage = {
-          model: "tag"
-id: { _id: "8c5a90580e301532469047df5a0286e5", _rev: "31-5d4bc291e9322e80f64c900f8445c11b", type: "tag", name: "Airbus", tagType: "level1", … }
-action: "update"
-object: null
-        };
-
-        documentServiceSpy.getTags.and.nextOneTimeWith(fakeTags);
-        couchDBServiceSpy.setStateUpdate.and.nextOneTimeWith(fakeMessage);
-        couchDBServiceSpy.setStateUpdate.and.returnValue(of(new Subject<any>()));
+        // @ts-ignores
+        couchDBServiceSpy.setStateUpdate.and.returnValue(
+          throwError({ status: 404 })
+        );
+        // @ts-ignores
+        spyOn(componentUnderTest, 'setup').and.callThrough();
       });
-      When(
-        fakeAsync(() => {
-          // @ts-ignore
-          componentUnderTest.setup();
-        })
-      );
-
-      Then(() => {});
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.logger.error).toHaveBeenCalled();
+      });
     });
   });
 
@@ -195,6 +195,18 @@ object: null
           expect(componentUnderTest.tagsLevel3.length).toBe(1);
         });
       });
+
+      describe('GIVEN Obeservable error THEN call error callback', () => {
+        Given(() => {
+          documentServiceSpy.getTags.and.returnValue(
+            throwError({ status: 404 })
+          );
+        });
+        Then(() => {
+          // @ts-ignore
+          expect(componentUnderTest.logger.error).toHaveBeenCalled();
+        });
+      });
     });
   });
 
@@ -217,4 +229,114 @@ object: null
       })
     );
   });
+
+  /* describe('METHOD: updateList(changedInfo)', () => {
+    Given(() => {
+      fakeTag = {
+        _id: '2',
+        _rev: '1',
+        type: 'tag',
+        name: 'Boeing',
+        tagType: 'level1'
+      };
+
+      fakeTags = [fakeTag];
+    });
+
+    describe('check delete', () => {
+      Given(() => {
+        changeInfo = {
+          model: 'tag',
+          id: '2',
+          action: 'delete',
+          object: fakeTag
+        };
+
+        // @ts-ignores
+        spyOn(componentUnderTest, 'updateList');
+      });
+
+      When(() => {
+        // @ts-ignore
+        componentUnderTest.updateList(changeInfo);
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.tags.length).toEqual(0);
+      });
+    });
+
+    describe('check add', () => {
+      Given(() => {
+        componentUnderTest.tags = [];
+        const newTag = {
+          _id: '3',
+          _rev: '1',
+          type: 'tag',
+          name: 'Airbus',
+          tagType: 'level1'
+        };
+
+        changeInfo = {
+          model: 'tag',
+          id: '1',
+          action: 'update',
+          object: newTag
+        };
+
+        // @ts-ignores
+        spyOn(componentUnderTest, 'updateList').and.callThrough();
+      });
+
+      When(() => {
+        // @ts-ignore
+        componentUnderTest.updateList(changeInfo);
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.tags.length).toEqual(1);
+      });
+    });
+
+    describe('check update', () => {
+      Given(() => {
+        componentUnderTest.tags = fakeTags;
+        const updateTag = {
+          _id: '2',
+          _rev: '1',
+          type: 'tag',
+          tagType: 'level1',
+          name: 'Boeing2'
+        };
+
+        changeInfo = {
+          model: 'tag',
+          id: '2',
+          action: 'update',
+          object: {
+            _id: '2',
+            _rev: '2',
+            type: 'tag',
+            name: 'Boeing2',
+            tagType: 'level1'
+          }
+        };
+
+        // @ts-ignores
+        spyOn(componentUnderTest, 'updateList').and.callThrough();
+      });
+
+      When(() => {
+        // @ts-ignore
+        componentUnderTest.updateList(changeInfo);
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.tags[0].name).toEqual('Boeing2');
+      });
+    });
+  }); */
 });

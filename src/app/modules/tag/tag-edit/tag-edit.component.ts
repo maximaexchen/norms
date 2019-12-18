@@ -184,7 +184,7 @@ export class TagEditComponent implements OnInit, OnDestroy {
   }
 
   private sendStateUpdate(action: string): void {
-    this.couchDBService.sendStateUpdate('tag', this.tag, action);
+    this.couchDBService.sendStateUpdate('tag', this.tag._id, action, this.tag);
   }
 
   public ngOnDestroy(): void {
