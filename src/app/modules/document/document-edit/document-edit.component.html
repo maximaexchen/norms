@@ -258,7 +258,9 @@
                   </c-badge>
                   <c-item>
                     <ng-template let-item="item">
-                      <label class="{{ item.tagType }}"> {{ item.name }}</label>
+                      <label class="{{ item.tagType }}">
+                        {{ item.name }}{{ item.id | json }}</label
+                      >
                     </ng-template>
                   </c-item>
                 </angular2-multiselect>

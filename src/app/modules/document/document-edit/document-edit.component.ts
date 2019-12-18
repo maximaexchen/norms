@@ -783,6 +783,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private addNormToLinkedNorms(relatedNorms: any[]) {
     relatedNorms.forEach(relatedNorm => {
+      console.log(relatedNorm);
       // get the linked Norm
       this.subsink.sink = this.couchDBService
         .fetchEntry('/' + relatedNorm)
@@ -902,7 +903,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.relatedDropdownSettings = {
       singleSelection: false,
-      primaryKey: 'id',
+      primaryKey: '_id',
       text: 'Referenz wählen',
       textField: 'normNumber',
       labelKey: 'normNumber',
