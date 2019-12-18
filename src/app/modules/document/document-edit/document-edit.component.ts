@@ -381,7 +381,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private processRelatedNorms(): any[] {
     const selectedRelatedNorms = [];
     this.selectedRelatedNorms.forEach(element => {
-      selectedRelatedNorms.push(element['id']);
+      selectedRelatedNorms.push(element['_id']);
     });
     console.log(this.normDoc);
     this.normDoc.relatedNorms =
