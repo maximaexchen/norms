@@ -64,7 +64,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           this.updateList(message);
         }
       },
-      error => this.logger.error(error.message)
+      error => {
+        this.logger.error(error.message);
+      }
     );
     this.getDocuments();
   }

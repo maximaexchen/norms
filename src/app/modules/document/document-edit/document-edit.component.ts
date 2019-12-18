@@ -50,6 +50,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   normDoc: NormDocument;
   owners: User[] = [];
+  currentOwner: User;
   users: User[] = [];
   selectedUsers: any[] = [];
 
@@ -191,10 +192,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.spinner.show();
     if (this.isNew) {
-      console.log('00');
       this.saveDocument();
     } else {
-      console.log('01');
       this.updateDocument();
     }
     this.assignMultiselectConfig();
@@ -258,9 +257,17 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setAdditionalNormDocData() {
+    console.log('setAdditionalNormDocData');
     this.revisionDate = new Date(this.normDoc.revisionDate);
+
     if (this.normDoc.owner) {
       this.owner = this.normDoc.owner;
+    }
+
+    if (this.normDoc.owner) {
+      this.currentOwner = this.owners.find(ow => {
+        return this.normDoc.owner === ow.externalID;
+      });
     }
 
     this.processType = this.normDoc.processType;
@@ -349,6 +356,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // add update status to users to be notified
     this.setUserNotification(this.normDoc.revision);
     this.resetTempData();
+    console.log(this.normDoc);
     return this.normDoc;
   }
 
@@ -562,6 +570,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    *
    */
   private getUsersForSelect(): void {
+    console.log('getUsersForSelect');
     this.documentService.getUsers().then(users => {
       // Add all users for the selectable owner dropdown
       this.owners = [];

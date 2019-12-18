@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { async, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { GeneralModule } from '@app/modules/general.module';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
-import { of, Subject, throwError } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentListComponent } from './document-list.component';
 import { NormDocument } from '@app/models';
@@ -76,8 +76,11 @@ describe('DocumentListComponent', () => {
           normNumber: 'AAA'
         }
       ];
+
       couchDBServiceSpy.findDocuments.and.nextOneTimeWith(fakeDocuments);
-      spyOn(componentUnderTest as any, 'getDocuments').and.callThrough();
+      couchDBServiceSpy.setStateUpdate.and.returnValue(of(new Subject<any>()));
+      // @ts-ignores
+      spyOn(componentUnderTest, 'getDocuments').and.callThrough();
     });
 
     When(
@@ -88,31 +91,10 @@ describe('DocumentListComponent', () => {
       })
     );
 
-    describe('GIVEN startup THEN getDocuments to be called', () => {
-      Given(() => {
-        couchDBServiceSpy.setStateUpdate.and.returnValue(
-          of(new Subject<any>())
-        );
-      });
-      Then(() => {
-        expect(componentUnderTest).toBeTruthy();
-        // @ts-ignore
-        expect(componentUnderTest.getDocuments).toHaveBeenCalled();
-      });
-    });
-
-    describe('GIVEN Obeservable error THEN call error callback', () => {
-      Given(() => {
-        // @ts-ignores
-        couchDBServiceSpy.setStateUpdate.and.returnValue(
-          throwError({ status: 404 })
-        );
-        spyOn(componentUnderTest as any, 'setup').and.callThrough();
-      });
-      Then(() => {
-        // @ts-ignore
-        // expect(componentUnderTest.logger.error).toHaveBeenCalled();
-      });
+    Then(() => {
+      expect(componentUnderTest).toBeTruthy();
+      // @ts-ignore
+      expect(componentUnderTest.getDocuments).toHaveBeenCalled();
     });
   });
 
@@ -160,7 +142,6 @@ describe('DocumentListComponent', () => {
 
     When(
       fakeAsync(() => {
-        // @ts-ignores
         componentUnderTest.showDetail(id);
         tick();
       })

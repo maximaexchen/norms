@@ -42,8 +42,7 @@ export class DocumentService {
       .toPromise()
       .then(response => {
         return response as NormDocument[];
-      })
-      .catch(this.handleError);
+      });
   }
 
   public getSelectedOwner(ownerId: string[]): Promise<User[]> {

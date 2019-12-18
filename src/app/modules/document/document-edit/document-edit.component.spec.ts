@@ -1,7 +1,7 @@
 import { CalendarModule } from 'primeng/calendar';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { DocumentService } from 'src/app/services/document.service';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, async } from '@angular/core/testing';
 
 import { GeneralModule } from '@app/modules/general.module';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
@@ -23,10 +23,12 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
 import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
+  let httpSpy: Spy<HttpClient>;
   let documentServiceSpy: Spy<DocumentService>;
   let couchDBServiceSpy: Spy<CouchDBService>;
   let fakeDocuments: NormDocument[];
@@ -67,6 +69,7 @@ describe('DocumentEditComponent', () => {
       declarations: [],
       providers: [
         DocumentEditComponent,
+        { provide: HttpClient, useValue: createSpyFromClass(HttpClient) },
         {
           provide: CouchDBService,
           useValue: createSpyFromClass(CouchDBService)
@@ -96,6 +99,7 @@ describe('DocumentEditComponent', () => {
     documentServiceSpy = TestBed.get(DocumentService);
     couchDBServiceSpy = TestBed.get(CouchDBService);
     activatedRoute = TestBed.get(ActivatedRoute);
+    httpSpy = TestBed.get(HttpClient);
 
     fakeDocuments = undefined;
     fakeDocument = undefined;
@@ -112,12 +116,10 @@ describe('DocumentEditComponent', () => {
       fakeDocuments = [
         {
           _id: '1',
-          _rev: '1',
-          type: 'user',
+          type: 'norm',
           normNumber: 'AAA'
         }
       ];
-      documentServiceSpy.getDocuments.and.resolveWith(fakeDocuments);
 
       fakeTags = [
         {
@@ -128,6 +130,7 @@ describe('DocumentEditComponent', () => {
         }
       ];
       couchDBServiceSpy.fetchEntries.and.nextOneTimeWith(fakeTags);
+      couchDBServiceSpy.fetchEntries.and.complete();
 
       fakeUsers = [];
       documentServiceSpy.getUsers.and.resolveWith(fakeUsers);
@@ -137,127 +140,131 @@ describe('DocumentEditComponent', () => {
       spyOn(componentUnderTest, 'setStartValues').and.callThrough();
     });
 
-    When(
-      fakeAsync(() => {
-        // @ts-ignore
-        componentUnderTest.ngOnInit();
-        tick();
-      })
-    );
-
-    describe('METHOD setStartValues to be called', () => {
-      Then(() => {
-        // @ts-ignore
-        expect(componentUnderTest.setStartValues).toHaveBeenCalled();
-      });
-    });
-
-    describe('GIVEN activatedRoute params THEN call editDocument', () => {
+    describe('INIT', () => {
+      When(
+        fakeAsync(() => {
+          // @ts-ignore
+          componentUnderTest.ngOnInit();
+          tick();
+        })
+      );
       Given(() => {
-        activatedRoute.params = of({ id: 1 });
-        // @ts-ignore
-        spyOn(componentUnderTest, 'editDocument');
+        documentServiceSpy.getDocuments.and.resolveWith(fakeDocuments);
       });
-      Then(() => {
-        // @ts-ignore
-        expect(componentUnderTest.editDocument).toHaveBeenCalled();
-      });
-    });
-
-    describe('GIVEN empty activatedRoute params THEN call newDocument', () => {
-      Given(() => {
-        activatedRoute.params = of({});
-        // @ts-ignore
-        spyOn(componentUnderTest, 'newDocument');
-      });
-      Then(() => {
-        // @ts-ignore
-        expect(componentUnderTest.newDocument).toHaveBeenCalled();
-      });
-    });
-
-    describe('Attribute relatedNormsSelectList is set', () => {
-      Then(() => {
-        expect(componentUnderTest.relatedNormsSelectList).toEqual([
-          {
-            _id: '1',
-            type: 'norm',
-            normNumber: 'AAA'
-          }
-        ]);
-      });
-    });
-
-    describe('Attribute relatedNormsSelectList is set', () => {
-      Then(() => {
-        expect(componentUnderTest.relatedNormsSelectList).toEqual([
-          {
-            _id: '1',
-            type: 'norm',
-            normNumber: 'AAA'
-          }
-        ]);
-      });
-    });
-
-    describe('GIVEN owners THEN store owners for select', () => {
-      Given(() => {
-        fakeUsers = [
-          {
-            _id: '1',
-            _rev: '1',
-            externalID: '1001',
-            type: 'user',
-            userName: 'owner',
-            role: 'owner',
-            supplierId: 0
-          }
-        ];
-        documentServiceSpy.getUsers.and.resolveWith(fakeUsers);
+      describe('METHOD setStartValues to be called', () => {
+        Then(() => {
+          // @ts-ignore
+          expect(componentUnderTest.setStartValues).toHaveBeenCalled();
+        });
       });
 
-      Then(() => {
-        expect(componentUnderTest.owners).toEqual([
-          {
-            _id: '1',
-            _rev: '1',
-            externalID: '1001',
-            type: 'user',
-            userName: 'owner',
-            role: 'owner',
-            supplierId: 0
-          }
-        ]);
-      });
-    });
-
-    describe('GIVEN users THEN expect users to be laoded', () => {
-      Given(() => {
-        fakeUsers = [
-          {
-            _id: '1',
-            _rev: '1',
-            externalID: '1001',
-            type: 'user',
-            userName: 'admin',
-            firstName: 'Max',
-            lastName: 'Mustermann',
-            role: 'admin',
-            supplierId: 1
-          }
-        ];
-        documentServiceSpy.getUsers.and.resolveWith(fakeUsers);
+      describe('GIVEN activatedRoute params THEN call editDocument', () => {
+        Given(() => {
+          activatedRoute.params = of({ id: 1 });
+          // @ts-ignore
+          spyOn(componentUnderTest, 'editDocument');
+        });
+        Then(() => {
+          // @ts-ignore
+          expect(componentUnderTest.editDocument).toHaveBeenCalled();
+        });
       });
 
-      Then(() => {
-        expect(componentUnderTest.users).toEqual([
-          {
-            _id: '1',
-            type: 'user',
-            externalID: '1001',
-            name: 'Mustermann, Max'
-          }
-        ]);
+      describe('GIVEN empty activatedRoute params THEN call newDocument', () => {
+        Given(() => {
+          activatedRoute.params = of({});
+          // @ts-ignore
+          spyOn(componentUnderTest, 'newDocument');
+        });
+        Then(() => {
+          // @ts-ignore
+          expect(componentUnderTest.newDocument).toHaveBeenCalled();
+        });
+      });
+
+      describe('Attribute relatedNormsSelectList is set', () => {
+        Then(() => {
+          expect(componentUnderTest.relatedNormsSelectList).toEqual([
+            {
+              _id: '1',
+              type: 'norm',
+              normNumber: 'AAA'
+            }
+          ]);
+        });
+      });
+
+      describe('Attribute relatedNormsSelectList is set', () => {
+        Then(() => {
+          expect(componentUnderTest.relatedNormsSelectList).toEqual([
+            {
+              _id: '1',
+              type: 'norm',
+              normNumber: 'AAA'
+            }
+          ]);
+        });
+      });
+
+      describe('GIVEN owners THEN store owners for select', () => {
+        Given(() => {
+          fakeUsers = [
+            {
+              _id: '1',
+              _rev: '1',
+              externalID: '1001',
+              type: 'user',
+              userName: 'owner',
+              role: 'owner',
+              supplierId: 0
+            }
+          ];
+          documentServiceSpy.getUsers.and.resolveWith(fakeUsers);
+        });
+
+        Then(() => {
+          expect(componentUnderTest.owners).toEqual([
+            {
+              _id: '1',
+              _rev: '1',
+              externalID: '1001',
+              type: 'user',
+              userName: 'owner',
+              role: 'owner',
+              supplierId: 0
+            }
+          ]);
+        });
+      });
+
+      describe('GIVEN users THEN expect users to be laoded', () => {
+        Given(() => {
+          fakeUsers = [
+            {
+              _id: '1',
+              _rev: '1',
+              externalID: '1001',
+              type: 'user',
+              userName: 'admin',
+              firstName: 'Max',
+              lastName: 'Mustermann',
+              role: 'admin',
+              supplierId: 1
+            }
+          ];
+          documentServiceSpy.getUsers.and.resolveWith(fakeUsers);
+        });
+
+        Then(() => {
+          expect(componentUnderTest.users).toEqual([
+            {
+              _id: '1',
+              type: 'user',
+              externalID: '1001',
+              name: 'Mustermann, Max'
+            }
+          ]);
+        });
       });
     });
   });
@@ -284,6 +291,20 @@ describe('DocumentEditComponent', () => {
         // fixture.detectChanges();
       })
     );
+
+    describe('GIVEN 404 on service observable THEN error callback', () => {
+      Given(() => {
+        documentServiceSpy.getDocument.and.returnValue(
+          throwError({ status: 404 })
+        );
+        // @ts-ignore
+        spyOn(componentUnderTest.logger, 'error').and.callThrough();
+      });
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.logger.error).toHaveBeenCalled();
+      });
+    });
 
     describe('GIVEN existing id THEN get normDocument', () => {
       id = '1';
@@ -438,6 +459,44 @@ describe('DocumentEditComponent', () => {
         // @ts-ignores
         expect(componentUnderTest.updateDocument).toHaveBeenCalled();
       });
+    });
+  }); */
+
+  /* describe('METHOD updateDocument', () => {
+    Given(() => {
+      componentUnderTest.normDoc = {
+        _id: '1',
+        type: 'norm',
+        normNumber: 'AAA'
+      };
+      fakeDocuments = [
+        {
+          _id: '1',
+          type: 'norm',
+          normNumber: 'AAA'
+        }
+      ];
+      fakeDocument = {
+        _id: '1',
+        _rev: '1',
+        type: 'user',
+        normNumber: 'AAA'
+      };
+
+      couchDBServiceSpy.updateEntry.calledWith(fakeDocument, '1');
+      // @ts-ignores
+      spyOn(componentUnderTest, 'updateDocument').and.callThrough();
+    });
+
+    When(
+      fakeAsync(() => {
+        // @ts-ignores
+        componentUnderTest.updateDocument();
+      })
+    );
+
+    Then(() => {
+      expect(componentUnderTest.isLoading).toBe(false);
     });
   }); */
 });
