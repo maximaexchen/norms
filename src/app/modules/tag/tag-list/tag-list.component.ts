@@ -30,12 +30,13 @@ export class TagListComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.start();
+    this.setup();
   }
 
-  private start() {
+  private setup() {
     this.subsink.sink = this.couchDBService.setStateUpdate().subscribe(
       message => {
+        console.log(message);
         if (message.model === 'tag') {
           this.getTags();
         }

@@ -1,13 +1,14 @@
-import { of, Subject } from 'rxjs';
-import { async, TestBed, fakeAsync } from '@angular/core/testing';
+import { async, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
-import { TagListComponent } from './tag-list.component';
-import { GeneralModule } from '@app/modules/general.module';
+import { of, Subject } from 'rxjs';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { Router } from '@angular/router';
-import { Tag } from '@app/models/tag.model';
 import { NGXLogger } from 'ngx-logger';
+
+import { Tag } from '@app/models/tag.model';
+import { GeneralModule } from '@app/modules/general.module';
 import { CouchDBService } from 'src/app/services/couchDB.service';
+import { TagListComponent } from './tag-list.component';
 import { DocumentService } from 'src/app/services/document.service';
 
 describe('TagListComponent', () => {
@@ -15,7 +16,8 @@ describe('TagListComponent', () => {
   let documentServiceSpy: Spy<DocumentService>;
   let couchDBServiceSpy: Spy<CouchDBService>;
   let router: Spy<Router>;
-  let fakeTagData: Tag[];
+  let fakeTags: Tag[];
+  let fakeMessage: any;
 
   Given(() => {
     TestBed.configureTestingModule({
@@ -44,53 +46,15 @@ describe('TagListComponent', () => {
 
     componentUnderTest = TestBed.get(TagListComponent);
     documentServiceSpy = TestBed.get(DocumentService);
-    couchDBServiceSpy = TestBed.get(DocumentService);
+    couchDBServiceSpy = TestBed.get(CouchDBService);
 
-    fakeTagData = undefined;
+    fakeTags = undefined;
+    fakeMessage = undefined;
   });
 
-  /* describe('METHOD: getTags() tags to be greater than 0', () => {
+  describe('INIT', () => {
     Given(() => {
-      console.log(couchDBServiceSpy.setStateUpdate);
-      couchDBServiceSpy.setStateUpdate.and.returnValue(
-        of({
-          message: { model: 'tag' }
-        })
-      ); */
-  //documentServiceSpy.getTags.and.nextOneTimeWith([]);
-  //couchDBServiceSpy.getRoles.and.nextOneTimeWith([]);
-  /* couchDBServiceSpy.setStateUpdate.and.returnValue({
-        message: { model: 'tag' }
-      });
-
-      let messageMock = new Subject<any>();
-
-      couchDBServiceSpy.setStateUpdate.and.returnValue(
-        of(
-          messageMock.next({
-            message: { model: 'tags' }
-          })
-        )
-      );
-      couchDBServiceSpy.setStateUpdate.c
-    });
-
-    When(
-      fakeAsync(() => {
-        // @ts-ignore
-        componentUnderTest.start();
-      })
-    );
-
-    Then(() => {
-      // @ts-ignore
-      expect(componentUnderTest.getTags.toHaveBeenCalled());
-    });
-  }); */
-
-  describe('METHOD: getTags() tags to be greater than 0', () => {
-    Given(() => {
-      fakeTagData = [
+      fakeTags = [
         {
           _id: '1',
           _rev: '1',
@@ -114,7 +78,79 @@ describe('TagListComponent', () => {
         }
       ];
 
-      documentServiceSpy.getTags.and.nextOneTimeWith(fakeTagData);
+      // @ts-ignores
+      documentServiceSpy.getTags.and.nextOneTimeWith(fakeTags);
+
+      // @ts-ignores
+      spyOn(componentUnderTest, 'getTags').and.callThrough();
+    });
+
+    describe('GIVEN startup THEN getTags to be called', () => {
+      When(
+        fakeAsync(() => {
+          // @ts-ignore
+          componentUnderTest.ngOnInit();
+          tick();
+        })
+      );
+      Then(() => {
+        expect(componentUnderTest).toBeTruthy();
+        // @ts-ignore
+        expect(componentUnderTest.getTags).toHaveBeenCalled();
+      });
+    });
+
+    describe('GIVEN update message THEN call getTags', () => {
+      Given(() => {
+        fakeMessage = {
+          model: "tag"
+id: { _id: "8c5a90580e301532469047df5a0286e5", _rev: "31-5d4bc291e9322e80f64c900f8445c11b", type: "tag", name: "Airbus", tagType: "level1", … }
+action: "update"
+object: null
+        };
+
+        documentServiceSpy.getTags.and.nextOneTimeWith(fakeTags);
+        couchDBServiceSpy.setStateUpdate.and.nextOneTimeWith(fakeMessage);
+        couchDBServiceSpy.setStateUpdate.and.returnValue(of(new Subject<any>()));
+      });
+      When(
+        fakeAsync(() => {
+          // @ts-ignore
+          componentUnderTest.setup();
+        })
+      );
+
+      Then(() => {});
+    });
+  });
+
+  describe('METHOD: getTags() tags to be greater than 0', () => {
+    Given(() => {
+      fakeTags = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'tag',
+          name: 'Tag name',
+          tagType: 'level1'
+        },
+        {
+          _id: '2',
+          _rev: '2',
+          type: 'tag',
+          name: 'Tag2 name',
+          tagType: 'level2'
+        },
+        {
+          _id: '3',
+          _rev: '3',
+          type: 'tag',
+          name: 'Tag3 name',
+          tagType: 'level3'
+        }
+      ];
+
+      documentServiceSpy.getTags.and.nextOneTimeWith(fakeTags);
     });
 
     When(
@@ -138,7 +174,7 @@ describe('TagListComponent', () => {
 
       describe('EXPECT mocked tags to be correct tag object', () => {
         Then(() => {
-          expect(componentUnderTest.tags).toEqual(fakeTagData);
+          expect(componentUnderTest.tags).toEqual(fakeTags);
         });
       });
 
