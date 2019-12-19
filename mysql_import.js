@@ -125,6 +125,7 @@ con.query(sql, function(err, result) {
     user.supplierId = element.supplier_id;
     user.levels = element.levels;
     user.active = element.active == 1 ? true : false;
+    user.role = 'owner';
 
     users.push(user);
   });

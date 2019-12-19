@@ -88,6 +88,7 @@ export class StartComponent implements OnInit, OnDestroy {
 
   public setOwnerData() {
     console.log('setOwnerData');
+    console.log(this.currentExternalId);
     const ownerQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -106,6 +107,7 @@ export class StartComponent implements OnInit, OnDestroy {
     const test = this.couchDBService.search(ownerQuery).pipe(
       flatMap(res => {
         res.docs.map(response => {
+          console.log(response);
           response.revisionLatest = this.documentService.getLatestActiveRevision(
             response.revisions
           );
