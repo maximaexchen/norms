@@ -35,7 +35,7 @@ export class AppComponent implements OnInit, OnDestroy {
     if (event.isValidUser) {
       this.subsink.sink = this.authService.userIsLoggedIn$.subscribe(
         res => {
-          if (sessionStorage.getItem('role') === 'user') {
+          if (sessionStorage.getItem('role') === 'owner') {
             this.router.navigate(['/start']);
           } else {
             this.router.navigate(['/document']);
