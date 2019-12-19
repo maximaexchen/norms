@@ -10,7 +10,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 
 import { NormDocument, User } from '@app/models';
 import { DocumentEditComponent } from './document-edit.component';
-import { FileUploadModule } from 'primeng/fileupload';
+import { FileUploadModule, FileUpload } from 'primeng/fileupload';
 import { FieldsetModule } from 'primeng/fieldset';
 import { DialogModule } from 'primeng/dialog';
 import { GroupModule } from '@app/modules/group/group.module';
@@ -22,10 +22,10 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { EnvService } from '@app/services/env.service';
+import { NgForm } from '@angular/forms';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
@@ -40,7 +40,9 @@ describe('DocumentEditComponent', () => {
   let actualResult: any;
   let changeInfo: any;
   let expectedObject: any;
-  let couchDBService: CouchDBService;
+  let routerSpy = {
+    navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
+  };
 
   let activatedRoute: any;
 
@@ -92,7 +94,8 @@ describe('DocumentEditComponent', () => {
           provide: AuthenticationService,
           useValue: createSpyFromClass(AuthenticationService)
         },
-        { provide: ActivatedRoute, useValue: activatedRouteStub }
+        { provide: ActivatedRoute, useValue: activatedRouteStub },
+        { provide: Router, useValue: routerSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -102,6 +105,7 @@ describe('DocumentEditComponent', () => {
     couchDBServiceSpy = TestBed.get(CouchDBService);
     activatedRoute = TestBed.get(ActivatedRoute);
     httpSpy = TestBed.get(HttpClient);
+    routerSpy = TestBed.get(Router);
 
     fakeDocuments = undefined;
     fakeDocument = undefined;
@@ -398,44 +402,21 @@ describe('DocumentEditComponent', () => {
     });
   });
 
-  /* describe('METHOD onSubmit', () => {
+  describe('METHOD onSubmit', () => {
     Given(() => {
-      componentUnderTest.isLoading = false;
-      componentUnderTest.normDoc = {
-        _id: '1',
-        type: 'norm',
-        normNumber: '1',
-        processType: { id: '1' }
-      };
-
-      // componentUnderTest.normForm = {
-      //   value: componentUnderTest.normDoc
-      // } as NgForm;
-
-      // const dormGroupDir: NgModelGroup = new NgModelGroup(null, null, null);
-      // componentUnderTest.normForm.addFormGroup(dormGroupDir);
-
       // @ts-ignores
       spyOn(componentUnderTest.spinner, 'show');
       // @ts-ignores
       spyOn(componentUnderTest, 'assignMultiselectConfig');
+      spyOn(componentUnderTest, 'onSubmit').and.callThrough();
     });
 
     When(
       fakeAsync(() => {
         componentUnderTest.onSubmit();
+        tick();
       })
     );
-
-    describe('GIVEN default call', () => {
-      Then(() => {
-        // @ts-ignores
-        expect(componentUnderTest.spinner.show).toHaveBeenCalled();
-        // @ts-ignores
-        expect(componentUnderTest.assignMultiselectConfig).toHaveBeenCalled();
-        expect(componentUnderTest.isLoading).toBe(true);
-      });
-    });
 
     describe('GIVEN isNew true', () => {
       Given(() => {
@@ -462,9 +443,75 @@ describe('DocumentEditComponent', () => {
         expect(componentUnderTest.updateDocument).toHaveBeenCalled();
       });
     });
-  }); */
+  });
 
-  describe('METHOD updateDocument', () => {
+  describe('METHOD saveDocument', () => {
+    Given(() => {
+      componentUnderTest.isLoading = false;
+      componentUnderTest.normForm = new NgForm([], []);
+      componentUnderTest.fileUploadInput = new FileUpload(
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      );
+      componentUnderTest.normDoc = {
+        _id: '1',
+        _rev: '1',
+        type: 'norm',
+        normNumber: 'AAA'
+      };
+
+      const testRespones = {
+        ok: true,
+        id: '1',
+        rev: '1'
+      };
+
+      couchDBServiceSpy.writeEntry.and.nextWith(testRespones);
+      // @ts-ignores
+      spyOn(componentUnderTest, 'saveDocument').and.callThrough();
+      // @ts-ignores
+      spyOn(componentUnderTest.spinner, 'hide');
+      spyOn(componentUnderTest, 'goToNorm');
+    });
+
+    When(() => {
+      // @ts-ignores
+      componentUnderTest.saveDocument();
+    });
+    describe('Check attributes to be changed isNe and spinner.hide', () => {
+      Then(() => {
+        expect(componentUnderTest.isNew).toBe(true);
+        // @ts-ignores
+        expect(componentUnderTest.spinner.hide).toHaveBeenCalled();
+      });
+    });
+    describe('Given document to save THEN response to be ok', () => {
+      Given(() => {});
+      Then(() => {
+        couchDBServiceSpy.writeEntry(fakeDocument).subscribe(res => {
+          expect(res.ok).toBe(true);
+        });
+        expect(componentUnderTest.goToNorm).toHaveBeenCalledWith('1');
+      });
+    });
+  });
+
+  describe('METHOD goToNorm', () => {
+    Given(() => {});
+
+    When(() => {
+      const id = '1';
+      componentUnderTest.goToNorm(id);
+    });
+
+    Then(() => {
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['../document/1/edit']);
+    });
+  });
+
+  /* describe('METHOD updateDocument', () => {
     Given(() => {
       componentUnderTest.normDoc = {
         _id: '1',
@@ -504,5 +551,5 @@ describe('DocumentEditComponent', () => {
     Then(() => {
       expect(componentUnderTest.isLoading).toBe(false);
     });
-  });
+  }); */
 });

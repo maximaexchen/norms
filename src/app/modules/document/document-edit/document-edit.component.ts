@@ -205,10 +205,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.spinner.show();
     this.normForm.form.markAsPristine();
 
-    console.log(this.normDoc);
-
     this.subsink.sink = this.couchDBService.writeEntry(this.normDoc).subscribe(
       result => {
+        console.log('result');
+        console.log(result);
         this.isLoading = false;
         this.spinner.hide();
         this.sendStateUpdate(this.normDoc._id, 'save');
@@ -227,12 +227,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     console.log('uodateDocument');
     this.isLoading = true;
     this.processFormData();
-    console.log('A:');
-    console.log(this.normDoc);
-    console.log('B:');
-    console.log(
-      this.couchDBService.updateEntry(this.normDoc, this.normDoc._id)
-    );
+
     this.subsink.sink = this.couchDBService
       .updateEntry(this.normDoc, this.normDoc._id)
       .subscribe(
@@ -359,7 +354,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // add update status to users to be notified
     this.setUserNotification(this.normDoc.revision);
     this.resetTempData();
-    console.log(this.normDoc);
     return this.normDoc;
   }
 
@@ -394,7 +388,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedRelatedNorms.forEach(element => {
       selectedRelatedNorms.push(element['_id']);
     });
-    console.log(this.normDoc);
+
     this.normDoc.relatedNorms =
       selectedRelatedNorms || this.selectedRelatedNorms;
 
@@ -794,7 +788,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private addNormToLinkedNorms(relatedNorms: any[]) {
     relatedNorms.forEach(relatedNorm => {
-      console.log(relatedNorm);
       // get the linked Norm
       this.subsink.sink = this.couchDBService
         .fetchEntry('/' + relatedNorm)
