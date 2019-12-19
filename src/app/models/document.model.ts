@@ -6,7 +6,7 @@ export interface NormDocument {
   type: string;
   normNumber: string;
   revision?: string;
-  revisionDate?: string;
+  revisionDate?: Date;
   publisher?: any;
   scope?: string;
   normLanguage?: string;

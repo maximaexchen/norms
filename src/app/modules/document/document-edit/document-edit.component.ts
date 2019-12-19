@@ -257,7 +257,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setAdditionalNormDocData() {
-    console.log('setAdditionalNormDocData');
     this.revisionDate = new Date(this.normDoc.revisionDate);
 
     if (this.normDoc.owner) {
@@ -351,6 +350,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     if (this.fileUpload) {
       this.uploadFileToServer();
     }
+    this.normDoc.revisionDate = this.revisionDate;
     this.normDoc.processType = {};
     this.normDoc.processType.id = this.processTypeId;
     // add update status to users to be notified
