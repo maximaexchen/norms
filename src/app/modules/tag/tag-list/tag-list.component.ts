@@ -75,7 +75,6 @@ export class TagListComponent implements OnInit, OnDestroy {
         }
       },
       error => {
-        console.error(error);
         this.logger.error(error.message);
       }
     );

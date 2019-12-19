@@ -25,6 +25,7 @@ import { Tag } from '@app/models/tag.model';
 import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { EnvService } from '@app/services/env.service';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
@@ -39,6 +40,7 @@ describe('DocumentEditComponent', () => {
   let actualResult: any;
   let changeInfo: any;
   let expectedObject: any;
+  let couchDBService: CouchDBService;
 
   let activatedRoute: any;
 
@@ -462,7 +464,7 @@ describe('DocumentEditComponent', () => {
     });
   }); */
 
-  /* describe('METHOD updateDocument', () => {
+  describe('METHOD updateDocument', () => {
     Given(() => {
       componentUnderTest.normDoc = {
         _id: '1',
@@ -483,20 +485,24 @@ describe('DocumentEditComponent', () => {
         normNumber: 'AAA'
       };
 
-      couchDBServiceSpy.updateEntry.calledWith(fakeDocument, '1');
+      couchDBServiceSpy.updateEntry
+        .withArgs(fakeDocument, '1')
+        .and.callThrough();
+
       // @ts-ignores
-      spyOn(componentUnderTest, 'updateDocument').and.callThrough();
+      // spyOn(componentUnderTest, 'updateDocument').and.callThrough();
     });
 
     When(
       fakeAsync(() => {
         // @ts-ignores
         componentUnderTest.updateDocument();
+        tick();
       })
     );
 
     Then(() => {
       expect(componentUnderTest.isLoading).toBe(false);
     });
-  }); */
+  });
 });
