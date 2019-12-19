@@ -137,7 +137,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    *
    */
   private editDocument(id) {
-    console.log('editDocument');
     this.resetComponent();
     this.isNew = false;
     this.formTitle = 'Norm bearbeiten';
@@ -225,11 +224,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private updateDocument(): void {
+    console.log('uodateDocument');
     this.isLoading = true;
     this.processFormData();
-
+    console.log('A:');
     console.log(this.normDoc);
-
+    console.log('B:');
+    console.log(
+      this.couchDBService.updateEntry(this.normDoc, this.normDoc._id)
+    );
     this.subsink.sink = this.couchDBService
       .updateEntry(this.normDoc, this.normDoc._id)
       .subscribe(
@@ -570,7 +573,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
    *
    */
   private getUsersForSelect(): void {
-    console.log('getUsersForSelect');
     this.documentService.getUsers().then(users => {
       // Add all users for the selectable owner dropdown
       this.owners = [];
