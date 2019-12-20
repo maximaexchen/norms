@@ -729,6 +729,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   public changeRevisionState(dateHash: string) {
     this.revisionDocuments.map(revDoc => {
+      this.normForm.form.markAsDirty();
       revDoc['isActive'] =
         revDoc['dateHash'] !== dateHash
           ? ''
