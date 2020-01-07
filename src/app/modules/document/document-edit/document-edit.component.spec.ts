@@ -22,8 +22,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
-import { ActivatedRoute, Router } from '@angular/router';
-import { of, throwError } from 'rxjs';
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { of, throwError, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { NgForm } from '@angular/forms';
 
@@ -43,6 +43,7 @@ describe('DocumentEditComponent', () => {
   let routerSpy = {
     navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
   };
+  let params: Subject<Params>;
 
   let activatedRoute: any;
 
@@ -94,7 +95,8 @@ describe('DocumentEditComponent', () => {
           provide: AuthenticationService,
           useValue: createSpyFromClass(AuthenticationService)
         },
-        { provide: ActivatedRoute, useValue: activatedRouteStub },
+        { provide: ActivatedRoute, useValue: { params: params } },
+        /* { provide: ActivatedRoute, useValue: activatedRouteStub }, */
         { provide: Router, useValue: routerSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
@@ -106,6 +108,7 @@ describe('DocumentEditComponent', () => {
     activatedRoute = TestBed.get(ActivatedRoute);
     httpSpy = TestBed.get(HttpClient);
     routerSpy = TestBed.get(Router);
+    params = new Subject<Params>();
 
     fakeDocuments = undefined;
     fakeDocument = undefined;
@@ -141,7 +144,7 @@ describe('DocumentEditComponent', () => {
       fakeUsers = [];
       documentServiceSpy.getUsers.and.resolveWith(fakeUsers);
 
-      spyOn(activatedRoute.params, 'subscribe');
+      // spyOn(activatedRoute.params, 'subscribe');
       // @ts-ignores
       spyOn(componentUnderTest, 'setStartValues').and.callThrough();
     });
@@ -149,6 +152,10 @@ describe('DocumentEditComponent', () => {
     describe('INIT', () => {
       When(
         fakeAsync(() => {
+          params.next({
+            id: 1
+          });
+          tick();
           // @ts-ignore
           componentUnderTest.ngOnInit();
           tick();
@@ -157,6 +164,35 @@ describe('DocumentEditComponent', () => {
       Given(() => {
         documentServiceSpy.getDocuments.and.resolveWith(fakeDocuments);
       });
+
+      describe('GIVEN route.paramas error THEN call error callback', () => {
+        Given(() => {
+          // @ts-ignores
+          spyOn(componentUnderTest.logger, 'error');
+        });
+
+        When(
+          fakeAsync(() => {
+            const testError = {
+              status: 406,
+              error: {
+                message: 'Test 406 error'
+              }
+            };
+
+            params.next(throwError(testError));
+            tick();
+          })
+        );
+
+        Then(
+          fakeAsync(() => {
+            // @ts-ignores
+            expect(componentUnderTest.logger.error).toHaveBeenCalled();
+          })
+        );
+      });
+
       describe('METHOD setStartValues to be called', () => {
         Then(() => {
           // @ts-ignore
@@ -480,6 +516,7 @@ describe('DocumentEditComponent', () => {
       // @ts-ignores
       componentUnderTest.saveDocument();
     });
+
     describe('Check attributes to be changed isNe and spinner.hide', () => {
       Then(() => {
         expect(componentUnderTest.isNew).toBe(true);
@@ -487,6 +524,7 @@ describe('DocumentEditComponent', () => {
         expect(componentUnderTest.spinner.hide).toHaveBeenCalled();
       });
     });
+
     describe('Given document to save THEN response to be ok', () => {
       Given(() => {});
       Then(() => {
@@ -494,6 +532,23 @@ describe('DocumentEditComponent', () => {
           expect(res.ok).toBe(true);
         });
         expect(componentUnderTest.goToNorm).toHaveBeenCalledWith('1');
+      });
+    });
+
+    describe('GIVEN Obeservable error THEN call error callback', () => {
+      Given(() => {
+        // @ts-ignores
+        couchDBServiceSpy.writeEntry.and.returnValue(
+          throwError({ status: 404 })
+        );
+        // @ts-ignores
+        // spyOn(componentUnderTest, 'setStartValues').and.callThrough();
+        spyOn(componentUnderTest.logger, 'error');
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.logger.error).toHaveBeenCalled();
       });
     });
   });

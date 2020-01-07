@@ -116,6 +116,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.getNormsForRelatedSelect();
     this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
+        console.log('A');
         this.processTypes = [
           { id: 1, name: 'Spezialprozess' },
           { id: 2, name: 'kein Spezialprozess' },
@@ -128,7 +129,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.newDocument();
         }
       },
-      error => this.logger.error(error.message)
+      error => {
+        console.log('B');
+        this.logger.error(error.message);
+      }
     );
   }
 
@@ -218,8 +222,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.logger.error(error.message);
         this.isLoading = false;
         this.spinner.hide();
-      },
-      () => {}
+      }
     );
   }
 
