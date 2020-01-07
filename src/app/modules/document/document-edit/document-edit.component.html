@@ -428,13 +428,12 @@
             </span>
             <hr *ngIf="latestAttachmentName" />
             <div *appIsGranted="'UPDATE'">
-              
               <p-fieldset
                 legend="Dokumenten Historie"
                 [toggleable]="true"
                 [transitionOptions]="'100ms'"
                 [collapsed]="false"
-                *ngIf="(isAdmin || isOwner)"
+                *ngIf="isAdmin || isOwner"
               >
                 <table class="table" style="width: 100%;">
                   <tr *ngFor="let revDoc of revisionDocuments; let i = index">
@@ -622,7 +621,7 @@
         </div>
       </p-tabPanel>
 
-      <p-tabPanel header="User" *appIsGranted="'UPDATE'">
+      <p-tabPanel header="User" *ngIf="isAdmin || isOwner">
         <div class="row">
           <div class="col-sm-6">
             <div *appIsGranted="'MAINTAIN'" class="form-group row">

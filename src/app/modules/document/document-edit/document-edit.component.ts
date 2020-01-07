@@ -292,7 +292,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
         return;
       });
-    console.log(this.revisionDocuments);
+
     if (this.documentService.getLatestActiveRevision(this.normDoc.revisions)) {
       this.latestAttachmentName = this.documentService.getLatestActiveRevision(
         this.normDoc.revisions
