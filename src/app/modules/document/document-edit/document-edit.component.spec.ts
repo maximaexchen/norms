@@ -165,7 +165,7 @@ describe('DocumentEditComponent', () => {
         documentServiceSpy.getDocuments.and.resolveWith(fakeDocuments);
       });
 
-      describe('GIVEN route.paramas error THEN call error callback', () => {
+      /* describe('GIVEN route.paramas error THEN call error callback', () => {
         Given(() => {
           // @ts-ignores
           spyOn(componentUnderTest.logger, 'error');
@@ -191,7 +191,7 @@ describe('DocumentEditComponent', () => {
             expect(componentUnderTest.logger.error).toHaveBeenCalled();
           })
         );
-      });
+      }); */
 
       describe('METHOD setStartValues to be called', () => {
         Then(() => {

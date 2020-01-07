@@ -116,7 +116,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.getNormsForRelatedSelect();
     this.subsink.sink = this.route.params.subscribe(
       selectedNorm => {
-        console.log('A');
         this.processTypes = [
           { id: 1, name: 'Spezialprozess' },
           { id: 2, name: 'kein Spezialprozess' },
@@ -130,7 +129,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         }
       },
       error => {
-        console.log('B');
         this.logger.error(error.message);
       }
     );
@@ -211,8 +209,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.subsink.sink = this.couchDBService.writeEntry(this.normDoc).subscribe(
       result => {
-        console.log('result');
-        console.log(result);
         this.isLoading = false;
         this.spinner.hide();
         this.sendStateUpdate(this.normDoc._id, 'save');
@@ -227,7 +223,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private updateDocument(): void {
-    console.log('uodateDocument');
+    console.log('updateDocument');
     this.isLoading = true;
     this.processFormData();
 
@@ -437,6 +433,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private resetComponent() {
     this.owner = '';
+    this.currentOwner = null;
     this.editable = false;
     this.attachment = {};
     this.selectedRelatedNorms = [];

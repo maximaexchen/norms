@@ -1,6 +1,5 @@
 import {
   Component,
-  OnInit,
   EventEmitter,
   Input,
   Output,
@@ -15,7 +14,7 @@ import { AuthenticationService } from '@app/modules/auth/services/authentication
   styleUrls: ['./crud-nav.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CrudNavComponent implements OnInit {
+export class CrudNavComponent {
   @Input() form: any;
   @Input() isNew: string;
   @Input() routeNew: string;
@@ -35,8 +34,6 @@ export class CrudNavComponent implements OnInit {
     private router: Router,
     public authenticationService: AuthenticationService
   ) {}
-
-  ngOnInit() {}
 
   public onSubmit() {
     this.save.emit('CrudNav Submit');
