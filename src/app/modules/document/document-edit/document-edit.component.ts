@@ -271,6 +271,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.processTypeId = this.normDoc.processType['id'];
     }
 
+    console.log(this.normDoc.revisions);
+
     this.revisionDocuments = _.sortBy(this.normDoc.revisions, 'date')
       .reverse()
       .filter(element => {
@@ -290,10 +292,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
         return;
       });
-
-    if (this.documentService.getLatestActiveRevision(this.revisionDocuments)) {
+    console.log(this.revisionDocuments);
+    if (this.documentService.getLatestActiveRevision(this.normDoc.revisions)) {
       this.latestAttachmentName = this.documentService.getLatestActiveRevision(
-        this.revisionDocuments
+        this.normDoc.revisions
       ).name;
     }
 
