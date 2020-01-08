@@ -1,8 +1,12 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, inject } from '@angular/core/testing';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType, HttpEvent } from '@angular/common/http';
 import { Role } from '@app/models';
+import {
+  HttpTestingController,
+  HttpClientTestingModule
+} from '@angular/common/http/testing';
 
 describe('CouchDBService test', () => {
   let serviceUnderTest: CouchDBService;
@@ -15,10 +19,8 @@ describe('CouchDBService test', () => {
 
   Given(() => {
     TestBed.configureTestingModule({
-      providers: [
-        CouchDBService,
-        { provide: HttpClient, useValue: createSpyFromClass(HttpClient) }
-      ]
+      imports: [HttpClientTestingModule],
+      providers: [CouchDBService]
     });
 
     serviceUnderTest = TestBed.get(CouchDBService);
@@ -31,21 +33,50 @@ describe('CouchDBService test', () => {
     actualResult = undefined;
   });
 
+  /* it('should writeEntry', fakeAsync(
+    inject(
+      [HttpTestingController, CouchDBService],
+      (httpMock: HttpTestingController, dataService: CouchDBService) => {
+        const mockObject = {
+          normNumber: '80-T-35-0100'
+        };
+
+        dataService.writeEntry(fakeObject).subscribe(objectData => {
+          expect(objectData.normNumber).toEqual('80-T-35-0100');
+          console.log(event.type);
+            switch (event.type) {
+              case HttpEventType.Response:
+                expect(event.body).toEqual(mockObject);
+            }
+        });
+
+        const mockReq = httpMock.expectOne(dataService.dbRequest);
+        expect(mockReq.request.method).toEqual('POST');
+        expect(mockReq.cancelled).toBeFalsy();
+        expect(mockReq.request.responseType).toEqual('json');
+
+        mockReq.flush(mockObject);
+
+        httpMock.verify();
+      }
+    )
+  )); */
+
   describe('METHOD writeEntry', () => {
     When(() => {
-      console.log(JSON.stringify(fakeObject));
       serviceUnderTest
-        .writeEntry({})
+        .writeEntry(fakeObject)
         .subscribe(value => (expectestFakeObject = value));
     });
 
     describe('GIVEN a successful request THEN return a object', () => {
       Given(() => {
         fakeObject = {
-          ok: true,
-          id: '1'
+          normNumber: '80-T-35-0100'
         };
-
+        console.log('#####################');
+        console.log(httpSpy.post.and);
+        console.log('#####################');
         httpSpy.post.and.nextOneTimeWith(fakeObject);
       });
 
@@ -55,7 +86,30 @@ describe('CouchDBService test', () => {
     });
   });
 
-  describe('METHOD updateEntry', () => {
+  describe('METHOD fetchEntries', () => {
+    When(() => {
+      serviceUnderTest
+        .fetchEntries(null)
+        .subscribe(value => (expectestFakeObject = value));
+    });
+
+    describe('GIVEN a successful request THEN return objects', () => {
+      Given(() => {
+        fakeObject = [
+          {
+            normNumber: '80-T-35-0100'
+          }
+        ];
+        httpSpy.get.and.nextOneTimeWith(fakeObject);
+      });
+
+      Then(() => {
+        expect(expectestFakeObject).toEqual(fakeObject);
+      });
+    });
+  });
+
+  /* describe('METHOD updateEntry', () => {
     When(() => {
       serviceUnderTest.updateEntry(fakeObject, '1').subscribe(value => {
         expectestFakeObject = value;
@@ -167,7 +221,7 @@ describe('CouchDBService test', () => {
         expect(actualResult).toEqual(fakeRolesOutput);
       });
     });
-  });
+  }); */
   /* describe('METHOD: setStateUpdate', () => {
     Given(() => {
       // @ts-ignore

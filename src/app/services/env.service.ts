@@ -11,8 +11,8 @@ export class EnvService {
   // Whether or not to enable debug mode
   public enableDebug = true;
 
-  public dbBaseUrl = 'http://116.203.220.19:5984/';
-  public dbName = 'norm_rep2';
+  public dbBaseUrl = 'http://127.0.0.1:5984/';
+  public dbName = 'norm_documents';
 
   public uploadUrl = 'http://localhost:4000/api/upload';
   public uploadDir = './dist/norms/assets/uploads/';
