@@ -11,6 +11,7 @@ export class EnvService {
   // Whether or not to enable debug mode
   public enableDebug = true;
 
+  public dbIP = '127.0.0.1:5984';
   public dbBaseUrl = 'http://127.0.0.1:5984/';
   public dbName = 'norm_documents';
 

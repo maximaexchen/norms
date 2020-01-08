@@ -29,6 +29,19 @@ con.query(sql, function(err, result) {
   users.push({
     type: 'user',
     externalID: '10001',
+    userName: 'superuser',
+    firstName: 'superuser',
+    lastName: 'superuser',
+    email: 'superuser@aircraft-philipp.com',
+    password: '0baea2f0ae20150db78f58cddac442a9',
+    role: 'superuser',
+    supplierId: 0,
+    active: true
+  });
+
+  users.push({
+    type: 'user',
+    externalID: '10001',
     userName: 'admin',
     firstName: 'My',
     lastName: 'Admin',

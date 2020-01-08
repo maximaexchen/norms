@@ -51,7 +51,7 @@ export class DocumentService {
     });
   }
 
-  public getSelectedUsers(usersIds: string[]): Promise<any[]> {
+  public getUsersByIds(usersIds: string[]): Promise<any[]> {
     return this.getUsers().then(users => {
       return users.filter(user => {
         return usersIds.indexOf(user.externalID) > -1;

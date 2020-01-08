@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { map, take, publishLast } from 'rxjs/operators';
+import { map, take, publishLast, tap, concatMap } from 'rxjs/operators';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 import { EnvService } from './env.service';
@@ -12,6 +12,7 @@ import { Role } from '@models/index';
 
 @Injectable({ providedIn: 'root' })
 export class CouchDBService {
+  private dbIP = this.env.dbIP;
   private baseUrl = this.env.dbBaseUrl;
   private dbName = this.env.dbName;
   public dbRequest = this.baseUrl + this.dbName;
@@ -145,5 +146,58 @@ export class CouchDBService {
     };
 
     return this.http.post(this.dbRequest + '/_find', updateQuery);
+  }
+
+  public getDBState(): Observable<any> {
+    const dbObj = {
+      keys: [this.dbName]
+    };
+    return this.http.post(this.baseUrl + '/_dbs_info ', dbObj).pipe(
+      map(response => {
+        return response[0].info;
+      })
+    );
+  }
+
+  public compactDB(username: string, password: string) {
+    const enco: any = new HttpHeaders()
+      .set('X-CouchDB-WWW-Authenticate', 'Cookie')
+      .set('Content-Type', 'application/x-www-form-urlencoded');
+    this.singnInDB(name, password).subscribe(res => {
+      console.log(res);
+      this.http
+        .post(
+          this.baseUrl + '_compact',
+          {},
+          {
+            headers: enco,
+            withCredentials: true
+          }
+        )
+        .subscribe(ress => {
+          console.log(ress);
+        });
+    });
+
+    /* const requestString =
+      'http://' +
+      name +
+      ':' +
+      password +
+      '@' +
+      this.dbIP +
+      '/' +
+      this.dbName +
+      '/_compact';
+    console.log(requestString);
+    return this.http.post(requestString, '');*/
+  }
+
+  private singnInDB(name: string, password: string): Observable<any> {
+    return this.http.post(this.baseUrl + '_session ', { name, password });
+  }
+
+  private singnOutDB(): Observable<any> {
+    return this.http.delete(this.baseUrl + '_session ');
   }
 }

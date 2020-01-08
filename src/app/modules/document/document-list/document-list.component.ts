@@ -20,6 +20,8 @@ import { SearchService } from '@app/services/search.service';
 import { AuthenticationService } from './../../auth/services/authentication.service';
 import _ = require('underscore');
 import { NGXLogger } from 'ngx-logger';
+import { User } from '@app/models';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-document-list',
@@ -36,6 +38,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   documents: NormDocument[] = [];
   selectedDocument: NormDocument;
   documentCount = 0;
+  owners: User[] = [];
   currentUserId: string;
   messages: any[] = [];
   changeSubscription: Subscription;
@@ -84,20 +87,38 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.currentUserId = this.authService.getCurrentUserID();
     this.documents = result;
     this.documentCount = this.documents.length;
+
     this.filterDocumentList();
     this.setPublisherFromTags();
   }
 
   private getDocuments() {
-    this.subsink.sink = this.couchDBService.findDocuments().subscribe(
-      result => {
-        this.initDocumentList(result);
-      },
-      error => {
-        this.logger.error(error.message);
-      },
-      () => {}
-    );
+    this.subsink.sink = this.couchDBService
+      .findDocuments()
+      .pipe(
+        switchMap(docs => {
+          return this.documentService.getUsers().then(users => {
+            this.owners = [];
+            this.owners = _.filter(
+              users,
+              user =>
+                user['supplierId'] === 0 && user['supplierId'] !== undefined
+            );
+
+            docs.forEach(doc => {
+              if (!!doc.owner) {
+                const ownerData = _.filter(this.owners, owner => {
+                  return owner['externalID'] === doc.owner;
+                });
+                doc.ownerExtended = ownerData[0];
+              }
+            });
+
+            this.initDocumentList(docs);
+          });
+        })
+      )
+      .subscribe(result => {});
   }
 
   private filterDocumentList() {

@@ -271,8 +271,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       this.processTypeId = this.normDoc.processType['id'];
     }
 
-    console.log(this.normDoc.revisions);
-
     this.revisionDocuments = _.sortBy(this.normDoc.revisions, 'date')
       .reverse()
       .filter(element => {
@@ -594,7 +592,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setSelectedUsers(users: any[]) {
-    this.documentService.getSelectedUsers(users).then(res => {
+    this.documentService.getUsersByIds(users).then(res => {
       this.selectedUsers = res.map(user => ({
         _id: user['_id'],
         externalID: user['externalID'],
