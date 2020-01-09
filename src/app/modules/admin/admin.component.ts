@@ -26,7 +26,6 @@ export class AdminComponent implements OnInit {
   private getDBState() {
     this.subsink.sink = this.couchDBService.getDBState().subscribe(
       result => {
-        console.log(result);
         this.dbName = result.db_name;
         this.docCount = result.doc_count;
         this.docDelCount = result.doc_del_count;
@@ -38,6 +37,6 @@ export class AdminComponent implements OnInit {
   }
 
   public compactDB() {
-    this.couchDBService.compactDB(this.dbUser, this.dbPassword);
+    this.couchDBService.compactDB(this.dbName, this.dbUser, this.dbPassword);
   }
 }

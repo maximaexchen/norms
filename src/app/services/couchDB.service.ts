@@ -159,18 +159,13 @@ export class CouchDBService {
     );
   }
 
-  public compactDB(username: string, password: string) {
-    const enco: any = new HttpHeaders()
-      .set('X-CouchDB-WWW-Authenticate', 'Cookie')
-      .set('Content-Type', 'application/x-www-form-urlencoded');
-    this.singnInDB(name, password).subscribe(res => {
-      console.log(res);
+  public compactDB(dbName: string, username: string, password: string) {
+    this.singnInDB(username, password).subscribe(res => {
       this.http
         .post(
-          this.baseUrl + '_compact',
+          this.baseUrl + dbName + '/_compact',
           {},
           {
-            headers: enco,
             withCredentials: true
           }
         )
@@ -178,26 +173,17 @@ export class CouchDBService {
           console.log(ress);
         });
     });
-
-    /* const requestString =
-      'http://' +
-      name +
-      ':' +
-      password +
-      '@' +
-      this.dbIP +
-      '/' +
-      this.dbName +
-      '/_compact';
-    console.log(requestString);
-    return this.http.post(requestString, '');*/
   }
 
-  private singnInDB(name: string, password: string): Observable<any> {
-    return this.http.post(this.baseUrl + '_session ', { name, password });
+  private checkDBAuthentication(): Observable<any> {
+    return this.http.get(this.baseUrl + '_session');
+  }
+
+  private singnInDB(username: string, password: string): Observable<any> {
+    return this.http.post(this.baseUrl + '_session', { username, password });
   }
 
   private singnOutDB(): Observable<any> {
-    return this.http.delete(this.baseUrl + '_session ');
+    return this.http.delete(this.baseUrl + '_session');
   }
 }
