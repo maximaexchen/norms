@@ -31,7 +31,8 @@
       ></app-crud-nav>
     </div>
   </div>
-
+{{ isAdmin | json }}
+{{ isOwner | json }}
   <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
     <input type="hidden" [(ngModel)]="isNew" name="isNew" />
     <input type="hidden" [(ngModel)]="normDoc._id" name="_id" />
@@ -460,8 +461,8 @@
                       ></a>
                     </td>
                     <td>
+                      <!-- *ngIf="revDoc['isActive'] || isAdmin" -->
                       <a
-                        *ngIf="revDoc['isActive'] || isAdmin"
                         class="dynamic-link"
                         (click)="getDownload(normDoc._id, revDoc['name'])"
                         ><i class="fas fa-file-download"></i> Download
@@ -621,9 +622,10 @@
         </div>
       </p-tabPanel>
 
-      <p-tabPanel header="User" *ngIf="isAdmin || isOwner">
+      <p-tabPanel header="User" *appIsGranted="'MAINTAIN'">
         <div class="row">
           <div class="col-sm-6">
+           
             <div *appIsGranted="'MAINTAIN'" class="form-group row">
               <label class="col-sm-2 col-form-label" i18n="@@string-owner"
                 >Owner</label
@@ -646,7 +648,7 @@
                 </select>
               </div>
             </div>
-            <div class="form-group row">
+            <!-- <div class="form-group row">
               <label class="col-sm-2 col-form-label" i18n="@@string-user"
                 >Benutzer</label
               >
@@ -668,7 +670,7 @@
                   </c-item>
                 </angular2-multiselect>
               </div>
-            </div>
+            </div>-->
           </div>
         </div>
       </p-tabPanel>

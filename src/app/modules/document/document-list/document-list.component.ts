@@ -77,10 +77,36 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   private addSearchListener() {
     this.subsink.sink = this.searchService.searchResultData.subscribe(
       result => {
-        this.initDocumentList(result);
+        this.initDocumentList(this.filterDocumentsByAccess(result));
       },
       error => this.logger.error(error.message)
     );
+  }
+
+  private filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
+    docs.forEach(doc => {
+      if (!!doc.owner) {
+        const ownerData = _.filter(this.owners, owner => {
+          return owner['externalID'] === doc.owner;
+        });
+        doc['ownerExtended'] = ownerData[0];
+      }
+    });
+
+    return docs.filter(element => {
+      if (this.authService.isAdmin()) {
+        return element;
+      }
+      if (!!element.owner) {
+        if (element.owner === this.authService.getCurrentUserExternalID()) {
+          return element;
+        } else {
+          return element['active'] === true ? element : undefined;
+        }
+      }
+
+      return;
+    });
   }
 
   private initDocumentList(result: any) {
@@ -105,16 +131,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
                 user['supplierId'] === 0 && user['supplierId'] !== undefined
             );
 
-            docs.forEach(doc => {
-              if (!!doc.owner) {
-                const ownerData = _.filter(this.owners, owner => {
-                  return owner['externalID'] === doc.owner;
-                });
-                doc.ownerExtended = ownerData[0];
-              }
-            });
-
-            this.initDocumentList(docs);
+            this.initDocumentList(this.filterDocumentsByAccess(docs));
           });
         })
       )
