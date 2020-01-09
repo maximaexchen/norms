@@ -8,8 +8,8 @@
 
   window.__env.dbIP = '127.0.0.1:5984';
   window.__env.dbBaseUrl = 'http://127.0.0.1:5984/';
-  window.__env.dbName = 'norm_local';
-  // window.__env.dbName = 'norm_documents';
+  // window.__env.dbName = 'norm_local';
+  window.__env.dbName = 'norm_documents';
 
   // window.__env.dbBaseUrl = 'http://192.168.178.24:8888/';
   // window.__env.dbName = 'norm_rep';

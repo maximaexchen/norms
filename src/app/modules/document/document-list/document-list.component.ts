@@ -113,8 +113,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.currentUserId = this.authService.getCurrentUserID();
     this.documents = result;
     this.documentCount = this.documents.length;
-
-    this.filterDocumentList();
     this.setPublisherFromTags();
   }
 
@@ -136,27 +134,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe(result => {});
-  }
-
-  private filterDocumentList() {
-    // Filter the documents by given owner or user
-    switch (this.authService.getUserRole()) {
-      /* case 'owner':
-        this.documents = this.documents.filter(obj => {
-          if (!!obj['owner']) {
-            return obj['owner']['_id'] === this.currentUserId;
-          }
-        });
-        break; */
-      case 'user':
-        this.documents = this.documents.filter(obj => {
-          return obj['active'] === true;
-        });
-
-        break;
-    }
-
-    this.documentCount = this.documents.length;
   }
 
   private updateList(changedInfo: any) {

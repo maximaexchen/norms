@@ -24,7 +24,7 @@ export class CouchDBService {
   constructor(private env: EnvService, private http: HttpClient) {}
 
   public writeEntry(document: any): Observable<any> {
-    console.log(this.dbRequest, document);
+    console.log(this.dbRequest, JSON.stringify(document));
     console.log(this.http.post(this.dbRequest, document));
     return this.http.post(this.dbRequest, document);
   }

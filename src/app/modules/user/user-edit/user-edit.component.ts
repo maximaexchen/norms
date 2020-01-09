@@ -7,6 +7,7 @@ import _ = require('underscore');
 import { Md5 } from 'ts-md5/dist/md5';
 import { NGXLogger } from 'ngx-logger';
 import { SubSink } from 'SubSink';
+import uuidv4 from '@bundled-es-modules/uuid/v4.js';
 
 import { CouchDBService } from '@services/couchDB.service';
 import { NotificationsService } from '@services/notifications.service';
@@ -339,7 +340,7 @@ export class UserEditComponent implements OnInit, OnDestroy {
 
   private createWriteItem() {
     this.user = {
-      _id: '',
+      _id: uuidv4(),
       type: 'user',
       externalID: this.userForm.value.externalID || null,
       userName: this.userForm.value.userName || '',
