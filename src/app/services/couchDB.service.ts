@@ -24,14 +24,11 @@ export class CouchDBService {
   constructor(private env: EnvService, private http: HttpClient) {}
 
   public writeEntry(document: any): Observable<any> {
-    console.log(this.dbRequest, JSON.stringify(document));
-    console.log(this.http.post(this.dbRequest, document));
     return this.http.post(this.dbRequest, document);
   }
 
   public updateEntry(document: any, id: string): Observable<any> {
     console.log('updateEntry');
-    console.log(document);
     return this.http.put(this.dbRequest + '/' + id, document);
   }
 
@@ -57,8 +54,6 @@ export class CouchDBService {
   }
 
   public fetchEntry(param: string): Observable<any> {
-    console.log('fetchEntry in CouchService');
-    console.log(param);
     return this.http.get(this.dbRequest + param);
   }
 
