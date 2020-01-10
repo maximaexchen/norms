@@ -40,7 +40,7 @@ describe('DocumentService test', () => {
     actualResult = undefined;
   });
 
-  describe('METHOD: getDocument()', () => {
+  /* describe('METHOD: getDocument()', () => {
     const id = '1';
     Given(() => {
       fakeNormDocument = {
@@ -94,7 +94,7 @@ describe('DocumentService test', () => {
       expect(actualResult).toEqual(fakeNormDocuments);
       expect(actualResult.length).toBeGreaterThan(0);
     });
-  });
+  }); */
 
   describe('METHOD: getTags()', () => {
     Given(() => {

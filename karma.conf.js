@@ -13,6 +13,8 @@ module.exports = function(config) {
       require('karma-jasmine-html-reporter'),
       require('karma-jasmine-diff-reporter'),
       require('karma-coverage-istanbul-reporter'),
+      require('karma-spec-reporter'),
+      require('karma-material-reporter'),
       require('@angular-devkit/build-angular/plugins/karma')
     ],
     client: {
@@ -23,13 +25,15 @@ module.exports = function(config) {
       reports: ['html', 'lcovonly', 'text-summary'],
       fixWebpackSourcePaths: true
     },
-    /* reporters: ['jasmine-diff', 'mocha'], */
-    reporters: ['jasmine-diff', 'progress', 'kjhtml'],
+    reporters: ['jasmine-diff'],
+    /*reporters: ['jasmine-diff', 'mocha', 'spec'],
+     reporters: ['jasmine-diff', 'progress', 'kjhtml'], */
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
+    browsers: ['ChromeHeadless'],
+    /* browsers: ['Chrome'], */
     singleRun: false,
     restartOnFileChange: true
   });

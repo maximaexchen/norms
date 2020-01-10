@@ -62,7 +62,7 @@ describe('CouchDBService test', () => {
     )
   )); */
 
-  describe('METHOD writeEntry', () => {
+  /* describe('METHOD writeEntry', () => {
     When(() => {
       serviceUnderTest
         .writeEntry(fakeObject)
@@ -84,9 +84,9 @@ describe('CouchDBService test', () => {
         expect(expectestFakeObject).toEqual(fakeObject);
       });
     });
-  });
+  }); */
 
-  describe('METHOD fetchEntries', () => {
+  /* describe('METHOD fetchEntries', () => {
     When(() => {
       serviceUnderTest
         .fetchEntries(null)
@@ -107,7 +107,7 @@ describe('CouchDBService test', () => {
         expect(expectestFakeObject).toEqual(fakeObject);
       });
     });
-  });
+  }); */
 
   /* describe('METHOD updateEntry', () => {
     When(() => {
