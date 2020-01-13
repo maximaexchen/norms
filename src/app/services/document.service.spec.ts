@@ -131,11 +131,11 @@ describe('DocumentService test', () => {
     });
 
     When(() => {
-      serviceUnderTest.getSelectedOwner(ownerId);
+      actualResult = serviceUnderTest.getSelectedOwner(ownerId);
     });
 
     Then(
-      fakeAsync(() => {
+      () => {
         fakeOwners = [
           {
             _id: '1',
@@ -145,10 +145,7 @@ describe('DocumentService test', () => {
           }
         ];
 
-        serviceUnderTest.getSelectedOwner(ownerId).then(result => {
-          expect(result).toEqual(fakeOwners);
-        });
-        tick();
+        expect(actualResult).toEqual(fakeOwners);
       })
     );
   });
