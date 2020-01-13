@@ -45,9 +45,11 @@ export class DocumentService {
       });
   }
 
-  public getSelectedOwner(ownerId: string[]): Promise<User[]> {
+  public getSelectedOwner(ownerIds: string[]): Promise<User[]> {
+    console.log('getSelectedOwner: ' + ownerIds);
     return this.getUsers().then(users => {
-      return users.filter(owner => ownerId.indexOf(owner.externalID) > -1);
+      console.log('getSelectedOwner.getUsers: ' + users);
+      return users.filter(owner => ownerIds.indexOf(owner.externalID) > -1);
     });
   }
 
