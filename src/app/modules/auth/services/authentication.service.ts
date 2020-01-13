@@ -55,6 +55,7 @@ export class AuthenticationService {
       switchMap(
         (loginResult): Observable<boolean | any> => {
           this.user = loginResult['docs'][0];
+          console.log(loginResult);
 
           if (!!this.user) {
             this.requestToken(username, password).subscribe(

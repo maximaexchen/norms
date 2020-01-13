@@ -10,6 +10,7 @@
         <th scope="col" i18n="@@string-revision">Revision</th>
         <th scope="col" i18n="@@string-pdf">PDF</th>
         <th scope="col" i18n="@@string-revisionDate">Datum Revision</th>
+        <th scope="col" i18n="@@string-active">Aktiv</th>
       </tr>
       <tr *ngFor="let norm of norms">
         <td>
@@ -36,6 +37,15 @@
             <i class="far fa-calendar"></i>
             {{ norm['revisionLatest']['date'] | date: 'dd.MM.yyyy' }}
           </span>
+        </td>
+        <td>
+          <i
+            [ngStyle]="{
+              'font-size': '16px'
+            }"
+            [ngClass]="norm.active ? 'fas fa-check-circle' : 'fas fa-ban'"
+            aria-hidden="true"
+          ></i>
         </td>
       </tr>
     </table>

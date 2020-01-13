@@ -83,6 +83,26 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     );
   }
 
+  private getDocuments() {
+    this.couchDBService
+      .findDocuments()
+      .pipe(
+        switchMap(docs => {
+          return this.documentService.getUsers().then(users => {
+            this.owners = [];
+            this.owners = _.filter(
+              users,
+              user =>
+                user['supplierId'] === 0 && user['supplierId'] !== undefined
+            );
+
+            this.initDocumentList(this.filterDocumentsByAccess(docs));
+          });
+        })
+      )
+      .toPromise();
+  }
+
   private filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
     docs.forEach(doc => {
       if (!!doc.owner) {
@@ -90,6 +110,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
           return owner['externalID'] === doc.owner;
         });
         doc['ownerExtended'] = ownerData[0];
+
+        return doc;
       }
     });
 
@@ -114,26 +136,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.documents = result;
     this.documentCount = this.documents.length;
     this.setPublisherFromTags();
-  }
-
-  private getDocuments() {
-    this.subsink.sink = this.couchDBService
-      .findDocuments()
-      .pipe(
-        switchMap(docs => {
-          return this.documentService.getUsers().then(users => {
-            this.owners = [];
-            this.owners = _.filter(
-              users,
-              user =>
-                user['supplierId'] === 0 && user['supplierId'] !== undefined
-            );
-
-            this.initDocumentList(this.filterDocumentsByAccess(docs));
-          });
-        })
-      )
-      .subscribe(result => {});
   }
 
   private updateList(changedInfo: any) {
@@ -189,7 +191,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.router.navigate(['../document/' + event.data._id + '/edit']);
   }
 
-  public onFilter(event: any, dt: any): void {
+  public onFilter(event: any): void {
+    console.log(event);
     // Check for simple ASCII Characters and give warning
     if (!_.isEmpty(event.filters.global)) {
       this.filterInputCheck = this.documentService.checkASCIIRange(

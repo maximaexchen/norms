@@ -25,15 +25,15 @@ module.exports = function(config) {
       reports: ['html', 'lcovonly', 'text-summary'],
       fixWebpackSourcePaths: true
     },
-    reporters: ['jasmine-diff'],
+    reporters: ['jasmine-diff', 'mocha', 'kjhtml'],
     /*reporters: ['jasmine-diff', 'mocha', 'spec'],
      reporters: ['jasmine-diff', 'progress', 'kjhtml'], */
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['ChromeHeadless'],
-    /* browsers: ['Chrome'], */
+    /* browsers: ['ChromeHeadless'], */
+    browsers: ['Chrome'],
     singleRun: false,
     restartOnFileChange: true
   });
