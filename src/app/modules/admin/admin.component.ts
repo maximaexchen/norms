@@ -9,6 +9,7 @@ import { NgForm } from '@angular/forms';
 })
 export class AdminComponent implements OnInit {
   @ViewChild('dbForm', { static: false }) dbForm: NgForm;
+  @ViewChild('dbForm2', { static: false }) dbForm2: NgForm;
   subsink = new SubSink();
   dbUser: string;
   dbPassword: string;
@@ -38,5 +39,9 @@ export class AdminComponent implements OnInit {
 
   public compactDB() {
     this.couchDBService.compactDB(this.dbName, this.dbUser, this.dbPassword);
+  }
+
+  public deleteDB() {
+    this.couchDBService.deleteDB(this.dbName, this.dbUser, this.dbPassword);
   }
 }

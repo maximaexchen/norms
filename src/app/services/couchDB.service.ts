@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { map, take, publishLast, tap, concatMap } from 'rxjs/operators';
+import { map, take, publishLast, tap, concatMap, first } from 'rxjs/operators';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 import { EnvService } from './env.service';
@@ -155,23 +155,39 @@ export class CouchDBService {
   }
 
   public compactDB(dbName: string, username: string, password: string) {
-    this.singnInDB(username, password).subscribe(res => {
-      this.http
-        .post(
-          this.baseUrl + dbName + '/_compact',
-          {},
-          {
-            withCredentials: true
-          }
-        )
-        .subscribe(ress => {
-          console.log(ress);
-        });
-    });
+    this.singnInDB(username, password)
+      .pipe(first())
+      .subscribe(res => {
+        this.http
+          .post(
+            this.baseUrl + dbName + '/_compact',
+            {},
+            {
+              withCredentials: true
+            }
+          )
+          .pipe(first())
+          .subscribe(ress => {});
+      });
   }
 
   private checkDBAuthentication(): Observable<any> {
     return this.http.get(this.baseUrl + '_session');
+  }
+
+  public deleteDB(dbName: string, username: string, password: string) {
+    this.singnOutDB().subscribe(signout => {
+      this.singnInDB(username, password)
+        .pipe(first())
+        .subscribe(res => {
+          this.http
+            .delete(this.baseUrl + 'norm_documents_clean')
+            .pipe(first())
+            .subscribe(ress => {
+              console.log(ress);
+            });
+        });
+    });
   }
 
   private singnInDB(username: string, password: string): Observable<any> {

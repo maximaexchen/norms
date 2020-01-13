@@ -7,14 +7,17 @@ import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { of, Subject } from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentListComponent } from './document-list.component';
-import { NormDocument } from '@app/models';
+import { NormDocument, User } from '@app/models';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { userInfo } from 'os';
 
 describe('DocumentListComponent', () => {
   let componentUnderTest: DocumentListComponent;
   let documentServiceSpy: Spy<DocumentService>;
   let couchDBServiceSpy: Spy<CouchDBService>;
   let fakeDocuments: NormDocument[];
+  let modifiedDocs: NormDocument[];
+  let fakeUsers: User[];
   let routerSpy = {
     navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
   };
@@ -60,27 +63,21 @@ describe('DocumentListComponent', () => {
     couchDBServiceSpy = TestBed.get(CouchDBService);
 
     fakeDocuments = undefined;
+    fakeUsers = undefined;
     actualResult = undefined;
     changeInfo = undefined;
     expectedObject = undefined;
     // router = undefined;
+
+    modifiedDocs = undefined;
+    actualResult = undefined;
+    expectedObject = undefined;
   });
 
-  /* describe('INIT', () => {
+  describe('INIT', () => {
     Given(() => {
-      fakeDocuments = [
-        {
-          _id: '1',
-          _rev: '1',
-          type: 'user',
-          normNumber: 'AAA'
-        }
-      ];
-
-      couchDBServiceSpy.findDocuments.and.nextOneTimeWith(fakeDocuments);
-      couchDBServiceSpy.setStateUpdate.and.returnValue(of(new Subject<any>()));
-      // @ts-ignores
-      spyOn(componentUnderTest, 'getDocuments').and.callThrough();
+      // @ts-ignore
+      spyOn(componentUnderTest, 'setup');
     });
 
     When(
@@ -94,11 +91,11 @@ describe('DocumentListComponent', () => {
     Then(() => {
       expect(componentUnderTest).toBeTruthy();
       // @ts-ignore
-      expect(componentUnderTest.getDocuments).toHaveBeenCalled();
+      expect(componentUnderTest.setup).toHaveBeenCalled();
     });
-  }); */
+  });
 
-  /* describe('METHOD: getDocuments()', () => {
+  describe('METHOD: getDocuments()', () => {
     Given(() => {
       fakeDocuments = [
         {
@@ -108,33 +105,177 @@ describe('DocumentListComponent', () => {
           normNumber: 'Normnumber'
         }
       ];
+      // @ts-ignore
+      spyOn(componentUnderTest, 'getDocuments').and.callThrough();
+
+      // @ts-ignore
+      spyOn(componentUnderTest, 'initDocumentList');
+
       couchDBServiceSpy.findDocuments.and.returnValue(of(fakeDocuments));
-      documentServiceSpy.getUsers.and.returnValues([
-        { _id: '1', _rev: '1', name: 'Username' }
-      ]);
+      fakeUsers = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          name: 'Username'
+        }
+      ];
+      documentServiceSpy.getUsers.and.callFake(() =>
+        Promise.resolve([
+          {
+            _id: '1',
+            _rev: '1',
+            type: 'user',
+            name: 'Username'
+          }
+        ])
+      );
     });
 
     When(
       fakeAsync(() => {
         // @ts-ignore
         componentUnderTest.getDocuments();
-        tick();
+        tick(500);
       })
     );
 
-    describe('EXPECT mocked documents to be one', () => {
+    describe('EXPECT mocked documents to be correct document object', () => {
+      Then(() => {
+        couchDBServiceSpy.findDocuments().subscribe(res => {
+          expect(res).toEqual(fakeDocuments);
+        });
+      });
+    });
+    describe('EXPECT initDocumentList toHaveBeenCalled', () => {
       Then(() => {
         // @ts-ignore
-        expect(componentUnderTest.documents.length).toEqual(1);
+        expect(componentUnderTest.initDocumentList).toHaveBeenCalled();
       });
     });
 
-    describe('EXPECT mocked documents to be correct document object', () => {
+    describe('EXPECT mocked users to be correct user object', () => {
       Then(() => {
-        expect(componentUnderTest.documents).toEqual(fakeDocuments);
+        documentServiceSpy.getUsers().then(res => {
+          expect(res).toEqual(fakeUsers);
+        });
       });
     });
-  }); */
+  });
+
+  describe('METHOD: initDocumentList(result)', () => {
+    Given(() => {
+      // @ts-ignore
+      spyOn(componentUnderTest, 'initDocumentList').and.callThrough();
+      // @ts-ignore
+      spyOn(componentUnderTest, 'setPublisherFromTags');
+    });
+
+    When(() => {
+      fakeDocuments = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber'
+        },
+        {
+          _id: '2',
+          _rev: '2',
+          type: 'document',
+          normNumber: 'Normnumber 2'
+        }
+      ];
+      // @ts-ignore
+      componentUnderTest.initDocumentList(fakeDocuments);
+    });
+
+    Then(() => {
+      // @ts-ignore
+      expect(componentUnderTest.setPublisherFromTags).toHaveBeenCalled();
+      expect(componentUnderTest.documentCount).toBeGreaterThan(1);
+    });
+  });
+
+  describe('METHOD: filterDocumentsByAccess(docs)', () => {
+    Given(() => {
+      // @ts-ignore
+      spyOn(componentUnderTest, 'filterDocumentsByAccess').and.callThrough();
+      /*
+    Expected [ Object({ _id: '1', _rev: '1', active: true, normNumber: 'Normnumber', owner: '1000', ownerExtended: Object({ _id: '1', _rev: '1', externalID: '1000', firstName: 'owner name', type: 'user' }), type: 'document' }), Object({ _id: '2', _rev: '2', active: true, normNumber: 'Normnumber 2', owner: '1000', ownerExtended: Object({ _id: '1', _rev: '1', externalID: '1000', firstName: 'owner name', type: 'user' }), type: 'document' }) ]
+    to equal [ Object({ _id: '1', _rev: '1', active: true, normNumber: 'Normnumber', owner: '1000', ownerExtended: Object({ _id: '1', firstName: 'owner name', type: 'user' }), type: 'document' }), Object({ _id: '2', _rev: '2', active: true, normNumber: 'Normnumber 2', owner: '1000', ownerExtended: Object({ _id: '1', firstName: 'owner name', type: 'user' }), type: 'document' }) ]
+    */
+      fakeUsers = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          firstName: 'owner name',
+          externalID: '1000'
+        },
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          firstName: 'owner 2',
+          externalID: '1001'
+        }
+      ];
+      componentUnderTest.owners = fakeUsers;
+      fakeDocuments = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          owner: '1000',
+          active: true
+        },
+        {
+          _id: '2',
+          _rev: '2',
+          type: 'document',
+          normNumber: 'Normnumber 2',
+          active: true
+        }
+      ];
+
+      modifiedDocs = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          owner: '1000',
+          ownerExtended: {
+            _id: '1',
+            _rev: '1',
+            externalID: '1000',
+            firstName: 'owner name',
+            type: 'user'
+          },
+          active: true
+        }
+      ];
+      // @ts-ignore
+      /* expectedObject = componentUnderTest.filterDocumentsByAccess(
+        fakeDocuments
+      ); */
+    });
+
+    When(() => {
+      // @ts-ignore
+      expectedObject = componentUnderTest.filterDocumentsByAccess(
+        fakeDocuments
+      );
+      console.log(expectedObject);
+    });
+
+    Then(() => {
+      // @ts-ignore
+      expect(expectedObject).toEqual(modifiedDocs);
+    });
+  });
 
   describe('METHOD: showDetail(id)', () => {
     const id = '1';
@@ -325,6 +466,92 @@ describe('DocumentListComponent', () => {
 
     Then(() => {
       expect(componentUnderTest.documents[0]['publisher']).toEqual('Boeing');
+    });
+  });
+
+  describe('METHOD: onFilter', () => {
+    Given(() => {
+      spyOn(componentUnderTest, 'onFilter').and.callThrough();
+    });
+
+    When(() => {
+      const event = {
+        filters: {
+          global: {
+            value: 'Norm',
+            matchMode: 'contains'
+          }
+        },
+        filteredValue: [
+          {
+            _id: '9d5e29d54d7766924e3ab4251f000938',
+            _rev: '13-4214279f8cf44978569a629246ab2c53',
+            type: 'document',
+            name: 'Norm1'
+          },
+          {
+            _id: '2',
+            _rev: '1',
+            type: 'document',
+            name: 'Norm2'
+          }
+        ]
+      };
+      componentUnderTest.onFilter(event);
+    });
+
+    Then(() => {
+      expect(componentUnderTest.documentCount).toBe(2);
+    });
+  });
+
+  describe('METHOD: toggleSidebar', () => {
+    Given(() => {
+      spyOn(componentUnderTest, 'toggleSidebar').and.callThrough();
+    });
+
+    When(() => {
+      componentUnderTest.toggleSidebar();
+    });
+    describe('METHOD closeSideBar to have been called', () => {
+      Given(() => {
+        componentUnderTest.visible = false;
+        spyOn(componentUnderTest.closeSideBar, 'emit').and.callThrough();
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.closeSideBar.emit).toHaveBeenCalled();
+      });
+    });
+
+    describe('METHOD openSideBar to have been called', () => {
+      Given(() => {
+        componentUnderTest.visible = true;
+        spyOn(componentUnderTest.openSideBar, 'emit').and.callThrough();
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.openSideBar.emit).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('METHOD: ngOnDestroy', () => {
+    Given(() => {
+      spyOn(componentUnderTest, 'ngOnDestroy').and.callThrough();
+      // @ts-ignore
+      spyOn(componentUnderTest.subsink, 'unsubscribe');
+    });
+
+    When(() => {
+      componentUnderTest.ngOnDestroy();
+    });
+
+    Then(() => {
+      // @ts-ignore
+      expect(componentUnderTest.subsink.unsubscribe).toHaveBeenCalled();
     });
   });
 });

@@ -95,8 +95,8 @@ describe('DocumentEditComponent', () => {
           provide: AuthenticationService,
           useValue: createSpyFromClass(AuthenticationService)
         },
-        { provide: ActivatedRoute, useValue: { params: params } },
-        /* { provide: ActivatedRoute, useValue: activatedRouteStub }, */
+        /* { provide: ActivatedRoute, useValue: { params: params } }, */
+        { provide: ActivatedRoute, useValue: activatedRouteStub },
         { provide: Router, useValue: routerSpy }
       ],
       schemas: [NO_ERRORS_SCHEMA]
