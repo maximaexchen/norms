@@ -77,7 +77,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   private addSearchListener() {
     this.subsink.sink = this.searchService.searchResultData.subscribe(
       result => {
-        this.initDocumentList(this.filterDocumentsByAccess(result));
+        this.initDocumentList(result);
       },
       error => this.logger.error(error.message)
     );
@@ -103,7 +103,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .toPromise();
   }
 
-  private filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
+  private joinOwnerDataToNorm(docs: NormDocument[]): NormDocument[] {
     docs.forEach(doc => {
       if (!!doc.owner) {
         const ownerData = _.filter(this.owners, owner => {
@@ -114,6 +114,21 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         return doc;
       }
     });
+
+    return docs;
+  }
+
+  private filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
+    /*  docs.forEach(doc => {
+      if (!!doc.owner) {
+        const ownerData = _.filter(this.owners, owner => {
+          return owner['externalID'] === doc.owner;
+        });
+        doc['ownerExtended'] = ownerData[0];
+
+        return doc;
+      }
+    }); */
 
     return docs.filter(element => {
       if (this.authService.isAdmin()) {
@@ -134,6 +149,10 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   private initDocumentList(result: any) {
     this.currentUserId = this.authService.getCurrentUserID();
     this.documents = result;
+
+    this.joinOwnerDataToNorm(this.documents);
+    this.filterDocumentsByAccess(this.documents);
+
     this.documentCount = this.documents.length;
     this.setPublisherFromTags();
   }
@@ -156,7 +175,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       // Remove from list
       this.documents.splice(index, 1);
     }
-
+    this.setPublisherFromTags();
+    this.joinOwnerDataToNorm(this.documents);
+    this.filterDocumentsByAccess(this.documents);
     // If the list is filtered, we have to reset the filter to reflect teh updated list values
     this.resetFilter();
   }
