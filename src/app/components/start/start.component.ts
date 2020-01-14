@@ -1,5 +1,11 @@
 import { NormDocument } from './../../models/document.model';
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef,
+  ViewChild
+} from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Observable, of } from 'rxjs';
@@ -21,7 +27,10 @@ import { flatMap } from 'rxjs/operators';
   styleUrls: ['./start.component.scss']
 })
 export class StartComponent implements OnInit, OnDestroy {
+  @ViewChild('dataTable', { static: false }) dataTable;
   subsink = new SubSink();
+  filterInputCheck = true;
+  documentCount = 0;
   currentUser: User;
   currentUserId: string;
   currentExternalId: string;
@@ -37,7 +46,7 @@ export class StartComponent implements OnInit, OnDestroy {
   firstName: string;
   lastName: string;
   norms: NormDocument[];
-
+  owners: User[];
   ownerData = {};
 
   constructor(
@@ -64,6 +73,8 @@ export class StartComponent implements OnInit, OnDestroy {
     } else {
       this.setUserData(this.currentUserId);
     }
+
+    this.getOwners();
   }
 
   public setUserData(id: string) {
@@ -87,8 +98,6 @@ export class StartComponent implements OnInit, OnDestroy {
   }
 
   public setOwnerData() {
-    console.log('setOwnerData');
-    console.log(this.currentExternalId);
     const ownerQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -104,10 +113,9 @@ export class StartComponent implements OnInit, OnDestroy {
       }
     };
 
-    const test = this.couchDBService.search(ownerQuery).pipe(
+    const normSelection = this.couchDBService.search(ownerQuery).pipe(
       flatMap(res => {
         res.docs.map(response => {
-          console.log(response);
           response.revisionLatest = this.documentService.getLatestActiveRevision(
             response.revisions
           );
@@ -117,13 +125,29 @@ export class StartComponent implements OnInit, OnDestroy {
       })
     );
 
-    this.subsink.sink = test.subscribe(r => {
-      this.norms = r.docs;
+    this.subsink.sink = normSelection.subscribe(result => {
+      this.getOwners().then(users => {
+        this.owners = [];
+        this.owners = _.filter(
+          users,
+          user => user['supplierId'] === 0 && user['supplierId'] !== undefined
+        );
+
+        this.norms = result.docs;
+
+        this.documentService.joinOwnerDataToNorm(this.norms, this.owners);
+        this.documentService.filterDocumentsByAccess(this.norms);
+        this.documentService.setPublisherFromTags(this.norms);
+      });
     });
   }
 
   public getUpdateNormUser(id: string): Observable<User> {
     return this.couchDBService.fetchEntry('/' + id);
+  }
+
+  private getOwners(): Promise<User[]> {
+    return this.documentService.getUsers();
   }
 
   public inform(normId: string, userId: string) {
@@ -207,5 +231,19 @@ export class StartComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.subsink.unsubscribe();
+  }
+  public onRowSelect(event: any) {
+    this.router.navigate(['../document/' + event.data._id + '/edit']);
+  }
+
+  public onFilter(event: any): void {
+    // Check for simple ASCII Characters and give warning
+    if (!_.isEmpty(event.filters.global)) {
+      this.filterInputCheck = this.documentService.checkASCIIRange(
+        event.filters.global.value
+      );
+    }
+
+    this.documentCount = event.filteredValue.length;
   }
 }

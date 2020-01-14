@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+
 import { Subscription, Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'underscore';
 
 import { CouchDBService } from 'src/app/services/couchDB.service';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Publisher } from '../models/publisher.model';
 import { User } from '@app/models/user.model';
 import { NormDocument } from './../models/document.model';
@@ -29,6 +31,7 @@ export class DocumentService {
   constructor(
     private http: HttpClient,
     private couchDBService: CouchDBService,
+    private authService: AuthenticationService,
     private logger: NGXLogger
   ) {}
 
@@ -45,6 +48,57 @@ export class DocumentService {
       .then(response => {
         return response as NormDocument[];
       });
+  }
+
+  public joinOwnerDataToNorm(
+    docs: NormDocument[],
+    docOwners: User[]
+  ): NormDocument[] {
+    docs.forEach(doc => {
+      if (!!doc.owner) {
+        const ownerData = _.filter(docOwners, owner => {
+          return owner['externalID'] === doc.owner;
+        });
+        doc['ownerExtended'] = ownerData[0];
+
+        return doc;
+      }
+    });
+
+    return docs;
+  }
+
+  public filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
+    return docs.filter(element => {
+      if (this.authService.isAdmin()) {
+        return element;
+      }
+      if (!!element.owner) {
+        if (element.owner === this.authService.getCurrentUserExternalID()) {
+          return element;
+        } else {
+          return element['active'] === true ? element : undefined;
+        }
+      }
+
+      return;
+    });
+  }
+
+  public setPublisherFromTags(docs: NormDocument[]): NormDocument[] {
+    if (docs.length > 0) {
+      docs.forEach(norm => {
+        if (norm['tags']) {
+          norm['tags'].forEach(tag => {
+            if (tag.tagType === 'level1') {
+              norm['publisher'] = tag.name;
+            }
+          });
+        }
+      });
+
+      return docs;
+    }
   }
 
   public getSelectedOwner(ownerIds: string[]): Promise<User[]> {

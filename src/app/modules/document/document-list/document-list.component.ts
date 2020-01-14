@@ -6,22 +6,22 @@ import {
   EventEmitter,
   ViewChild
 } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { SubSink } from 'SubSink';
+import _ = require('underscore');
+import { NGXLogger } from 'ngx-logger';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { NormDocument } from '../../../models/document.model';
 import { EnvService } from 'src/app//services/env.service';
-import { Router } from '@angular/router';
 import { SearchService } from '@app/services/search.service';
 import { AuthenticationService } from './../../auth/services/authentication.service';
-import _ = require('underscore');
-import { NGXLogger } from 'ngx-logger';
 import { User } from '@app/models';
-import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-document-list',
@@ -96,14 +96,14 @@ export class DocumentListComponent implements OnInit, OnDestroy {
                 user['supplierId'] === 0 && user['supplierId'] !== undefined
             );
 
-            this.initDocumentList(this.filterDocumentsByAccess(docs));
+            this.initDocumentList(docs);
           });
         })
       )
       .toPromise();
   }
 
-  private joinOwnerDataToNorm(docs: NormDocument[]): NormDocument[] {
+  /* private joinOwnerDataToNorm(docs: NormDocument[]): NormDocument[] {
     docs.forEach(doc => {
       if (!!doc.owner) {
         const ownerData = _.filter(this.owners, owner => {
@@ -119,17 +119,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
-    /*  docs.forEach(doc => {
-      if (!!doc.owner) {
-        const ownerData = _.filter(this.owners, owner => {
-          return owner['externalID'] === doc.owner;
-        });
-        doc['ownerExtended'] = ownerData[0];
-
-        return doc;
-      }
-    }); */
-
     return docs.filter(element => {
       if (this.authService.isAdmin()) {
         return element;
@@ -144,17 +133,17 @@ export class DocumentListComponent implements OnInit, OnDestroy {
 
       return;
     });
-  }
+  } */
 
   private initDocumentList(result: any) {
     this.currentUserId = this.authService.getCurrentUserID();
     this.documents = result;
 
-    this.joinOwnerDataToNorm(this.documents);
-    this.filterDocumentsByAccess(this.documents);
+    this.documentService.joinOwnerDataToNorm(this.documents, this.owners);
+    this.documentService.filterDocumentsByAccess(this.documents);
+    this.documentService.setPublisherFromTags(this.documents);
 
     this.documentCount = this.documents.length;
-    this.setPublisherFromTags();
   }
 
   private updateList(changedInfo: any) {
@@ -176,9 +165,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       this.documents.splice(index, 1);
     }
 
-    this.setPublisherFromTags();
-    this.joinOwnerDataToNorm(this.documents);
-    this.filterDocumentsByAccess(this.documents);
+    this.documentService.joinOwnerDataToNorm(this.documents, this.owners);
+    this.documentService.filterDocumentsByAccess(this.documents);
+    this.documentService.setPublisherFromTags(this.documents);
     // If the list is filtered, we have to reset the filter to reflect teh updated list values
     this.resetFilter();
   }
@@ -191,7 +180,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setPublisherFromTags() {
+  /* private setPublisherFromTags() {
     if (this.documents.length > 0) {
       this.documents.forEach(norm => {
         if (norm['tags']) {
@@ -203,7 +192,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
+  } */
 
   public getDownload(id: string, attachments: any) {
     this.documentService.getDownload(id, Object.keys(attachments)[0]);
