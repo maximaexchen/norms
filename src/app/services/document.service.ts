@@ -101,13 +101,13 @@ export class DocumentService {
     }
   }
 
-  public getSelectedOwner(ownerIds: string[]): Promise<User[]> {
+  /* public getSelectedOwner(ownerIds: string[]): Promise<User[]> {
     console.log('getSelectedOwner: ' + ownerIds);
     return this.getUsers().then(users => {
       console.log('getSelectedOwner.getUsers: ' + users);
       return users.filter(owner => ownerIds.indexOf(owner.externalID) > -1);
     });
-  }
+  } */
 
   public getUsersByIds(usersIds: string[]): Promise<any[]> {
     return this.getUsers().then(users => {

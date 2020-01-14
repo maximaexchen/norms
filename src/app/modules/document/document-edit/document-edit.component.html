@@ -31,8 +31,6 @@
       ></app-crud-nav>
     </div>
   </div>
-  {{ isAdmin | json }}
-  {{ isOwner | json }}
   <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
     <input type="hidden" [(ngModel)]="isNew" name="isNew" />
     <input type="hidden" [(ngModel)]="normDoc._id" name="_id" />
