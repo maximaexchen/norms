@@ -22,13 +22,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
-<<<<<<< HEAD
-import { ActivatedRoute } from '@angular/router';
-import { of, throwError } from 'rxjs';
-=======
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { of, throwError, Subject } from 'rxjs';
->>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 import { HttpClient } from '@angular/common/http';
 import { EnvService } from '@app/services/env.service';
 
@@ -45,13 +40,10 @@ describe('DocumentEditComponent', () => {
   let actualResult: any;
   let changeInfo: any;
   let expectedObject: any;
-<<<<<<< HEAD
-=======
   let routerSpy = {
     navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
   };
   let params: Subject<Params>;
->>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 
   let activatedRoute: any;
 
@@ -103,13 +95,9 @@ describe('DocumentEditComponent', () => {
           provide: AuthenticationService,
           useValue: createSpyFromClass(AuthenticationService)
         },
-<<<<<<< HEAD
-        { provide: ActivatedRoute, useValue: activatedRouteStub }
-=======
         /* { provide: ActivatedRoute, useValue: { params: params } }, */
         { provide: ActivatedRoute, useValue: activatedRouteStub },
         { provide: Router, useValue: routerSpy }
->>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -119,11 +107,8 @@ describe('DocumentEditComponent', () => {
     couchDBServiceSpy = TestBed.get(CouchDBService);
     activatedRoute = TestBed.get(ActivatedRoute);
     httpSpy = TestBed.get(HttpClient);
-<<<<<<< HEAD
-=======
     routerSpy = TestBed.get(Router);
     params = new Subject<Params>();
->>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 
     fakeDocuments = undefined;
     fakeDocument = undefined;
