@@ -57,7 +57,7 @@
   <ng-template pTemplate="header">
     <tr>
       <th [pSortableColumn]="'normNumber'" width="120">
-        <span i18n="@@string-headline-number">Nummer</span
+        <span i18n="@@string-headline-title">Bezeichnung</span
         ><p-sortIcon [field]="'normNumber'"></p-sortIcon>
       </th>
       <th [pSortableColumn]="'revision'" width="90">
@@ -68,7 +68,10 @@
         <span i18n="@@string-headline-publisher">Herausgeber</span>
         <p-sortIcon [field]="'publisher'"></p-sortIcon>
       </th>
-      <th><span i18n="@@string-headline-description">Beschreibung</span></th>
+      <th [pSortableColumn]="'description.de'">
+        <span i18n="@@string-headline-description">Beschreibung</span>
+        <p-sortIcon [field]="'description.de'"></p-sortIcon>
+      </th>
 
       <th [pSortableColumn]="'revisionDate'" width="110">
         <span i18n="@@string-headline-revisionDate">Rev-Datum</span
@@ -94,8 +97,8 @@
         tooltipPosition="top"
       >
         {{
-          document.description.de.length > 15
-            ? (document.description.de | slice: 0:15) + '...'
+          document.description.de.length > 20
+            ? (document.description.de | slice: 0:20) + '...'
             : document.description.de
         }}
       </td>
@@ -105,8 +108,8 @@
         tooltipPosition="top"
       >
         {{
-          document.description.en.length > 15
-            ? (document.description.en | slice: 0:15) + '...'
+          document.description.en.length > 20
+            ? (document.description.en | slice: 0:20) + '...'
             : document.description.en
         }}
       </td>
@@ -117,8 +120,8 @@
         tooltipPosition="top"
       >
         {{
-          document.description.fr.length > 15
-            ? (document.description.fr | slice: 0:15) + '...'
+          document.description.fr.length > 20
+            ? (document.description.fr | slice: 0:20) + '...'
             : document.description.fr
         }}
       </td>
