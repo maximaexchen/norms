@@ -175,6 +175,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       // Remove from list
       this.documents.splice(index, 1);
     }
+
     this.setPublisherFromTags();
     this.joinOwnerDataToNorm(this.documents);
     this.filterDocumentsByAccess(this.documents);

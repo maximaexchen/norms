@@ -143,7 +143,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.isNew = false;
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
-    this.subsink.sink = this.documentService.getDocument('/' + id).subscribe(
+    this.subsink.sink = this.documentService.getDocument(id).subscribe(
       normDoc => {
         this.normDoc = normDoc;
         this.isOwner = this.documentService.isNormOwner(

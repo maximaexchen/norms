@@ -33,7 +33,9 @@ export class DocumentService {
   ) {}
 
   public getDocument(param: string): Observable<any> {
-    return this.http.get<NormDocument[]>(this.couchDBService.dbRequest + param);
+    return this.http.get<NormDocument[]>(
+      this.couchDBService.dbRequest + '/' + param
+    );
   }
 
   public getDocuments(): Promise<NormDocument[]> {
