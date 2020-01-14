@@ -30,7 +30,7 @@
   [sortOrder]="1"
   [(selection)]="selectedDocument"
   (onRowSelect)="onRowSelect($event)"
-  (onFilter)="onFilter($event, dataTable)"
+  (onFilter)="onFilter($event)"
 >
   <ng-template pTemplate="caption">
     <div style="text-align: center;">
@@ -126,8 +126,8 @@
       <td>{{ document.revisionDate | date }}</td>
       <td>
         <span *ngIf="document.owner">
-          {{ document.owner.lastName }},
-          {{ document.owner.firstName }}
+          {{ document.ownerExtended.lastName }},
+          {{ document.ownerExtended.firstName }}
         </span>
       </td>
       <td>

@@ -25,6 +25,9 @@ import { AuthModule } from '@modules/auth/auth.module';
 import { AuthInterceptor } from '@modules/auth/auth.interceptor';
 import { StartComponent } from './components/start/start.component';
 import { CheckboxModule } from 'primeng/checkbox';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
+import { PaginatorModule } from 'primeng/paginator';
 
 registerLocaleData(localeDe, 'de-DE', localeDeExtra);
 
@@ -44,6 +47,9 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
     FormsModule,
     MenubarModule,
     ButtonModule,
+    TableModule,
+    PaginatorModule,
+    TooltipModule,
     DialogModule,
     CheckboxModule,
     ToastModule,

@@ -6,20 +6,22 @@ import {
   EventEmitter,
   ViewChild
 } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Subscription } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { SubSink } from 'SubSink';
+import _ = require('underscore');
+import { NGXLogger } from 'ngx-logger';
 
 import { CouchDBService } from 'src/app//services/couchDB.service';
 import { DocumentService } from 'src/app//services/document.service';
 import { NormDocument } from '../../../models/document.model';
 import { EnvService } from 'src/app//services/env.service';
-import { Router } from '@angular/router';
 import { SearchService } from '@app/services/search.service';
 import { AuthenticationService } from './../../auth/services/authentication.service';
-import _ = require('underscore');
-import { NGXLogger } from 'ngx-logger';
+import { User } from '@app/models';
 
 @Component({
   selector: 'app-document-list',
@@ -36,6 +38,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   documents: NormDocument[] = [];
   selectedDocument: NormDocument;
   documentCount = 0;
+  owners: User[] = [];
   currentUserId: string;
   messages: any[] = [];
   changeSubscription: Subscription;
@@ -80,43 +83,65 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     );
   }
 
+  private getDocuments() {
+    this.couchDBService
+      .findDocuments()
+      .pipe(
+        switchMap(docs => {
+          return this.documentService.getUsers().then(users => {
+            this.owners = [];
+            this.owners = _.filter(
+              users,
+              user =>
+                user['supplierId'] === 0 && user['supplierId'] !== undefined
+            );
+
+            this.initDocumentList(docs);
+          });
+        })
+      )
+      .toPromise();
+  }
+
+  /* private joinOwnerDataToNorm(docs: NormDocument[]): NormDocument[] {
+    docs.forEach(doc => {
+      if (!!doc.owner) {
+        const ownerData = _.filter(this.owners, owner => {
+          return owner['externalID'] === doc.owner;
+        });
+        doc['ownerExtended'] = ownerData[0];
+
+        return doc;
+      }
+    });
+
+    return docs;
+  }
+
+  private filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
+    return docs.filter(element => {
+      if (this.authService.isAdmin()) {
+        return element;
+      }
+      if (!!element.owner) {
+        if (element.owner === this.authService.getCurrentUserExternalID()) {
+          return element;
+        } else {
+          return element['active'] === true ? element : undefined;
+        }
+      }
+
+      return;
+    });
+  } */
+
   private initDocumentList(result: any) {
     this.currentUserId = this.authService.getCurrentUserID();
     this.documents = result;
-    this.documentCount = this.documents.length;
-    this.filterDocumentList();
-    this.setPublisherFromTags();
-  }
 
-  private getDocuments() {
-    this.subsink.sink = this.couchDBService.findDocuments().subscribe(
-      result => {
-        this.initDocumentList(result);
-      },
-      error => {
-        this.logger.error(error.message);
-      },
-      () => {}
-    );
-  }
-
-  private filterDocumentList() {
-    // Filter the documents by given owner or user
-    switch (this.authService.getUserRole()) {
-      /* case 'owner':
-        this.documents = this.documents.filter(obj => {
-          if (!!obj['owner']) {
-            return obj['owner']['_id'] === this.currentUserId;
-          }
-        });
-        break; */
-      case 'user':
-        this.documents = this.documents.filter(obj => {
-          return obj['active'] === true;
-        });
-
-        break;
-    }
+    this.documentService.joinOwnerDataToNorm(this.documents, this.owners);
+    this.documentService.filterDocumentsByAccess(this.documents);
+    this.documentService.setPublisherFromTags(this.documents);
 
     this.documentCount = this.documents.length;
   }
@@ -140,6 +165,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       this.documents.splice(index, 1);
     }
 
+    this.documentService.joinOwnerDataToNorm(this.documents, this.owners);
+    this.documentService.filterDocumentsByAccess(this.documents);
+    this.documentService.setPublisherFromTags(this.documents);
     // If the list is filtered, we have to reset the filter to reflect teh updated list values
     this.resetFilter();
   }
@@ -152,7 +180,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setPublisherFromTags() {
+  /* private setPublisherFromTags() {
     if (this.documents.length > 0) {
       this.documents.forEach(norm => {
         if (norm['tags']) {
@@ -164,7 +192,7 @@ export class DocumentListComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
+  } */
 
   public getDownload(id: string, attachments: any) {
     this.documentService.getDownload(id, Object.keys(attachments)[0]);
@@ -174,7 +202,8 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     this.router.navigate(['../document/' + event.data._id + '/edit']);
   }
 
-  public onFilter(event: any, dt: any): void {
+  public onFilter(event: any): void {
+    console.log(event);
     // Check for simple ASCII Characters and give warning
     if (!_.isEmpty(event.filters.global)) {
       this.filterInputCheck = this.documentService.checkASCIIRange(

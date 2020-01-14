@@ -37,6 +37,11 @@ const routes: Routes = [
     canActivate: [AuthGuardService]
   },
   {
+    path: 'admin',
+    loadChildren: './modules/admin/admin.module#AdminModule',
+    canActivate: [AuthGuardService]
+  },
+  {
     path: 'login',
     loadChildren: './modules/auth/auth.module#AuthModule'
   },

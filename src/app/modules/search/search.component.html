@@ -55,13 +55,13 @@
               <option [ngValue]="null" selected="selected">Owner wählen</option>
               <option
                 *ngFor="let owner of owners"
-                [value]="owner['_id']"
-                [selected]="owner['_id'] == owner"
+                [value]="owner['externalID']"
+                [selected]="owner['externalID'] == owner"
               >
                 {{ owner['lastName'] }}, {{ owner['firstName'] }}
               </option>
             </select>
-            <div class="form-check mb-2 mr-sm-2" *appIsGranted="'UPDATE'">
+            <div class="form-check mb-2 mr-sm-2" *appIsGranted="'MAINTAIN'">
               <p-checkbox
                 name="activeNorms"
                 binary="true"

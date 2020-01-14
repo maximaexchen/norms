@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
-import { map, take, publishLast } from 'rxjs/operators';
+import { map, take, publishLast, tap, concatMap, first } from 'rxjs/operators';
 import { Observable, Subject, BehaviorSubject } from 'rxjs';
 
 import { EnvService } from './env.service';
@@ -12,6 +12,7 @@ import { Role } from '@models/index';
 
 @Injectable({ providedIn: 'root' })
 export class CouchDBService {
+  private dbIP = this.env.dbIP;
   private baseUrl = this.env.dbBaseUrl;
   private dbName = this.env.dbName;
   public dbRequest = this.baseUrl + this.dbName;
@@ -28,7 +29,6 @@ export class CouchDBService {
 
   public updateEntry(document: any, id: string): Observable<any> {
     console.log('updateEntry');
-    console.log(document);
     return this.http.put(this.dbRequest + '/' + id, document);
   }
 
@@ -54,8 +54,6 @@ export class CouchDBService {
   }
 
   public fetchEntry(param: string): Observable<any> {
-    console.log('fetchEntry in CouchService');
-    console.log(param);
     return this.http.get(this.dbRequest + param);
   }
 
@@ -143,5 +141,60 @@ export class CouchDBService {
     };
 
     return this.http.post(this.dbRequest + '/_find', updateQuery);
+  }
+
+  public getDBState(): Observable<any> {
+    const dbObj = {
+      keys: [this.dbName]
+    };
+    return this.http.post(this.baseUrl + '/_dbs_info ', dbObj).pipe(
+      map(response => {
+        return response[0].info;
+      })
+    );
+  }
+
+  public compactDB(dbName: string, username: string, password: string) {
+    this.singnInDB(username, password)
+      .pipe(first())
+      .subscribe(res => {
+        this.http
+          .post(
+            this.baseUrl + dbName + '/_compact',
+            {},
+            {
+              withCredentials: true
+            }
+          )
+          .pipe(first())
+          .subscribe(ress => {});
+      });
+  }
+
+  private checkDBAuthentication(): Observable<any> {
+    return this.http.get(this.baseUrl + '_session');
+  }
+
+  public deleteDB(dbName: string, username: string, password: string) {
+    this.singnOutDB().subscribe(signout => {
+      this.singnInDB(username, password)
+        .pipe(first())
+        .subscribe(res => {
+          this.http
+            .delete(this.baseUrl + 'norm_documents_clean')
+            .pipe(first())
+            .subscribe(ress => {
+              console.log(ress);
+            });
+        });
+    });
+  }
+
+  private singnInDB(username: string, password: string): Observable<any> {
+    return this.http.post(this.baseUrl + '_session', { username, password });
+  }
+
+  private singnOutDB(): Observable<any> {
+    return this.http.delete(this.baseUrl + '_session');
   }
 }

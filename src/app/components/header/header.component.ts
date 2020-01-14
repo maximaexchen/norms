@@ -52,7 +52,10 @@ export class HeaderComponent implements OnInit {
       label: 'Herausgeber',
       routerLink: 'publisher'
     }); */
-    if (sessionStorage.getItem('role') === 'admin') {
+    if (
+      sessionStorage.getItem('role') === 'admin' ||
+      sessionStorage.getItem('role') === 'superuser'
+    ) {
       this.mainmenuItems.push({
         icon: 'fas fa-tags',
         label: 'Tags',
@@ -75,7 +78,19 @@ export class HeaderComponent implements OnInit {
         routerLink: 'role'
       });
     }
-    if (sessionStorage.getItem('role') !== 'admin') {
+
+    if (sessionStorage.getItem('role') === 'superuser') {
+      this.mainmenuItems.push({
+        icon: 'fas fa-id-card',
+        label: 'Admin',
+        routerLink: 'admin'
+      });
+    }
+
+    if (
+      sessionStorage.getItem('role') !== 'admin' &&
+      sessionStorage.getItem('role') !== 'superuser'
+    ) {
       this.mainmenuItems.push({
         icon: 'fas fa-id-card',
         label: 'Profil',

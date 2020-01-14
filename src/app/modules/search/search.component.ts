@@ -115,13 +115,9 @@ export class SearchComponent implements OnInit, OnDestroy {
       }
     };
 
-    console.log(this.tagIds);
-    console.log(this.searchForm.value.tags);
-
     if (this.searchForm.value.tags.length > 0) {
       this.tagIds = _.pluck(this.searchForm.value.tags, '_id');
     }
-    console.log(this.tagIds);
 
     /* if (this.searchForm.value.publisherId !== undefined) {
       this.publisherId = this.searchForm.value.publisherId;
@@ -191,7 +187,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       Object.assign(
         searchObject['selector']['$or'].push({
           owner: {
-            _id: { $eq: this.ownerId }
+            $eq: this.ownerId
           }
         })
       );

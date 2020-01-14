@@ -1,3 +1,4 @@
+import { AdminComponent } from './../modules/admin/admin.component';
 import { Injectable } from '@angular/core';
 import { from } from 'rxjs';
 import { GroupComponent } from './../modules/group/group.component';
@@ -22,7 +23,8 @@ export class ACP_Menu {
       { path: 'tag', component: TagComponent },
       { path: 'group', component: GroupComponent },
       { path: 'user', component: GroupComponent },
-      { path: 'role', component: RoleComponent }
+      { path: 'role', component: RoleComponent },
+      { path: 'admin', component: AdminComponent }
     ];
   }
 

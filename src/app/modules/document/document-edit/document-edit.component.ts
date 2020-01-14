@@ -128,7 +128,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.newDocument();
         }
       },
-      error => this.logger.error(error.message)
+      error => {
+        this.logger.error(error.message);
+      }
     );
   }
 
@@ -141,7 +143,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.isNew = false;
     this.formTitle = 'Norm bearbeiten';
     // fetch document which should be upated
-    this.subsink.sink = this.documentService.getDocument('/' + id).subscribe(
+    this.subsink.sink = this.documentService.getDocument(id).subscribe(
       normDoc => {
         this.normDoc = normDoc;
         this.isOwner = this.documentService.isNormOwner(
@@ -207,8 +209,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.subsink.sink = this.couchDBService.writeEntry(this.normDoc).subscribe(
       result => {
-        console.log('result');
-        console.log(result);
         this.isLoading = false;
         this.spinner.hide();
         this.sendStateUpdate(this.normDoc._id, 'save');
@@ -218,13 +218,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.logger.error(error.message);
         this.isLoading = false;
         this.spinner.hide();
-      },
-      () => {}
+      }
     );
   }
 
   private updateDocument(): void {
-    console.log('uodateDocument');
+    console.log('updateDocument');
     this.isLoading = true;
     this.processFormData();
 
@@ -292,9 +291,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         return;
       });
 
-    if (this.documentService.getLatestActiveRevision(this.revisionDocuments)) {
+    if (this.documentService.getLatestActiveRevision(this.normDoc.revisions)) {
       this.latestAttachmentName = this.documentService.getLatestActiveRevision(
-        this.revisionDocuments
+        this.normDoc.revisions
       ).name;
     }
 
@@ -434,6 +433,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private resetComponent() {
     this.owner = '';
+    this.currentOwner = null;
     this.editable = false;
     this.attachment = {};
     this.selectedRelatedNorms = [];
@@ -592,7 +592,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setSelectedUsers(users: any[]) {
-    this.documentService.getSelectedUsers(users).then(res => {
+    this.documentService.getUsersByIds(users).then(res => {
       this.selectedUsers = res.map(user => ({
         _id: user['_id'],
         externalID: user['externalID'],

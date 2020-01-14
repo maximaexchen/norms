@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+
 import { Subscription, Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'underscore';
 
 import { CouchDBService } from 'src/app/services/couchDB.service';
+import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Publisher } from '../models/publisher.model';
 import { User } from '@app/models/user.model';
 import { NormDocument } from './../models/document.model';
@@ -29,11 +31,14 @@ export class DocumentService {
   constructor(
     private http: HttpClient,
     private couchDBService: CouchDBService,
+    private authService: AuthenticationService,
     private logger: NGXLogger
   ) {}
 
   public getDocument(param: string): Observable<any> {
-    return this.http.get<NormDocument[]>(this.couchDBService.dbRequest + param);
+    return this.http.get<NormDocument[]>(
+      this.couchDBService.dbRequest + '/' + param
+    );
   }
 
   public getDocuments(): Promise<NormDocument[]> {
@@ -45,13 +50,66 @@ export class DocumentService {
       });
   }
 
-  public getSelectedOwner(ownerId: string[]): Promise<User[]> {
-    return this.getUsers().then(users => {
-      return users.filter(owner => ownerId.indexOf(owner.externalID) > -1);
+  public joinOwnerDataToNorm(
+    docs: NormDocument[],
+    docOwners: User[]
+  ): NormDocument[] {
+    docs.forEach(doc => {
+      if (!!doc.owner) {
+        const ownerData = _.filter(docOwners, owner => {
+          return owner['externalID'] === doc.owner;
+        });
+        doc['ownerExtended'] = ownerData[0];
+
+        return doc;
+      }
+    });
+
+    return docs;
+  }
+
+  public filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
+    return docs.filter(element => {
+      if (this.authService.isAdmin()) {
+        return element;
+      }
+      if (!!element.owner) {
+        if (element.owner === this.authService.getCurrentUserExternalID()) {
+          return element;
+        } else {
+          return element['active'] === true ? element : undefined;
+        }
+      }
+
+      return;
     });
   }
 
-  public getSelectedUsers(usersIds: string[]): Promise<any[]> {
+  public setPublisherFromTags(docs: NormDocument[]): NormDocument[] {
+    if (docs.length > 0) {
+      docs.forEach(norm => {
+        if (norm['tags']) {
+          norm['tags'].forEach(tag => {
+            if (tag.tagType === 'level1') {
+              norm['publisher'] = tag.name;
+            }
+          });
+        }
+      });
+
+      return docs;
+    }
+  }
+
+  public getSelectedOwner(ownerIds: string[]): Promise<User[]> {
+    console.log('getSelectedOwner: ' + ownerIds);
+    return this.getUsers().then(users => {
+      console.log('getSelectedOwner.getUsers: ' + users);
+      return users.filter(owner => ownerIds.indexOf(owner.externalID) > -1);
+    });
+  }
+
+  public getUsersByIds(usersIds: string[]): Promise<any[]> {
     return this.getUsers().then(users => {
       return users.filter(user => {
         return usersIds.indexOf(user.externalID) > -1;

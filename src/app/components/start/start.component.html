@@ -1,47 +1,158 @@
 <div class="row">
   <div class="col-md-6">
-    <h1 style="margin-bottom: 30px;">Willkommen {{ userName }}!</h1>
+    <h1 i18n="@@string-own-norms">Eigene Normen</h1>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <p-table
+      #dataTable
+      [value]="norms"
+      [paginator]="true"
+      [rows]="13"
+      class="table"
+      [globalFilterFields]="[
+        'normNumber',
+        'revision',
+        'publisher',
+        'description.de',
+        'description.en',
+        'description.fr',
+        'revisionDate',
+        'scope',
+        'owner.userName'
+      ]"
+      selectionMode="single"
+      sortField="normNumber"
+      [resizableColumns]="true"
+      columnResizeMode="fit"
+      [sortOrder]="1"
+      (onRowSelect)="onRowSelect($event)"
+      (onFilter)="onFilter($event)"
+    >
+      <ng-template pTemplate="caption">
+        <div style="text-align: center;">
+          <i class="fas fa-search" style="margin:4px 6px 0 0;"></i>
+          <input
+            type="text"
+            pInputText
+            size="50"
+            i18n-placeholder
+            placeholder="Globale Suche"
+            (input)="dataTable.filterGlobal($event.target.value, 'contains')"
+            style="width:auto"
+          />
+        </div>
+        <div
+          *ngIf="!filterInputCheck"
+          class="alert alert-danger"
+          role="alert"
+          i18n="@@string-ascii-warning"
+        >
+          Erlaubt ASCII_Zeichen von 32 bis 126
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th [pSortableColumn]="'normNumber'" width="120">
+            <span i18n="@@string-headline-number">Nummer</span>
+            <p-sortIcon [field]="'normNumber'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'revision'" width="90">
+            <span i18n="@@string-headline-revision">Revision</span>
+            <p-sortIcon [field]="'revision'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'publisher'" width="110">
+            <span i18n="@@string-headline-publisher">Herausgeber</span>
+            <p-sortIcon [field]="'publisher'"></p-sortIcon>
+          </th>
+          <th>
+            <span i18n="@@string-headline-description">Beschreibung</span>
+          </th>
 
-    <table class="table table-striped">
-      <tr>
-        <th scope="col" i18n="@@string-number">
-          Nummer
-        </th>
-        <th scope="col" i18n="@@string-revision">Revision</th>
-        <th scope="col" i18n="@@string-pdf">PDF</th>
-        <th scope="col" i18n="@@string-revisionDate">Datum Revision</th>
-      </tr>
-      <tr *ngFor="let norm of norms">
-        <td>
-          <a class="js-link" (click)="gotoNorm(norm._id)"
-            ><i class="fas fa-link"></i> {{ norm.normNumber }}
-          </a>
-        </td>
-        <td>
-          <a class="js-link" (click)="gotoNorm(norm._id)"
-            ><i class="fas fa-exchange-alt"></i> {{ norm.revision }}</a
+          <th [pSortableColumn]="'revisionDate'" width="110">
+            <span i18n="@@string-headline-revisionDate">Rev-Datum</span>
+            <p-sortIcon [field]="'revisionDate'"></p-sortIcon>
+          </th>
+          <th [pSortableColumn]="'document.owner.lastName'">
+            <span i18n="@@string-headline-owner">Owner</span>
+            <p-sortIcon [field]="'owner'"></p-sortIcon>
+          </th>
+          <th width="40">
+            <span i18n="@@string-headline-active">Aktiv</span>
+          </th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-document>
+        <tr [pSelectableRow]="document">
+          <td>{{ document.normNumber }}</td>
+          <td>{{ document.revision }}</td>
+          <td>{{ document.publisher }}</td>
+          <td
+            *ngIf="document.normLanguage === 'de'"
+            pTooltip="{{ document.description.de }}"
+            tooltipPosition="top"
           >
-        </td>
-        <td>
-          <span *ngIf="norm._attachments">
-            <a
-              class="js-link"
-              (click)="getDownload(norm._id, norm._attachments)"
-              ><i class="fas fa-file-download"></i> Download PDF</a
-            >
-          </span>
-        </td>
-        <td>
-          <span *ngIf="norm['revisionLatest']">
-            <i class="far fa-calendar"></i>
-            {{ norm['revisionLatest']['date'] | date: 'dd.MM.yyyy' }}
-          </span>
-        </td>
-      </tr>
-    </table>
+            {{
+              document.description.de.length > 15
+                ? (document.description.de | slice: 0:15) + '...'
+                : document.description.de
+            }}
+          </td>
+          <td
+            *ngIf="
+              document.normLanguage === 'en' || document.normLanguage === ''
+            "
+            pTooltip="{{ document.description.en }}"
+            tooltipPosition="top"
+          >
+            {{
+              document.description.en.length > 15
+                ? (document.description.en | slice: 0:15) + '...'
+                : document.description.en
+            }}
+          </td>
 
-    <div class="form-check mb-2 mr-sm-2">
-      <br />
-    </div>
+          <td
+            *ngIf="document.normLanguage === 'fr'"
+            pTooltip="{{ document.description.fr }}"
+            tooltipPosition="top"
+          >
+            {{
+              document.description.fr.length > 15
+                ? (document.description.fr | slice: 0:15) + '...'
+                : document.description.fr
+            }}
+          </td>
+
+          <td>{{ document.revisionDate | date }}</td>
+          <td>
+            <span *ngIf="document.owner">
+              {{ document.ownerExtended.lastName }},
+              {{ document.ownerExtended.firstName }}
+            </span>
+          </td>
+          <td>
+            <i
+              [ngStyle]="{
+                'font-size': '16px'
+              }"
+              [ngClass]="document.active ? 'fas fa-check-circle' : 'fas fa-ban'"
+              aria-hidden="true"
+            ></i>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary" let-document>
+        <div
+          style="height:100px; font-size:90%; padding:10px"
+          i18n="@@document-status-data-count"
+        >
+          Es {documentCount, plural, =0 {wurde keine Dokument gefunden} =1
+          {wurde 1 Dokument gefunden} other { wurden
+          {{ documentCount }} Dokumente gefunden }}
+        </div>
+      </ng-template>
+    </p-table>
   </div>
 </div>

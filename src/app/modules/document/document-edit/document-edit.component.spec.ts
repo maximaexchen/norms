@@ -22,8 +22,13 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
 import { Tag } from '@app/models/tag.model';
+<<<<<<< HEAD
 import { ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
+=======
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { of, throwError, Subject } from 'rxjs';
+>>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 import { HttpClient } from '@angular/common/http';
 import { EnvService } from '@app/services/env.service';
 
@@ -40,6 +45,13 @@ describe('DocumentEditComponent', () => {
   let actualResult: any;
   let changeInfo: any;
   let expectedObject: any;
+<<<<<<< HEAD
+=======
+  let routerSpy = {
+    navigate: jasmine.createSpy('navigate') // to spy on the url that has been routed
+  };
+  let params: Subject<Params>;
+>>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 
   let activatedRoute: any;
 
@@ -91,7 +103,13 @@ describe('DocumentEditComponent', () => {
           provide: AuthenticationService,
           useValue: createSpyFromClass(AuthenticationService)
         },
+<<<<<<< HEAD
         { provide: ActivatedRoute, useValue: activatedRouteStub }
+=======
+        /* { provide: ActivatedRoute, useValue: { params: params } }, */
+        { provide: ActivatedRoute, useValue: activatedRouteStub },
+        { provide: Router, useValue: routerSpy }
+>>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();
@@ -101,6 +119,11 @@ describe('DocumentEditComponent', () => {
     couchDBServiceSpy = TestBed.get(CouchDBService);
     activatedRoute = TestBed.get(ActivatedRoute);
     httpSpy = TestBed.get(HttpClient);
+<<<<<<< HEAD
+=======
+    routerSpy = TestBed.get(Router);
+    params = new Subject<Params>();
+>>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 
     fakeDocuments = undefined;
     fakeDocument = undefined;
@@ -136,7 +159,7 @@ describe('DocumentEditComponent', () => {
       fakeUsers = [];
       documentServiceSpy.getUsers.and.resolveWith(fakeUsers);
 
-      spyOn(activatedRoute.params, 'subscribe');
+      // spyOn(activatedRoute.params, 'subscribe');
       // @ts-ignores
       spyOn(componentUnderTest, 'setStartValues').and.callThrough();
     });
@@ -144,6 +167,10 @@ describe('DocumentEditComponent', () => {
     describe('INIT', () => {
       When(
         fakeAsync(() => {
+          params.next({
+            id: 1
+          });
+          tick();
           // @ts-ignore
           componentUnderTest.ngOnInit();
           tick();
@@ -152,6 +179,35 @@ describe('DocumentEditComponent', () => {
       Given(() => {
         documentServiceSpy.getDocuments.and.resolveWith(fakeDocuments);
       });
+
+      /* describe('GIVEN route.paramas error THEN call error callback', () => {
+        Given(() => {
+          // @ts-ignores
+          spyOn(componentUnderTest.logger, 'error');
+        });
+
+        When(
+          fakeAsync(() => {
+            const testError = {
+              status: 406,
+              error: {
+                message: 'Test 406 error'
+              }
+            };
+
+            params.next(throwError(testError));
+            tick();
+          })
+        );
+
+        Then(
+          fakeAsync(() => {
+            // @ts-ignores
+            expect(componentUnderTest.logger.error).toHaveBeenCalled();
+          })
+        );
+      }); */
+
       describe('METHOD setStartValues to be called', () => {
         Then(() => {
           // @ts-ignore
@@ -461,7 +517,96 @@ describe('DocumentEditComponent', () => {
         expect(componentUnderTest.updateDocument).toHaveBeenCalled();
       });
     });
+<<<<<<< HEAD
   }); */
+=======
+  });
+
+  describe('METHOD saveDocument', () => {
+    Given(() => {
+      componentUnderTest.isLoading = false;
+      componentUnderTest.normForm = new NgForm([], []);
+      componentUnderTest.fileUploadInput = new FileUpload(
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      );
+      componentUnderTest.normDoc = {
+        _id: '1',
+        _rev: '1',
+        type: 'norm',
+        normNumber: 'AAA'
+      };
+
+      const testRespones = {
+        ok: true,
+        id: '1',
+        rev: '1'
+      };
+
+      couchDBServiceSpy.writeEntry.and.nextWith(testRespones);
+      // @ts-ignores
+      spyOn(componentUnderTest, 'saveDocument').and.callThrough();
+      // @ts-ignores
+      spyOn(componentUnderTest.spinner, 'hide');
+      spyOn(componentUnderTest, 'goToNorm');
+    });
+
+    When(() => {
+      // @ts-ignores
+      componentUnderTest.saveDocument();
+    });
+
+    describe('Check attributes to be changed isNe and spinner.hide', () => {
+      Then(() => {
+        expect(componentUnderTest.isNew).toBe(true);
+        // @ts-ignores
+        expect(componentUnderTest.spinner.hide).toHaveBeenCalled();
+      });
+    });
+
+    describe('Given document to save THEN response to be ok', () => {
+      Given(() => {});
+      Then(() => {
+        couchDBServiceSpy.writeEntry(fakeDocument).subscribe(res => {
+          expect(res.ok).toBe(true);
+        });
+        expect(componentUnderTest.goToNorm).toHaveBeenCalledWith('1');
+      });
+    });
+
+    describe('GIVEN Obeservable error THEN call error callback', () => {
+      Given(() => {
+        // @ts-ignores
+        couchDBServiceSpy.writeEntry.and.returnValue(
+          throwError({ status: 404 })
+        );
+        // @ts-ignores
+        // spyOn(componentUnderTest, 'setStartValues').and.callThrough();
+        spyOn(componentUnderTest.logger, 'error');
+      });
+
+      Then(() => {
+        // @ts-ignore
+        expect(componentUnderTest.logger.error).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe('METHOD goToNorm', () => {
+    Given(() => {});
+
+    When(() => {
+      const id = '1';
+      componentUnderTest.goToNorm(id);
+    });
+
+    Then(() => {
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['../document/1/edit']);
+    });
+  });
+>>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 
   describe('METHOD updateDocument', () => {
     Given(() => {

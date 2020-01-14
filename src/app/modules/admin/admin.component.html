@@ -1,0 +1,94 @@
+<div class="row">
+  <div class="main-content col-sm-12">
+    <div class="table">
+      <table class="table">
+        <tr>
+          <th scope="col">DB Name</th>
+          <th scope="col">Dokumente</th>
+          <th scope="col">Dokumente (gelöscht)</th>
+          <th scope="col">Größe auf Disk</th>
+          <th scope="col"></th>
+        </tr>
+        <tr>
+          <td>{{ dbName }}</td>
+          <td>{{ docCount }}</td>
+          <td>{{ docDelCount }}</td>
+          <td>{{ diskSize }} MB</td>
+          <td>
+            <form class="form" (ngSubmit)="compactDB()" #dbForm="ngForm">
+              <div class="form-group row">
+                <div class="col-sm-6">
+                  <input
+                    type="text"
+                    class="form-control"
+                    i18n-placeholder
+                    placeholder="DBUser"
+                    [(ngModel)]="dbUser"
+                    #dbUserText="ngModel"
+                    name="dbUser"
+                    required
+                  />
+
+                  <input
+                    type="password"
+                    class="form-control"
+                    i18n-placeholder
+                    placeholder="DBPassword"
+                    [(ngModel)]="dbPassword"
+                    #dbPasswordText="ngModel"
+                    name="dbPassword"
+                    required
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                class="btn btn-default btn-sm"
+                [disabled]="!dbForm.valid"
+              >
+                Compact
+              </button>
+            </form>
+            <hr />
+            <form class="form" (ngSubmit)="deleteDB()" #dbForm2="ngForm">
+              <div class="form-group row">
+                <div class="col-sm-6">
+                  <input
+                    type="text"
+                    class="form-control"
+                    i18n-placeholder
+                    placeholder="DBUser"
+                    [(ngModel)]="dbUser"
+                    #dbUserText="ngModel"
+                    name="dbUser"
+                    required
+                  />
+
+                  <input
+                    type="password"
+                    class="form-control"
+                    i18n-placeholder
+                    placeholder="DBPassword"
+                    [(ngModel)]="dbPassword"
+                    #dbPasswordText="ngModel"
+                    name="dbPassword"
+                    required
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                class="btn btn-default btn-sm"
+                [disabled]="!dbForm2.valid"
+              >
+                Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <router-outlet></router-outlet>
+  </div>
+</div>

@@ -4,7 +4,7 @@ import { TestBed, fakeAsync, tick, async } from '@angular/core/testing';
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { HttpClient } from '@angular/common/http';
-import { NormDocument } from '@app/models';
+import { NormDocument, User } from '@app/models';
 import { NGXLogger } from 'ngx-logger';
 
 describe('DocumentService test', () => {
@@ -14,6 +14,8 @@ describe('DocumentService test', () => {
   let fakeNormDocuments: NormDocument[];
   let fakeNormDocument: NormDocument;
   let fakeTags: Tag[];
+  let fakeUsers: User[];
+  let fakeOwners: User[];
   let fakeAttributes: any;
   let actualResult: any;
 
@@ -25,8 +27,14 @@ describe('DocumentService test', () => {
           provide: CouchDBService,
           useValue: createSpyFromClass(CouchDBService)
         },
-        { provide: HttpClient, useValue: createSpyFromClass(HttpClient) },
-        { provide: NGXLogger, useValue: createSpyFromClass(NGXLogger) }
+        {
+          provide: HttpClient,
+          useValue: createSpyFromClass(HttpClient)
+        },
+        {
+          provide: NGXLogger,
+          useValue: createSpyFromClass(NGXLogger)
+        }
       ]
     });
 
@@ -37,10 +45,12 @@ describe('DocumentService test', () => {
     fakeNormDocuments = undefined;
     fakeNormDocument = undefined;
     fakeTags = undefined;
+    fakeUsers = undefined;
+    fakeOwners = undefined;
     actualResult = undefined;
   });
 
-  describe('METHOD: getDocument()', () => {
+  /* describe('METHOD: getDocument()', () => {
     const id = '1';
     Given(() => {
       fakeNormDocument = {
@@ -64,7 +74,7 @@ describe('DocumentService test', () => {
       expect(actualResult).toEqual(fakeNormDocument);
       expect(actualResult.length).not.toBeNull();
     });
-  });
+  });*/
 
   describe('METHOD: getDocuments()', () => {
     const id = '1';
@@ -73,27 +83,71 @@ describe('DocumentService test', () => {
         {
           _id: '1',
           _rev: '1',
-          type: 'user',
+          type: 'document',
           normNumber: 'AAA'
         }
       ];
 
-      couchDBServiceSpy.fetchEntries.and.nextOneTimeWith(fakeNormDocuments);
+      couchDBServiceSpy.fetchEntries.and.nextWith(fakeNormDocuments);
+      couchDBServiceSpy.fetchEntries.and.complete();
     });
 
     When(
       fakeAsync(async () => {
         // with additional async and await
         // Short form for
-        // serviceUnderTest.getDocuments().then(value => actualResult = value);
         actualResult = await serviceUnderTest.getDocuments();
       })
     );
 
     Then(() => {
+      fakeNormDocuments = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'AAA'
+        }
+      ];
       expect(actualResult).toEqual(fakeNormDocuments);
       expect(actualResult.length).toBeGreaterThan(0);
     });
+  });
+
+  describe('METHOD: getSelectedOwner()', () => {
+    const ownerId = ['1', '2'];
+    Given(() => {
+      fakeUsers = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          firstName: 'Max'
+        }
+      ];
+      spyOn(serviceUnderTest, 'getUsers').and.returnValue(
+        Promise.resolve(fakeUsers)
+      );
+    });
+
+    When(() => {
+      actualResult = serviceUnderTest.getSelectedOwner(ownerId);
+    });
+
+    Then(
+      () => {
+        fakeOwners = [
+          {
+            _id: '1',
+            _rev: '1',
+            type: 'user',
+            firstName: 'Max'
+          }
+        ];
+
+        expect(actualResult).toEqual(fakeOwners);
+      })
+    );
   });
 
   describe('METHOD: getTags()', () => {

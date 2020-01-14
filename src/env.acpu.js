@@ -7,6 +7,7 @@
   window.__env.enableDebug = false;
   window.__env.envFileLoaded = true;
 
+  window.__env.dbIP = '116.203.220.19:5984';
   window.__env.dbBaseUrl = 'http://116.203.220.19:5984/';
   window.__env.dbName = 'norm_rep2';
 

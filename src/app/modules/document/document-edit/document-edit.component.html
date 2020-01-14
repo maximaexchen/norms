@@ -31,7 +31,8 @@
       ></app-crud-nav>
     </div>
   </div>
-
+  {{ isAdmin | json }}
+  {{ isOwner | json }}
   <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
     <input type="hidden" [(ngModel)]="isNew" name="isNew" />
     <input type="hidden" [(ngModel)]="normDoc._id" name="_id" />
@@ -44,15 +45,15 @@
         <div class="row">
           <div class="col-sm-6">
             <div class="row">
-              <div class="col-sm-8">
+              <div class="col-sm-12">
                 <div class="form-group row">
                   <label
                     for="normNumber"
-                    class="col-sm-6 col-form-label"
-                    i18n="@@string-number"
-                    >Nummer</label
+                    class="col-sm-4 col-form-label"
+                    i18n="@@string-norm-title"
+                    >Bezeichnung</label
                   >
-                  <div class="col-sm-6">
+                  <div class="col-sm-8">
                     <input
                       type="text"
                       class="form-control"
@@ -78,7 +79,28 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-4">
+            </div>
+
+            <div class="form-group row">
+              <label
+                class="col-sm-4 col-form-label"
+                for="revisionDate"
+                i18n="@@string-date"
+                >Datum</label
+              >
+              <div class="col-sm-3">
+                <p-calendar
+                  [(ngModel)]="revisionDate"
+                  [showIcon]="false"
+                  [inline]="false"
+                  dateFormat="dd.mm.yy"
+                  id="revisionDate"
+                  name="revisionDate"
+                  required
+                  [disabled]="!editable"
+                ></p-calendar>
+              </div>
+              <div class="col-sm-5">
                 <div class="form-group row">
                   <label
                     class="col-sm-4 col-form-label"
@@ -98,27 +120,6 @@
                     />
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div class="form-group row">
-              <label
-                class="col-sm-4 col-form-label"
-                for="revisionDate"
-                i18n="@@string-date"
-                >Datum</label
-              >
-              <div class="col-sm-4">
-                <p-calendar
-                  [(ngModel)]="revisionDate"
-                  [showIcon]="false"
-                  [inline]="false"
-                  dateFormat="dd.mm.yy"
-                  id="revisionDate"
-                  name="revisionDate"
-                  required
-                  [disabled]="!editable"
-                ></p-calendar>
               </div>
             </div>
 
@@ -414,7 +415,6 @@
                 </p>
               </div>
             </div>
-
             <hr *ngIf="latestAttachmentName" />
             <span *ngIf="normDoc.active">
               <button
@@ -434,7 +434,7 @@
                 [toggleable]="true"
                 [transitionOptions]="'100ms'"
                 [collapsed]="false"
-                *ngIf="revisionDocuments.length > 0 && (isAdmin || isOwner)"
+                *ngIf="isAdmin || isOwner"
               >
                 <table class="table" style="width: 100%;">
                   <tr *ngFor="let revDoc of revisionDocuments; let i = index">
@@ -461,8 +461,8 @@
                       ></a>
                     </td>
                     <td>
+                      <!-- *ngIf="revDoc['isActive'] || isAdmin" -->
                       <a
-                        *ngIf="revDoc['isActive'] || isAdmin"
                         class="dynamic-link"
                         (click)="getDownload(normDoc._id, revDoc['name'])"
                         ><i class="fas fa-file-download"></i> Download
@@ -622,7 +622,7 @@
         </div>
       </p-tabPanel>
 
-      <p-tabPanel header="User" *appIsGranted="'UPDATE'">
+      <p-tabPanel header="User" *appIsGranted="'MAINTAIN'">
         <div class="row">
           <div class="col-sm-6">
             <div *appIsGranted="'MAINTAIN'" class="form-group row">
@@ -647,7 +647,7 @@
                 </select>
               </div>
             </div>
-            <div class="form-group row">
+            <!-- <div class="form-group row">
               <label class="col-sm-2 col-form-label" i18n="@@string-user"
                 >Benutzer</label
               >
@@ -669,7 +669,7 @@
                   </c-item>
                 </angular2-multiselect>
               </div>
-            </div>
+            </div>-->
           </div>
         </div>
       </p-tabPanel>
