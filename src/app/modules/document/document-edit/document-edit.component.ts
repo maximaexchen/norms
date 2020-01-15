@@ -747,6 +747,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     const filterActive = this.revisionDocuments.filter(
       element => element['isActive']
     );
+    
     if (Array.isArray(filterActive) && filterActive.length) {
       this.normDoc.active = true;
     } else {
