@@ -134,7 +134,6 @@ export class StartComponent implements OnInit, OnDestroy {
         );
 
         this.norms = result.docs;
-
         this.documentService.joinOwnerDataToNorm(this.norms, this.owners);
         this.documentService.filterDocumentsByAccess(this.norms);
         this.documentService.setPublisherFromTags(this.norms);
