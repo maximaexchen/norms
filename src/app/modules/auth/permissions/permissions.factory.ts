@@ -16,12 +16,18 @@ export class PermissionsFactory {
     } else {
       const role = sessionStorage.getItem('role');
 
+      console.log(role);
+      console.log(Roles.OWNER);
+      console.log(role);
+      console.log('getInstance');
+
       switch (role) {
         case Roles.ADMIN:
           this.instance = new AdminPermission();
           break;
         case Roles.OWNER:
           this.instance = new OwnerPermission();
+          console.log(this.instance);
           break;
         case Roles.USER:
           this.instance = new UserPermission();

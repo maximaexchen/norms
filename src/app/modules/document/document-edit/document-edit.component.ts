@@ -153,13 +153,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.normDoc
         );
         this.isAdmin = this.authService.isAdmin();
+        this.setAdditionalNormDocData();
       },
       error => {
         this.logger.error(error.message);
       },
-      () => {
-        this.setAdditionalNormDocData();
-      }
+      () => {}
     );
   }
 
@@ -203,7 +202,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private saveDocument(): void {
-    console.log('saveDocument');
     this.processFormData();
     this.isLoading = true;
     this.spinner.show();
@@ -225,7 +223,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private updateDocument(): void {
-    console.log('updateDocument');
     this.isLoading = true;
     this.processFormData();
 
@@ -261,11 +258,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setAdditionalNormDocData() {
-    console.log('setAdditionalNormDocData');
-    this.currentOwner = this.owners.find(ow => {
-      return this.normDoc.owner === ow.externalID;
-    });
-
+    this.setNormOwner();
     this.revisionDate = new Date(this.normDoc.revisionDate);
 
     if (this.normDoc.owner) {
@@ -338,6 +331,20 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  private setNormOwner() {
+    this.documentService.getUsers().then(users => {
+      let owner = [];
+      owner = _.filter(
+        users,
+        user => user['supplierId'] === 0 && user['supplierId'] !== undefined
+      );
+
+      this.currentOwner = owner.find(ow => {
+        return this.normDoc.owner === ow.externalID;
+      });
+    });
   }
 
   private processFormData() {
