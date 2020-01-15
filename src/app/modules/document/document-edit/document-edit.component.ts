@@ -254,17 +254,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private setAdditionalNormDocData() {
+    console.log('setAdditionalNormDocData');
     this.revisionDate = new Date(this.normDoc.revisionDate);
 
     if (this.normDoc.owner) {
       this.owner = this.normDoc.owner;
     }
 
-    if (this.normDoc.owner) {
-      this.currentOwner = this.owners.find(ow => {
-        return this.normDoc.owner === ow.externalID;
-      });
-    }
+    this.currentOwner = this.owners.find(ow => {
+      return this.normDoc.owner === ow.externalID;
+    });
 
     this.processType = this.normDoc.processType;
     if (this.normDoc.processType) {
