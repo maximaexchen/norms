@@ -182,8 +182,6 @@ export class DocumentService {
   }
 
   public deleteRelatedDBEntries(id: string) {
-    this.deleteAssociatedNormEntriesInUser(id);
-
     const deleteQuery = {
       use_index: ['_design/search_norm'],
       selector: {

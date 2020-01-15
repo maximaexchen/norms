@@ -352,6 +352,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // add update status to users to be notified
     this.setUserNotification(this.normDoc.revision);
     this.resetTempData();
+
     return this.normDoc;
   }
 
@@ -394,6 +395,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processRelatedFromNorms() {
+    console.log('processRelatedFromNorms');
+    console.log(this.relatedNormsFrom);
     const selectedRelatedFromNorms = [];
     this.relatedNormsFrom.forEach(element => {
       selectedRelatedFromNorms.push(element['id']);
@@ -410,6 +413,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .deleteEntry(this.normDoc._id, this.normDoc._rev)
           .subscribe(
             res => {
+              this.documentService.deleteAssociatedNormEntriesInUser(
+                this.normDoc._id
+              );
               this.documentService.deleteRelatedDBEntries(this.normDoc._id);
             },
             error => {
