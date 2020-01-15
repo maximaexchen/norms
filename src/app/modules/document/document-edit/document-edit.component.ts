@@ -42,6 +42,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   editable = false;
   deletable = false;
   readyToSave = false;
+  justUpdateDocument = false;
   uploadUrl = this.env.uploadUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
@@ -60,6 +61,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   relatedNormsSelectList: NormDocument[] = [];
   selectedRelatedNorms: NormDocument[] = [];
+  selectedRelatedNormsUpdate: NormDocument[] = [];
   relatedNormsFrom: NormDocument[] = [];
 
   revisionDocuments: RevisionDocument[] = [];
@@ -233,7 +235,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         results => {
           // Set updated _rev
           this.normDoc._rev = results.rev;
-          this.editable = false;
+          if (this.justUpdateDocument) {
+            this.editable = true;
+          } else {
+            this.justUpdateDocument = false;
+            this.editable = false;
+          }
         },
         error => {
           this.isLoading = false;
@@ -255,15 +262,15 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private setAdditionalNormDocData() {
     console.log('setAdditionalNormDocData');
+    this.currentOwner = this.owners.find(ow => {
+      return this.normDoc.owner === ow.externalID;
+    });
+
     this.revisionDate = new Date(this.normDoc.revisionDate);
 
     if (this.normDoc.owner) {
       this.owner = this.normDoc.owner;
     }
-
-    this.currentOwner = this.owners.find(ow => {
-      return this.normDoc.owner === ow.externalID;
-    });
 
     this.processType = this.normDoc.processType;
     if (this.normDoc.processType) {
@@ -337,7 +344,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     const selectedRelatedNorms = this.processRelatedNorms();
     this.processRelatedFromNorms();
     // write current norm to related norms for "reletedFrom"
-    this.addNormToLinkedNorms(selectedRelatedNorms);
+    this.handleNormToLinkedNorms(selectedRelatedNorms);
     this.setSelectedUser();
     this.setSelectedTags();
     // If there is a new PDF upload add to revisions and attachment Array
@@ -384,6 +391,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private processRelatedNorms(): any[] {
     const selectedRelatedNorms = [];
+
     this.selectedRelatedNorms.forEach(element => {
       selectedRelatedNorms.push(element['_id']);
     });
@@ -395,12 +403,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processRelatedFromNorms() {
-    console.log('processRelatedFromNorms');
-    console.log(this.relatedNormsFrom);
     const selectedRelatedFromNorms = [];
+
     this.relatedNormsFrom.forEach(element => {
       selectedRelatedFromNorms.push(element['id']);
     });
+
     this.normDoc.relatedFrom =
       selectedRelatedFromNorms || this.relatedNormsFrom;
   }
@@ -747,7 +755,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     const filterActive = this.revisionDocuments.filter(
       element => element['isActive']
     );
-    
+
     if (Array.isArray(filterActive) && filterActive.length) {
       this.normDoc.active = true;
     } else {
@@ -793,7 +801,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private addNormToLinkedNorms(relatedNorms: any[]) {
+  private handleNormToLinkedNorms(relatedNorms: any[]) {
     relatedNorms.forEach(relatedNorm => {
       // get the linked Norm
       this.subsink.sink = this.couchDBService
@@ -860,6 +868,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           .subscribe(result => {});
 
         this.readyToSave = true;
+        this.justUpdateDocument = true;
+        this.updateDocument();
       },
       reject: () => {}
     });
@@ -955,6 +965,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       {},
       this.relatedDropdownSettings
     );
+  }
+
+  public toggleActiveState() {
+    this.normDoc.active = !this.normDoc.active;
   }
 
   public onItemSelect(item: any) {}

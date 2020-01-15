@@ -348,7 +348,24 @@
                   <label i18n="@@string-status" class=" col-form-label"
                     >Status</label
                   >
-                  <p-selectButton
+                  <a
+                    class="dynamic-link"
+                    (click)="toggleActiveState()"
+                    [style.pointer-events]="!editable ? 'none' : 'auto'"
+                    style="margin-left: 10px;"
+                  >
+                    <i
+                      [ngStyle]="{
+                        'font-size': '16px'
+                      }"
+                      [ngClass]="
+                        normDoc.active ? 'fas fa-check-circle' : 'fas fa-ban'
+                      "
+                      aria-hidden="true"
+                    ></i
+                  ></a>
+
+                  <!-- <p-selectButton
                     [options]="[
                       {
                         value: true,
@@ -365,7 +382,7 @@
                     class="icon-p-selectButton"
                     [(ngModel)]="normDoc.active"
                     [disabled]="!editable"
-                  ></p-selectButton>
+                  ></p-selectButton> -->
                 </div>
                 <div class="col-sm-6" *ngIf="currentOwner">
                   <span i18n="@@string-responsible"
