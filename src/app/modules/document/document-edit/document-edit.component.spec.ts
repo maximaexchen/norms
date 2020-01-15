@@ -10,7 +10,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
 
 import { NormDocument, User } from '@app/models';
 import { DocumentEditComponent } from './document-edit.component';
-import { FileUploadModule, FileUpload } from 'primeng/fileupload';
+import { FileUploadModule } from 'primeng/fileupload';
 import { FieldsetModule } from 'primeng/fieldset';
 import { DialogModule } from 'primeng/dialog';
 import { GroupModule } from '@app/modules/group/group.module';
@@ -25,7 +25,7 @@ import { Tag } from '@app/models/tag.model';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { of, throwError, Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { NgForm } from '@angular/forms';
+import { EnvService } from '@app/services/env.service';
 
 describe('DocumentEditComponent', () => {
   let componentUnderTest: DocumentEditComponent;
@@ -438,21 +438,44 @@ describe('DocumentEditComponent', () => {
     });
   });
 
-  describe('METHOD onSubmit', () => {
+  /* describe('METHOD onSubmit', () => {
     Given(() => {
+      componentUnderTest.isLoading = false;
+      componentUnderTest.normDoc = {
+        _id: '1',
+        type: 'norm',
+        normNumber: '1',
+        processType: { id: '1' }
+      };
+
+      // componentUnderTest.normForm = {
+      //   value: componentUnderTest.normDoc
+      // } as NgForm;
+
+      // const dormGroupDir: NgModelGroup = new NgModelGroup(null, null, null);
+      // componentUnderTest.normForm.addFormGroup(dormGroupDir);
+
       // @ts-ignores
       spyOn(componentUnderTest.spinner, 'show');
       // @ts-ignores
       spyOn(componentUnderTest, 'assignMultiselectConfig');
-      spyOn(componentUnderTest, 'onSubmit').and.callThrough();
     });
 
     When(
       fakeAsync(() => {
         componentUnderTest.onSubmit();
-        tick();
       })
     );
+
+    describe('GIVEN default call', () => {
+      Then(() => {
+        // @ts-ignores
+        expect(componentUnderTest.spinner.show).toHaveBeenCalled();
+        // @ts-ignores
+        expect(componentUnderTest.assignMultiselectConfig).toHaveBeenCalled();
+        expect(componentUnderTest.isLoading).toBe(true);
+      });
+    });
 
     describe('GIVEN isNew true', () => {
       Given(() => {
@@ -479,6 +502,9 @@ describe('DocumentEditComponent', () => {
         expect(componentUnderTest.updateDocument).toHaveBeenCalled();
       });
     });
+<<<<<<< HEAD
+  }); */
+=======
   });
 
   describe('METHOD saveDocument', () => {
@@ -565,8 +591,9 @@ describe('DocumentEditComponent', () => {
       expect(routerSpy.navigate).toHaveBeenCalledWith(['../document/1/edit']);
     });
   });
+>>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 
-  /* describe('METHOD updateDocument', () => {
+  describe('METHOD updateDocument', () => {
     Given(() => {
       componentUnderTest.normDoc = {
         _id: '1',
@@ -606,5 +633,5 @@ describe('DocumentEditComponent', () => {
     Then(() => {
       expect(componentUnderTest.isLoading).toBe(false);
     });
-  }); */
+  });
 });
