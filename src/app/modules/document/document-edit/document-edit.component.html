@@ -441,9 +441,15 @@
               >
                 <i class="fas fa-file-download"></i> Download Norm
               </button>
-              <!-- <button type="button" (click)="getWatermark(normDoc._id, latestAttachmentName)" *ngIf="latestAttachmentName" title="{{ latestAttachmentName }}" class="btn btn-acp attachmentDownload">
+              <button
+                type="button"
+                (click)="callPHP(normDoc._id, latestAttachmentName)"
+                *ngIf="latestAttachmentName"
+                title="{{ latestAttachmentName }}"
+                class="btn btn-acp attachmentDownload"
+              >
                 <i class="fas fa-file-download"></i> Watermark
-              </button> -->
+              </button>
             </span>
             <hr *ngIf="latestAttachmentName" />
             <div *appIsGranted="'UPDATE'">

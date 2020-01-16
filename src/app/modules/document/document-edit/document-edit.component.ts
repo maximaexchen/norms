@@ -578,6 +578,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       );
   }
 
+  public callPHP(id: string, name: any) {
+    this.documentService.callPHP(id, name);
+  }
+
   public getDownload(id: string, name: any) {
     this.documentService.getDownload(id, name);
   }
