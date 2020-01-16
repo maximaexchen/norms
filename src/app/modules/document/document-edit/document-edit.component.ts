@@ -582,6 +582,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.documentService.getDownload(id, name);
   }
 
+  /* public getWatermark(id: string, name: any) {
+    this.documentService.getWatermark(id, name);
+  } */
+
   /**
    * Data for selectboxes
    *

@@ -4,6 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Subscription, Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'underscore';
+import { PDFDocument, StandardFonts, rgb, degrees } from 'pdf-lib';
 
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
@@ -353,6 +354,80 @@ export class DocumentService {
     );
   }
 
+  public async getWatermark(arrayBuffer: ArrayBuffer) {
+    /* console.log('getWatermark');
+    const url = 'https://pdf-lib.js.org/assets/with_update_sections.pdf';
+    const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer()); */
+    const existingPdfBytes = arrayBuffer;
+
+    console.log(existingPdfBytes);
+
+    const pdfDoc = await PDFDocument.load(existingPdfBytes, {
+      ignoreEncryption: true
+    });
+    const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+    const pages = pdfDoc.getPages();
+    const firstPage = pages[0];
+    const { width, height } = firstPage.getSize();
+    firstPage.drawText('This text was added with JavaScript!', {
+      x: 5,
+      y: height / 2 + 300,
+      size: 50,
+      font: helveticaFont,
+      color: rgb(0.95, 0.1, 0.1),
+      rotate: degrees(-45)
+    });
+
+    const pdfBytes = await pdfDoc.save();
+
+    const newBlob = new Blob([pdfBytes], {
+      type: 'application/pdf'
+    });
+
+    // IE doesn't allow using a blob object directly as link href
+    // instead it is necessary to use msSaveOrOpenBlob
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveOrOpenBlob(newBlob);
+      return;
+    }
+
+    // For other browsers:
+    // Create a link pointing to the ObjectURL containing the blob.
+    const data = window.URL.createObjectURL(newBlob);
+
+    const link = document.createElement('a');
+    link.href = data;
+    link.download = name;
+    // this is necessary as link.click() does not work on the latest firefox
+    link.dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      })
+    );
+
+    setTimeout(() => {
+      // For Firefox it is necessary to delay revoking the ObjectURL
+      window.URL.revokeObjectURL(data);
+      link.remove();
+    }, 100);
+    /* this.processDownload(id, name).subscribe(
+      res => {
+        // It is necessary to create a new blob object with mime-type explicitly set
+        // otherwise only Chrome works like it should
+        const newBlob = new Blob([res], { type: 'application/pdf' });
+      },
+      error => {
+        this.logger.error(error.message);
+      },
+      () => {
+        console.log('created watermark');
+      }
+    ); */
+  }
+
   public processDownload(id: string, documentName: string): Observable<any> {
     const url = '/' + id + '/' + documentName;
 
@@ -368,7 +443,13 @@ export class DocumentService {
       res => {
         // It is necessary to create a new blob object with mime-type explicitly set
         // otherwise only Chrome works like it should
-        const newBlob = new Blob([res], { type: 'application/pdf' });
+        res.arrayBuffer().then(r => {
+          this.getWatermark(r);
+          const uint8View = new Uint8Array(r);
+          console.log(uint8View);
+        });
+
+        /* const newBlob = new Blob([res], { type: 'application/pdf' });
 
         // IE doesn't allow using a blob object directly as link href
         // instead it is necessary to use msSaveOrOpenBlob
@@ -397,7 +478,7 @@ export class DocumentService {
           // For Firefox it is necessary to delay revoking the ObjectURL
           window.URL.revokeObjectURL(data);
           link.remove();
-        }, 100);
+        }, 100); */
       },
       error => {
         this.logger.error(error.message);
