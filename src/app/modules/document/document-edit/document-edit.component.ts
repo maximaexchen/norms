@@ -578,17 +578,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       );
   }
 
-  public callPHP(id: string, name: any) {
-    this.documentService.callPHP(id, name);
+  public downloadPDF(id: string, name: any) {
+    console.log('downloadPDF');
+    this.documentService.downloadPDF(id, name);
   }
 
   public getDownload(id: string, name: any) {
     this.documentService.getDownload(id, name);
   }
-
-  /* public getWatermark(id: string, name: any) {
-    this.documentService.getWatermark(id, name);
-  } */
 
   /**
    * Data for selectboxes

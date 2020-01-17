@@ -1,10 +1,11 @@
-import { first } from 'rxjs/operators';
+import { last, reduce } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 
 import { Subscription, Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'underscore';
+import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
@@ -354,111 +355,92 @@ export class DocumentService {
     );
   }
 
-  public callPHP(id: string, name: string) {
-    console.log('GET Download');
-    this.processDownload(id, name).subscribe(
-      res => {
-        // It is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
-        const newBlob = new Blob([res], { type: 'application/pdf' });
-
-        let file: File;
-
-        let b: any = newBlob;
-        // A Blob() is almost a File() - it's just missing the two properties below which we will add
-        b.lastModifiedDate = new Date();
-        b.name = 'test.pdf';
-
-        // Cast to a File() type
-        file = b as File;
-
-        console.log(file);
-
-        const formdata: FormData = new FormData();
-        formdata.append('file', file);
-
-        this.http
-          .post('http://normenverwaltung/php/outputPDF.php', formdata)
-          .subscribe(
-            response => {
-              console.log(response);
-              //handle response
-            },
-            err => {
-              //handle error
-            }
-          );
-
-        /* const req = new HttpRequest(
-          'POST',
-          'http://normenverwaltung/php/outputPDF.php',
-          formdata,
-          {
-            reportProgress: true,
-            responseType: 'text'
-          }
-        );
-
-        this.http.request(req).subscribe(r => {
-          console.log(r);
-        }); */
-      },
-      error => {
-        this.logger.error(error.message);
-      },
-      () => {
-        console.log('Completed file download.');
-      }
-    );
+  public downloadPDF(id: string, name: string) {
+    this.processDownload(id, name).subscribe(res => {
+      // It is necessary to create a new blob object with mime-type explicitly set
+      // otherwise only Chrome works like it should
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(res);
+      reader.onloadend = event => {
+        // The contents of the BLOB are in reader.results
+        this.addWatermark(reader.result as ArrayBuffer);
+      };
+    });
   }
 
-  /* public callPHP(id: string, documentName: string) {
-    this.processDownload(id, name)
-      .pipe(first())
-      .subscribe(res => {
-        // It is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
-        const newBlob = new Blob([res], { type: 'application/pdf' });
-        let file: File;
+  public async addWatermark(file: ArrayBuffer) {
+    let newBlob: Blob;
+    // This should be a Uint8Array or ArrayBuffer
+    // This data can be obtained in a number of different ways
+    // If your running in a Node environment, you could use fs.readFile()
+    // In the browser, you could make a fetch() call and use res.arrayBuffer()
+    const existingPdfBytes = file;
 
-        let b: any = newBlob;
-        // A Blob() is almost a File() - it's just missing the two properties below which we will add
-        b.lastModifiedDate = new Date();
-        b.name = 'test.pdf';
+    try {
+      // Load a PDFDocument from the existing PDF bytes
+      const pdfDoc = await PDFDocument.load(existingPdfBytes);
 
-        // Cast to a File() type
-        file = b as File;
+      // Embed the Helvetica font
+      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-        console.log(file);
+      // Get the first page of the document
+      const pages = pdfDoc.getPages();
+      const firstPage = pages[0];
 
-        const formdata: FormData = new FormData();
-        formdata.append('file', file);
-        const req = new HttpRequest(
-          'POST',
-          'http://normenverwaltung/php/outputPDF.php',
-          formdata,
-          {
-            reportProgress: true,
-            responseType: 'text'
-          }
-        );
+      // Get the width and height of the first page
+      const { width, height } = firstPage.getSize();
 
-        this.http
-          .request(req)
-
-          .subscribe(r => {
-            console.log(r);
-          });
+      // Draw a string of text diagonally across the first page
+      firstPage.drawText('This text was added with JavaScript!', {
+        x: 5,
+        y: height / 2 + 300,
+        size: 50,
+        font: helveticaFont,
+        color: rgb(0.95, 0.1, 0.1),
+        rotate: degrees(-45)
       });
-  } */
 
-  public processDownload(id: string, documentName: string): Observable<any> {
-    const url = '/' + id + '/' + documentName;
+      // Serialize the PDFDocument to bytes (a Uint8Array)
+      const pdfBytes = await pdfDoc.save();
 
-    return this.http.get(this.couchDBService.dbRequest + url, {
-      responseType: 'blob',
-      headers: new HttpHeaders().append('Content-Type', 'application/pdf')
-    });
+      newBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+    } catch (err) {
+      console.log(err.message);
+      newBlob = new Blob([existingPdfBytes], { type: 'application/pdf' });
+    }
+
+    this.sendDownloadToBrowser(newBlob);
+  }
+
+  public sendDownloadToBrowser(blob: Blob) {
+    // IE doesn't allow using a blob object directly as link href
+    // instead it is necessary to use msSaveOrOpenBlob
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveOrOpenBlob(blob);
+      return;
+    }
+
+    // For other browsers:
+    // Create a link pointing to the ObjectURL containing the blob.
+    const data = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = data;
+    link.download = name;
+    // this is necessary as link.click() does not work on the latest firefox
+    link.dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      })
+    );
+
+    setTimeout(() => {
+      // For Firefox it is necessary to delay revoking the ObjectURL
+      window.URL.revokeObjectURL(data);
+      link.remove();
+    }, 100);
   }
 
   public getDownload(id: string, name: string) {
@@ -521,5 +503,53 @@ export class DocumentService {
         ...renamedObject
       };
     }, {});
+  }
+
+  public callPHP(id: string, name: string) {
+    console.log('callPHP');
+    this.processDownload(id, name).subscribe(
+      res => {
+        // It is necessary to create a new blob object with mime-type explicitly set
+        // otherwise only Chrome works like it should
+        /* const newBlob = new Blob([res], { type: 'application/pdf' });
+
+
+        const file = new File([newBlob], 'test.pdf', {
+          type: 'application/pdf'
+        });
+
+        const formdata: FormData = new FormData();
+        formdata.append('file', file);
+
+        this.http
+          .post('http://normenverwaltung/php/outputPDF.php', formdata)
+          .pipe(last())
+          .subscribe(
+            response => {
+              console.log(response);
+              //handle response
+            },
+            err => {
+              console.log(err);
+              //handle error
+            }
+          ); */
+      },
+      error => {
+        this.logger.error(error.message);
+      },
+      () => {
+        console.log('Completed file download.');
+      }
+    );
+  }
+
+  public processDownload(id: string, documentName: string): Observable<any> {
+    const url = '/' + id + '/' + documentName;
+
+    return this.http.get(this.couchDBService.dbRequest + url, {
+      responseType: 'blob',
+      headers: new HttpHeaders().append('Content-Type', 'application/pdf')
+    });
   }
 }
