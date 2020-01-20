@@ -15,43 +15,48 @@ const routes: Routes = [
     path: 'document',
     // loadChildren: './modules/document/document.module#DocumentModule',
     loadChildren: () =>
-      import('./modules/document/document.module#DocumentModule').then(
-        m => m.DocumentModule
-      ),
+      import('./modules/document/document.module').then(m => m.DocumentModule),
     canActivate: [AuthGuardService]
   },
   {
     path: 'tag',
-    loadChildren: './modules/tag/tag.module#TagModule',
+    loadChildren: () =>
+      import('./modules/tag/tag.module').then(m => m.TagModule),
     canActivate: [AuthGuardService]
   },
   {
     path: 'group',
-    loadChildren: './modules/group/group.module#GroupModule',
+    loadChildren: () =>
+      import('./modules/group/group.module').then(m => m.GroupModule),
     canActivate: [AuthGuardService]
   },
   {
     path: 'user',
-    loadChildren: './modules/user/user.module#UserModule',
+    loadChildren: () =>
+      import('./modules/user/user.module').then(m => m.UserModule),
     canActivate: [AuthGuardService]
   },
   {
     path: 'role',
-    loadChildren: './modules/role/role.module#RoleModule',
+    loadChildren: () =>
+      import('./modules/role/role.module').then(m => m.RoleModule),
     canActivate: [AuthGuardService]
   },
   {
     path: 'admin',
-    loadChildren: './modules/admin/admin.module#AdminModule',
+    loadChildren: () =>
+      import('./modules/admin/admin.module').then(m => m.AdminModule),
     canActivate: [AuthGuardService]
   },
   {
     path: 'login',
-    loadChildren: './modules/auth/auth.module#AuthModule'
+    loadChildren: () =>
+      import('./modules/auth/auth.module').then(m => m.AuthModule)
   },
   {
     path: 'logout',
-    loadChildren: './modules/auth/auth.module#AuthModule'
+    loadChildren: () =>
+      import('./modules/auth/auth.module').then(m => m.AuthModule)
   }
 ];
 
