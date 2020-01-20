@@ -32,7 +32,8 @@
               "src/server-service.js",
               "src/server-service.bat",
               "src/private.key",
-              "src/public.key"
+              "src/public.key",
+              { "glob": "**/*", "input": "./php", "output": "/php/" }
             ],
             "styles": ["src/styles.scss"],
             "scripts": []

@@ -5,7 +5,7 @@ import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
 import { Subscription, Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'underscore';
-import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+/* import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib'; */
 
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
@@ -355,7 +355,7 @@ export class DocumentService {
     );
   }
 
-  public downloadPDF(id: string, name: string) {
+  /* public downloadPDF(id: string, name: string) {
     this.processDownload(id, name).subscribe(res => {
       // It is necessary to create a new blob object with mime-type explicitly set
       // otherwise only Chrome works like it should
@@ -366,9 +366,9 @@ export class DocumentService {
         this.addWatermark(reader.result as ArrayBuffer);
       };
     });
-  }
+  } */
 
-  public async addWatermark(file: ArrayBuffer) {
+  /* public async addWatermark(file: ArrayBuffer) {
     let newBlob: Blob;
     // This should be a Uint8Array or ArrayBuffer
     // This data can be obtained in a number of different ways
@@ -410,7 +410,7 @@ export class DocumentService {
     }
 
     this.sendDownloadToBrowser(newBlob);
-  }
+  } */
 
   public sendDownloadToBrowser(blob: Blob) {
     // IE doesn't allow using a blob object directly as link href
@@ -441,6 +441,44 @@ export class DocumentService {
       window.URL.revokeObjectURL(data);
       link.remove();
     }, 100);
+  }
+
+  public downloadPDFwithPHP(id: string, name: string) {
+    console.log('downloadPDFwithPHP');
+    this.processDownload(id, name).subscribe(
+      res => {
+        // It is necessary to create a new blob object with mime-type explicitly set
+        // otherwise only Chrome works like it should
+        const newBlob = new Blob([res], { type: 'application/pdf' });
+
+        const file = new File([newBlob], 'test.pdf', {
+          type: 'application/pdf'
+        });
+
+        const formdata: FormData = new FormData();
+        formdata.append('file', file);
+
+        this.http
+          .post('http://normenverwaltung/php/outputPDF.php', formdata)
+          .pipe(last())
+          .subscribe(
+            response => {
+              console.log(response);
+              //handle response
+            },
+            err => {
+              console.log(err);
+              //handle error
+            }
+          );
+      },
+      error => {
+        this.logger.error(error.message);
+      },
+      () => {
+        console.log('Completed file download.');
+      }
+    );
   }
 
   public getDownload(id: string, name: string) {
@@ -503,44 +541,6 @@ export class DocumentService {
         ...renamedObject
       };
     }, {});
-  }
-
-  public callPHP(id: string, name: string) {
-    console.log('callPHP');
-    this.processDownload(id, name).subscribe(
-      res => {
-        // It is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
-        const newBlob = new Blob([res], { type: 'application/pdf' });
-
-        const file = new File([newBlob], 'test.pdf', {
-          type: 'application/pdf'
-        });
-
-        const formdata: FormData = new FormData();
-        formdata.append('file', file);
-
-        this.http
-          .post('http://normenverwaltung/php/outputPDF.php', formdata)
-          .pipe(last())
-          .subscribe(
-            response => {
-              console.log(response);
-              //handle response
-            },
-            err => {
-              console.log(err);
-              //handle error
-            }
-          );
-      },
-      error => {
-        this.logger.error(error.message);
-      },
-      () => {
-        console.log('Completed file download.');
-      }
-    );
   }
 
   public processDownload(id: string, documentName: string): Observable<any> {
