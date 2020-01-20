@@ -1,4 +1,6 @@
 <?php
+error_reporting(E_ERROR | E_PARSE);
+
 if (!defined('DOCROOT')) {
     define('DOCROOT', __DIR__ . '/');
 }
@@ -8,15 +10,15 @@ define('PROGRAM_PDFTK', 'C:\\web_software\\PDFtk\\bin\\pdftk.exe');
 define('PROGRAM_IMAGEMAGICK_CONVERT', 'C:\\web_software\\ImageMagick\\convert.exe');
 define('PROGRAM_IMAGEMAGICK_IDENTIFY', 'C:\\web_software\\ImageMagick\\identify.exe');
 
-var_dump($_FILES);
+$file = normenWatermark($_FILES['file']['tmp_name'], '1', 'WATERMARK', 26);
 
-
-normenWatermark($_FILES['file']['tmp_name'], '1', 'WATERMARK', 26);
+$fsize = filesize($file);
 
 function normenMeasurePDF($file)
 {
     $pages = array();
     $tmpfolder = TEMPDIR.'\\'.time().'_'.str_pad(rand(1, 1000), 4, '0', STR_PAD_LEFT);
+
     if (is_file($file)) {
         if (!is_dir($tmpfolder)) {
             mkdir($tmpfolder);
@@ -63,12 +65,10 @@ function normenMeasurePDF($file)
 
 function normenWatermark($file, $id, $text, $fontScale = 26)
 {
-
     $pages = normenMeasurePDF($file);
 
-
-    if (is_array($pages) && count($pages)) {
-
+    if (is_array($pages) && count($pages))
+    {
         include_once(DOCROOT.'/3rdparty/tcpdf_6_2_8/tcpdf.php');
 
         class MYPDF extends TCPDF
@@ -89,8 +89,9 @@ function normenWatermark($file, $id, $text, $fontScale = 26)
 
         $ppt = 0.352777778;
         $page = 1;
-        foreach ($pages as $pageinfo) {
 
+        foreach ($pages as $pageinfo)
+        {
             $orientation = $pageinfo['height'] >= $pageinfo['width'] ? 'P' : 'L';
             $pdf->AddPage($orientation, array($pageinfo['width'] * $ppt, $pageinfo['height'] * $ppt));
 
@@ -117,20 +118,35 @@ function normenWatermark($file, $id, $text, $fontScale = 26)
 
         $pdf->Output($tmp_filename, 'F');
 
-        if (is_file($tmp_filename)) {
+        if (is_file($tmp_filename))
+        {
             $tmp_filename2 = TEMPDIR.'\\normen_watermark_'.$id.'_stamped.pdf';
 
             $run = PROGRAM_PDFTK." \"".$file."\" multistamp \"".$tmp_filename."\" output \"".$tmp_filename2."\" dont_ask";
 
             shell_exec($run);
 
-            if (is_file($tmp_filename2)) {
+            if (is_file($tmp_filename2))
+            {
                 $file = $tmp_filename2;
+
+                return $file;
             }
         }
     }
 
     return $file;
 }
+// Quick check to verify that the file exists
+if( !file_exists($file) ) die("File not found");
 
-?>
+// Force the download
+header("Pragma: no-cache");
+header("Content-type: application/pdf", true);
+//header("Accept-Ranges: bytes");
+header("Content-Disposition: attachment; filename=norm.pdf");
+//header("Content-Length: " . filesize($file));
+//header("Content-Type: application/octet-stream;");
+ob_clean();   // discard any data in the output buffer (if possible)
+flush();      // flush headers (if pos
+readfile($file);

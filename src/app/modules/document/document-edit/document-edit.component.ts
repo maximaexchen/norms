@@ -579,7 +579,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   public downloadPDFwithPHP(id: string, name: any) {
-    console.log('downloadPDFwithPHP');
     this.documentService.downloadPDFwithPHP(id, name);
   }
 

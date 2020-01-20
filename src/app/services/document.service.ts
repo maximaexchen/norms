@@ -1,6 +1,11 @@
-import { last, reduce } from 'rxjs/operators';
+import { last, reduce, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpRequest } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpRequest,
+  HttpResponse
+} from '@angular/common/http';
 
 import { Subscription, Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
@@ -355,6 +360,14 @@ export class DocumentService {
     );
   }
 
+  /*
+  ######################################################
+  ## JAVASCRIPT Version of PDF WATERMARK creation
+  ## does not work with typescript verion below 3.7
+  ## but angular 8 does not support that. Maybe in future
+  ######################################################
+  */
+
   /* public downloadPDF(id: string, name: string) {
     this.processDownload(id, name).subscribe(res => {
       // It is necessary to create a new blob object with mime-type explicitly set
@@ -413,6 +426,9 @@ export class DocumentService {
   } */
 
   public sendDownloadToBrowser(blob: Blob) {
+    // It is necessary to have a new blob object with mime-type explicitly set
+    // otherwise only Chrome works like it should
+
     // IE doesn't allow using a blob object directly as link href
     // instead it is necessary to use msSaveOrOpenBlob
     if (window.navigator && window.navigator.msSaveOrOpenBlob) {
@@ -444,79 +460,37 @@ export class DocumentService {
   }
 
   public downloadPDFwithPHP(id: string, name: string) {
-    console.log('downloadPDFwithPHP');
-    this.processDownload(id, name).subscribe(
-      res => {
-        // It is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
-        const newBlob = new Blob([res], { type: 'application/pdf' });
+    console.log('downloadPDFwithPHP2');
+    this.processDownload(id, name)
+      .pipe(
+        switchMap(res => {
+          const newBlob = new Blob([res], { type: 'application/pdf' });
+          const file = new File([newBlob], 'test.pdf', {
+            type: 'application/pdf'
+          });
 
-        const file = new File([newBlob], 'test.pdf', {
-          type: 'application/pdf'
-        });
+          const formdata: FormData = new FormData();
+          formdata.append('file', file);
 
-        const formdata: FormData = new FormData();
-        formdata.append('file', file);
-
-        this.http
-          .post('http://normenverwaltung/php/outputPDF.php', formdata)
-          .pipe(last())
-          .subscribe(
-            response => {
-              console.log(response);
-              //handle response
-            },
-            err => {
-              console.log(err);
-              //handle error
-            }
+          return this.http.post(
+            'http://normenverwaltung/php/outputPDF.php',
+            formdata,
+            { observe: 'response', responseType: 'blob' }
           );
-      },
-      error => {
-        this.logger.error(error.message);
-      },
-      () => {
-        console.log('Completed file download.');
-      }
-    );
+        })
+      )
+      .subscribe(blob => {
+        const newblob = new Blob([blob.body], { type: 'application/pdf' });
+        this.sendDownloadToBrowser(newblob);
+      });
   }
 
   public getDownload(id: string, name: string) {
     console.log('GET Download');
     this.processDownload(id, name).subscribe(
       res => {
-        // It is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
         const newBlob = new Blob([res], { type: 'application/pdf' });
-
-        // IE doesn't allow using a blob object directly as link href
-        // instead it is necessary to use msSaveOrOpenBlob
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(newBlob);
-          return;
-        }
-
-        // For other browsers:
-        // Create a link pointing to the ObjectURL containing the blob.
-        const data = window.URL.createObjectURL(newBlob);
-
-        const link = document.createElement('a');
-        link.href = data;
-        link.download = name;
-        // this is necessary as link.click() does not work on the latest firefox
-        link.dispatchEvent(
-          new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-          })
-        );
-
-        setTimeout(() => {
-          // For Firefox it is necessary to delay revoking the ObjectURL
-          window.URL.revokeObjectURL(data);
-          link.remove();
-        }, 100);
+        this.sendDownloadToBrowser(newBlob);
       },
       error => {
         this.logger.error(error.message);
