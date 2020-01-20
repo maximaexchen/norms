@@ -511,8 +511,7 @@ export class DocumentService {
       res => {
         // It is necessary to create a new blob object with mime-type explicitly set
         // otherwise only Chrome works like it should
-        /* const newBlob = new Blob([res], { type: 'application/pdf' });
-
+        const newBlob = new Blob([res], { type: 'application/pdf' });
 
         const file = new File([newBlob], 'test.pdf', {
           type: 'application/pdf'
@@ -533,7 +532,7 @@ export class DocumentService {
               console.log(err);
               //handle error
             }
-          ); */
+          );
       },
       error => {
         this.logger.error(error.message);

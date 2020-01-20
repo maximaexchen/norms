@@ -448,7 +448,11 @@
                 title="{{ latestAttachmentName }}"
                 class="btn btn-acp attachmentDownload"
               >
-                <i class="fas fa-file-download"></i> Watermark
+                <i class="fas fa-file-download"></i> Watermark (js)
+              </button>
+
+              <button type="button" (click)="downloadPDF(normDoc._id, latestAttachmentName)" *ngIf="latestAttachmentName" title="{{ latestAttachmentName }}" class="btn btn-acp attachmentDownload">
+                <i class="fas fa-file-download"></i> Watermark (php)
               </button>
             </span>
             <hr *ngIf="latestAttachmentName" />

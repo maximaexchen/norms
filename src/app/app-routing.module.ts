@@ -13,7 +13,11 @@ const routes: Routes = [
   { path: 'start', component: StartComponent, canActivate: [AuthGuardService] },
   {
     path: 'document',
-    loadChildren: './modules/document/document.module#DocumentModule',
+    // loadChildren: './modules/document/document.module#DocumentModule',
+    loadChildren: () =>
+      import('./modules/document/document.module#DocumentModule').then(
+        m => m.DocumentModule
+      ),
     canActivate: [AuthGuardService]
   },
   {
