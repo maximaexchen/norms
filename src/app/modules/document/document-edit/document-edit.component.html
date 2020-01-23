@@ -433,8 +433,8 @@
             <hr *ngIf="latestAttachmentName" />
 
             <span *ngIf="!latestAttachmentName">
-              <span *ngIf="!isAdmin && !isOwner">
-                Keine Norm Aktiv
+              <span *ngIf="!isAdmin && !isOwner" class="alert alert-warning" i18n="@@string-no-norm-active">
+                Es ist keine Keine Norm aktiv
               </span>
             </span>
 

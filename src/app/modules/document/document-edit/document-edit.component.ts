@@ -599,9 +599,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   } */
 
   public getDownload(id: string, name: any) {
-    console.log('getDownload');
-    console.log(id);
-    console.log(name);
     this.documentService.getDownload(id, name);
   }
 
