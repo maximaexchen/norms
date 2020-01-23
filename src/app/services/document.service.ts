@@ -172,7 +172,7 @@ export class DocumentService {
         }
 
         const relatedItem = {
-          id: mapped['_id'],
+          _id: mapped['_id'],
           normNumber: mapped['normNumber'],
           revision: mapped['revision'],
           description: revDescription

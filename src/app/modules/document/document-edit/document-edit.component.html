@@ -431,17 +431,23 @@
               </div>
             </div>
             <hr *ngIf="latestAttachmentName" />
-            <span *ngIf="normDoc.active">
-              <button
-                type="button"
-                (click)="getDownload(normDoc._id, latestAttachmentName)"
-                *ngIf="latestAttachmentName"
-                title="{{ latestAttachmentName }}"
-                class="btn btn-acp attachmentDownload"
-              >
-                <i class="fas fa-file-download"></i> Download Norm
-              </button>
-              <!-- <button
+
+            <span *ngIf="!latestAttachmentName">
+              <span *ngIf="!isAdmin && !isOwner">
+                Keine Norm Aktiv
+              </span>
+            </span>
+
+            <button
+              type="button"
+              (click)="getDownload(normDoc._id, latestAttachmentName)"
+              *ngIf="latestAttachmentName"
+              title="{{ latestAttachmentName }}"
+              class="btn btn-acp attachmentDownload"
+            >
+              <i class="fas fa-file-download"></i> Download Norm
+            </button>
+            <!-- <button
                 type="button"
                 (click)="downloadPDF(normDoc._id, latestAttachmentName)"
                 *ngIf="latestAttachmentName"
@@ -451,7 +457,7 @@
                 <i class="fas fa-file-download"></i> Watermark (js)
               </button> -->
 
-              <button
+            <!-- <button
                 type="button"
                 (click)="downloadPDFwithPHP(normDoc._id, latestAttachmentName)"
                 *ngIf="latestAttachmentName"
@@ -459,8 +465,8 @@
                 class="btn btn-acp attachmentDownload"
               >
                 <i class="fas fa-file-download"></i> Watermark (php)
-              </button>
-            </span>
+              </button> -->
+
             <hr *ngIf="latestAttachmentName" />
             <div *appIsGranted="'UPDATE'">
               <p-fieldset
@@ -525,12 +531,13 @@
               <div class="col-sm-10">
                 <angular2-multiselect
                   name="relatedNormsSelectList"
+                  class="relatedNormsSelectList"
                   [data]="relatedNormsSelectList"
                   [(ngModel)]="selectedRelatedNorms"
                   [settings]="relatedDropdownSettings"
-                  (onSelect)="onItemSelect($event)"
-                  (onDeSelect)="onItemDeSelect($event)"
-                  (onSelectAll)="onSelectAll($event)"
+                  (onSelect)="onRelatedNormSelect($event)"
+                  (onDeSelect)="onRelatedNormDeSelect($event)"
+                  (onSelectAll)="onRelatedNormSelectAll($event)"
                   (onDeSelectAll)="onDeSelectAllRelatedNorms($event)"
                 >
                   <c-item>
@@ -588,7 +595,7 @@
                           type="button"
                           [disabled]="normForm.invalid || !editable"
                           class="btn dynamic-link "
-                          (click)="deleteRelated(related.id)"
+                          (click)="removeRelatedFromList(related._id)"
                         >
                           <i class="fas fa-trash"></i>
                           <span i18n="@@string-delete"> Löschen</span>

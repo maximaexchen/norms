@@ -61,7 +61,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   relatedNormsSelectList: NormDocument[] = [];
   selectedRelatedNorms: NormDocument[] = [];
-  selectedRelatedNormsUpdate: NormDocument[] = [];
+  selectedRelatedNormsState: NormDocument[] = [];
   relatedNormsFrom: NormDocument[] = [];
 
   revisionDocuments: RevisionDocument[] = [];
@@ -223,6 +223,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private updateDocument(): void {
+    console.log('updateDocument');
+
     this.isLoading = true;
     this.processFormData();
 
@@ -232,29 +234,33 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         results => {
           // Set updated _rev
           this.normDoc._rev = results.rev;
-          if (this.justUpdateDocument) {
+          /* if (this.justUpdateDocument) {
             this.editable = true;
           } else {
-            this.justUpdateDocument = false;
             this.editable = false;
-          }
+          } */
+
+          this.justUpdateDocument === true
+            ? (this.editable = true)
+            : (this.editable = false);
+
+          this.justUpdateDocument = false;
         },
         error => {
-          this.isLoading = false;
-          this.spinner.hide();
           this.logger.error(error.message);
           this.showConfirmation('error', error.message);
         },
         () => {
           // Inform about database change.
-          this.isLoading = false;
-          this.spinner.hide();
           this.sendStateUpdate(this.normDoc._id, 'update');
           this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
           this.normForm.form.markAsPristine();
         }
       );
+
+    this.isLoading = false;
+    this.spinner.hide();
   }
 
   private setAdditionalNormDocData() {
@@ -348,7 +354,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processFormData() {
+    console.log('processFormData');
+
     const selectedRelatedNorms = this.processRelatedNorms();
+
     this.processRelatedFromNorms();
     // write current norm to related norms for "reletedFrom"
     this.handleNormToLinkedNorms(selectedRelatedNorms);
@@ -397,6 +406,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processRelatedNorms(): any[] {
+    console.log('processRelatedNorms');
     const selectedRelatedNorms = [];
 
     this.selectedRelatedNorms.forEach(element => {
@@ -809,6 +819,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private setRelatedNorms(relatedNorms: any[]) {
     this.documentService.setRelated(relatedNorms).then(res => {
       this.selectedRelatedNorms = res;
+      // deep copy of result
+      this.selectedRelatedNormsState = JSON.parse(JSON.stringify(res));
     });
   }
 
@@ -855,7 +867,29 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.router.navigate(['../document/' + id + '/edit']);
   }
 
-  public deleteRelated(id: string) {
+  public deleteRelated() {
+    console.log('deleteRelated');
+
+    const difference = this.selectedRelatedNormsState.filter(
+      ({ _id: id1 }) =>
+        !this.selectedRelatedNorms.some(({ _id: id2 }) => id2 === id1)
+    );
+
+    this.normDoc.relatedNorms = difference.map(x => x._id);
+
+    console.log(difference);
+    console.log(this.normDoc.relatedNorms);
+  }
+
+  public removeRelatedFromList(id: string) {
+    this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
+      item => item['_id'] !== id
+    );
+
+    this.deleteRelated();
+  }
+
+  public deleteRelated2(id: string) {
     this.confirmationService.confirm({
       message:
         'Sie wollen die Referenz wirklich ' +
@@ -988,10 +1022,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.normDoc.active = !this.normDoc.active;
   }
 
-  public onItemSelect(item: any) {}
-  public onItemDeSelect(item: any) {}
-  public onSelectAll(items: any) {}
-  public onDeSelectAll(items: any) {}
+  public onRelatedNormSelect(item: any) {}
+
+  public onRelatedNormDeSelect(item: any) {}
+  public onRelatedNormSelectAll(items: any) {}
+
+  public onDeSelectAllRelatedNorms(items: any) {
+    this.deleteRelated();
+  }
   public onDeSelectAllTag1(items: any) {
     this.selectedTags1 = [];
   }
@@ -1004,13 +1042,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedTags3 = [];
   }
 
-  public onDeSelectAllRelatedNorms(items: any) {
-    this.selectedRelatedNorms = [];
-  }
-
   public onDeSelectAllSelectedUsers(items: any) {
     this.selectedUsers = [];
   }
+
+  public onItemSelect(item: any) {}
+  public onItemDeSelect(item: any) {}
+  public onSelectAll(items: any) {}
+  public onDeSelectAll(items: any) {}
 
   ngOnDestroy(): void {
     this.subsink.unsubscribe();
