@@ -407,6 +407,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private processRelatedNorms(): any[] {
     console.log('processRelatedNorms');
+    this.deleteRelated();
     const selectedRelatedNorms = [];
 
     this.selectedRelatedNorms.forEach(element => {
@@ -599,6 +600,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   public getDownload(id: string, name: any) {
     console.log('getDownload');
+    console.log(id);
+    console.log(name);
     this.documentService.getDownload(id, name);
   }
 
@@ -870,27 +873,53 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public deleteRelated() {
     console.log('deleteRelated');
 
-    const difference = this.selectedRelatedNormsState.filter(
+    const difference1 = this.selectedRelatedNormsState.filter(
       ({ _id: id1 }) =>
         !this.selectedRelatedNorms.some(({ _id: id2 }) => id2 === id1)
     );
 
-    this.normDoc.relatedNorms = difference.map(x => x._id);
+    const difference2 = this.selectedRelatedNormsState.filter(({ _id: id1 }) =>
+      this.selectedRelatedNorms.some(({ _id: id2 }) => id2 === id1)
+    );
 
-    console.log(difference);
+    this.normDoc.relatedNorms = difference1.map(x => x._id);
+
+    console.log(difference1);
+    console.log(difference2);
+    console.log(this.selectedRelatedNormsState);
     console.log(this.normDoc.relatedNorms);
+
+    difference1.forEach(element => {
+      this.deleteRelated2(element._id);
+    });
   }
 
   public removeRelatedFromList(id: string) {
     this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
       item => item['_id'] !== id
     );
-
-    this.deleteRelated();
   }
 
   public deleteRelated2(id: string) {
-    this.confirmationService.confirm({
+    // get the linked Norm
+    this.couchDBService
+      .fetchEntry('/' + id)
+      .pipe(
+        switchMap(linkedNorm => {
+          const filtered = linkedNorm.relatedFrom.filter(relNorm => {
+            return relNorm !== this.normDoc._id;
+          });
+
+          linkedNorm.relatedFrom = filtered;
+
+          return this.couchDBService
+            .updateEntry(linkedNorm, linkedNorm['_id'])
+            .pipe(tap(r => {}));
+        })
+      )
+      .subscribe(result => {});
+
+    /* this.confirmationService.confirm({
       message:
         'Sie wollen die Referenz wirklich ' +
         'entfernen?<br><strong><span class="text-warning">' +
@@ -923,7 +952,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.updateDocument();
       },
       reject: () => {}
-    });
+    }); */
   }
 
   private showConfirmation(type: string, result: string) {

@@ -487,6 +487,8 @@ export class DocumentService {
 
   public getDownload(id: string, name: string) {
     console.log('GET Download');
+    console.log(id);
+    console.log(name);
     this.processDownload(id, name).subscribe(
       res => {
         const newBlob = new Blob([res], { type: 'application/pdf' });

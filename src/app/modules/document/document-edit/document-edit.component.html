@@ -572,7 +572,7 @@
                   <tbody>
                     <tr *ngFor="let related of selectedRelatedNorms">
                       <td>
-                        <a class="dynamic-link" (click)="goToNorm(related.id)"
+                        <a class="dynamic-link" (click)="goToNorm(related._id)"
                           ><i class="fas fa-link"></i>
                           {{ related.normNumber }}</a
                         >
@@ -584,7 +584,7 @@
                           *ngIf="related.normFileName"
                           class="dynamic-link"
                           (click)="
-                            getDownload(related.id, related.normFileName)
+                            getDownload(related._id, related.normFileName)
                           "
                           ><i class="fas fa-file-download"></i>
                           Download
@@ -634,7 +634,7 @@
                       <td>
                         <a
                           class="dynamic-link"
-                          (click)="goToNorm(relatedFrom.id)"
+                          (click)="goToNorm(relatedFrom._id)"
                           ><i class="fas fa-link"></i>
                           {{ relatedFrom.normNumber }}</a
                         >
@@ -647,7 +647,7 @@
                           class="dynamic-link"
                           (click)="
                             getDownload(
-                              relatedFrom.id,
+                              relatedFrom._id,
                               relatedFrom.normFileName
                             )
                           "
