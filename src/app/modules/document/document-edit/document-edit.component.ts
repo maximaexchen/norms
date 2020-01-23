@@ -407,7 +407,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private processRelatedNorms(): any[] {
     console.log('processRelatedNorms');
-    this.deleteRelated();
+    this.removeRelated();
     const selectedRelatedNorms = [];
 
     this.selectedRelatedNorms.forEach(element => {
@@ -867,7 +867,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.router.navigate(['../document/' + id + '/edit']);
   }
 
-  public deleteRelated() {
+  public removeRelated() {
     console.log('deleteRelated');
 
     const difference1 = this.selectedRelatedNormsState.filter(
@@ -881,13 +881,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
     this.normDoc.relatedNorms = difference1.map(x => x._id);
 
-    console.log(difference1);
-    console.log(difference2);
-    console.log(this.selectedRelatedNormsState);
-    console.log(this.normDoc.relatedNorms);
-
     difference1.forEach(element => {
-      this.deleteRelated2(element._id);
+      this.deleteRelated(element._id);
     });
   }
 
@@ -897,7 +892,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  public deleteRelated2(id: string) {
+  public deleteRelated(id: string) {
     // get the linked Norm
     this.couchDBService
       .fetchEntry('/' + id)
@@ -915,41 +910,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         })
       )
       .subscribe(result => {});
-
-    /* this.confirmationService.confirm({
-      message:
-        'Sie wollen die Referenz wirklich ' +
-        'entfernen?<br><strong><span class="text-warning">' +
-        'Bitte Norm speichern nicht vergessen!!</span></strong>',
-      accept: () => {
-        this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
-          item => item['id'] !== id
-        );
-
-        // get the linked Norm
-        this.couchDBService
-          .fetchEntry('/' + id)
-          .pipe(
-            switchMap(linkedNorm => {
-              const filtered = linkedNorm.relatedFrom.filter(relNorm => {
-                return relNorm !== this.normDoc._id;
-              });
-
-              linkedNorm.relatedFrom = filtered;
-
-              return this.couchDBService
-                .updateEntry(linkedNorm, linkedNorm['_id'])
-                .pipe(tap(r => {}));
-            })
-          )
-          .subscribe(result => {});
-
-        this.readyToSave = true;
-        this.justUpdateDocument = true;
-        this.updateDocument();
-      },
-      reject: () => {}
-    }); */
   }
 
   private showConfirmation(type: string, result: string) {
@@ -1054,7 +1014,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   public onRelatedNormSelectAll(items: any) {}
 
   public onDeSelectAllRelatedNorms(items: any) {
-    this.deleteRelated();
+    this.removeRelated();
   }
   public onDeSelectAllTag1(items: any) {
     this.selectedTags1 = [];
