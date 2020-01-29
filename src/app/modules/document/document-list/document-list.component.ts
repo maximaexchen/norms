@@ -103,44 +103,14 @@ export class DocumentListComponent implements OnInit, OnDestroy {
       .toPromise();
   }
 
-  /* private joinOwnerDataToNorm(docs: NormDocument[]): NormDocument[] {
-    docs.forEach(doc => {
-      if (!!doc.owner) {
-        const ownerData = _.filter(this.owners, owner => {
-          return owner['externalID'] === doc.owner;
-        });
-        doc['ownerExtended'] = ownerData[0];
-
-        return doc;
-      }
-    });
-
-    return docs;
-  }
-
-  private filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
-    return docs.filter(element => {
-      if (this.authService.isAdmin()) {
-        return element;
-      }
-      if (!!element.owner) {
-        if (element.owner === this.authService.getCurrentUserExternalID()) {
-          return element;
-        } else {
-          return element['active'] === true ? element : undefined;
-        }
-      }
-
-      return;
-    });
-  } */
-
   private initDocumentList(result: any) {
     this.currentUserId = this.authService.getCurrentUserID();
     this.documents = result;
 
     this.documentService.joinOwnerDataToNorm(this.documents, this.owners);
-    this.documentService.filterDocumentsByAccess(this.documents);
+    this.documents = this.documentService.filterDocumentsByAccess(
+      this.documents
+    );
     this.documentService.setPublisherFromTags(this.documents);
 
     this.documentCount = this.documents.length;
@@ -166,7 +136,9 @@ export class DocumentListComponent implements OnInit, OnDestroy {
     }
 
     this.documentService.joinOwnerDataToNorm(this.documents, this.owners);
-    this.documentService.filterDocumentsByAccess(this.documents);
+    this.documents = this.documentService.filterDocumentsByAccess(
+      this.documents
+    );
     this.documentService.setPublisherFromTags(this.documents);
     // If the list is filtered, we have to reset the filter to reflect teh updated list values
     this.resetFilter();

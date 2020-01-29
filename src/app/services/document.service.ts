@@ -19,6 +19,7 @@ import { User } from '@app/models/user.model';
 import { NormDocument } from './../models/document.model';
 import { Group } from '@app/models/group.model';
 import { Tag } from '@app/models/tag.model';
+import { ParseTreeResult } from '@angular/compiler';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
@@ -78,17 +79,18 @@ export class DocumentService {
   public filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
     return docs.filter(element => {
       if (this.authService.isAdmin()) {
-        return element;
+        return true;
       }
+
       if (!!element.owner) {
         if (element.owner === this.authService.getCurrentUserExternalID()) {
-          return element;
+          return true;
         } else {
-          return element['active'] === true ? element : undefined;
+          return element['active'] === true ? true : false;
         }
       }
 
-      return;
+      return false;
     });
   }
 
