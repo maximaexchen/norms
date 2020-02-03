@@ -93,15 +93,24 @@ app.post('/api/upload', function(req, res) {
     if (err) {
       return res.end('Error uploading file: ' + err);
     } else {
+      console.log('req.files: ' + JSON.stringify(req.files));
       let tempPath = './' + req.files[0].path;
       let copyPath =
         req.body.uploadDir + req.body.createID + '/' + req.files[0].filename;
       // Move file in synamic generated Directory
       console.log('tempPath: ' + tempPath);
       console.log('copyPath: ' + copyPath);
+
       fs.move(tempPath, copyPath, function(err) {
         if (err) return console.error(err);
+
+        fs.emptyDir('./uploadsTemp/', err => {
+          if (err) return console.error(err);
+
+          console.log('success empty temp dir !');
+        });
       });
+
       res.json({
         file: copyPath,
         fileName: req.files[0].filename,

@@ -433,10 +433,9 @@
             <hr *ngIf="latestAttachmentName" />
 
             <span *ngIf="!latestAttachmentName">
-              <div *ngIf="!isAdmin && !isOwner" class="alert alert-primary">
+              <div *ngIf="!isAdmin && !isOwner" class="alert alert-danger">
                 <span class="fa-stack fa-lg">
-                  <i class="fas fa-circle fa-stack-2x"></i>
-                  <i class="fas fa-times fa-stack-1x fa-inverse"></i>
+                  <i class="fas fa-ban fa-stack-1x "></i>
                 </span>
                 <span i18n="@@string-no-norm-active" style="padding-left: 10px;"
                   >Es ist keine Norm aktiv</span

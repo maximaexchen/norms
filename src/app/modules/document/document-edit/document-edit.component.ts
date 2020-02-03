@@ -366,6 +366,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // If there is a new PDF upload add to revisions and attachment Array
     this.addNewRevision();
 
+    console.log('this.fileUpload');
+    console.log(this.fileUpload);
+
     if (this.fileUpload) {
       this.uploadFileToServer();
     }
@@ -584,6 +587,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.showConfirmation('error', error.message);
         },
         () => {
+          if (this.fileUpload) {
+            this.fileUpload = null;
+          }
           this.showConfirmation('success', 'Upload erfolgreich');
         }
       );
