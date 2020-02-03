@@ -111,11 +111,17 @@ app.post('/api/upload', function(req, res) {
         });
       });
 
-      res.json({
+      const respObject = {
         file: copyPath,
         fileName: req.files[0].filename,
         success: 'File has been uploaded'
-      });
+      };
+
+      console.log('respObject');
+      console.log(respObject);
+      console.log('respObject');
+
+      res.json(respObject);
     }
   });
 });
