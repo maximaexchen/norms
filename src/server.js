@@ -109,7 +109,7 @@ app.post('/api/upload', function(req, res) {
 
           console.log('success empty temp dir !');
 
-          fs.writeFile('.gitkeep', '!', function(err) {
+          fs.writeFile('./uploadsTemp/.gitkeep', '', function(err) {
             if (err) throw err;
             console.log('Saved!');
           });
