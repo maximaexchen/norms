@@ -1008,6 +1008,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.normDoc.active = !this.normDoc.active;
   }
 
+  public isEmptyObject(obj) {
+    console.log(obj);
+    console.log(Object.keys(obj));
+    return obj && Object.keys(obj).length === 0;
+  }
+
   public onRelatedNormSelect(item: any) {}
 
   public onRelatedNormDeSelect(item: any) {}

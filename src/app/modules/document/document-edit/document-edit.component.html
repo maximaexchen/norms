@@ -649,7 +649,10 @@
                       <td>{{ relatedFrom.description }}</td>
                       <td>
                         <a
-                          *ngIf="relatedFrom.normFileName"
+                          *ngIf="
+                            relatedFrom.normFileName &&
+                            relatedFrom.activeRevision?.length !== null
+                          "
                           class="dynamic-link"
                           (click)="
                             getDownload(

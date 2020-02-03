@@ -180,6 +180,12 @@ export class DocumentService {
           description: revDescription
         };
 
+        if (mapped['revisions']) {
+          relatedItem['activeRevision'] = this.getLatestActiveRevision(
+            mapped['revisions']
+          );
+        }
+
         if (mapped['_attachments']) {
           relatedItem['normFileName'] = this.getLatestAttchmentFileName(
             mapped['_attachments']
