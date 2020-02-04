@@ -7,15 +7,15 @@ import { NGXLogger } from 'ngx-logger';
 
 import { SubSink } from 'SubSink';
 
-import { MessagingService } from './services/messaging.service';
-import { AuthenticationService } from './modules/auth/services/authentication.service';
+import { MessagingService } from './../../services/messaging.service';
+import { AuthenticationService } from './../../modules/auth/services/authentication.service';
 
 @Component({
-  selector: 'app-start',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  selector: 'app-root',
+  templateUrl: './root.component.html',
+  styleUrls: ['./root.component.scss']
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class RootComponent implements OnInit, OnDestroy {
   subsink = new SubSink();
   title = 'Normenverwaltung';
 

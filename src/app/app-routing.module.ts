@@ -1,3 +1,4 @@
+import { RootComponent } from './components/root/root.component';
 import { StartComponent } from './components/start/start.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
@@ -6,8 +7,15 @@ import { AuthGuardService } from './modules/auth/guards/authGuard.service';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'start',
     pathMatch: 'full',
+    component: RootComponent
+  },
+  {
+    path: 'access-point',
+    loadChildren: () =>
+      import('./modules/access-point/access-point.module').then(
+        m => m.AccessPointModule
+      ),
     canActivate: [AuthGuardService]
   },
   { path: 'start', component: StartComponent, canActivate: [AuthGuardService] },
