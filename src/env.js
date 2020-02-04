@@ -23,7 +23,7 @@
 
   // window.__env.uploadDir = './dist/norms/assets/uploads/';
   // window.__env.uploadRoot = './dist/norms/';
-  window.__env.uploadDir = './src/assets/uploads/';
+  window.__env.uploadDir = './assets/uploads/';
   window.__env.uploadRoot = './src/';
 
   // ng build --prod --base-href ./

@@ -9,12 +9,8 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const jwt = require('jsonwebtoken');
 const app = express();
-const cors = require('cors');
 const nodemailer = require('nodemailer');
 let fileName = '';
-
-const DIR = './uploads';
-const LOGS = './logs';
 
 app.use(methodOverride());
 app.use(bodyParser.json());
@@ -25,7 +21,7 @@ var allowCrossDomain = function(req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, revision, createid, body, filename'
+    'Content-Type, Authorization, revision, createid, deleteid, body, filename'
   );
 
   // intercept OPTIONS method
@@ -72,14 +68,15 @@ app.get('/api/findDirectory/:id', searchMiddleware, function(req, res) {
     });
 });
 
+app.post('/api/deleteFolder', function(req, res) {});
+
 /*
 ==================== Fileupload =====================
 */
-
 // Store file in temp directory
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, path.join(__dirname, '/uploadsTemp/'));
+    callback(null, path.join(__dirname, '..', 'uploadsTemp'));
   },
   filename: (req, file, callback) => {
     fileName = req.headers.filename;
@@ -94,9 +91,8 @@ app.post('/api/upload', function(req, res) {
       return res.end('Error uploading file: ' + err);
     } else {
       console.log('req.files: ' + '/' + JSON.stringify(req.files));
-      console.log('tempPath: ' + req.files[0].path);
-      let tempPath = req.files[0].path;
 
+      let tempPath = req.files[0].path;
       let copyPath = path.join(
         __dirname,
         req.body.uploadDir + req.body.createID + '/' + req.files[0].filename
@@ -108,13 +104,13 @@ app.post('/api/upload', function(req, res) {
       fs.move(tempPath, copyPath, function(err) {
         if (err) return console.error(err);
 
-        fs.emptyDir(path.join(__dirname, '/uploadsTemp/'), err => {
+        fs.emptyDir(path.join(__dirname, '..', '/uploadsTemp/'), err => {
           if (err) return console.error(err);
 
           // console.log('success empty temp dir !');
 
           fs.writeFile(
-            path.join(__dirname, '/uploadsTemp/.gitkeep'),
+            path.join(__dirname, '..', '/uploadsTemp/.gitkeep'),
             '',
             function(err) {
               if (err) throw err;
