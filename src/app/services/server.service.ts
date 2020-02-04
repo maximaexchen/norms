@@ -53,18 +53,16 @@ export class ServerService {
   public deleteFolderFromServer(
     url: string,
     deleteid: string,
-    uploadDir: string,
-    filename: string
+    uploaddir: string
   ): Observable<HttpEvent<any>> {
-    const formData = new FormData();
-    formData.append('deleteID', deleteid);
-    formData.append('uploadDir', uploadDir);
-    formData.append('filename', filename);
+    const deleteData = new FormData();
+    deleteData.append('deleteid', deleteid);
+    deleteData.append('uploaddir', uploaddir);
+    deleteData.append('test', 'Ein Test');
 
     const params = new HttpParams();
 
     const headers = new HttpHeaders({
-      filename,
       deleteid
     });
 
@@ -74,6 +72,6 @@ export class ServerService {
       headers
     };
 
-    return this.http.request(new HttpRequest('POST', url, formData, options));
+    return this.http.request(new HttpRequest('POST', url, deleteData, options));
   }
 }

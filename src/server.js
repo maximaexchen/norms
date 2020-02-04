@@ -68,7 +68,23 @@ app.get('/api/findDirectory/:id', searchMiddleware, function(req, res) {
     });
 });
 
-app.post('/api/deleteFolder', function(req, res) {});
+let deleteData = multer();
+app.post('/api/deleteFolder', deleteData.fields([]), function(req, res) {
+  // console.log(req.headers);
+  console.log(req.body);
+
+  const respObject = {};
+
+  if (req.headers.deleteid) {
+    fs.remove(path.join(__dirname, req.body.uploaddir + req.body.deleteid));
+
+    respObject.success = 'Folder has been deleted';
+  } else {
+    respObject.error = 'Error! Folder has NOT been deleted';
+  }
+
+  res.json(respObject);
+});
 
 /*
 ==================== Fileupload =====================
@@ -90,24 +106,17 @@ app.post('/api/upload', function(req, res) {
     if (err) {
       return res.end('Error uploading file: ' + err);
     } else {
-      console.log('req.files: ' + '/' + JSON.stringify(req.files));
-
       let tempPath = req.files[0].path;
       let copyPath = path.join(
         __dirname,
         req.body.uploadDir + req.body.createID + '/' + req.files[0].filename
       );
-      // Move file in synamic generated Directory
-      console.log('tempPath: ' + tempPath);
-      console.log('copyPath: ' + copyPath);
 
       fs.move(tempPath, copyPath, function(err) {
         if (err) return console.error(err);
 
         fs.emptyDir(path.join(__dirname, '..', '/uploadsTemp/'), err => {
           if (err) return console.error(err);
-
-          // console.log('success empty temp dir !');
 
           fs.writeFile(
             path.join(__dirname, '..', '/uploadsTemp/.gitkeep'),
@@ -125,10 +134,6 @@ app.post('/api/upload', function(req, res) {
         fileName: req.files[0].filename,
         success: 'File has been uploaded'
       };
-
-      console.log('respObject');
-      console.log(respObject);
-      console.log('respObject');
 
       res.json(respObject);
     }

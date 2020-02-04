@@ -12,6 +12,7 @@
   window.__env.dbName = 'norm_rep2';
 
   window.__env.uploadUrl = 'http://192.9.155.184:4000/api/upload';
+  window.__env.deleteUrl = 'http://192.9.155.184:4000/api/deleteFolder';
 
   window.__env.uploadDir = './assets/uploads/';
   window.__env.uploadRoot = './';

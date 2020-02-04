@@ -44,6 +44,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   readyToSave = false;
   justUpdateDocument = false;
   uploadUrl = this.env.uploadUrl;
+  deleteUrl = this.env.deleteUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
   isNew = true; // 1 = new / 0 = update
@@ -438,6 +439,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normDoc.normNumber + '?',
       accept: () => {
+        this.deleteFolderFromServer();
         this.subsink.sink = this.couchDBService
           .deleteEntry(this.normDoc._id, this.normDoc._rev)
           .subscribe(
@@ -446,6 +448,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
                 this.normDoc._id
               );
               this.documentService.deleteRelatedDBEntries(this.normDoc._id);
+              this.deleteFolderFromServer();
             },
             error => {
               this.logger.error(error.message);
@@ -568,6 +571,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         this.showConfirmation('success', 'Files added');
       }
     );
+  }
+
+  private deleteFolderFromServer() {
+    this.subsink.sink = this.serverService
+      .deleteFolderFromServer(
+        this.deleteUrl,
+        this.normDoc._id,
+        this.env.uploadDir
+      )
+      .subscribe(
+        res => {},
+        error => {
+          this.logger.error(error.message);
+          this.spinner.hide();
+          this.showConfirmation('error', error.message);
+        },
+        () => {
+          this.showConfirmation('success', 'Delete erfolgreich');
+        }
+      );
   }
 
   private uploadFileToServer() {

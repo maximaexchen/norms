@@ -18,6 +18,7 @@ export class EnvService {
   public uploadUrl = 'http://localhost:4000/api/upload';
   public uploadDir = './dist/norms/assets/uploads/';
   public uploadRoot = './dist/norms/';
+  public deleteUrl = 'http://localhost:4000/api/deleteFolder';
 
   public apiUrl = 'http://localhost:4000';
 
