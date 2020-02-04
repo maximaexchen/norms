@@ -68,11 +68,11 @@ app.get('/api/findDirectory/:id', searchMiddleware, function(req, res) {
     });
 });
 
+/*
+==================== Folderdelete =====================
+*/
 let deleteData = multer();
 app.post('/api/deleteFolder', deleteData.fields([]), function(req, res) {
-  // console.log(req.headers);
-  console.log(req.body);
-
   const respObject = {};
 
   if (req.headers.deleteid) {
@@ -92,7 +92,7 @@ app.post('/api/deleteFolder', deleteData.fields([]), function(req, res) {
 // Store file in temp directory
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, path.join(__dirname, '..', 'uploadsTemp'));
+    callback(null, path.join(__dirname, '/uploadsTemp'));
   },
   filename: (req, file, callback) => {
     fileName = req.headers.filename;
@@ -115,11 +115,11 @@ app.post('/api/upload', function(req, res) {
       fs.move(tempPath, copyPath, function(err) {
         if (err) return console.error(err);
 
-        fs.emptyDir(path.join(__dirname, '..', '/uploadsTemp/'), err => {
+        fs.emptyDir(path.join(__dirname, '/uploadsTemp'), err => {
           if (err) return console.error(err);
 
           fs.writeFile(
-            path.join(__dirname, '..', '/uploadsTemp/.gitkeep'),
+            path.join(__dirname, '/uploadsTemp/.gitkeep'),
             '',
             function(err) {
               if (err) throw err;
@@ -143,7 +143,6 @@ app.post('/api/upload', function(req, res) {
 /*
 ==================== Authentication =====================
 */
-
 app.post('/api/auth', function(req, res) {
   const body = req.body;
 
