@@ -112,7 +112,8 @@ export class SearchComponent implements OnInit, OnDestroy {
       selector: {
         _id: { $gt: null },
         type: { $eq: 'norm' }
-      }
+      },
+      limit: 999
     };
 
     if (this.searchForm.value.tags.length > 0) {
