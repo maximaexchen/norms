@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head> </head>
+
+  <body>
+    <button
+      type="button"
+      onclick="popup('http://normenverwaltung/access-point', '', 1024, 768);"
+    >
+      Add My Card
+    </button>
+    =&gt;
+    <span id="retrievedData">No data yet.</span>
+
+    <script>
+      function popup(url, title, width, height) {
+        var left = screen.width / 2 - width / 2;
+        var top = screen.height / 2 - height / 2;
+        var options = '';
+        options += ',width=' + width;
+        options += ',height=' + height;
+        options += ',top=' + top;
+        options += ',left=' + left;
+        return window.open(url, title, options);
+      }
+
+      function setData(data) {
+        var strData = JSON.stringify(data);
+        console.log(strData);
+        console.log(data);
+      }
+    </script>
+  </body>
+</html>

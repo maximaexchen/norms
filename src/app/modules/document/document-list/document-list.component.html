@@ -3,9 +3,6 @@
   <span class="nav-button fas fa-chevron-left" (click)="toggleSidebar()"></span>
 </div>
 
-<!-- (sortFunction)="tableSort($event)"
-  [customSort]="true" -->
-<div>{{ documentCount | json }}</div>
 <p-table
   #dataTable
   [value]="documents"

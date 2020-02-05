@@ -19,7 +19,7 @@
   [resizableColumns]="true"
   columnResizeMode="fit"
   [sortOrder]="1"
-  [(selection)]="selectedDocument"
+  [(selection)]="selectedDocuments"
   (onFilter)="onFilter($event)"
 >
   <ng-template pTemplate="caption">
@@ -148,6 +148,15 @@
       Es {documentCount, plural, =0 {wurde keine Dokument gefunden} =1 {wurde 1
       Dokument gefunden} other { wurden {{ documentCount }} Dokumente gefunden
       }}
+    </div>
+    <div>
+      <button
+        type="button"
+        (click)="submitSelectedNorms()"
+        i18n="@@btn-request"
+      >
+        Anfordern
+      </button>
     </div>
   </ng-template>
 </p-table>

@@ -33,6 +33,8 @@
               "src/server-service.bat",
               "src/private.key",
               "src/public.key",
+              "src/access-test.html",
+              "src/.htaccess",
               { "glob": "**/*", "input": "./php", "output": "/php/" }
             ],
             "styles": ["src/styles.scss"],

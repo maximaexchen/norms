@@ -1,14 +1,6 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  Output,
-  EventEmitter,
-  ViewChild
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Subscription } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
 import { SubSink } from 'SubSink';
@@ -17,11 +9,9 @@ import { NGXLogger } from 'ngx-logger';
 
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { DocumentService } from 'src/app/services/document.service';
-import { NormDocument } from '@models/document.model';
-import { EnvService } from 'src/app/services/env.service';
 import { SearchService } from '@app/services/search.service';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
-import { User } from '@app/models';
+import { User, NormDocument } from '@app/models';
 
 @Component({
   selector: 'app-access-point',
@@ -34,15 +24,13 @@ export class AccessPointComponent implements OnInit, OnDestroy {
   visible = true;
   filterInputCheck = true;
   documents: NormDocument[] = [];
-  selectedDocument: NormDocument;
+  selectedDocuments: NormDocument[] = [];
   documentCount = 0;
   owners: User[] = [];
   currentUserId: string;
   messages: any[] = [];
 
   constructor(
-    private router: Router,
-    private env: EnvService,
     private authService: AuthenticationService,
     private couchDBService: CouchDBService,
     private documentService: DocumentService,
@@ -123,6 +111,41 @@ export class AccessPointComponent implements OnInit, OnDestroy {
     }
 
     this.documentCount = event.filteredValue.length;
+  }
+
+  public submitSelectedNorms() {
+    console.log('Yepp');
+    // console.log(this.selectedDocuments);
+
+    let returnObjects = [];
+
+    this.selectedDocuments.forEach(element => {
+      returnObjects.push(this.prepareExportObject(element));
+    });
+
+    window.opener.setData(returnObjects);
+  }
+
+  private prepareExportObject(norm: any): any {
+    console.log(norm);
+
+    const newNorm = Object.assign({}, norm);
+
+    delete newNorm['_rev'];
+    delete newNorm['type'];
+    delete newNorm['active'];
+    delete newNorm['users'];
+    delete newNorm['users'];
+
+    newNorm['owner'] = {};
+    newNorm.owner.firstName = norm['ownerExtended']['firstName'];
+    newNorm.owner.lastName = norm['ownerExtended']['lastName'];
+    newNorm.owner.email = norm['ownerExtended']['email'];
+    newNorm.owner.email = norm['ownerExtended']['email'];
+
+    delete newNorm['ownerExtended'];
+
+    return newNorm;
   }
 
   ngOnDestroy() {
