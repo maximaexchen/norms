@@ -22,6 +22,8 @@
   window.__env.deleteUrl = 'http://localhost:4000/api/deleteFolder';
   window.__env.apiUrl = 'http://localhost:4000';
 
+  window.__env.printPDFUrl = 'http://normenverwaltung/php/outputPDF.php';
+
   // window.__env.uploadDir = './dist/norms/assets/uploads/';
   // window.__env.uploadRoot = './dist/norms/';
   window.__env.uploadDir = './assets/uploads/';

@@ -14,6 +14,8 @@
   window.__env.uploadUrl = 'http://192.9.155.184:4000/api/upload';
   window.__env.deleteUrl = 'http://192.9.155.184:4000/api/deleteFolder';
 
+  window.__env.printPDFUrl = 'http://acpext:90/airweb/norms/php/outputPDF.php';
+
   window.__env.uploadDir = './assets/uploads/';
   window.__env.uploadRoot = './';
 

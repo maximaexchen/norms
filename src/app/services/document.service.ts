@@ -1,3 +1,4 @@
+import { EnvService } from '@app/services/env.service';
 import { last, reduce, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import {
@@ -40,6 +41,7 @@ export class DocumentService {
     private http: HttpClient,
     private couchDBService: CouchDBService,
     private authService: AuthenticationService,
+    private env: EnvService,
     private logger: NGXLogger
   ) {}
 
@@ -480,11 +482,10 @@ export class DocumentService {
           const formdata: FormData = new FormData();
           formdata.append('file', file);
 
-          return this.http.post(
-            'http://normenverwaltung/php/outputPDF.php',
-            formdata,
-            { observe: 'response', responseType: 'blob' }
-          );
+          return this.http.post(this.env.printPDFUrl, formdata, {
+            observe: 'response',
+            responseType: 'blob'
+          });
         })
       )
       .subscribe(blob => {

@@ -20,6 +20,8 @@ export class EnvService {
   public uploadRoot = './dist/norms/';
   public deleteUrl = 'http://localhost:4000/api/deleteFolder';
 
+  public printPDFUrl = 'http://normenverwaltung/php/outputPDF.php';
+
   public apiUrl = 'http://localhost:4000';
 
   constructor() {}
