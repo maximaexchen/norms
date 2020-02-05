@@ -179,6 +179,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       description: {},
       active: false
     };
+
+    this.normDoc.description.fr = 'n/a';
   }
 
   public onEdit() {
