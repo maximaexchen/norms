@@ -462,15 +462,15 @@
                 <i class="fas fa-file-download"></i> Watermark (js)
               </button> -->
 
-            <!-- <button
-                type="button"
-                (click)="downloadPDFwithPHP(normDoc._id, latestAttachmentName)"
-                *ngIf="latestAttachmentName"
-                title="{{ latestAttachmentName }}"
-                class="btn btn-acp attachmentDownload"
-              >
-                <i class="fas fa-file-download"></i> Watermark (php)
-              </button> -->
+            <button
+              type="button"
+              (click)="downloadPDFwithPHP(normDoc._id, latestAttachmentName)"
+              *ngIf="latestAttachmentName"
+              title="{{ latestAttachmentName }}"
+              class="btn btn-acp attachmentDownload"
+            >
+              <i class="fas fa-file-download"></i> mit Wasserzeichen
+            </button>
 
             <hr *ngIf="latestAttachmentName" />
             <div *appIsGranted="'UPDATE'">
