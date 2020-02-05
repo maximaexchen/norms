@@ -1,1 +1,15 @@
-<router-outlet></router-outlet>
+<app-header
+  (logoutEvent)="logout($event)"
+  *ngIf="router.url !== '/access-point'"
+></app-header>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
+<app-login
+  (loginEvent)="login($event)"
+  *ngIf="!authService.isAuthenticated() && router.url !== '/access-point'"
+></app-login>

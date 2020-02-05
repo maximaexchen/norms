@@ -113,10 +113,6 @@ export class AccessPointComponent implements OnInit, OnDestroy {
     this.documentService.getDownload(id, Object.keys(attachments)[0]);
   }
 
-  public onRowSelect(event: any) {
-    this.router.navigate(['../document/' + event.data._id + '/edit']);
-  }
-
   public onFilter(event: any): void {
     console.log(event);
     // Check for simple ASCII Characters and give warning

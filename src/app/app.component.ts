@@ -24,8 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     public authService: AuthenticationService,
     private api: ApiService,
-    private router: Router,
-    private messaging: MessagingService,
+    public router: Router,
     private logger: NGXLogger
   ) {}
 

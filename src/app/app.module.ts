@@ -24,7 +24,6 @@ import { AppComponent } from './app.component';
 import { AuthModule } from '@modules/auth/auth.module';
 import { AuthInterceptor } from '@modules/auth/auth.interceptor';
 import { StartComponent } from './components/start/start.component';
-import { RootComponent } from './components/root/root.component';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
@@ -36,7 +35,6 @@ registerLocaleData(localeDe, 'de-DE', localeDeExtra);
   declarations: [
     AppComponent,
     StartComponent,
-    RootComponent,
     HeaderComponent,
     FileInputValueAccessor,
     NotificationsComponent
