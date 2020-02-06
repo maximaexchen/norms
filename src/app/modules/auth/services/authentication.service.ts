@@ -55,13 +55,11 @@ export class AuthenticationService {
       switchMap(
         (loginResult): Observable<boolean | any> => {
           this.user = loginResult['docs'][0];
-          console.log(loginResult);
 
           if (!!this.user) {
             this.requestToken(username, password).subscribe(
               res => {
                 this.role = this.user['role'];
-
                 if (this.role) {
                   this.userS.authAs(this.role as Roles);
                 } else {

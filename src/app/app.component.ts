@@ -11,7 +11,7 @@ import { MessagingService } from './services/messaging.service';
 import { AuthenticationService } from './modules/auth/services/authentication.service';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-start',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
@@ -24,8 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     public authService: AuthenticationService,
     private api: ApiService,
-    private router: Router,
-    private messaging: MessagingService,
+    public router: Router,
     private logger: NGXLogger
   ) {}
 

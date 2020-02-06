@@ -253,8 +253,8 @@ describe('DocumentService test', () => {
     });
   });
 
-  describe('METHOD: getSelectedOwner()', () => {
-    const ownerId = ['1', '2'];
+  /* describe('METHOD: getUsersByIds()', () => {
+    const userIds = ['1', '2'];
     Given(() => {
       fakeUsers = [
         {
@@ -264,17 +264,21 @@ describe('DocumentService test', () => {
           firstName: 'Max'
         }
       ];
-      spyOn(serviceUnderTest, 'getUsers').and.returnValue(
+      spyOn(serviceUnderTest, 'getUsersByIds').and.returnValue(
         Promise.resolve(fakeUsers)
       );
     });
 
-    When(() => {
-      actualResult = serviceUnderTest.getSelectedOwner(ownerId);
-    });
+    When(
+      fakeAsync(() => {
+        serviceUnderTest
+          .getUsersByIds(userIds)
+          .then(res => (actualResult = res));
+      })
+    );
 
     Then(() => {
-      fakeOwners = [
+      fakeUsers = [
         {
           _id: '1',
           _rev: '1',
@@ -349,4 +353,144 @@ describe('DocumentService test', () => {
       });
     });
   });
+
+  /*
+  describe('METHOD: filterDocumentsByAccess(docs)', () => {
+    Given(() => {
+      // @ts-ignore
+      spyOn(componentUnderTest, 'filterDocumentsByAccess').and.callThrough();
+      //  Expected [ Object({ _id: '1', _rev: '1', active: true, normNumber: 'Normnumber', owner: '1000', ownerExtended: Object({ _id: '1', _rev: '1', externalID: '1000', firstName: 'owner name', type: 'user' }), type: 'document' }), Object({ _id: '2', _rev: '2', active: true, normNumber: 'Normnumber 2', owner: '1000', ownerExtended: Object({ _id: '1', _rev: '1', externalID: '1000', firstName: 'owner name', type: 'user' }), type: 'document' }) ]
+      // to equal [ Object({ _id: '1', _rev: '1', active: true, normNumber: 'Normnumber', owner: '1000', ownerExtended: Object({ _id: '1', firstName: 'owner name', type: 'user' }), type: 'document' }), Object({ _id: '2', _rev: '2', active: true, normNumber: 'Normnumber 2', owner: '1000', ownerExtended: Object({ _id: '1', firstName: 'owner name', type: 'user' }), type: 'document' }) ]
+
+      fakeUsers = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          firstName: 'owner name',
+          externalID: '1000'
+        },
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          firstName: 'owner 2',
+          externalID: '1001'
+        }
+      ];
+      componentUnderTest.owners = fakeUsers;
+      fakeDocuments = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          owner: '1000',
+          active: true
+        },
+        {
+          _id: '2',
+          _rev: '2',
+          type: 'document',
+          normNumber: 'Normnumber 2',
+          active: true
+        }
+      ];
+
+      modifiedDocs = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          owner: '1000',
+          ownerExtended: {
+            _id: '1',
+            _rev: '1',
+            externalID: '1000',
+            firstName: 'owner name',
+            type: 'user'
+          },
+          active: true
+        }
+      ];
+      // @ts-ignore
+      ///* expectedObject = componentUnderTest.filterDocumentsByAccess(
+      //  fakeDocuments
+      //);
+    });
+
+    When(() => {
+      // @ts-ignore
+      expectedObject = componentUnderTest.filterDocumentsByAccess(
+        fakeDocuments
+      );
+      console.log(expectedObject);
+    });
+
+    Then(() => {
+      // @ts-ignore
+      expect(expectedObject).toEqual(modifiedDocs);
+    });
+  });
+   */
+
+  /* describe('setPublisherFromTags', () => {
+    Given(() => {
+      componentUnderTest.documents = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          tags: [
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Boeing',
+              tagType: 'level1',
+              active: true
+            },
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Tessla',
+              tagType: 'level2',
+              active: true
+            }
+          ]
+        },
+        {
+          _id: '2',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber2',
+          tags: [
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Boeing',
+              tagType: 'level1',
+              active: true
+            },
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Tessla',
+              tagType: 'level2',
+              active: true
+            }
+          ]
+        }
+      ];
+
+      // @ts-ignores
+      documentServiceSpy.setPublisherFromTags.and.callThrough();
+    });
+
+    When(() => {
+      // @ts-ignores
+      componentUnderTest.setPublisherFromTags();
+    });
+
+    Then(() => {
+      expect(componentUnderTest.documents[0]['publisher']).toEqual('Boeing');
+    });
+  }); */
 });

@@ -24,15 +24,17 @@ export class PermissionManagerService {
   }
 
   public authAs(role: Roles) {
+    console.log(role);
     sessionStorage.setItem('role', role === null ? Roles.EXTERNAL : role);
     this.permissions = PermissionsFactory.getInstance();
+    console.log(PermissionsFactory.getInstance());
     console.log(this.permissions);
   }
 
   public removeAuth() {
     sessionStorage.removeItem('role');
     sessionStorage.removeItem('access_token');
-
+    sessionStorage.removeItem('externalID');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('userName');
     sessionStorage.removeItem('firstName');

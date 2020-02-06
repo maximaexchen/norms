@@ -42,7 +42,9 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   editable = false;
   deletable = false;
   readyToSave = false;
+  justUpdateDocument = false;
   uploadUrl = this.env.uploadUrl;
+  deleteUrl = this.env.deleteUrl;
   uploadDir = this.env.uploadDir;
   formTitle: string;
   isNew = true; // 1 = new / 0 = update
@@ -60,6 +62,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   relatedNormsSelectList: NormDocument[] = [];
   selectedRelatedNorms: NormDocument[] = [];
+  selectedRelatedNormsState: NormDocument[] = [];
   relatedNormsFrom: NormDocument[] = [];
 
   revisionDocuments: RevisionDocument[] = [];
@@ -151,13 +154,12 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.normDoc
         );
         this.isAdmin = this.authService.isAdmin();
+        this.setAdditionalNormDocData();
       },
       error => {
         this.logger.error(error.message);
       },
-      () => {
-        this.setAdditionalNormDocData();
-      }
+      () => {}
     );
   }
 
@@ -177,6 +179,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
       description: {},
       active: false
     };
+
+    this.normDoc.description.fr = 'n/a';
   }
 
   public onEdit() {
@@ -201,7 +205,6 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private saveDocument(): void {
-    console.log('saveDocument');
     this.processFormData();
     this.isLoading = true;
     this.spinner.show();
@@ -224,6 +227,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private updateDocument(): void {
     console.log('updateDocument');
+
     this.isLoading = true;
     this.processFormData();
 
@@ -233,37 +237,41 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
         results => {
           // Set updated _rev
           this.normDoc._rev = results.rev;
-          this.editable = false;
+          /* if (this.justUpdateDocument) {
+            this.editable = true;
+          } else {
+            this.editable = false;
+          } */
+
+          this.justUpdateDocument === true
+            ? (this.editable = true)
+            : (this.editable = false);
+
+          this.justUpdateDocument = false;
         },
         error => {
-          this.isLoading = false;
-          this.spinner.hide();
           this.logger.error(error.message);
           this.showConfirmation('error', error.message);
         },
         () => {
           // Inform about database change.
-          this.isLoading = false;
-          this.spinner.hide();
           this.sendStateUpdate(this.normDoc._id, 'update');
           this.showConfirmation('success', 'Updated');
           this.fileUploadInput.clear();
           this.normForm.form.markAsPristine();
         }
       );
+
+    this.isLoading = false;
+    this.spinner.hide();
   }
 
   private setAdditionalNormDocData() {
+    this.setNormOwner();
     this.revisionDate = new Date(this.normDoc.revisionDate);
 
     if (this.normDoc.owner) {
       this.owner = this.normDoc.owner;
-    }
-
-    if (this.normDoc.owner) {
-      this.currentOwner = this.owners.find(ow => {
-        return this.normDoc.owner === ow.externalID;
-      });
     }
 
     this.processType = this.normDoc.processType;
@@ -334,15 +342,35 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     }
   }
 
+  private setNormOwner() {
+    this.documentService.getUsers().then(users => {
+      let owner = [];
+      owner = _.filter(
+        users,
+        user => user['supplierId'] === 0 && user['supplierId'] !== undefined
+      );
+
+      this.currentOwner = owner.find(ow => {
+        return this.normDoc.owner === ow.externalID;
+      });
+    });
+  }
+
   private processFormData() {
+    console.log('processFormData');
+
     const selectedRelatedNorms = this.processRelatedNorms();
+
     this.processRelatedFromNorms();
     // write current norm to related norms for "reletedFrom"
-    this.addNormToLinkedNorms(selectedRelatedNorms);
+    this.handleNormToLinkedNorms(selectedRelatedNorms);
     this.setSelectedUser();
     this.setSelectedTags();
     // If there is a new PDF upload add to revisions and attachment Array
     this.addNewRevision();
+
+    console.log('this.fileUpload');
+    console.log(this.fileUpload);
 
     if (this.fileUpload) {
       this.uploadFileToServer();
@@ -353,6 +381,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     // add update status to users to be notified
     this.setUserNotification(this.normDoc.revision);
     this.resetTempData();
+
     return this.normDoc;
   }
 
@@ -383,7 +412,10 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   }
 
   private processRelatedNorms(): any[] {
+    console.log('processRelatedNorms');
+    this.removeRelated();
     const selectedRelatedNorms = [];
+
     this.selectedRelatedNorms.forEach(element => {
       selectedRelatedNorms.push(element['_id']);
     });
@@ -396,9 +428,11 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
 
   private processRelatedFromNorms() {
     const selectedRelatedFromNorms = [];
+
     this.relatedNormsFrom.forEach(element => {
       selectedRelatedFromNorms.push(element['id']);
     });
+
     this.normDoc.relatedFrom =
       selectedRelatedFromNorms || this.relatedNormsFrom;
   }
@@ -407,11 +441,16 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.confirmationService.confirm({
       message: 'Sie wollen den Datensatz ' + this.normDoc.normNumber + '?',
       accept: () => {
+        this.deleteFolderFromServer();
         this.subsink.sink = this.couchDBService
           .deleteEntry(this.normDoc._id, this.normDoc._rev)
           .subscribe(
             res => {
+              this.documentService.deleteAssociatedNormEntriesInUser(
+                this.normDoc._id
+              );
               this.documentService.deleteRelatedDBEntries(this.normDoc._id);
+              this.deleteFolderFromServer();
             },
             error => {
               this.logger.error(error.message);
@@ -536,6 +575,26 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
   }
 
+  private deleteFolderFromServer() {
+    this.subsink.sink = this.serverService
+      .deleteFolderFromServer(
+        this.deleteUrl,
+        this.normDoc._id,
+        this.env.uploadDir
+      )
+      .subscribe(
+        res => {},
+        error => {
+          this.logger.error(error.message);
+          this.spinner.hide();
+          this.showConfirmation('error', error.message);
+        },
+        () => {
+          this.showConfirmation('success', 'Delete erfolgreich');
+        }
+      );
+  }
+
   private uploadFileToServer() {
     this.subsink.sink = this.serverService
       .uploadFileToServer(
@@ -553,10 +612,22 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
           this.showConfirmation('error', error.message);
         },
         () => {
+          if (this.fileUpload) {
+            this.fileUpload = null;
+          }
           this.showConfirmation('success', 'Upload erfolgreich');
         }
       );
   }
+
+  public downloadPDFwithPHP(id: string, name: any) {
+    this.documentService.downloadPDFwithPHP(id, name);
+  }
+
+  /* public downloadPDF(id: string, name: any) {
+    console.log('downloadPDF');
+    this.documentService.downloadPDF(id, name);
+  } */
 
   public getDownload(id: string, name: any) {
     this.documentService.getDownload(id, name);
@@ -742,6 +813,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     const filterActive = this.revisionDocuments.filter(
       element => element['isActive']
     );
+
     if (Array.isArray(filterActive) && filterActive.length) {
       this.normDoc.active = true;
     } else {
@@ -778,6 +850,8 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
   private setRelatedNorms(relatedNorms: any[]) {
     this.documentService.setRelated(relatedNorms).then(res => {
       this.selectedRelatedNorms = res;
+      // deep copy of result
+      this.selectedRelatedNormsState = JSON.parse(JSON.stringify(res));
     });
   }
 
@@ -787,7 +861,7 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     });
   }
 
-  private addNormToLinkedNorms(relatedNorms: any[]) {
+  private handleNormToLinkedNorms(relatedNorms: any[]) {
     relatedNorms.forEach(relatedNorm => {
       // get the linked Norm
       this.subsink.sink = this.couchDBService
@@ -824,39 +898,49 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.router.navigate(['../document/' + id + '/edit']);
   }
 
-  public deleteRelated(id: string) {
-    this.confirmationService.confirm({
-      message:
-        'Sie wollen die Referenz wirklich ' +
-        'entfernen?<br><strong><span class="text-warning">' +
-        'Bitte Norm speichern nicht vergessen!!</span></strong>',
-      accept: () => {
-        this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
-          item => item['id'] !== id
-        );
+  public removeRelated() {
+    console.log('deleteRelated');
 
-        // get the linked Norm
-        this.couchDBService
-          .fetchEntry('/' + id)
-          .pipe(
-            switchMap(linkedNorm => {
-              const filtered = linkedNorm.relatedFrom.filter(relNorm => {
-                return relNorm !== this.normDoc._id;
-              });
+    const difference1 = this.selectedRelatedNormsState.filter(
+      ({ _id: id1 }) =>
+        !this.selectedRelatedNorms.some(({ _id: id2 }) => id2 === id1)
+    );
 
-              linkedNorm.relatedFrom = filtered;
+    const difference2 = this.selectedRelatedNormsState.filter(({ _id: id1 }) =>
+      this.selectedRelatedNorms.some(({ _id: id2 }) => id2 === id1)
+    );
 
-              return this.couchDBService
-                .updateEntry(linkedNorm, linkedNorm['_id'])
-                .pipe(tap(r => {}));
-            })
-          )
-          .subscribe(result => {});
+    this.normDoc.relatedNorms = difference1.map(x => x._id);
 
-        this.readyToSave = true;
-      },
-      reject: () => {}
+    difference1.forEach(element => {
+      this.deleteRelated(element._id);
     });
+  }
+
+  public removeRelatedFromList(id: string) {
+    this.selectedRelatedNorms = this.selectedRelatedNorms.filter(
+      item => item['_id'] !== id
+    );
+  }
+
+  public deleteRelated(id: string) {
+    // get the linked Norm
+    this.couchDBService
+      .fetchEntry('/' + id)
+      .pipe(
+        switchMap(linkedNorm => {
+          const filtered = linkedNorm.relatedFrom.filter(relNorm => {
+            return relNorm !== this.normDoc._id;
+          });
+
+          linkedNorm.relatedFrom = filtered;
+
+          return this.couchDBService
+            .updateEntry(linkedNorm, linkedNorm['_id'])
+            .pipe(tap(r => {}));
+        })
+      )
+      .subscribe(result => {});
   }
 
   private showConfirmation(type: string, result: string) {
@@ -951,10 +1035,24 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  public onItemSelect(item: any) {}
-  public onItemDeSelect(item: any) {}
-  public onSelectAll(items: any) {}
-  public onDeSelectAll(items: any) {}
+  public toggleActiveState() {
+    this.normDoc.active = !this.normDoc.active;
+  }
+
+  public isEmptyObject(obj) {
+    console.log(obj);
+    console.log(Object.keys(obj));
+    return obj && Object.keys(obj).length === 0;
+  }
+
+  public onRelatedNormSelect(item: any) {}
+
+  public onRelatedNormDeSelect(item: any) {}
+  public onRelatedNormSelectAll(items: any) {}
+
+  public onDeSelectAllRelatedNorms(items: any) {
+    this.removeRelated();
+  }
   public onDeSelectAllTag1(items: any) {
     this.selectedTags1 = [];
   }
@@ -967,13 +1065,14 @@ export class DocumentEditComponent implements OnInit, OnDestroy {
     this.selectedTags3 = [];
   }
 
-  public onDeSelectAllRelatedNorms(items: any) {
-    this.selectedRelatedNorms = [];
-  }
-
   public onDeSelectAllSelectedUsers(items: any) {
     this.selectedUsers = [];
   }
+
+  public onItemSelect(item: any) {}
+  public onItemDeSelect(item: any) {}
+  public onSelectAll(items: any) {}
+  public onDeSelectAll(items: any) {}
 
   ngOnDestroy(): void {
     this.subsink.unsubscribe();

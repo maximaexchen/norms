@@ -9,12 +9,8 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 const jwt = require('jsonwebtoken');
 const app = express();
-const cors = require('cors');
 const nodemailer = require('nodemailer');
 let fileName = '';
-
-const DIR = './uploads';
-const LOGS = './logs';
 
 app.use(methodOverride());
 app.use(bodyParser.json());
@@ -25,7 +21,7 @@ var allowCrossDomain = function(req, res, next) {
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.header(
     'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, revision, createid, body, filename'
+    'Content-Type, Authorization, revision, createid, deleteid, body, filename'
   );
 
   // intercept OPTIONS method
@@ -73,13 +69,30 @@ app.get('/api/findDirectory/:id', searchMiddleware, function(req, res) {
 });
 
 /*
+==================== Folderdelete =====================
+*/
+let deleteData = multer();
+app.post('/api/deleteFolder', deleteData.fields([]), function(req, res) {
+  const respObject = {};
+
+  if (req.headers.deleteid) {
+    fs.remove(path.join(__dirname, req.body.uploaddir + req.body.deleteid));
+
+    respObject.success = 'Folder has been deleted';
+  } else {
+    respObject.error = 'Error! Folder has NOT been deleted';
+  }
+
+  res.json(respObject);
+});
+
+/*
 ==================== Fileupload =====================
 */
-
 // Store file in temp directory
 var storage = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, './uploadsTemp/');
+    callback(null, path.join(__dirname, '/uploadsTemp'));
   },
   filename: (req, file, callback) => {
     fileName = req.headers.filename;
@@ -93,20 +106,36 @@ app.post('/api/upload', function(req, res) {
     if (err) {
       return res.end('Error uploading file: ' + err);
     } else {
-      let tempPath = './' + req.files[0].path;
-      let copyPath =
-        req.body.uploadDir + req.body.createID + '/' + req.files[0].filename;
-      // Move file in synamic generated Directory
-      console.log('tempPath: ' + tempPath);
-      console.log('copyPath: ' + copyPath);
+      let tempPath = req.files[0].path;
+      let copyPath = path.join(
+        __dirname,
+        req.body.uploadDir + req.body.createID + '/' + req.files[0].filename
+      );
+
       fs.move(tempPath, copyPath, function(err) {
         if (err) return console.error(err);
+
+        fs.emptyDir(path.join(__dirname, '/uploadsTemp'), err => {
+          if (err) return console.error(err);
+
+          fs.writeFile(
+            path.join(__dirname, '/uploadsTemp/.gitkeep'),
+            '',
+            function(err) {
+              if (err) throw err;
+              // console.log('Saved!');
+            }
+          );
+        });
       });
-      res.json({
+
+      const respObject = {
         file: copyPath,
         fileName: req.files[0].filename,
         success: 'File has been uploaded'
-      });
+      };
+
+      res.json(respObject);
     }
   });
 });
@@ -114,7 +143,6 @@ app.post('/api/upload', function(req, res) {
 /*
 ==================== Authentication =====================
 */
-
 app.post('/api/auth', function(req, res) {
   const body = req.body;
 

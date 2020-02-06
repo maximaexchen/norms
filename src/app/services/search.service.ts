@@ -28,10 +28,13 @@ export class SearchService implements OnDestroy {
   public search(searchObject?: any) {
     if (searchObject) {
       console.log('search');
+      console.log(this.dbRequest + '/_find');
       this.subsink.sink = this.http
         .post(this.dbRequest + '/_find', searchObject)
         .subscribe(
           result => {
+            console.log('RESULT #################################');
+            console.log(result);
             this.searchResult.next(result['docs']);
           },
           error => this.logger.error(error.message)

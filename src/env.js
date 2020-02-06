@@ -19,11 +19,14 @@
 
   // window.__env.uploadUrl = 'http://116.203.220.19:4000/api/upload';
   window.__env.uploadUrl = 'http://localhost:4000/api/upload';
+  window.__env.deleteUrl = 'http://localhost:4000/api/deleteFolder';
   window.__env.apiUrl = 'http://localhost:4000';
+
+  window.__env.printPDFUrl = 'http://normenverwaltung/php/outputPDF.php';
 
   // window.__env.uploadDir = './dist/norms/assets/uploads/';
   // window.__env.uploadRoot = './dist/norms/';
-  window.__env.uploadDir = './src/assets/uploads/';
+  window.__env.uploadDir = './assets/uploads/';
   window.__env.uploadRoot = './src/';
 
   // ng build --prod --base-href ./

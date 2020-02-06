@@ -14,7 +14,7 @@ export class AuthErrorHandler implements ErrorHandler {
       console.error('Backend returned status code: ', error.status);
       console.error('Response body:', error.message);
       if (error.status === 401 || error.status === 403) {
-        router.navigate(['/login']);
+        router.navigate(['app/login']);
       }
     } else {
       //A client-side or network error occurred.

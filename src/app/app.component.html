@@ -1,4 +1,7 @@
-<app-header (logoutEvent)="logout($event)"></app-header>
+<app-header
+  (logoutEvent)="logout($event)"
+  *ngIf="router.url !== '/access-point'"
+></app-header>
 <div class="container-fluid">
   <div class="row">
     <div class="col-sm-12">
@@ -8,5 +11,5 @@
 </div>
 <app-login
   (loginEvent)="login($event)"
-  *ngIf="!authService.isAuthenticated()"
+  *ngIf="!authService.isAuthenticated() && router.url !== '/access-point'"
 ></app-login>

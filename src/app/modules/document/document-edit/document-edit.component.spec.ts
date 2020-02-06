@@ -320,7 +320,7 @@ describe('DocumentEditComponent', () => {
         type: 'user',
         normNumber: 'AAA'
       };
-      documentServiceSpy.getDocument.and.nextOneTimeWith(fakeDocument);
+      documentServiceSpy.getDocument.and.nextOneTimeWith(fakeDocument._id);
 
       // @ts-ignores
       spyOn(componentUnderTest, 'editDocument').and.callThrough();
@@ -331,6 +331,7 @@ describe('DocumentEditComponent', () => {
         // @ts-ignore
         componentUnderTest.editDocument(id);
         // fixture.detectChanges();
+        tick();
       })
     );
 
@@ -348,19 +349,20 @@ describe('DocumentEditComponent', () => {
       });
     });
 
-    describe('GIVEN existing id THEN get normDocument', () => {
+    /* describe('GIVEN existing id THEN get normDocument', () => {
       id = '1';
-      Given(() => {});
-
-      Then(() => {
+      Given(() => {
         // @ts-ignore
         documentServiceSpy.getDocument
           .mustBeCalledWith(id)
           .nextOneTimeWith(fakeDocument);
+        documentServiceSpy.getUsers.and.callThrough();
+      });
 
+      Then(() => {
         expect(componentUnderTest.normDoc).toEqual(fakeDocument);
       });
-    });
+    }); */
   });
 
   describe('METHOD newDocument', () => {
@@ -502,94 +504,9 @@ describe('DocumentEditComponent', () => {
         expect(componentUnderTest.updateDocument).toHaveBeenCalled();
       });
     });
-  });
+  }); */
 
-  describe('METHOD saveDocument', () => {
-    Given(() => {
-      componentUnderTest.isLoading = false;
-      componentUnderTest.normForm = new NgForm([], []);
-      componentUnderTest.fileUploadInput = new FileUpload(
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      );
-      componentUnderTest.normDoc = {
-        _id: '1',
-        _rev: '1',
-        type: 'norm',
-        normNumber: 'AAA'
-      };
-
-      const testRespones = {
-        ok: true,
-        id: '1',
-        rev: '1'
-      };
-
-      couchDBServiceSpy.writeEntry.and.nextWith(testRespones);
-      // @ts-ignores
-      spyOn(componentUnderTest, 'saveDocument').and.callThrough();
-      // @ts-ignores
-      spyOn(componentUnderTest.spinner, 'hide');
-      spyOn(componentUnderTest, 'goToNorm');
-    });
-
-    When(() => {
-      // @ts-ignores
-      componentUnderTest.saveDocument();
-    });
-
-    describe('Check attributes to be changed isNe and spinner.hide', () => {
-      Then(() => {
-        expect(componentUnderTest.isNew).toBe(true);
-        // @ts-ignores
-        expect(componentUnderTest.spinner.hide).toHaveBeenCalled();
-      });
-    });
-
-    describe('Given document to save THEN response to be ok', () => {
-      Given(() => {});
-      Then(() => {
-        couchDBServiceSpy.writeEntry(fakeDocument).subscribe(res => {
-          expect(res.ok).toBe(true);
-        });
-        expect(componentUnderTest.goToNorm).toHaveBeenCalledWith('1');
-      });
-    });
-
-    describe('GIVEN Obeservable error THEN call error callback', () => {
-      Given(() => {
-        // @ts-ignores
-        couchDBServiceSpy.writeEntry.and.returnValue(
-          throwError({ status: 404 })
-        );
-        // @ts-ignores
-        // spyOn(componentUnderTest, 'setStartValues').and.callThrough();
-        spyOn(componentUnderTest.logger, 'error');
-      });
-
-      Then(() => {
-        // @ts-ignore
-        expect(componentUnderTest.logger.error).toHaveBeenCalled();
-      });
-    });
-  });
-
-  describe('METHOD goToNorm', () => {
-    Given(() => {});
-
-    When(() => {
-      const id = '1';
-      componentUnderTest.goToNorm(id);
-    });
-
-    Then(() => {
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['../document/1/edit']);
-    });
-  });
-
-  describe('METHOD updateDocument', () => {
+  /* describe('METHOD updateDocument', () => {
     Given(() => {
       componentUnderTest.normDoc = {
         _id: '1',
@@ -629,7 +546,5 @@ describe('DocumentEditComponent', () => {
     Then(() => {
       expect(componentUnderTest.isLoading).toBe(false);
     });
-  });
-
-*/
+  }); */
 });

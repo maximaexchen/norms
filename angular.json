@@ -32,7 +32,10 @@
               "src/server-service.js",
               "src/server-service.bat",
               "src/private.key",
-              "src/public.key"
+              "src/public.key",
+              "src/access-test.html",
+              "src/.htaccess",
+              { "glob": "**/*", "input": "./php", "output": "/php/" }
             ],
             "styles": ["src/styles.scss"],
             "scripts": []
@@ -143,7 +146,7 @@
               "node_modules/chart.js/dist/Chart.js",
               "node_modules/quill/dist/quill.js"
             ],
-            "codeCoverage": true
+            "codeCoverage": false
           }
         },
         "lint": {

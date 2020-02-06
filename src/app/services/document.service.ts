@@ -1,9 +1,17 @@
+import { EnvService } from '@app/services/env.service';
+import { last, reduce, switchMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpRequest,
+  HttpResponse
+} from '@angular/common/http';
 
 import { Subscription, Observable } from 'rxjs';
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'underscore';
+/* import { degrees, PDFDocument, rgb, StandardFonts } from 'pdf-lib'; */
 
 import { CouchDBService } from 'src/app/services/couchDB.service';
 import { AuthenticationService } from '@app/modules/auth/services/authentication.service';
@@ -12,6 +20,7 @@ import { User } from '@app/models/user.model';
 import { NormDocument } from './../models/document.model';
 import { Group } from '@app/models/group.model';
 import { Tag } from '@app/models/tag.model';
+import { ParseTreeResult } from '@angular/compiler';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentService {
@@ -32,6 +41,7 @@ export class DocumentService {
     private http: HttpClient,
     private couchDBService: CouchDBService,
     private authService: AuthenticationService,
+    private env: EnvService,
     private logger: NGXLogger
   ) {}
 
@@ -71,17 +81,18 @@ export class DocumentService {
   public filterDocumentsByAccess(docs: NormDocument[]): NormDocument[] {
     return docs.filter(element => {
       if (this.authService.isAdmin()) {
-        return element;
+        return true;
       }
+
       if (!!element.owner) {
         if (element.owner === this.authService.getCurrentUserExternalID()) {
-          return element;
+          return true;
         } else {
-          return element['active'] === true ? element : undefined;
+          return element['active'] === true ? true : false;
         }
       }
 
-      return;
+      return false;
     });
   }
 
@@ -101,13 +112,13 @@ export class DocumentService {
     }
   }
 
-  public getSelectedOwner(ownerIds: string[]): Promise<User[]> {
+  /* public getSelectedOwner(ownerIds: string[]): Promise<User[]> {
     console.log('getSelectedOwner: ' + ownerIds);
     return this.getUsers().then(users => {
       console.log('getSelectedOwner.getUsers: ' + users);
       return users.filter(owner => ownerIds.indexOf(owner.externalID) > -1);
     });
-  }
+  } */
 
   public getUsersByIds(usersIds: string[]): Promise<any[]> {
     return this.getUsers().then(users => {
@@ -165,11 +176,17 @@ export class DocumentService {
         }
 
         const relatedItem = {
-          id: mapped['_id'],
+          _id: mapped['_id'],
           normNumber: mapped['normNumber'],
           revision: mapped['revision'],
           description: revDescription
         };
+
+        if (mapped['revisions']) {
+          relatedItem['activeRevision'] = this.getLatestActiveRevision(
+            mapped['revisions']
+          );
+        }
 
         if (mapped['_attachments']) {
           relatedItem['normFileName'] = this.getLatestAttchmentFileName(
@@ -182,8 +199,6 @@ export class DocumentService {
   }
 
   public deleteRelatedDBEntries(id: string) {
-    this.deleteAssociatedNormEntriesInUser(id);
-
     const deleteQuery = {
       use_index: ['_design/search_norm'],
       selector: {
@@ -331,6 +346,7 @@ export class DocumentService {
     return check;
   }
 
+  // TODO: jsjs;
   private handleError(error: any): Promise<any> {
     console.error('Ein fehler ist aufgetreten', error);
     return Promise.reject(error.message || error);
@@ -354,51 +370,135 @@ export class DocumentService {
     );
   }
 
-  public processDownload(id: string, documentName: string): Observable<any> {
-    const url = '/' + id + '/' + documentName;
+  /*
+  ######################################################
+  ## JAVASCRIPT Version of PDF WATERMARK creation
+  ## does not work with typescript verion below 3.7
+  ## but angular 8 does not support that. Maybe in future
+  ######################################################
+  */
 
-    return this.http.get(this.couchDBService.dbRequest + url, {
-      responseType: 'blob',
-      headers: new HttpHeaders().append('Content-Type', 'application/pdf')
+  /* public downloadPDF(id: string, name: string) {
+    this.processDownload(id, name).subscribe(res => {
+      // It is necessary to create a new blob object with mime-type explicitly set
+      // otherwise only Chrome works like it should
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(res);
+      reader.onloadend = event => {
+        // The contents of the BLOB are in reader.results
+        this.addWatermark(reader.result as ArrayBuffer);
+      };
     });
+  } */
+
+  /* public async addWatermark(file: ArrayBuffer) {
+    let newBlob: Blob;
+    // This should be a Uint8Array or ArrayBuffer
+    // This data can be obtained in a number of different ways
+    // If your running in a Node environment, you could use fs.readFile()
+    // In the browser, you could make a fetch() call and use res.arrayBuffer()
+    const existingPdfBytes = file;
+
+    try {
+      // Load a PDFDocument from the existing PDF bytes
+      const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+      // Embed the Helvetica font
+      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+      // Get the first page of the document
+      const pages = pdfDoc.getPages();
+      const firstPage = pages[0];
+
+      // Get the width and height of the first page
+      const { width, height } = firstPage.getSize();
+
+      // Draw a string of text diagonally across the first page
+      firstPage.drawText('This text was added with JavaScript!', {
+        x: 5,
+        y: height / 2 + 300,
+        size: 50,
+        font: helveticaFont,
+        color: rgb(0.95, 0.1, 0.1),
+        rotate: degrees(-45)
+      });
+
+      // Serialize the PDFDocument to bytes (a Uint8Array)
+      const pdfBytes = await pdfDoc.save();
+
+      newBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+    } catch (err) {
+      console.log(err.message);
+      newBlob = new Blob([existingPdfBytes], { type: 'application/pdf' });
+    }
+
+    this.sendDownloadToBrowser(newBlob);
+  } */
+
+  public sendDownloadToBrowser(blob: Blob) {
+    // It is necessary to have a new blob object with mime-type explicitly set
+    // otherwise only Chrome works like it should
+
+    // IE doesn't allow using a blob object directly as link href
+    // instead it is necessary to use msSaveOrOpenBlob
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveOrOpenBlob(blob);
+      return;
+    }
+
+    // For other browsers:
+    // Create a link pointing to the ObjectURL containing the blob.
+    const data = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = data;
+    link.download = name;
+    // this is necessary as link.click() does not work on the latest firefox
+    link.dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      })
+    );
+
+    setTimeout(() => {
+      // For Firefox it is necessary to delay revoking the ObjectURL
+      window.URL.revokeObjectURL(data);
+      link.remove();
+    }, 100);
+  }
+
+  public downloadPDFwithPHP(id: string, name: string) {
+    console.log('downloadPDFwithPHP2');
+    this.processDownload(id, name)
+      .pipe(
+        switchMap(res => {
+          const newBlob = new Blob([res], { type: 'application/pdf' });
+          const file = new File([newBlob], 'test.pdf', {
+            type: 'application/pdf'
+          });
+
+          const formdata: FormData = new FormData();
+          formdata.append('file', file);
+
+          return this.http.post(this.env.printPDFUrl, formdata, {
+            observe: 'response',
+            responseType: 'blob'
+          });
+        })
+      )
+      .subscribe(blob => {
+        const newblob = new Blob([blob.body], { type: 'application/pdf' });
+        this.sendDownloadToBrowser(newblob);
+      });
   }
 
   public getDownload(id: string, name: string) {
-    console.log('GET Download');
     this.processDownload(id, name).subscribe(
       res => {
-        // It is necessary to create a new blob object with mime-type explicitly set
-        // otherwise only Chrome works like it should
         const newBlob = new Blob([res], { type: 'application/pdf' });
-
-        // IE doesn't allow using a blob object directly as link href
-        // instead it is necessary to use msSaveOrOpenBlob
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(newBlob);
-          return;
-        }
-
-        // For other browsers:
-        // Create a link pointing to the ObjectURL containing the blob.
-        const data = window.URL.createObjectURL(newBlob);
-
-        const link = document.createElement('a');
-        link.href = data;
-        link.download = name;
-        // this is necessary as link.click() does not work on the latest firefox
-        link.dispatchEvent(
-          new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-          })
-        );
-
-        setTimeout(() => {
-          // For Firefox it is necessary to delay revoking the ObjectURL
-          window.URL.revokeObjectURL(data);
-          link.remove();
-        }, 100);
+        this.sendDownloadToBrowser(newBlob);
       },
       error => {
         this.logger.error(error.message);
@@ -423,5 +523,14 @@ export class DocumentService {
         ...renamedObject
       };
     }, {});
+  }
+
+  public processDownload(id: string, documentName: string): Observable<any> {
+    const url = '/' + id + '/' + documentName;
+
+    return this.http.get(this.couchDBService.dbRequest + url, {
+      responseType: 'blob',
+      headers: new HttpHeaders().append('Content-Type', 'application/pdf')
+    });
   }
 }

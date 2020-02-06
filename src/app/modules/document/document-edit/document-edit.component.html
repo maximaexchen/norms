@@ -31,8 +31,6 @@
       ></app-crud-nav>
     </div>
   </div>
-  {{ isAdmin | json }}
-  {{ isOwner | json }}
   <form class="form" (ngSubmit)="onSubmit()" #normForm="ngForm">
     <input type="hidden" [(ngModel)]="isNew" name="isNew" />
     <input type="hidden" [(ngModel)]="normDoc._id" name="_id" />
@@ -350,7 +348,24 @@
                   <label i18n="@@string-status" class=" col-form-label"
                     >Status</label
                   >
-                  <p-selectButton
+                  <a
+                    class="dynamic-link"
+                    (click)="toggleActiveState()"
+                    [style.pointer-events]="!editable ? 'none' : 'auto'"
+                    style="margin-left: 10px;"
+                  >
+                    <i
+                      [ngStyle]="{
+                        'font-size': '16px'
+                      }"
+                      [ngClass]="
+                        normDoc.active ? 'fas fa-check-circle' : 'fas fa-ban'
+                      "
+                      aria-hidden="true"
+                    ></i
+                  ></a>
+
+                  <!-- <p-selectButton
                     [options]="[
                       {
                         value: true,
@@ -367,7 +382,7 @@
                     class="icon-p-selectButton"
                     [(ngModel)]="normDoc.active"
                     [disabled]="!editable"
-                  ></p-selectButton>
+                  ></p-selectButton> -->
                 </div>
                 <div class="col-sm-6" *ngIf="currentOwner">
                   <span i18n="@@string-responsible"
@@ -416,17 +431,47 @@
               </div>
             </div>
             <hr *ngIf="latestAttachmentName" />
-            <span *ngIf="normDoc.active">
-              <button
+
+            <span *ngIf="!latestAttachmentName">
+              <div *ngIf="!isAdmin && !isOwner" class="alert alert-danger">
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-ban fa-stack-1x "></i>
+                </span>
+                <span i18n="@@string-no-norm-active" style="padding-left: 10px;"
+                  >Es ist keine Norm aktiv</span
+                >
+              </div>
+            </span>
+
+            <button
+              type="button"
+              (click)="getDownload(normDoc._id, latestAttachmentName)"
+              *ngIf="latestAttachmentName"
+              title="{{ latestAttachmentName }}"
+              class="btn btn-acp attachmentDownload"
+            >
+              <i class="fas fa-file-download"></i> Download Norm
+            </button>
+            <!-- <button
                 type="button"
-                (click)="getDownload(normDoc._id, latestAttachmentName)"
+                (click)="downloadPDF(normDoc._id, latestAttachmentName)"
                 *ngIf="latestAttachmentName"
                 title="{{ latestAttachmentName }}"
                 class="btn btn-acp attachmentDownload"
               >
-                <i class="fas fa-file-download"></i> Download Norm
-              </button>
-            </span>
+                <i class="fas fa-file-download"></i> Watermark (js)
+              </button> -->
+
+            <!-- <button
+              type="button"
+              (click)="downloadPDFwithPHP(normDoc._id, latestAttachmentName)"
+              *ngIf="latestAttachmentName"
+              title="{{ latestAttachmentName }}"
+              class="btn btn-acp attachmentDownload"
+            >
+              <i class="fas fa-file-download"></i> mit Wasserzeichen
+            </button> -->
+
             <hr *ngIf="latestAttachmentName" />
             <div *appIsGranted="'UPDATE'">
               <p-fieldset
@@ -491,12 +536,13 @@
               <div class="col-sm-10">
                 <angular2-multiselect
                   name="relatedNormsSelectList"
+                  class="relatedNormsSelectList"
                   [data]="relatedNormsSelectList"
                   [(ngModel)]="selectedRelatedNorms"
                   [settings]="relatedDropdownSettings"
-                  (onSelect)="onItemSelect($event)"
-                  (onDeSelect)="onItemDeSelect($event)"
-                  (onSelectAll)="onSelectAll($event)"
+                  (onSelect)="onRelatedNormSelect($event)"
+                  (onDeSelect)="onRelatedNormDeSelect($event)"
+                  (onSelectAll)="onRelatedNormSelectAll($event)"
                   (onDeSelectAll)="onDeSelectAllRelatedNorms($event)"
                 >
                   <c-item>
@@ -531,7 +577,7 @@
                   <tbody>
                     <tr *ngFor="let related of selectedRelatedNorms">
                       <td>
-                        <a class="dynamic-link" (click)="goToNorm(related.id)"
+                        <a class="dynamic-link" (click)="goToNorm(related._id)"
                           ><i class="fas fa-link"></i>
                           {{ related.normNumber }}</a
                         >
@@ -543,7 +589,7 @@
                           *ngIf="related.normFileName"
                           class="dynamic-link"
                           (click)="
-                            getDownload(related.id, related.normFileName)
+                            getDownload(related._id, related.normFileName)
                           "
                           ><i class="fas fa-file-download"></i>
                           Download
@@ -554,7 +600,7 @@
                           type="button"
                           [disabled]="normForm.invalid || !editable"
                           class="btn dynamic-link "
-                          (click)="deleteRelated(related.id)"
+                          (click)="removeRelatedFromList(related._id)"
                         >
                           <i class="fas fa-trash"></i>
                           <span i18n="@@string-delete"> Löschen</span>
@@ -593,7 +639,7 @@
                       <td>
                         <a
                           class="dynamic-link"
-                          (click)="goToNorm(relatedFrom.id)"
+                          (click)="goToNorm(relatedFrom._id)"
                           ><i class="fas fa-link"></i>
                           {{ relatedFrom.normNumber }}</a
                         >
@@ -602,11 +648,14 @@
                       <td>{{ relatedFrom.description }}</td>
                       <td>
                         <a
-                          *ngIf="relatedFrom.normFileName"
+                          *ngIf="
+                            relatedFrom.normFileName &&
+                            relatedFrom.activeRevision?.length !== null
+                          "
                           class="dynamic-link"
                           (click)="
                             getDownload(
-                              relatedFrom.id,
+                              relatedFrom._id,
                               relatedFrom.normFileName
                             )
                           "

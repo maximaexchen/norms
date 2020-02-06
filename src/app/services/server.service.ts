@@ -49,4 +49,29 @@ export class ServerService {
 
     return this.http.request(new HttpRequest('POST', url, formData, options));
   }
+
+  public deleteFolderFromServer(
+    url: string,
+    deleteid: string,
+    uploaddir: string
+  ): Observable<HttpEvent<any>> {
+    const deleteData = new FormData();
+    deleteData.append('deleteid', deleteid);
+    deleteData.append('uploaddir', uploaddir);
+    deleteData.append('test', 'Ein Test');
+
+    const params = new HttpParams();
+
+    const headers = new HttpHeaders({
+      deleteid
+    });
+
+    const options = {
+      params,
+      reportProgress: true,
+      headers
+    };
+
+    return this.http.request(new HttpRequest('POST', url, deleteData, options));
+  }
 }
