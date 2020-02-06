@@ -14,10 +14,6 @@
   // window.__env.dbBaseUrl = 'http://192.168.178.24:8888/';
   // window.__env.dbName = 'norm_rep';
 
-  // window.__env.dbBaseUrl = 'http://116.203.220.19:5984/';
-  // window.__env.dbName = 'norm_rep2';
-
-  // window.__env.uploadUrl = 'http://116.203.220.19:4000/api/upload';
   window.__env.uploadUrl = 'http://localhost:4000/api/upload';
   window.__env.deleteUrl = 'http://localhost:4000/api/deleteFolder';
   window.__env.apiUrl = 'http://localhost:4000';
@@ -31,10 +27,3 @@
 
   // ng build --prod --base-href ./
 })(this);
-
-// sudo lsof -i :4000
-// node server.js </dev/null &>/dev/null &
-// ps -A
-// ng serve --port 8085 --host 116.203.220.19 </dev/null &>/dev/null &
-
-// http-server . -p 8085 </dev/null &>/dev/null &^

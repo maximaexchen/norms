@@ -8,7 +8,6 @@ import { EnvService } from './env.service';
 import { Role } from '@models/index';
 
 // CouchDB Ubuntu Server
-/* $kP2ZernC */
 
 @Injectable({ providedIn: 'root' })
 export class CouchDBService {
