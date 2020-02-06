@@ -76,6 +76,145 @@ describe('DocumentService test', () => {
     });
   });*/
 
+  describe('METHOD: filterDocumentsByAccess(docs)', () => {
+    Given(() => {
+      // @ts-ignore
+      spyOn(serviceUnderTest, 'filterDocumentsByAccess').and.callThrough();
+      /*
+    Expected [ Object({ _id: '1', _rev: '1', active: true, normNumber: 'Normnumber', owner: '1000', ownerExtended: Object({ _id: '1', _rev: '1', externalID: '1000', firstName: 'owner name', type: 'user' }), type: 'document' }), Object({ _id: '2', _rev: '2', active: true, normNumber: 'Normnumber 2', owner: '1000', ownerExtended: Object({ _id: '1', _rev: '1', externalID: '1000', firstName: 'owner name', type: 'user' }), type: 'document' }) ]
+    to equal [ Object({ _id: '1', _rev: '1', active: true, normNumber: 'Normnumber', owner: '1000', ownerExtended: Object({ _id: '1', firstName: 'owner name', type: 'user' }), type: 'document' }), Object({ _id: '2', _rev: '2', active: true, normNumber: 'Normnumber 2', owner: '1000', ownerExtended: Object({ _id: '1', firstName: 'owner name', type: 'user' }), type: 'document' }) ]
+    */
+      fakeUsers = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          firstName: 'owner name',
+          externalID: '1000'
+        },
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          firstName: 'owner 2',
+          externalID: '1001'
+        }
+      ];
+      serviceUnderTest.owners = fakeUsers;
+      fakeNormDocuments = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          owner: '1000',
+          active: true
+        },
+        {
+          _id: '2',
+          _rev: '2',
+          type: 'document',
+          normNumber: 'Normnumber 2',
+          active: true
+        }
+      ];
+
+      actualResult = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          owner: '1000',
+          ownerExtended: {
+            _id: '1',
+            _rev: '1',
+            externalID: '1000',
+            firstName: 'owner name',
+            type: 'user'
+          },
+          active: true
+        }
+      ];
+      // @ts-ignore
+      /* expectedObject = componentUnderTest.filterDocumentsByAccess(
+        fakeDocuments
+      ); */
+    });
+
+    When(() => {
+      // @ts-ignore
+      actualResult = serviceUnderTest.filterDocumentsByAccess(
+        fakeNormDocuments
+      );
+      console.log(actualResult);
+    });
+
+    Then(() => {
+      // @ts-ignore
+      expect(expectedObject).toEqual(modifiedDocs);
+    });
+  });
+
+  /* describe('setPublisherFromTags', () => {
+    Given(() => {
+      serviceUnderTest.documents = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber',
+          tags: [
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Boeing',
+              tagType: 'level1',
+              active: true
+            },
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Tessla',
+              tagType: 'level2',
+              active: true
+            }
+          ]
+        },
+        {
+          _id: '2',
+          _rev: '1',
+          type: 'document',
+          normNumber: 'Normnumber2',
+          tags: [
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Boeing',
+              tagType: 'level1',
+              active: true
+            },
+            {
+              id: 'e88637ef0c7d07557cab7140ad02ce35',
+              name: 'Tessla',
+              tagType: 'level2',
+              active: true
+            }
+          ]
+        }
+      ];
+
+      // @ts-ignores
+      spyOn(componentUnderTest, 'setPublisherFromTags').and.callThrough();
+    });
+
+    When(() => {
+      // @ts-ignores
+      componentUnderTest.setPublisherFromTags();
+    });
+
+    Then(() => {
+      // expect(serviceUnderTest.documents[0]['publisher']).toEqual('Boeing');
+    });
+  }); */
+
   describe('METHOD: getDocuments()', () => {
     const id = '1';
     Given(() => {
@@ -134,20 +273,18 @@ describe('DocumentService test', () => {
       actualResult = serviceUnderTest.getSelectedOwner(ownerId);
     });
 
-    Then(
-      () => {
-        fakeOwners = [
-          {
-            _id: '1',
-            _rev: '1',
-            type: 'user',
-            firstName: 'Max'
-          }
-        ];
+    Then(() => {
+      fakeOwners = [
+        {
+          _id: '1',
+          _rev: '1',
+          type: 'user',
+          firstName: 'Max'
+        }
+      ];
 
-        expect(actualResult).toEqual(fakeOwners);
-      })
-    );
+      expect(actualResult).toEqual(fakeOwners);
+    });
   });
 
   describe('METHOD: getTags()', () => {

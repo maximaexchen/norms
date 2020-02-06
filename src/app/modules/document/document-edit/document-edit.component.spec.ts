@@ -502,9 +502,6 @@ describe('DocumentEditComponent', () => {
         expect(componentUnderTest.updateDocument).toHaveBeenCalled();
       });
     });
-<<<<<<< HEAD
-  }); */
-=======
   });
 
   describe('METHOD saveDocument', () => {
@@ -591,7 +588,6 @@ describe('DocumentEditComponent', () => {
       expect(routerSpy.navigate).toHaveBeenCalledWith(['../document/1/edit']);
     });
   });
->>>>>>> a08431ecc957ea6372650292f57a02c724e88f88
 
   describe('METHOD updateDocument', () => {
     Given(() => {
@@ -634,4 +630,6 @@ describe('DocumentEditComponent', () => {
       expect(componentUnderTest.isLoading).toBe(false);
     });
   });
+
+*/
 });
