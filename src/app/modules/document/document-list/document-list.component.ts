@@ -104,9 +104,12 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   private initDocumentList(result: any) {
+    console.log('++++++++++++++++++++++ RESULT');
+    console.log(result);
     this.currentUserId = this.authService.getCurrentUserID();
     this.documents = result;
-
+    console.log(this.documents.length);
+    console.log(this.documents.values);
     this.documentService.joinOwnerDataToNorm(this.documents, this.owners);
     this.documents = this.documentService.filterDocumentsByAccess(
       this.documents
@@ -175,7 +178,6 @@ export class DocumentListComponent implements OnInit, OnDestroy {
   }
 
   public onFilter(event: any): void {
-    console.log(event);
     // Check for simple ASCII Characters and give warning
     if (!_.isEmpty(event.filters.global)) {
       this.filterInputCheck = this.documentService.checkASCIIRange(

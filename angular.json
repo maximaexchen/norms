@@ -146,7 +146,7 @@
               "node_modules/chart.js/dist/Chart.js",
               "node_modules/quill/dist/quill.js"
             ],
-            "codeCoverage": true
+            "codeCoverage": false
           }
         },
         "lint": {
